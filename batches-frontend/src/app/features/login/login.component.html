@@ -1,0 +1,93 @@
+<div class="auth-wrapper">
+  <div class="square-top-right-blue" [class.animate]="animate"></div>
+  <div class="square-top-right-green" [class.animate]="animate"></div>
+
+  <div class="square-bottom-left-blue" [class.animate]="animate"></div>
+  <div class="square-bottom-left-green" [class.animate]="animate"></div>
+
+  <div class="auth-content text-center">
+    <div class="logo" [class.animate]="animate">
+      <div class="logo-partx part-1" [class.animate]="animate"></div>
+      <div class="logo-partx part-2" [class.animate]="animate"></div>
+    </div>
+
+    <div class="form-container" [class.animate]="animate">
+      <div class="form-title">
+        <span>S'identifier</span>
+      </div>
+      <form [formGroup]="form">
+        <label for="identifiant">Identifiant</label>
+        <div class="input-group" [class.has-error]="usernameError">
+          <input
+            type="text"
+            id="identifiant"
+            formControlName="username"
+            [class.error]="usernameError"
+            (keydown)="onCapsLockChange($event.getModifierState('CapsLock'))"
+          />
+          <i class="icon pi pi-user"></i>
+        </div>
+        <div class="field-error" *ngIf="usernameError">
+          {{ errorMessage }}
+        </div>
+
+        <label for="password">Mot de passe</label>
+        <div class="input-group" [class.has-error]="passwordError">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            [class.error]="passwordError"
+            (keydown)="onCapsLockChange($event.getModifierState('CapsLock'))"
+          />
+          <i
+            class="icon pi"
+            [class.pi-eye-slash]="!showPassword"
+            [class.pi-eye]="showPassword"
+            (click)="togglePasswordVisibility()"
+            style="cursor: pointer;"
+          ></i>
+        </div>
+        <div class="field-error" *ngIf="passwordError">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          class="login-btn"
+          type="submit"
+          (click)="onSubmit()"
+          [disabled]="loading || usernameError || form.invalid"
+        >
+          <span *ngIf="!loading">Se connecter</span>
+          <span *ngIf="loading">
+            <i class="pi pi-spin pi-spinner"></i> Connexion...
+          </span>
+        </button>
+
+        @if (capsLockOn()) {
+        <div class="caps-lock-warning-bna">
+          <div class="wave-border"></div>
+          <div class="glow-pulse"></div>
+          <div class="content-flex">
+            <div class="icon-container">
+              <i class="pi pi-lock"></i>
+              <span class="icon-ring"></span>
+            </div>
+            <div class="text-content">
+              <span class="warning-text">La touche Verr. Maj est</span>
+              <span class="status-text">ACTIVÉ</span>
+            </div>
+          </div>
+        </div>
+        }
+      </form>
+    </div>
+  </div>
+
+  <div class="logo-container" [class.animate]="animate">
+    <img class="logo-name" src="assets/images/BNAF.png" alt="Logo BNA" />
+    <div>
+      <span class="project-name">{{ nameAPP }}</span>
+    </div>
+  </div>
+</div>

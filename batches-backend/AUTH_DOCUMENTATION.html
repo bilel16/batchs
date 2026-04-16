@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation Authentification — BATCHES</title>
+  <style>
+    :root {
+      --primary:    #162636;
+      --accent:     #37978f;
+      --accent2:    #06534d;
+      --bg:         #f4f6f9;
+      --card:       #ffffff;
+      --text:       #2c3e50;
+      --muted:      #6c757d;
+      --border:     #dee2e6;
+      --success:    #28a745;
+      --warning:    #ffc107;
+      --danger:     #dc3545;
+      --info:       #17a2b8;
+      --code-bg:    #1e2d3d;
+      --code-text:  #e8f4f8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 2.5rem 3rem;
+      border-bottom: 5px solid var(--accent);
+    }
+    header h1 { font-size: 2rem; letter-spacing: .1rem; }
+    header p  { opacity: .8; margin-top: .4rem; font-size: 1rem; }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: .2rem .75rem;
+      border-radius: 20px;
+      font-size: .8rem;
+      margin-top: .6rem;
+      margin-right: .3rem;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .toc h2 { margin-bottom: 1rem; color: var(--accent2); }
+    .toc ol { padding-left: 1.5rem; }
+    .toc li { margin: .4rem 0; }
+    .toc a  { color: var(--accent2); text-decoration: none; font-weight: 500; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── SECTIONS ── */
+    section {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      border: 1px solid var(--border);
+    }
+    section h2 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: .5rem;
+      margin-bottom: 1.5rem;
+    }
+    section h3 {
+      font-size: 1.15rem;
+      color: var(--accent2);
+      margin: 1.5rem 0 .6rem;
+    }
+    p { margin-bottom: .8rem; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .5rem;
+      margin: 1.5rem 0;
+    }
+    .flow-step {
+      background: var(--primary);
+      color: white;
+      padding: .6rem 1rem;
+      border-radius: 8px;
+      font-size: .875rem;
+      font-weight: 600;
+      text-align: center;
+      min-width: 130px;
+    }
+    .flow-step.green   { background: var(--accent2); }
+    .flow-step.teal    { background: var(--accent); }
+    .flow-step.warning { background: var(--warning); color: #333; }
+    .flow-step.danger  { background: var(--danger); }
+    .flow-arrow { font-size: 1.4rem; color: var(--muted); }
+
+    /* ── CODE BLOCKS ── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: .875rem;
+      line-height: 1.6;
+      margin: 1rem 0;
+      position: relative;
+    }
+    code { font-family: 'Consolas', 'Courier New', monospace; }
+    .lang-label {
+      position: absolute;
+      top: .5rem;
+      right: .75rem;
+      font-size: .7rem;
+      color: var(--accent);
+      font-weight: bold;
+      letter-spacing: .05rem;
+    }
+    .inline-code {
+      background: #e8f4f8;
+      color: var(--accent2);
+      padding: .1rem .4rem;
+      border-radius: 4px;
+      font-family: 'Consolas', monospace;
+      font-size: .9em;
+    }
+
+    /* ── FILE CARDS ── */
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .file-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      background: #f8fafb;
+      border-left: 4px solid var(--accent);
+    }
+    .file-card.backend { border-left-color: var(--primary); }
+    .file-card.frontend { border-left-color: var(--accent); }
+    .file-card .path {
+      font-family: 'Consolas', monospace;
+      font-size: .78rem;
+      color: var(--muted);
+      word-break: break-all;
+      margin-bottom: .4rem;
+    }
+    .file-card .name {
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .35rem;
+    }
+    .file-card .desc { font-size: .88rem; color: var(--muted); }
+
+    /* ── TABLES ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: .9rem;
+    }
+    th {
+      background: var(--primary);
+      color: white;
+      padding: .75rem 1rem;
+      text-align: left;
+    }
+    td {
+      padding: .65rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:nth-child(even) td { background: #f8f9fa; }
+
+    /* ── ALERTS ── */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      font-size: .92rem;
+      border-left: 5px solid;
+    }
+    .alert.info    { background: #e8f4f8; border-color: var(--info); }
+    .alert.success { background: #e8f6e9; border-color: var(--success); }
+    .alert.warning { background: #fff8e1; border-color: var(--warning); }
+    .alert.danger  { background: #fdecea; border-color: var(--danger); }
+    .alert strong  { display: block; margin-bottom: .25rem; }
+
+    /* ── STEPS ── */
+    .steps { counter-reset: step; margin: 1rem 0; }
+    .step  {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+    .step-num {
+      counter-increment: step;
+      background: var(--accent2);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+      font-size: .9rem;
+    }
+    .step-body { flex: 1; }
+    .step-body strong { display: block; margin-bottom: .2rem; color: var(--primary); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: .88rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<header>
+  <h1>🔐 Documentation Authentification — BATCHES</h1>
+  <p>Guide complet pour les développeurs débutants : comment fonctionne la sécurité et où toucher</p>
+  <span class="badge">Spring Boot 3</span>
+  <span class="badge">Angular 20</span>
+  <span class="badge">JWT HS512</span>
+  <span class="badge">Oracle DB</span>
+</header>
+
+<div class="container">
+
+  <!-- ═══════════════════ TABLE DES MATIÈRES ═══════════════════ -->
+  <div class="toc">
+    <h2>📋 Table des matières</h2>
+    <ol>
+      <li><a href="#concept">C'est quoi l'authentification JWT ?</a></li>
+      <li><a href="#flow">Flux complet d'authentification (schéma)</a></li>
+      <li><a href="#backend">Backend — Comment ça marche étape par étape</a></li>
+      <li><a href="#frontend">Frontend — Comment ça marche étape par étape</a></li>
+      <li><a href="#files">Tous les fichiers importants et leur rôle</a></li>
+      <li><a href="#config">Configuration : les variables d'environnement</a></li>
+      <li><a href="#scenarios">Scénarios courants : que se passe-t-il quand...</a></li>
+      <li><a href="#modify">Où toucher si vous voulez modifier...</a></li>
+      <li><a href="#debug">Comment déboguer un problème d'authentification</a></li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════════ 1. CONCEPT JWT ═══════════════════ -->
+  <section id="concept">
+    <h2>1 — C'est quoi l'authentification JWT ?</h2>
+
+    <p>JWT signifie <strong>JSON Web Token</strong>. C'est une façon de prouver son identité sans stocker de session côté serveur.</p>
+
+    <div class="alert info">
+      <strong>💡 Analogie simple</strong>
+      Imaginez un badge d'entrée dans un immeuble. Quand vous vous connectez, le serveur vous donne un badge (le token JWT). À chaque fois que vous essayez d'accéder à une ressource protégée, vous montrez votre badge. Le serveur <em>vérifie</em> le badge mais n'a pas besoin de se souvenir de vous (stateless = sans état).
+    </div>
+
+    <h3>Structure d'un token JWT</h3>
+    <p>Un token JWT est composé de 3 parties séparées par des points <span class="inline-code">.</span> :</p>
+    <pre><code>eyJhbGciOiJIUzUxMiJ9   ←  HEADER  (algorithme : HS512)
+.
+eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdfQ  ←  PAYLOAD (données : username, rôles, expiration)
+.
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c  ←  SIGNATURE (vérification d'intégrité)</code></pre>
+
+    <div class="alert warning">
+      <strong>⚠️ Important</strong>
+      Le PAYLOAD est encodé en Base64 — il n'est <strong>PAS chiffré</strong>. N'y mettez jamais de mot de passe. La SIGNATURE, elle, garantit que le token n'a pas été modifié.
+    </div>
+
+    <table>
+      <tr><th>Propriété</th><th>Valeur dans BATCHES</th><th>Explication</th></tr>
+      <tr><td>Algorithme</td><td>HS512</td><td>HMAC avec SHA-512 (clé ≥ 512 bits)</td></tr>
+      <tr><td>Durée de vie</td><td>1 heure (3 600 000 ms)</td><td>Après 1h, le token expire → reconnexion obligatoire</td></tr>
+      <tr><td>Clé secrète</td><td>Variable <span class="inline-code">BATCHES_JWT_SECRET</span></td><td>Clé Base64 de 64 octets minimum</td></tr>
+      <tr><td>Contenu</td><td>username + rôles (profils) + expiration</td><td>Stocké dans le PAYLOAD du JWT</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════ 2. FLUX COMPLET ═══════════════════ -->
+  <section id="flow">
+    <h2>2 — Flux complet d'authentification (schéma)</h2>
+
+    <h3>Phase 1 : Connexion (Login)</h3>
+    <div class="flow">
+      <div class="flow-step teal">Navigateur<br/>(Angular)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">POST /authenticate<br/>{username, password}</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step green">AuthController<br/>(Spring Boot)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step warning">Serveur Auth<br/>Externe (urlAuth)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step green">Génère JWT<br/>+ Retourne Token</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step teal">Angular stocke<br/>le token</div>
+    </div>
+
+    <h3>Phase 2 : Accès à une ressource protégée</h3>
+    <div class="flow">
+      <div class="flow-step teal">Angular envoie<br/>Bearer Token</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">JwtRequestFilter<br/>(filtre Spring)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step warning">Serveur Rôles<br/>Externe (urlroles)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step green">Valide token<br/>+ Autorise requête</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step teal">Réponse<br/>API reçue</div>
+    </div>
+
+    <h3>Phase 3 : Token expiré ou invalide</h3>
+    <div class="flow">
+      <div class="flow-step teal">Angular envoie<br/>requête</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step danger">401 Unauthorized<br/>(token expiré)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step teal">authInterceptor<br/>détecte 401</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step teal">Efface token<br/>→ redirige /login</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ 3. BACKEND ═══════════════════ -->
+  <section id="backend">
+    <h2>3 — Backend : Comment ça marche étape par étape</h2>
+
+    <h3>Étape 1 — L'utilisateur envoie ses identifiants</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>POST /authenticate</strong>
+          Angular envoie une requête HTTP POST avec <span class="inline-code">{"username": "admin", "password": "admin123"}</span>.
+          Cette URL est <em>publique</em> (pas besoin de token).
+        </div>
+      </div>
+    </div>
+
+    <h3>Étape 2 — AuthController appelle le serveur externe</h3>
+    <p>Fichier : <span class="inline-code">controllers/AuthController.java</span></p>
+    <pre><code class="java"><span class="lang-label">JAVA</span>// Le controller encode les identifiants en Base64
+String credentials = username + ":" + password;
+String encoded = Base64.getEncoder().encodeToString(credentials.getBytes());
+
+// Il appelle le serveur d'authentification externe (urlAuth)
+HttpHeaders headers = new HttpHeaders();
+headers.set("Authorization", "Basic " + encoded);  // ← Basic Auth
+
+AuthUser body = new AuthUser(clientIp, codeApp);    // ← IP + code application
+AuthResponse response = restTemplate.postForObject(urlAuth, entity, AuthResponse.class);</code></pre>
+
+    <div class="alert info">
+      <strong>💡 Pourquoi Base64 ?</strong>
+      Le serveur externe attend les identifiants en HTTP Basic Authentication, ce qui utilise le format Base64. Ce n'est pas du chiffrement — c'est un encodage standard.
+    </div>
+
+    <h3>Étape 3 — Le serveur externe répond avec les données de l'utilisateur</h3>
+    <pre><code class="json"><span class="lang-label">JSON — Réponse du serveur externe</span>{
+  "returnCode": 0,           ←  0 = succès, autre = erreur
+  "message": "OK",
+  "habilData": {
+    "nom": "Ben Ali",
+    "prenom": "Ahmed",
+    "mail": "ahmed@bna.tn",
+    "codeStructure": "001",
+    "profils": [
+      {
+        "codeProfil": "ROLE_ADMIN",
+        "menus": [{"codeMenu": "MENU_DASHBOARD"}, ...]
+      }
+    ]
+  }
+}</code></pre>
+
+    <h3>Étape 4 — Génération du JWT</h3>
+    <p>Fichier : <span class="inline-code">security/jwt/JwtTokenUtil.java</span></p>
+    <pre><code class="java"><span class="lang-label">JAVA</span>// Les profils deviennent des "authorities" Spring Security
+List&lt;SimpleGrantedAuthority&gt; authorities = profils.stream()
+    .map(ProfilBatches::getCodeProfil)
+    .map(SimpleGrantedAuthority::new)
+    .toList();
+
+// On crée un UserDetails Spring
+UserDetails userDetails = new User(username, email, authorities);
+
+// JwtTokenUtil génère le token signé avec HS512
+String token = jwtTokenUtil.generateToken(userDetails);
+// → "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImFkbWluIi4uLn0.SIGNATURE"</code></pre>
+
+    <h3>Étape 5 — Réponse envoyée à Angular</h3>
+    <pre><code class="json"><span class="lang-label">JSON — JwtResponse envoyé au frontend</span>{
+  "token":         "eyJhbGciOiJIUzUxMiJ9...",
+  "username":      "admin",
+  "nom":           "Ben Ali",
+  "prenom":        "Ahmed",
+  "email":         "ahmed@bna.tn",
+  "codeStructure": "001",
+  "profils":       "[{\"codeProfil\":\"ROLE_ADMIN\",\"menus\":[...]}]",
+  "poste":         "Directeur",
+  "codePoste":     "DIR001"
+}</code></pre>
+
+    <h3>Étape 6 — Filtre JWT sur chaque requête suivante</h3>
+    <p>Fichier : <span class="inline-code">security/filter/JwtRequestFilter.java</span></p>
+    <p>Ce filtre s'exécute <strong>automatiquement</strong> sur chaque requête HTTP (sauf /authenticate) :</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>Lire le header Authorization</strong> — Cherche <span class="inline-code">Bearer eyJhbGci...</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>Extraire le username</strong> — Décode le JWT pour lire le <span class="inline-code">subject</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>Appeler urlroles</strong> — Récupère les rôles actuels de l'utilisateur depuis le serveur externe</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body"><strong>Valider le token</strong> — Compare les rôles du token avec les rôles frais + vérifie l'expiration</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body"><strong>Autoriser ou bloquer</strong> — Si tout est OK → continue. Sinon → 401 Unauthorized</div>
+      </div>
+    </div>
+
+    <h3>Gestion des erreurs 401 et 403</h3>
+    <table>
+      <tr><th>Code</th><th>Fichier responsable</th><th>Quand ?</th></tr>
+      <tr>
+        <td><span class="inline-code">401 Unauthorized</span></td>
+        <td><span class="inline-code">JwtAuthenticationEntryPoint.java</span></td>
+        <td>Requête sans token ou token invalide</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">403 Forbidden</span></td>
+        <td><span class="inline-code">JwtAccessDeniedHandler.java</span></td>
+        <td>Token valide mais rôle insuffisant</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">Token expiré</span></td>
+        <td><span class="inline-code">JwtRequestFilter.java</span></td>
+        <td>Token valide mais délai de 1h dépassé</td>
+      </tr>
+    </table>
+
+    <h3>URLs publiques (sans token)</h3>
+    <p>Fichier : <span class="inline-code">config/security/SecurityConstants.java</span></p>
+    <pre><code class="java"><span class="lang-label">JAVA</span>public static final List&lt;String&gt; PUBLIC_URLS = List.of(
+    "/authenticate",       // ← login
+    "/api/authenticate",
+    "/h2-console/**",      // ← console DB (dev seulement)
+    "/swagger-ui/**",      // ← documentation API
+    "/v3/api-docs/**",
+    "/actuator/**",        // ← monitoring
+    "/error"
+);</code></pre>
+  </section>
+
+  <!-- ═══════════════════ 4. FRONTEND ═══════════════════ -->
+  <section id="frontend">
+    <h2>4 — Frontend Angular : Comment ça marche étape par étape</h2>
+
+    <h3>Vue d'ensemble des services Angular impliqués</h3>
+    <div class="file-grid">
+      <div class="file-card frontend">
+        <div class="name">AuthService</div>
+        <div class="path">core/services/backend/auth.service.ts</div>
+        <div class="desc">Fait l'appel HTTP POST /authenticate et stocke le résultat</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">AuthSignalService</div>
+        <div class="path">core/services/frontend/auth-signal.service.ts</div>
+        <div class="desc">Gère l'état de connexion avec des Signals Angular (token, user, menus)</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">authInterceptor</div>
+        <div class="path">core/interceptors/auth.interceptor.ts</div>
+        <div class="desc">Ajoute automatiquement le token à chaque requête HTTP</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">authGuard</div>
+        <div class="path">core/guards/auth.guard.ts</div>
+        <div class="desc">Protège les routes : redirige vers /login si non connecté</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">loginGuard</div>
+        <div class="path">core/guards/login.guard.ts</div>
+        <div class="desc">Redirige vers /dashboard si déjà connecté (évite de voir login)</div>
+      </div>
+    </div>
+
+    <h3>Étape 1 — L'utilisateur soumet le formulaire</h3>
+    <p>Fichier : <span class="inline-code">features/login/login.component.ts</span></p>
+    <pre><code class="typescript"><span class="lang-label">TYPESCRIPT</span>onSubmit(): void {
+  this.loading = true;
+  const { username, password } = this.form.value;
+
+  this.authService.login(username, password).subscribe({
+    next: () => this.handleLoginSuccess(),   // ← succès → animation + navigate
+    error: (err) => this.handleLoginError(err) // ← erreur → affiche message
+  });
+}</code></pre>
+
+    <h3>Étape 2 — AuthService envoie la requête et stocke le résultat</h3>
+    <pre><code class="typescript"><span class="lang-label">TYPESCRIPT</span>login(username: string, password: string): Observable&lt;any&gt; {
+  return this.http
+    .post(environment.apiURL + 'authenticate', { username, password })
+    .pipe(
+      map(response =&gt; {
+        this.handleTokenResponse(response); // ← stocke token + user
+        return response;
+      })
+    );
+}
+
+private handleTokenResponse(response: any): void {
+  // 1. Stocke le token JWT
+  this.auth.setToken(response.token);
+
+  // 2. Stocke les infos utilisateur
+  const user = {
+    username: response.username,
+    nom: response.nom,
+    prenom: response.prenom,
+    email: response.email,
+    roles: this.parseRoles(response.roles)
+  };
+  this.auth.setUser(user);
+
+  // 3. Stocke les menus autorisés
+  this.auth.setMenus(this.extractMenus(response.roles));
+}</code></pre>
+
+    <h3>Étape 3 — AuthSignalService persiste l'état dans sessionStorage</h3>
+    <pre><code class="typescript"><span class="lang-label">TYPESCRIPT</span>// Fichier : auth-signal.service.ts
+// Angular Signals = variables réactives (comme useState en React)
+
+readonly user  = signal&lt;User | null&gt;(null);  // ← état de l'utilisateur
+readonly token = signal&lt;string | null&gt;(null); // ← le JWT
+readonly menus = signal&lt;string[]&gt;([]);         // ← menus autorisés
+
+// Calculé automatiquement depuis user + token
+readonly isLoggedIn = computed(() =&gt; !!(this.user() &amp;&amp; this.token()));
+
+// Chaque modification de signal → sauvegarde automatique dans sessionStorage
+effect(() =&gt; {
+  const state = { user: this.user(), token: this.token(), menus: this.menus() };
+  sessionStorage.setItem('__auth_batches', JSON.stringify(state));
+});</code></pre>
+
+    <div class="alert info">
+      <strong>💡 Pourquoi sessionStorage et non localStorage ?</strong>
+      sessionStorage est effacé quand l'onglet du navigateur se ferme. C'est plus sécurisé car si quelqu'un ferme le navigateur, le token ne reste pas.
+    </div>
+
+    <h3>Étape 4 — L'intercepteur ajoute le token à chaque requête</h3>
+    <pre><code class="typescript"><span class="lang-label">TYPESCRIPT</span>// Fichier : auth.interceptor.ts
+// Ce code s'exécute AUTOMATIQUEMENT avant CHAQUE requête HTTP
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = inject(AuthSignalService).token();
+
+  // Ne pas ajouter le token pour le login
+  const skip = req.url.includes('/authenticate');
+
+  if (!skip &amp;&amp; token) {
+    // Clone la requête et ajoute le header Authorization
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+      //  ↑ ce que le backend attend dans le filtre JWT
+    });
+  }
+
+  return next(req).pipe(
+    catchError(err =&gt; {
+      if (err.status === 401) {
+        // Token expiré ou invalide → déconnexion automatique
+        auth.clear();
+        router.navigate(['/login']);
+      }
+      return throwError(() =&gt; err);
+    })
+  );
+};</code></pre>
+
+    <h3>Étape 5 — Les Guards protègent les routes</h3>
+    <pre><code class="typescript"><span class="lang-label">TYPESCRIPT</span>// Fichier : app-routing-module.ts
+const routes: Routes = [
+  { path: 'login',     canActivate: [loginGuard], ... }, // ← si déjà connecté → /dashboard
+  { path: 'dashboard', canActivate: [authGuard],  ... }, // ← si pas connecté  → /login
+];
+
+// authGuard : vérifie auth.isLoggedIn()
+export const authGuard: CanActivateFn = () =&gt; {
+  if (auth.isLoggedIn()) return true;
+  router.navigate(['/login']);
+  return false;
+};</code></pre>
+
+    <h3>Animation de connexion (login → dashboard)</h3>
+    <p>Quand la connexion réussit, une animation s'exécute pendant <strong>~3 secondes</strong> avant de naviguer vers le dashboard :</p>
+    <pre><code class="typescript"><span class="lang-label">TYPESCRIPT</span>private handleLoginSuccess(): void {
+  this.animate = true;        // ← déclenche les animations CSS (carrés qui grandissent)
+  setTimeout(() =&gt; {
+    this.router.navigate(['dashboard']); // ← navigation après 2980ms
+  }, 2980); // ← cette valeur = ANIMATION_DURATION
+}</code></pre>
+  </section>
+
+  <!-- ═══════════════════ 5. FICHIERS IMPORTANTS ═══════════════════ -->
+  <section id="files">
+    <h2>5 — Tous les fichiers importants et leur rôle</h2>
+
+    <h3>🖥️ Backend (Spring Boot)</h3>
+    <div class="file-grid">
+      <div class="file-card backend">
+        <div class="name">AuthController.java</div>
+        <div class="path">controllers/AuthController.java</div>
+        <div class="desc">Point d'entrée du login. Appelle le serveur externe, génère le JWT, retourne la réponse.</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">JwtTokenUtil.java</div>
+        <div class="path">security/jwt/JwtTokenUtil.java</div>
+        <div class="desc">Génère, signe, et valide les tokens JWT. Contient la logique HS512.</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">JwtRequestFilter.java</div>
+        <div class="path">security/filter/JwtRequestFilter.java</div>
+        <div class="desc">Filtre exécuté sur chaque requête. Valide le token + récupère les rôles.</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">SecurityConfiguration.java</div>
+        <div class="path">config/security/SecurityConfiguration.java</div>
+        <div class="desc">Configure Spring Security : quelles URLs sont publiques, CORS, session stateless.</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">SecurityConstants.java</div>
+        <div class="path">config/security/SecurityConstants.java</div>
+        <div class="desc">Liste des URLs publiques (sans authentification requise).</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">JwtAuthenticationEntryPoint.java</div>
+        <div class="path">security/handler/JwtAuthenticationEntryPoint.java</div>
+        <div class="desc">Retourne 401 JSON quand une requête non authentifiée arrive sur une URL protégée.</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">GlobalExceptionHandler.java</div>
+        <div class="path">controllers/GlobalExceptionHandler.java</div>
+        <div class="desc">Intercepte toutes les exceptions et retourne des messages JSON lisibles.</div>
+      </div>
+      <div class="file-card backend">
+        <div class="name">application.properties</div>
+        <div class="path">src/main/resources/application.properties</div>
+        <div class="desc">Toute la configuration : port, DB Oracle, urlAuth, urlroles, JWT secret.</div>
+      </div>
+    </div>
+
+    <h3>🌐 Frontend (Angular)</h3>
+    <div class="file-grid">
+      <div class="file-card frontend">
+        <div class="name">login.component.ts</div>
+        <div class="path">features/login/login.component.ts</div>
+        <div class="desc">Logique du formulaire de connexion, gestion des erreurs, animation.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">login.component.html</div>
+        <div class="path">features/login/login.component.html</div>
+        <div class="desc">Template HTML du formulaire avec les bindings Angular.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">login.component.scss</div>
+        <div class="path">features/login/login.component.scss</div>
+        <div class="desc">Tous les styles + animations CSS de la page de connexion.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">auth.service.ts</div>
+        <div class="path">core/services/backend/auth.service.ts</div>
+        <div class="desc">Appels HTTP vers /authenticate. Parse et stocke la réponse JWT.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">auth-signal.service.ts</div>
+        <div class="path">core/services/frontend/auth-signal.service.ts</div>
+        <div class="desc">Store réactif (Signals). Contient user, token, menus. Persiste dans sessionStorage.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">auth.interceptor.ts</div>
+        <div class="path">core/interceptors/auth.interceptor.ts</div>
+        <div class="desc">Injecte automatiquement le Bearer token dans chaque requête HTTP.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">auth.guard.ts</div>
+        <div class="path">core/guards/auth.guard.ts</div>
+        <div class="desc">Protège /dashboard. Redirige vers /login si non authentifié.</div>
+      </div>
+      <div class="file-card frontend">
+        <div class="name">environment.ts</div>
+        <div class="path">environments/environment.ts</div>
+        <div class="desc">URL de l'API backend. Changer ici pour pointer vers un autre serveur.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ 6. CONFIGURATION ═══════════════════ -->
+  <section id="config">
+    <h2>6 — Configuration : les variables d'environnement</h2>
+
+    <div class="alert warning">
+      <strong>⚠️ Ne jamais mettre des mots de passe ou secrets dans le code source !</strong>
+      Toutes les informations sensibles passent par des variables d'environnement (préfixées <span class="inline-code">BATCHES_</span>).
+    </div>
+
+    <table>
+      <tr>
+        <th>Variable</th>
+        <th>Obligatoire</th>
+        <th>Exemple</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_DB_URL</span></td>
+        <td>✅ Oui</td>
+        <td><span class="inline-code">jdbc:oracle:thin:@10.1.9.10:1521:BNADB</span></td>
+        <td>URL de la base Oracle</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_DB_USERNAME</span></td>
+        <td>✅ Oui</td>
+        <td><span class="inline-code">batches_user</span></td>
+        <td>Utilisateur Oracle</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_DB_PASSWORD</span></td>
+        <td>✅ Oui</td>
+        <td><span class="inline-code">********</span></td>
+        <td>Mot de passe Oracle</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_URL_AUTH</span></td>
+        <td>✅ Oui</td>
+        <td><span class="inline-code">http://10.1.9.221:8082/authenticate</span></td>
+        <td>URL du serveur d'authentification externe</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_URL_ROLES</span></td>
+        <td>✅ Oui</td>
+        <td><span class="inline-code">http://10.1.9.221:8082/roles</span></td>
+        <td>URL du serveur de rôles externe</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_CODE_APP</span></td>
+        <td>⬜ Non (défaut: BATCHES)</td>
+        <td><span class="inline-code">BATCHES</span></td>
+        <td>Code de l'application dans le serveur auth</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_JWT_SECRET</span></td>
+        <td>⬜ Non (défaut fourni)</td>
+        <td>Clé Base64 de 64 octets min</td>
+        <td>Clé secrète pour signer les JWT (à changer en prod !)</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_SERVER_PORT</span></td>
+        <td>⬜ Non (défaut: 8000)</td>
+        <td><span class="inline-code">8000</span></td>
+        <td>Port du serveur Spring Boot</td>
+      </tr>
+      <tr>
+        <td><span class="inline-code">BATCHES_ENV</span></td>
+        <td>⬜ Non (défaut: dev)</td>
+        <td><span class="inline-code">dev</span> ou <span class="inline-code">prod</span></td>
+        <td>En dev → utilise local.ip. En prod → utilise l'IP réelle du client</td>
+      </tr>
+    </table>
+
+    <h3>Comment définir ces variables ?</h3>
+    <pre><code><span class="lang-label">WINDOWS — CMD</span>set BATCHES_URL_AUTH=http://10.1.9.221:8082/authenticate
+set BATCHES_DB_URL=jdbc:oracle:thin:@10.1.9.10:1521:BNADB
+mvn spring-boot:run</code></pre>
+    <pre><code><span class="lang-label">LINUX / MAC</span>export BATCHES_URL_AUTH=http://10.1.9.221:8082/authenticate
+export BATCHES_DB_URL=jdbc:oracle:thin:@10.1.9.10:1521:BNADB
+mvn spring-boot:run</code></pre>
+  </section>
+
+  <!-- ═══════════════════ 7. SCÉNARIOS ═══════════════════ -->
+  <section id="scenarios">
+    <h2>7 — Scénarios courants : que se passe-t-il quand...</h2>
+
+    <h3>✅ Connexion réussie</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">Angular envoie POST /authenticate → Backend appelle urlAuth → returnCode=0</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">JWT généré → renvoyé à Angular → stocké dans sessionStorage</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">Animation de 3s → navigation vers /dashboard</div></div>
+    </div>
+
+    <h3>❌ Mauvais mot de passe</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">Backend appelle urlAuth → returnCode ≠ 0, message = "Mot de passe invalide"</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">AuthController lance une AuthenticationException avec ce message</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">GlobalExceptionHandler retourne <span class="inline-code">{"message": "Mot de passe invalide", "status": "401"}</span></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body">Angular affiche le message sous le champ mot de passe avec animation shake</div></div>
+    </div>
+
+    <h3>⏱️ Token expiré (après 1 heure)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">Angular envoie une requête avec un token expiré</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">JwtRequestFilter détecte ExpiredJwtException → retourne 401 avec message "Token expired"</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">authInterceptor Angular détecte l'erreur 401 → appelle auth.clear() → redirige /login</div></div>
+    </div>
+
+    <h3>🔄 Rechargement de page (F5)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">AuthSignalService s'initialise → lit sessionStorage → recharge user + token + menus</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">isLoggedIn() retourne true → authGuard laisse passer → dashboard affiché</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ 8. OÙ TOUCHER ═══════════════════ -->
+  <section id="modify">
+    <h2>8 — Où toucher si vous voulez modifier...</h2>
+
+    <table>
+      <tr><th>Objectif</th><th>Fichier(s) à modifier</th><th>Ce qu'il faut changer</th></tr>
+      <tr>
+        <td>Changer la durée du token JWT</td>
+        <td><span class="inline-code">application.properties</span></td>
+        <td>Modifier <span class="inline-code">jwt.expiration=3600000</span> (en ms)</td>
+      </tr>
+      <tr>
+        <td>Ajouter une nouvelle URL publique (sans auth)</td>
+        <td><span class="inline-code">SecurityConstants.java</span></td>
+        <td>Ajouter le chemin dans <span class="inline-code">PUBLIC_URLS</span></td>
+      </tr>
+      <tr>
+        <td>Modifier le message d'erreur de connexion</td>
+        <td><span class="inline-code">login.component.ts</span></td>
+        <td>Méthode <span class="inline-code">handleLoginError()</span></td>
+      </tr>
+      <tr>
+        <td>Changer le design de la page login</td>
+        <td><span class="inline-code">login.component.html</span> et <span class="inline-code">login.component.scss</span></td>
+        <td>HTML + styles CSS/SCSS</td>
+      </tr>
+      <tr>
+        <td>Changer la durée de l'animation login→dashboard</td>
+        <td><span class="inline-code">login.component.ts</span></td>
+        <td>Modifier <span class="inline-code">ANIMATION_DURATION = 2980</span></td>
+      </tr>
+      <tr>
+        <td>Changer l'URL du backend</td>
+        <td><span class="inline-code">environments/environment.ts</span></td>
+        <td>Modifier <span class="inline-code">apiURL</span></td>
+      </tr>
+      <tr>
+        <td>Ajouter une route protégée</td>
+        <td><span class="inline-code">app-routing-module.ts</span></td>
+        <td>Ajouter <span class="inline-code">canActivate: [authGuard]</span> sur la route</td>
+      </tr>
+      <tr>
+        <td>Accéder à l'utilisateur connecté dans un composant</td>
+        <td>N'importe quel composant</td>
+        <td>Injecter <span class="inline-code">AuthSignalService</span> et utiliser <span class="inline-code">auth.user()</span></td>
+      </tr>
+      <tr>
+        <td>Vérifier si l'utilisateur a un rôle</td>
+        <td>N'importe où</td>
+        <td><span class="inline-code">auth.hasRole('ROLE_ADMIN')</span></td>
+      </tr>
+      <tr>
+        <td>Ajouter un endpoint protégé (backend)</td>
+        <td>Nouveau Controller</td>
+        <td>Simplement créer un <span class="inline-code">@RestController</span> — le filtre JWT protège tout automatiquement</td>
+      </tr>
+      <tr>
+        <td>Forcer un rôle spécifique sur un endpoint</td>
+        <td>Le Controller concerné</td>
+        <td>Ajouter <span class="inline-code">@PreAuthorize("hasAuthority('ROLE_ADMIN')")</span></td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════ 9. DÉBOGAGE ═══════════════════ -->
+  <section id="debug">
+    <h2>9 — Comment déboguer un problème d'authentification</h2>
+
+    <h3>Problème : "Une erreur est survenue lors de la connexion"</h3>
+    <div class="alert danger">
+      <strong>Cause probable :</strong> Le serveur d'authentification externe (urlAuth) est inaccessible.
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">Vérifier que <span class="inline-code">BATCHES_URL_AUTH</span> est défini et accessible</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">Regarder les logs Spring Boot : chercher <span class="inline-code">ERROR AuthController</span></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">Tester manuellement avec Postman : POST sur urlAuth avec Basic Auth</div></div>
+    </div>
+
+    <h3>Problème : WeakKeyException (JWT)</h3>
+    <div class="alert danger">
+      <strong>Cause :</strong> La clé JWT fait moins de 512 bits (64 octets décodés en Base64).
+    </div>
+    <pre><code><span class="lang-label">NODE.JS — Générer une clé valide</span>node -e "const c=require('crypto'); console.log(c.randomBytes(64).toString('base64'));"
+# → Copier le résultat dans BATCHES_JWT_SECRET</code></pre>
+
+    <h3>Problème : 401 sur toutes les requêtes après connexion</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">Ouvrir DevTools (F12) → onglet Network → regarder les headers de la requête</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">Vérifier que le header <span class="inline-code">Authorization: Bearer eyJ...</span> est bien présent</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">Si absent → problème dans <span class="inline-code">auth.interceptor.ts</span> ou token non stocké</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body">Si présent mais 401 → vérifier que <span class="inline-code">urlroles</span> répond correctement</div></div>
+    </div>
+
+    <h3>Commandes utiles pour vérifier un token JWT</h3>
+    <pre><code><span class="lang-label">NAVIGATEUR — Console JavaScript</span>// Lire le token stocké
+const raw = sessionStorage.getItem('__auth_batches');
+const state = JSON.parse(raw);
+console.log('Token:', state.token);
+console.log('User:', state.user);
+
+// Décoder le payload du JWT (sans vérification de signature)
+const payload = JSON.parse(atob(state.token.split('.')[1]));
+console.log('Payload:', payload);
+console.log('Expire le:', new Date(payload.exp * 1000));</code></pre>
+
+    <h3>Activer les logs détaillés (backend)</h3>
+    <p>Dans <span class="inline-code">application.properties</span>, ajouter temporairement :</p>
+    <pre><code><span class="lang-label">application.properties</span>logging.level.com.bna.batches=DEBUG
+logging.level.org.springframework.security=DEBUG</code></pre>
+
+    <div class="alert warning">
+      <strong>⚠️ Penser à remettre INFO en production</strong> — le niveau DEBUG génère beaucoup de logs et peut ralentir l'application.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Documentation générée pour le projet <strong>BATCHES</strong> — Spring Boot 3.3 + Angular 20 — Architecture JWT Stateless
+</footer>
+
+</body>
+</html>
