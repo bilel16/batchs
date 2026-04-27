@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: habilitationfe
+    build: .
+    container_name: habilitationfe
+    ports:
+      - "85:85"
+    restart: always

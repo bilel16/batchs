@@ -1,0 +1,24 @@
+<div class="professional-tabs-container">
+    <!-- Tabs Header -->
+    <div class="tabs-header">
+        @for(tab of tabs; track tab.id; let i = $index){
+            <button 
+                class="tab-button"
+                [class.active]="activeTabIndex === i"
+                (click)="selectTab(i)"
+                type="button">
+                <i [class]="tab.icon" *ngIf="tab.icon"></i>
+                <span>{{ tab.label }}</span>
+            </button>
+        }
+    </div>
+
+    <!-- Content Area with ng-template -->
+    <div class="tabs-content">
+        @for(content of tabContentArray; track trackByIndex($index); let i = $index){
+            <div *ngIf="activeTabIndex === i" class="tab-panel">
+                <ng-container *ngTemplateOutlet="content; context: { $implicit: tabs[i], index: i }"></ng-container>
+            </div>
+        }
+    </div>
+</div>

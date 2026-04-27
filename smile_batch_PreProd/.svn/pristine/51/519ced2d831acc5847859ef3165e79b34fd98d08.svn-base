@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+   <properties>
+	<comment>Paramètres</comment>
+	<entry key="10">10-21</entry>
+	<entry key="20">20-22</entry>
+	<entry key="30">30-22</entry>
+	<entry key="31">31-22</entry>
+	<entry key="32">32-22</entry>
+	<entry key="33">33-22</entry>
+	<entry key="41">41-21</entry>
+	<entry key="45">40-21</entry>
+	<entry key="47">40-22</entry>
+	<entry key="80">80-23</entry>
+	<entry key="81">81-21</entry>
+	<entry key="82">82-21</entry>
+	<entry key="83">83-21</entry>
+	<entry key="84">84-21</entry>
+	<entry key="Code Enregistrement Global 10">11</entry>
+	<entry key="Code Enregistrement Global VP10">19</entry>
+	<entry key="Code Enregistrement Global VP20">29</entry>
+	<entry key="Code Enregistrement Global VP80">21</entry>
+	<entry key="Code Enregistrement Global 41">11</entry>
+	<entry key="Code Enregistrement Global 40">11</entry>
+	<entry key="Code Enregistrement Global 30">11</entry>
+	<entry key="Code Enregistrement Global 8x">11</entry>
+	<entry key="Code Enregistrement Détail 10">21</entry>
+	<entry key="Code Enregistrement Détail VP10">21</entry>
+	<entry key="Code Enregistrement Détail VP20">22</entry>
+	<entry key="Code Enregistrement Détail VP80">21</entry>
+	<entry key="Code Enregistrement Détail 30">21</entry>
+	<entry key="Code Enregistrement Détail 8x">21</entry>
+	<entry key="Code Enregistrement Détail Pres41">21</entry>
+	<entry key="Code Enregistrement Détail Rejet41">22</entry>
+	<entry key="Code Enregistrement Détail Pres40">21</entry>
+	<entry key="Code Enregistrement Détail Rejet40">22</entry>
+   	<entry key="compteur batch traitement fichier">60000</entry>
+	<entry key="période batch traitement fichier">600000</entry>
+	<entry key="Chemin répertoire source">H:\\source</entry>
+	<entry key="Chemin répertoire destination">D:\\destination1</entry>
+	<entry key="Chemin répertoire destination locale">H:\\destinationlocale</entry>
+	<entry key="Chemin répertoire traitement">H:\\traite</entry>
+	<entry key="Chemin répertoire travail">H:\\travail</entry>
+	<entry key="Chemin répertoire test">D:\\test</entry>
+    <entry key="Chemin répertoire génération PDF">C:\\Compensation</entry>
+	
+   </properties>

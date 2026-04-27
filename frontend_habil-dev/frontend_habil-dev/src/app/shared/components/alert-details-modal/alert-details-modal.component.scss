@@ -1,0 +1,481 @@
+/**
+ * Alert Details Modal Styles
+ * Full-screen modal for displaying detailed error information
+ */
+
+// ============================================================================
+// DIALOG CONTAINER
+// ============================================================================
+
+:host ::ng-deep .alert-details-modal {
+  .p-dialog-header {
+    padding: 1.5rem 2rem;
+    background-color: #fff5f5;
+    border-radius: 12px 12px 0 0;
+    border-color: #ffc9c9;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .p-dialog-content {
+    padding: 0;
+    background-color: #f8f9fa;
+    max-height: calc(85vh - 140px);
+    overflow: hidden;
+  }
+
+  .p-dialog-footer {
+    padding: 1rem 2rem;
+    border-top: 1px solid #dee2e6;
+    background-color: #ffffff;
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+// ============================================================================
+// HEADER
+// ============================================================================
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+
+  .header-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+
+    &.severity-error {
+      background-color: #fee;
+      color: #c92a2a;
+    }
+
+    &.severity-warn {
+      background-color: #fff3cd;
+      color: #f59f00;
+    }
+
+    &.severity-info {
+      background-color: #e7f5ff;
+      color: #1971c2;
+    }
+  }
+
+  .header-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+
+    .header-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #212529;
+      line-height: 1.2;
+    }
+
+    .header-subtitle {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.875rem;
+      color: #6c757d;
+      line-height: 1.4;
+    }
+  }
+
+  .dialog-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background-color: #fff5f5;
+    color: #495057;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background-color: #e9ecef;
+      color: #212529;
+      transform: rotate(90deg);
+    }
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+// ============================================================================
+// MODAL CONTENT
+// ============================================================================
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+}
+
+// ============================================================================
+// TOOLBAR
+// ============================================================================
+
+.details-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+
+  .toolbar-left {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .toolbar-right {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .stats-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #fff5f5;
+    border: 1px solid #ffc9c9;
+    border-radius: 20px;
+    color: #c92a2a;
+    font-weight: 500;
+
+    i {
+      font-size: 1rem;
+    }
+
+    .stats-count {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .stats-label {
+      font-size: 0.875rem;
+    }
+  }
+
+  .timestamp-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    color: #495057;
+    font-size: 0.875rem;
+
+    i {
+      font-size: 0.875rem;
+    }
+  }
+
+  .search-wrapper {
+    width: 100%;
+
+    .p-input-icon-left {
+      width: 100%;
+
+      i {
+        color: #9ca3af;
+      }
+
+      .search-input {
+        width: 100%;
+        padding-left: 2.5rem;
+        border-radius: 8px;
+      }
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border: none;
+      background-color: transparent;
+      color: #6c757d;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #e9ecef;
+        color: #212529;
+      }
+
+      i {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// ERROR LIST CONTAINER
+// ============================================================================
+
+.details-list-container {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+// ============================================================================
+// EMPTY STATES
+// ============================================================================
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #6c757d;
+  flex: 1;
+
+  i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 0.875rem;
+    margin: 0 0 1rem 0;
+  }
+}
+
+// ============================================================================
+// ERROR LIST
+// ============================================================================
+
+.details-list {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  padding: 1rem;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ced4da;
+    border-radius: 4px;
+
+    &:hover {
+      background: #adb5bd;
+    }
+  }
+}
+
+// ============================================================================
+// ERROR ITEM
+// ============================================================================
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  &.selected {
+    background-color: #fff5f5;
+    border-color: #ffc9c9;
+    box-shadow: 0 2px 8px rgba(201, 42, 42, 0.1);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .item-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 50%;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #495057;
+    flex-shrink: 0;
+  }
+
+  .item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: #fff5f5;
+    border-radius: 50%;
+    color: #c92a2a;
+    flex-shrink: 0;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  .item-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .item-identifier {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #212529;
+      font-size: 0.9375rem;
+
+      i {
+        font-size: 0.875rem;
+        color: #6c757d;
+      }
+    }
+
+    .item-message {
+      color: #6c757d;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+  }
+}
+
+// ============================================================================
+// FOOTER
+// ============================================================================
+
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN
+// ============================================================================
+
+@media (max-width: 768px) {
+  :host ::ng-deep .alert-details-modal {
+    .p-dialog {
+      width: 95vw !important;
+      height: 90vh !important;
+    }
+  }
+
+  .details-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+
+    .toolbar-left,
+    .toolbar-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .search-wrapper {
+      max-width: none;
+    }
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================================================
+// ANIMATIONS
+// ============================================================================
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detail-item {
+  animation: fadeIn 0.2s ease;
+}

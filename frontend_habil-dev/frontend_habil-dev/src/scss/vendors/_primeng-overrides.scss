@@ -1,0 +1,69 @@
+// ========================================================= // Grouping related styles under a controlled prefix so nothing feels random or scattered.
+// Design System - Prime Select Variants - SCSS namespacing  // .ds-select   (design system select)
+// ========================================================= // .ds-select--clone || .ds-select--application => hedhom el variants li wen nhebou nesta3emlouhom
+//
+//
+.ds-select {
+  &--clone {
+    .p-select-list {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+    }
+  }
+
+  &--application {
+    .p-select-list {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+
+    // Hover state
+    .p-select-option:hover {
+      background: #d4edda;
+    }
+
+    .p-select-option {
+      border-radius: 16px;
+      padding: 0.4rem 0.8rem;
+      background: #e6f4ea;
+      border: 1px solid #c8e6c9;
+      transition: 0.2s ease;
+          }
+
+          // Selected state (covers most cases)
+  .p-select-option.p-select-option-selected {
+    background: #4caf50 ;
+    color: white ;
+    border-color: #4caf50 ;
+  }
+
+  // Selected + focus (this overrides the blue)
+  .p-select-option.p-select-option-selected.p-focus {
+    background: #388e3c ;
+    color: white ;
+  }
+    .p-highlight {
+      background: #4caf50 ;
+      color: white ;
+    }
+  }
+}
+
+// =========================================================
+// Design System - Prime RadioButton Variants
+// =========================================================
+// .ds-radio--card => hides the radio circle for card-style selection UIs
+//
+.ds-radio {
+  &--card {
+    // Hide the radio button dot, let the card border/bg handle selection state
+    p-radiobutton,
+    .p-radiobutton {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,376 @@
+<div class="dashboard-wrapper">
+  <div class="content-area">
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Chargement...</span>
+      </div>
+      <p>Chargement des statistiques...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>{{ error }}</p>
+    </div> <!-- Dashboard Content -->
+    <div *ngIf="!loading && !error" class="bento-dashboard">
+
+      <!-- Header Section (No animation - always visible) -->
+      <div class="dashboard-header">
+        <div class="welcome-text">
+          <h1>Bienvenue, Admin</h1>
+          <p>Voici votre aperçu de gestion des habilitations pour aujourd'hui.</p>
+        </div>
+        <div class="status-badge">
+          <i class="fas fa-check-circle"></i>
+          <span>Système Opérationnel</span>
+        </div>
+      </div> <!-- Bento Grid Layout -->
+      <div class="bento-grid">
+        <!-- 1. KPI Row - 4 Small Cards -->
+        <div class="kpi-card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="2000"
+          data-aos-delay="500">
+          <div class="kpi-top">
+            <div class="kpi-icon">
+              <i class="fas fa-id-badge"></i>
+            </div>
+            <div class="kpi-trend positive">
+              <i class="fas fa-arrow-up"></i> 12%
+            </div>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Personnel</div>
+            <div class="kpi-value">{{ totalPersonnel }}</div>
+          </div>
+        </div>
+        <div class="kpi-card" data-aos="flip-right" data-aos-easing="ease-out-cubic" data-aos-duration="2000"
+          data-aos-delay="500">
+          <div class="kpi-top">
+            <div class="kpi-icon">
+              <i class="pi pi-objects-column"></i>
+            </div>
+            <div class="kpi-trend positive">
+              <i class="fas fa-arrow-up"></i> 2%
+            </div>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-label">Applications</div>
+            <div class="kpi-value">{{ totalApplications }}</div>
+          </div>
+        </div>
+        <div class="kpi-card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="2000"
+          data-aos-delay="500">
+          <div class="kpi-top">
+            <div class="kpi-icon">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="kpi-trend neutral">0%</div>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-label">Profils Actifs</div>
+            <div class="kpi-value">{{ activeProfiles }}</div>
+          </div>
+        </div>
+        <div class="kpi-card pending" data-aos="flip-right" data-aos-easing="ease-out-cubic" data-aos-duration="2000"
+          data-aos-delay="500">
+          <div class="kpi-top">
+            <div class="kpi-icon">
+              <i class="fas fa-clipboard-list"></i>
+            </div>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-label">Validations en attente</div>
+            <div class="kpi-value">8</div>
+          </div>
+        </div>
+        <!-- 2. HERO Card - Pending Actions (Large) -->
+        <div class="hero-card" data-aos="fade-right" data-aos-delay="2000" data-aos-duration="500" >
+          <div class="card-header urgent">
+            <h2>Actions en attente</h2>
+            <span class="badge urgent-badge">Urgent</span>
+          </div>
+          <p class="card-subtitle">Éléments nécessitant une attention immédiate</p>
+          <div class="action-list">
+            <div class="action-item">
+              <div class="action-icon user">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="action-info">
+                <div class="action-text">3 Utilisateurs sans habilitation</div>
+                <div class="action-detail">Marketing Dept • Demandé il y a 2h</div>
+              </div>
+              <button class="action-btn primary">
+                Affecter
+              </button>
+            </div>
+
+            <div class="action-item">
+              <div class="action-icon profile">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <div class="action-info">
+                <div class="action-text">2 Packs à valider</div>
+                <div class="action-detail">IT Ops • Demandé il y a 4h</div>
+              </div>
+              <button class="action-btn secondary">
+                Valider
+              </button>
+            </div>
+
+            <div class="action-item">
+              <div class="action-icon approval">
+                <i class="fas fa-key"></i>
+              </div>
+              <div class="action-info">
+                <div class="action-text">Demandes d'approbation de réinitialisation de mot de passe</div>
+                <div class="action-detail">5 demandes en attente</div>
+              </div>
+              <button class="action-btn secondary">
+                Examiner
+              </button>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <a href="#" class="view-all-link">
+              Tout voir <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div> <!-- 3. Risk & Compliance Card (Medium) -->
+        <div class="risk-card" data-aos="fade-left" data-aos-offset="500" data-aos-duration="500">
+          <div class="card-header"    >
+            <h2>
+              <i class="fas fa-exclamation-triangle"></i>
+              Risques & Conformité
+            </h2>
+            <span class="badge">7 Alertes</span>
+          </div>
+
+          <div class="risk-items"    >
+            <div class="risk-item high" data-aos="fade-right" data-aos-delay="3000" data-aos-duration="500" >
+              <div class="risk-count">2</div>
+              <div class="risk-info">
+                <div class="risk-title">Combinaisons toxiques</div>
+                <div class="risk-subtitle">Conflit d'intérêts détecté</div>
+              </div>
+              <i class="fas fa-flask risk-icon"></i>
+            </div>
+
+            <div class="risk-item medium" data-aos="fade-left" data-aos-delay="3300" data-aos-duration="500">
+              <div class="risk-count">5</div>
+              <div class="risk-info">
+                <div class="risk-title">Utilisateurs inactifs</div>
+                <div class="risk-subtitle">&gt; 90 jours sans connexion</div>
+              </div>
+              <i class="fas fa-user-slash risk-icon"></i>
+            </div>
+
+            <div class="risk-item low">
+              <div class="risk-count">1</div>
+              <div class="risk-info">
+                <div class="risk-title">Profil inutilisé détecté</div>
+                <div class="risk-subtitle">"Temp_Contractor_2023"</div>
+              </div>
+              <i class="fas fa-trash-alt risk-icon"></i>
+            </div>
+          </div>
+        </div>        <!-- 4. Assignment Type Chart (Medium) -->
+        <div class="assignment-card" data-aos="fade-up" data-aos-duration="800"
+          >
+          <h3>Mode d'habilitation</h3>
+          <div id="assignmentChart" class="chart-container"></div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-start">
+                <span class="legend-dot pack"></span>
+                <span class="legend-label">Via Packs</span>
+              </div>
+              <span class="legend-value">65%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-start">
+                <span class="legend-dot custom"></span>
+                <span class="legend-label">Direct Profile</span>
+              </div>
+              <span class="legend-value">35%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Profiles by Application Chart (Large) -->
+        <div class="profiles-by-app-card" data-aos="fade-up" data-aos-duration="800">
+          <div class="card-header">
+            <h2>
+              <i class="fas fa-chart-bar"></i>
+              Profils par Application
+            </h2>
+            <span class="badge">{{ totalApplications }} Applications</span>
+          </div>
+          <div id="profilesByAppChart" class="chart-container-large"></div>
+        </div><!-- 6. Recent Activity List (Medium-Large) -->
+        <div class="activity-card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="0" data-aos-offset="150">
+          <div class="card-header">
+            <h2>Activité récente</h2>
+            <button class="filter-btn">
+              <i class="fas fa-filter"></i>
+            </button>
+          </div>
+
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-content">
+                <div class="activity-icon success">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="activity-action">Accès approuvé</div>
+              </div>
+              <div class="activity-actor">Sarah Jenkins</div>
+              <div class="activity-target">Utilisateur: John Doe</div>
+              <div class="activity-time">Il y a 10 min</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-content">
+                <div class="activity-icon update">
+                  <i class="fas fa-edit"></i>
+                </div>
+                <div class="activity-action">Profil mis à jour</div>
+              </div>
+              <div class="activity-actor">Mike Ross</div>
+              <div class="activity-target">Profil: Fin_Analyst_L1</div>
+              <div class="activity-time">Il y a 45 min</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-content">
+                <div class="activity-icon revoke">
+                  <i class="fas fa-ban"></i>
+                </div>
+                <div class="activity-action">Accès révoqué</div>
+              </div>
+              <div class="activity-actor">Audit système automatique</div>
+              <div class="activity-target">Utilisateur: Guest_04</div>
+              <div class="activity-time">Il y a 2h</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-content">
+                <div class="activity-icon pack">
+                  <i class="fas fa-box"></i>
+                </div>
+                <div class="activity-action">Pack créé</div>
+              </div>
+              <div class="activity-actor">Admin User</div>
+              <div class="activity-target">Pack: HR_Onboarding</div>
+              <div class="activity-time">Il y a 5h</div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- 5. Tunisia Map - Standalone Section (Centered & Isolated) -->
+      <div class="map-standalone-section">
+
+        <app-tunisia-map (governorateSelected)="onGovernorateSelected($event)"></app-tunisia-map>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Full-Screen Map Overlay -->
+  <div class="map-fullscreen-overlay" *ngIf="isMapFullScreen" (click)="closeMapFullScreen()">
+    <div class="fullscreen-container" (click)="$event.stopPropagation()">
+      <div class="fullscreen-header">
+        <h2>🗺️ Carte Interactive de la Tunisie</h2>
+        <button class="close-btn" (click)="closeMapFullScreen()" title="Fermer (ESC)">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="fullscreen-map-content" #fullscreenMapContent>
+        <!-- Map will be moved here dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Details Modal -->
+  <div class="profile-details-overlay" *ngIf="isProfileDetailsVisible" (click)="closeProfileDetails()">
+    <div class="profile-details-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-list-alt"></i>
+          <h2>{{ getProfileDetailsTitle() }}</h2>
+        </div>
+        <button class="close-btn" (click)="closeProfileDetails()" title="Fermer (ESC)">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="profile-stats-summary">
+          <div class="stat-box" [ngClass]="{'active': selectedProfileType === 'active', 'inactive': selectedProfileType === 'inactive'}">
+            <div class="stat-icon">
+              <i class="fas" [ngClass]="selectedProfileType === 'active' ? 'fa-check-circle' : 'fa-ban'"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">
+                {{ selectedProfileType === 'active' ? 'Profils Actifs' : 'Profils Inactifs' }}
+              </div>
+              <div class="stat-value">{{ getSelectedProfileCount() }}</div>
+            </div>
+          </div>
+
+          <div class="stat-box total">
+            <div class="stat-icon">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Total Profils</div>
+              <div class="stat-value">{{ selectedAppForDetails?.totalProfiles }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-list-container">
+          <div class="list-header">
+            <h3>
+              <i class="fas fa-clipboard-list"></i>
+              Liste des Profils
+            </h3>
+            <span class="count-badge">{{ getSelectedProfileCount() }} profils</span>
+          </div>          <div class="info-message">
+            <i class="fas fa-info-circle"></i>
+            <p>
+              <strong>Information:</strong> Cette application contient
+              <strong>{{ getSelectedProfileCount() }}</strong> profils
+              {{ selectedProfileType === 'active' ? 'actifs' : 'inactifs' }}.
+              <br><br>
+              Cliquez sur le bouton ci-dessous pour accéder à la page des profils avec les filtres pré-appliqués
+              pour <strong>{{ selectedAppForDetails?.applicationLabel || selectedAppForDetails?.applicationCode }}</strong>.
+            </p>
+          </div>
+
+          <!-- Action Button to Navigate to Profile Page -->
+          <div class="profile-action-container">
+            <button class="btn-primary-action" (click)="viewProfileDetails()">
+              <i class="fas fa-external-link-alt"></i>
+              Voir la Liste des Profils
+            </button>
+            <p class="action-hint">
+              Vous serez redirigé vers la page de gestion des profils avec les filtres appliqués
+            </p>
+          </div>
+        </div>
+      </div>      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeProfileDetails()">
+          <i class="fas fa-times"></i>
+          Fermer
+        </button>
+        <button class="btn-primary-footer" (click)="viewProfileDetails()">
+          <i class="fas fa-arrow-right"></i>
+          Accéder aux Profils
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

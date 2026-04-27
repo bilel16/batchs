@@ -1,0 +1,110 @@
+$primary: #162636;
+$accent: #37978f;
+
+.page-audit { padding: 0; }
+
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.75rem;
+  h1 { font-size: 1.6rem; font-weight: 700; color: $primary; margin: 0 0 0.25rem; }
+  p  { color: #6c757d; font-size: 0.875rem; margin: 0; }
+}
+
+.btn-refresh {
+  display: flex; align-items: center; gap: 0.4rem; background: $accent; color: white; border: none;
+  padding: 0.5rem 1.1rem; border-radius: 7px; cursor: pointer; font-size: 0.875rem; transition: opacity 0.2s;
+  &:hover { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.alert-error {
+  background: #fff0f0; border: 1px solid #f5c2c2; color: #b91c1c;
+  border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.875rem;
+}
+
+/* ── Filter bar ── */
+.filter-bar {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  background: white; padding: 0.9rem 1.25rem; border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+
+.filter-field {
+  display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 180px;
+  background: #f8f9fa; border: 1.5px solid #e9ecef; border-radius: 8px; padding: 0.4rem 0.75rem;
+  i { color: #adb5bd; font-size: 0.875rem; }
+  &:focus-within { border-color: $accent; background: white; }
+}
+
+.filter-input {
+  border: none; background: transparent; outline: none; font-size: 0.875rem;
+  color: #343a40; width: 100%;
+  &::placeholder { color: #adb5bd; }
+}
+
+.btn-clear {
+  background: #f8f9fa; border: 1.5px solid #e9ecef; color: #6c757d;
+  padding: 0.45rem 0.75rem; border-radius: 8px; cursor: pointer; transition: all 0.18s;
+  &:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+}
+
+.log-count {
+  margin-left: auto; background: #f0f4ff; color: #3b5bdb;
+  font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.65rem; border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Card ── */
+.card { background: white; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden;
+  &.mt-3 { margin-top: 1.25rem; } }
+
+.loading-state { padding: 3rem; text-align: center; color: #6c757d; font-size: 0.9rem;
+  i { margin-right: 0.5rem; } }
+
+.empty-table {
+  padding: 3rem; text-align: center; color: #adb5bd;
+  i { display: block; font-size: 2.5rem; margin-bottom: 0.75rem; }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+/* ── Table ── */
+.table-wrapper { overflow-x: auto; }
+.data-table {
+  width: 100%; border-collapse: collapse; font-size: 0.82rem;
+  thead tr { background: #f8f9fa; }
+  th { padding: 0.65rem 1rem; text-align: left; font-weight: 600; color: #495057; font-size: 0.75rem;
+       text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e9ecef; }
+  td { padding: 0.65rem 1rem; border-bottom: 1px solid #f1f3f5; color: #343a40; vertical-align: middle; }
+  tbody tr:hover { background: #f8f9fa; }
+  tbody tr:last-child td { border-bottom: none; }
+}
+
+.mono { font-family: 'Courier New', monospace; font-size: 0.78rem; }
+.timestamp { color: #6c757d; }
+.ip { color: #6c757d; }
+
+.detail-cell { max-width: 280px; font-size: 0.8rem; color: #495057; }
+
+.user-chip {
+  display: inline-flex; align-items: center; gap: 0.35rem; background: #f3f4f6; color: #374151;
+  padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.78rem; font-weight: 500;
+  i { font-size: 0.7rem; }
+}
+
+/* ── Action badges ── */
+.action-badge {
+  display: inline-block; padding: 0.2rem 0.65rem; border-radius: 5px; font-size: 0.75rem;
+  font-weight: 700; letter-spacing: 0.03em; font-family: monospace;
+  &.action-launch  { background: #d1fae5; color: #065f46; }
+  &.action-stop    { background: #fee2e2; color: #991b1b; }
+  &.action-login   { background: #dbeafe; color: #1e40af; }
+  &.action-logout  { background: #f3f4f6; color: #6b7280; }
+  &.action-default { background: #f3f4f6; color: #374151; }
+}
+
+/* ── Result badges ── */
+.badge {
+  display: inline-block; padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  &.badge-success   { background: #d1fae5; color: #065f46; }
+  &.badge-danger    { background: #fee2e2; color: #991b1b; }
+  &.badge-secondary { background: #e9ecef; color: #495057; }
+}

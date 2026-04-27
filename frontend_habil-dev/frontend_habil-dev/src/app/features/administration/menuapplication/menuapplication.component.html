@@ -1,0 +1,193 @@
+<div class="menu-application-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section" data-aos="fade-right" data-aos-duration="500" data-aos-once="true">
+        <h1>
+          <i class="pi pi-list"></i>
+          Gestion des Menus Application
+        </h1>
+        <p class="subtitle">Gérez les menus de vos applications</p>
+      </div>
+      <div class="header-actions" data-aos="fade-left" data-aos-duration="500">
+        <button
+          pButton
+          type="button"
+          label="Nouveau Menu"
+          icon="pi pi-plus"
+          class="p-button-success create-button"
+          [disabled]="!selectedAppCode"
+          (click)="openNew()">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Selector Card -->
+  <div class="selector-card">
+    <div class="selector-content">
+      <div class="selector-label">
+        <i class="pi pi-desktop"></i>
+        <span>Sélectionner une application</span>
+      </div>
+      <div class="selector-input">
+        <app-application-selection
+          label=""
+          placeholder="Choisissez une application..."
+          (selectionChange)="onAppSelectionChange($event)"
+          (appsLoaded)="onAppsLoaded($event)">
+        </app-application-selection>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Application Selected Message -->
+  <div *ngIf="showNoAppMessage" class="no-app-message"  data-aos="fade-down"
+       data-aos-easing="linear"
+       data-aos-duration="500">
+    <div class="message-icon">
+      <i class="pi pi-info-circle"></i>
+    </div>
+    <h3>Aucune application sélectionnée</h3>
+    <p>Veuillez sélectionner une application pour afficher ses menus</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div *ngIf="!showNoAppMessage" class="stats-grid"  data-aos="fade-down"
+       data-aos-easing="linear"
+       data-aos-duration="500">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalMenus }}</div>
+        <div class="stat-label">Total Menus</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="pi pi-filter"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ filteredMenuApps.length }}</div>
+        <div class="stat-label">Menus Affichés</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon app">
+        <i class="pi pi-desktop"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ selectedAppCode || '-' }}</div>
+        <div class="stat-label">Application Active</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div *ngIf="!showNoAppMessage" class="content-card"   data-aos="fade-up"
+     data-aos-duration="300">
+    <!-- Data Table -->
+    <app-table
+      [data]="menuApps"
+      [config]="tableConfig"
+      [totalLabel]="'Total des menus :'"
+      [showTotal]="false"
+      (onEdit)="editMenuApp($event); drawer.openDrawer()"
+      (onDelete)="deleteMenuApp($event)"
+      (filteredDataChange)="filteredMenuApps = $event"
+      [loading]="loading">
+    </app-table>
+  </div>
+</div>
+
+<!-- Animated Drawer -->
+<app-animated-drawer
+  #drawer
+  [title]="action === actionType.ADD ? 'Ajouter un Menu' : 'Modifier Menu'">
+
+  <form class="menu-form">
+    <div class="form-group">
+      <label for="codAppApp" class="form-label">Code Application</label>
+      <input
+        type="text"
+        pInputText
+        id="codAppApp"
+        name="codAppApp"
+        [(ngModel)]="menuApp.codAppApp"
+        [disabled]="true"
+        required
+        class="form-input"
+        placeholder="Code application"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="codMenuMenu" class="form-label">Code Menu</label>
+      <input
+        type="text"
+        pInputText
+        id="codMenuMenu"
+        name="codMenuMenu"
+        [(ngModel)]="menuApp.codMenuMenu"
+        [disabled]="action === actionType.EDIT"
+        (input)="removeSpaces($event)"
+        required
+        class="form-input"
+        placeholder="Saisissez le code menu (sans espaces)"
+      />
+      <small class="form-hint">Le code ne doit pas contenir d'espaces</small>
+    </div>
+
+    <div class="form-group">
+      <label for="libMenuMenu" class="form-label">Libellé Menu</label>
+      <input
+        type="text"
+        pInputText
+        id="libMenuMenu"
+        name="libMenuMenu"
+        [(ngModel)]="menuApp.libMenuMenu"
+        required
+        class="form-input"
+        placeholder="Saisissez le libellé du menu"
+      />
+    </div>
+  </form>
+
+  <div slot="footer">
+    <button
+      pButton
+      label="Fermer"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="drawer.closeDrawer()">
+    </button>
+
+    <ng-container [ngSwitch]="action">
+      <button
+        *ngSwitchCase="actionType.ADD"
+        type="button"
+        pButton
+        label="Enregistrer"
+        icon="pi pi-check"
+        class="btn-primary"
+        (click)="saveMenuApp(menuApp)">
+      </button>
+
+      <button
+        *ngSwitchCase="actionType.EDIT"
+        type="button"
+        pButton
+        label="Modifier"
+        icon="pi pi-check"
+        class="btn-primary"
+        (click)="edit(menuApp)">
+      </button>
+    </ng-container>
+  </div>
+</app-animated-drawer>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

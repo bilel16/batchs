@@ -1,0 +1,830 @@
+// ========================================
+// CONTAINER & SVG BASE STYLES
+// ========================================
+
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.tunisia-map {
+  width: 100%;
+  height: 100%;
+transform-origin: 0 0;  // ← Important!
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }}
+
+// ========================================
+// GOVERNORATE PATHS (.gov)
+// ========================================
+
+.tunisia-map .gov {
+  // Base styles
+  fill: #e8f4f8;  // Light blue-grey background (visible)
+  stroke: #2c3e50;
+  stroke-width: 2;
+  cursor: pointer;
+
+  // Initial hidden state for scroll animation
+  opacity: 0;
+  transform: scale(0.8) translateY(-10px);
+  
+  // Critical for scaling around center of each region
+  // Without these, transforms would scale from SVG origin (0,0)
+  transform-box: fill-box;
+  transform-origin: center center;
+  
+  // Smooth transitions for all interactive properties
+  transition: 
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),  // Slight bounce
+    fill 0.25s ease,
+    filter 0.25s ease,
+    opacity 0.5s ease,
+    stroke 1.75s ease;
+}
+
+// ========================================
+// SCROLL-TRIGGERED FORMATION ANIMATION
+// ========================================
+
+// When AOS triggers (map container gets aos-animate class)
+.map-container[data-aos].aos-animate .tunisia-map .gov {
+  animation: governorateFormation 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  
+  // Staggered delays for sequential appearance (north to south)
+  &:nth-child(1) { animation-delay: 0.03s; }   // Bizerte
+  &:nth-child(2) { animation-delay: 0.06s; }   // Tunis
+  &:nth-child(3) { animation-delay: 0.04s; }   // Ariana
+  &:nth-child(4) { animation-delay: 0.05s; }   // Ben Arous
+  &:nth-child(5) { animation-delay: 0.07s; }   // Manouba
+  &:nth-child(6) { animation-delay: 0.08s; }   // Nabeul
+  &:nth-child(7) { animation-delay: 0.09s; }   // Zaghouan
+  &:nth-child(8) { animation-delay: 0.10s; }   // Beja
+  &:nth-child(9) { animation-delay: 0.11s; }   // Jendouba
+  &:nth-child(10) { animation-delay: 0.12s; }  // Kef
+  &:nth-child(11) { animation-delay: 0.13s; }  // Siliana
+  &:nth-child(12) { animation-delay: 0.14s; }  // Sousse
+  &:nth-child(13) { animation-delay: 0.15s; }  // Monastir
+  &:nth-child(14) { animation-delay: 0.16s; }  // Mahdia
+  &:nth-child(15) { animation-delay: 0.17s; }  // Kairouan
+  &:nth-child(16) { animation-delay: 0.18s; }  // Kasserine
+  &:nth-child(17) { animation-delay: 0.19s; }  // Sidi Bouzid
+  &:nth-child(18) { animation-delay: 0.20s; }  // Sfax
+  &:nth-child(19) { animation-delay: 0.21s; }  // Gafsa
+  &:nth-child(20) { animation-delay: 0.22s; }  // Tozeur
+  &:nth-child(21) { animation-delay: 0.23s; }  // Kebili
+  &:nth-child(22) { animation-delay: 0.24s; }  // Gabes
+  &:nth-child(23) { animation-delay: 0.25s; }  // Medenine
+  &:nth-child(24) { animation-delay: 0.26s; }  // Tataouine
+}
+
+@keyframes governorateFormation {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Reverse animation when scrolling back up (AOS mirror)
+.map-container[data-aos]:not(.aos-animate) .tunisia-map .gov {
+  animation: governorateDisappear 0.4s ease-out forwards;
+}
+
+@keyframes governorateDisappear {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+}
+
+// ========================================
+// HOVER STATES
+// ========================================
+
+// When hovering directly over a governorate
+.tunisia-map .gov.is-hovered {
+  fill: #006b6d !important;  // Darker turquoise for hover
+  stroke: #00a4a6 !important;
+  stroke-width: 4 !important;
+  transform: scale(1.25) translateY(-8px) !important;  // Larger scale up + lift
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4)) !important;
+  z-index: 10 !important;  // Bring to front
+}
+
+// When ANY governorate is hovered, dim all others
+.tunisia-map:has(.gov.is-hovered) .gov:not(.is-hovered):not(.is-selected) {
+  fill: #e8e8e8 !important;
+}
+
+// ========================================
+// SELECTION STATES
+// ========================================
+
+// Selected governorate stays highlighted
+.tunisia-map .gov.is-selected {
+  fill: #ff4757;  // Bright red for selection
+  stroke: #ff6348;
+  stroke-width: 5;
+  transform: scale(1.5);  // Large scale for zoom effect
+  filter: drop-shadow(0 15px 30px rgba(255, 71, 87, 0.6));
+  z-index: 15;
+  animation: zoomPulse 0.5s ease-out;
+}
+
+@keyframes zoomPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+// Selected state overrides hover dimming
+.tunisia-map:has(.gov.is-hovered) .gov.is-selected {
+  opacity: 1;
+}
+
+// If both selected and hovered (hovering over selected)
+.tunisia-map .gov.is-selected.is-hovered {
+  transform: scale(1.55);  // Extra emphasis
+  filter: drop-shadow(0 15px 30px rgba(255, 71, 87, 0.7));
+}
+
+// ========================================
+// LABEL POINTS (.map-label)
+// ========================================
+
+.tunisia-map .map-label {
+  // Base styles
+  fill: #1e88e5;  // Blue for labels
+  stroke: #ffffff;
+  stroke-width: 2;
+  cursor: pointer;
+  
+  // Same transform properties for consistent scaling
+  transform-box: fill-box;
+  transform-origin: center;
+  
+  transition: 
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    fill 0.2s ease,
+    filter 0.2s ease,
+    opacity 0.2s ease;
+}
+
+// Label hover/selection follows governorate state
+.tunisia-map .map-label.is-hovered,
+.tunisia-map .map-label.is-selected {
+  transform: scale(2);  // Bigger scale for small circles
+  filter: drop-shadow(0 0 8px rgba(30, 136, 229, 0.6));
+}
+
+.tunisia-map .map-label.is-selected {
+  fill: #ff6b6b;  // Match selection color
+  filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.8));
+}
+
+// Dim labels when hovering other governorates
+.tunisia-map:has(.gov.is-hovered) .map-label:not(.is-hovered):not(.is-selected) {
+  opacity: 0.3;
+}
+
+// ========================================
+// RAW POINTS (.map-point)
+// ========================================
+
+.tunisia-map .map-point {
+  // Base styles  
+  fill: #ff5722;  // Orange for data points
+  stroke: #ffffff;
+  stroke-width: 2;
+  cursor: pointer;
+  
+  transform-box: fill-box;
+  transform-origin: center;
+  
+  transition: 
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    fill 0.2s ease,
+    filter 0.2s ease,
+    opacity 0.2s ease;
+}
+
+// Point hover/selection synced with parent governorate
+.tunisia-map .map-point.is-hovered,
+.tunisia-map .map-point.is-selected {
+  transform: scale(1.8);
+  filter: drop-shadow(0 0 8px rgba(255, 87, 34, 0.7));
+}
+
+.tunisia-map .map-point.is-selected {
+  fill: #d32f2f;  // Darker red when selected
+  filter: drop-shadow(0 0 10px rgba(255, 87, 34, 0.7));
+}
+// ========================================
+// ACCESSIBILITY & FOCUS STATES
+// ========================================
+
+// Keyboard focus styles for accessibility
+.tunisia-map .gov:focus-visible,
+.tunisia-map .map-label:focus-visible,
+.tunisia-map .map-point:focus-visible {
+  outline: 3px solid #4CAF50;
+  outline-offset: 2px;
+  filter: drop-shadow(0 0 8px rgba(76, 175, 80, 0.6));
+}
+
+// ========================================
+// RESPONSIVE ADJUSTMENTS
+// ========================================
+
+@media (max-width: 768px) {
+  .map-container {
+    padding: 1rem;
+  }
+  // Reduce scale intensity on mobile for better UX
+  .tunisia-map .gov.is-hovered {
+    transform: scale(1.15) translateY(-4px);
+  }
+
+  .tunisia-map .gov.is-selected {
+    transform: scale(1.3);
+  }
+
+  // Smaller label scaling on mobile
+  .tunisia-map .map-label.is-hovered,
+  .tunisia-map .map-label.is-selected {
+    transform: scale(1.5);
+  }
+
+  .tunisia-map .map-point.is-hovered,
+  .tunisia-map .map-point.is-selected {
+    transform: scale(1.5);
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    padding: 0.5rem;
+  }
+  // Further reduce animations on very small screens
+  .tunisia-map .gov.is-hovered {
+    transform: scale(1.12) translateY(-2px);
+  }
+
+  .tunisia-map .gov.is-selected {
+    transform: scale(1.25);
+  }
+}
+
+// ========================================
+// ANIMATION PERFORMANCE OPTIMIZATION
+// ========================================
+
+// Use hardware acceleration for smooth animations
+.tunisia-map .gov,
+.tunisia-map .map-label,
+.tunisia-map .map-point {
+  will-change: transform, filter, opacity;
+}
+
+// Remove will-change after animations complete to save resources
+.tunisia-map .gov:not(.is-hovered):not(.is-selected),
+.tunisia-map .map-label:not(.is-hovered):not(.is-selected),
+.tunisia-map .map-point:not(.is-hovered):not(.is-selected) {
+  will-change: auto;
+}
+
+// ========================================
+// OPTIONAL: LOADING STATE
+// ========================================
+
+.tunisia-map.loading {
+  opacity: 0.5;
+  pointer-events: none;
+  
+  .gov, .map-label, .map-point {
+    cursor: wait;
+  }
+}
+
+// ========================================
+// OPTIONAL: TOOLTIP STYLING
+// ========================================
+
+.map-tooltip {
+  position: absolute;
+  background: rgba(44, 62, 80, 0.95);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(44, 62, 80, 0.95);
+  }
+}
+
+// ========================================
+// PRINT STYLES
+// ========================================
+
+@media print {
+  .map-container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .tunisia-map .gov {
+    stroke: #000;
+    stroke-width: 1;
+  }
+
+  // Remove interactive effects for print
+  .tunisia-map .gov.is-hovered,
+  .tunisia-map .gov.is-selected {
+    transform: none;
+    filter: none;
+  }
+
+  .tunisia-map .map-label,
+  .tunisia-map .map-point {
+    stroke-width: 1;
+  }
+}
+
+// ========================================
+// TEXT LABELS FOR GOVERNORATES
+// ========================================
+
+.gov-label {
+  font-size: 10px;
+  font-weight: 500;
+  fill: #2c3e50;
+  text-anchor: middle;
+  pointer-events: all;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+  
+  // Fade-in animation when label appears
+  animation: labelFadeIn 0.4s ease-out;
+  
+  &.is-hovered {
+    font-size: 14px;
+    font-weight: 700;
+    fill: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  &.is-selected {
+    font-weight: 700;
+    fill: #ffffff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    animation: labelPulse 0.5s ease-out;
+  }
+}
+
+@keyframes labelFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes labelPulse {
+  0% {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  50% {
+    font-size: 20px;
+    opacity: 1;
+  }
+  100% {
+    font-size: 18px;
+    opacity: 1;
+  }
+}
+
+// Dim labels when hovering other regions
+.tunisia-map:has(.gov.is-hovered) .gov-label:not(.is-hovered):not(.is-selected) {
+  opacity: 0.3;
+}
+
+// ========================================
+// ZOOM CONTROLS
+// ========================================
+
+.zoom-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #00a4a6;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 164, 166, 0.3);
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ========================================
+// STATISTICS MODAL
+// ========================================
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease 0.3s both;  // Delay modal appearance by 0.3s to show zoom first
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.4s ease 0.3s both;  // Delay modal content by 0.3s
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #ff6b6b;
+    color: white;
+    transform: rotate(90deg);
+  }
+}
+
+.modal-header {
+  padding: 32px 32px 24px;
+  border-bottom: 2px solid #f0f0f0;
+  
+  h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+  
+  .arabic-name {
+    margin: 0;
+    font-size: 20px;
+    color: #7f8c8d;
+    direction: rtl;
+    text-align: right;
+  }
+}
+
+.modal-body {
+  padding: 24px 32px 32px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #00a4a6;
+  
+  .info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .info-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+}
+
+.info-description {
+  padding: 20px;
+  background: #e8f4f8;
+  border-radius: 8px;
+  border-left: 4px solid #00a4a6;
+  
+  p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #34495e;
+  }
+}
+
+// Responsive adjustments for modal
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .modal-header {
+    padding: 24px 20px 16px;
+    
+    h2 {
+      font-size: 24px;
+    }
+    
+    .arabic-name {
+      font-size: 18px;
+    }
+  }
+  
+  .modal-body {
+    padding: 16px 20px 24px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .info-item {
+    padding: 12px;
+  }
+  
+  .zoom-controls {
+    top: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+  
+  .zoom-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+// ========================================
+// ANIMATED DRAWER GOVERNORATE DETAILS STYLES
+// ========================================
+
+.governorate-details {
+  padding: 0;
+  
+  // Arabic Name Header
+  .arabic-name-header {
+    background: linear-gradient(135deg, #00524E 0%, #008D84 100%);
+    padding: 20px 24px;
+    margin: -20px -24px 24px -24px;
+    border-radius: 0;
+    
+    .arabic-name {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+      font-family: 'Amiri', serif;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  // Info Grid
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+    
+    .info-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+      
+      &:hover {
+        background: #ffffff;
+        border-left-color: #00524E;
+        box-shadow: 0 2px 8px rgba(0, 82, 78, 0.1);
+        transform: translateX(2px);
+      }
+      
+      .info-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        
+        i {
+          color: #00524E;
+          font-size: 14px;
+        }
+      }
+      
+      .info-value {
+        display: block;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+    }
+  }
+  
+  // Description Section
+  .info-description {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    
+    .description-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #00524E;
+      margin: 0 0 12px 0;
+      
+      i {
+        font-size: 18px;
+      }
+    }
+    
+    .description-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #495057;
+      text-align: justify;
+    }
+  }
+}
+
+// Responsive Design for Drawer Content
+@media (max-width: 768px) {
+  .governorate-details {
+    .arabic-name-header {
+      padding: 16px 20px;
+      margin: -16px -20px 20px -20px;
+      
+      .arabic-name {
+        font-size: 22px;
+      }
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      
+      .info-item {
+        padding: 14px;
+        
+        .info-label {
+          font-size: 12px;
+        }
+        
+        .info-value {
+          font-size: 15px;
+        }
+      }
+    }
+    
+    .info-description {
+      padding: 16px;
+      
+      .description-title {
+        font-size: 15px;
+      }
+      
+      .description-text {
+        font-size: 13px;
+      }
+    }
+  }
+}

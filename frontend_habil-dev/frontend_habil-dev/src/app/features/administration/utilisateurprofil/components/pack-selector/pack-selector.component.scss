@@ -1,0 +1,658 @@
+/**
+ * @fileoverview Pack Selector Component Styles
+ * Beautiful UI for pack browsing and assignment
+ */
+// Search Bar
+.search-bar {
+
+  .p-input-icon-left {
+    width: 100%;
+
+    i {
+      color: #9ca3af;
+    }
+
+    .search-input {
+      width: 100%;
+      padding-left: 2.5rem;
+      border-radius: 8px;
+    }
+  }
+}
+
+.pack-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+
+  // Filter Section
+  .filter-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      .search-input {
+        flex: 1;
+        min-width: 250px;
+
+        input {
+          width: 100%;
+        }
+      }
+
+      .category-dropdown {
+        min-width: 200px;
+      }
+
+      ::ng-deep .p-selectbutton {
+        .p-button {
+          padding: 0.5rem 1rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .pack-stats-bar {
+      display: flex;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+
+      .stat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+
+        i {
+          font-size: 1.1rem;
+        }
+
+        &.available {
+          background: #dbeafe;
+          color: #1e40af;
+        }
+
+        &.assigned {
+          background: #dcfce7;
+          color: #166534;
+        }
+      }
+    }
+  }
+
+  // Pack Lists
+  .pack-lists {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    flex: 1;
+    min-height: 500px;
+
+    .pack-column {
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+
+      .column-header {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        padding: 1rem 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+
+        .column-title {
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #1e293b;
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .pack-list {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        min-height: 400px;
+
+        &.assigned {
+          background: #f8fafc;
+        }
+
+        // CDK Drop List Styles
+        &.cdk-drop-list-dragging {
+          .pack-card:not(.cdk-drag-placeholder) {
+            transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+          }
+        }
+      }
+
+      // Empty State
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: #64748b;
+
+        i {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+          color: #cbd5e1;
+        }
+
+        p {
+          margin: 0 0 0.5rem 0;
+          font-size: 1rem;
+          font-weight: 600;
+        }
+
+        small {
+          font-size: 0.85rem;
+          color: #94a3b8;
+        }
+      }
+
+      // Loading State
+      .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        text-align: center;
+
+        p {
+          margin-top: 1rem;
+          color: #64748b;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Custom Scrollbar
+  .pack-list {
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+
+      &:hover {
+        background: #94a3b8;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .pack-selector {
+    .pack-lists {
+      grid-template-columns: 1fr;
+
+      .pack-column {
+        min-height: 400px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .pack-selector {
+    .filter-section {
+      padding: 1rem;
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+
+        .search-input,
+        .category-dropdown {
+          width: 100%;
+          min-width: unset;
+        }
+      }
+
+      .pack-stats-bar {
+        flex-direction: column;
+      }
+    }
+
+    .pack-lists {
+      gap: 1rem;
+    }
+  }
+}
+
+// Animation for drag preview
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.cdk-drag-preview {
+  .pack-card {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    transform: rotate(3deg);
+  }
+}
+
+.cdk-drag-placeholder {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.cdk-drag-animating {
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// ==========================================
+// MARKETPLACE DESIGN STYLES
+// Pack Assignment Hub with Shopping Cart
+// ==========================================
+
+.pack-assignment-hub {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 2rem;
+  height: 100%;
+
+  // Shopping cart is handled by pack-cart component
+
+  // Marketplace Catalog
+  .pack-marketplace {
+    display: flex;
+    flex-direction: column;
+    // gap: 1.5rem;
+    flex: 1;
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    // Filter Section (reuse existing styles)
+    .filter-section {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      .filter-bar {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+
+        .search-input {
+          flex: 1;
+          min-width: 250px;
+
+          input {
+            width: 100%;
+          }
+        }
+
+        .category-dropdown {
+          min-width: 200px;
+        }
+
+        ::ng-deep .p-selectbutton {
+          .p-button {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+          }
+        }
+      }
+
+      .pack-stats-bar {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+        flex-wrap: wrap;
+
+        .stat-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          font-weight: 600;
+
+          i {
+            font-size: 1.1rem;
+          }
+
+          &.available {
+            background: #dbeafe;
+            color: #1e40af;
+          }
+
+          &.cart {
+            background: #fef3c7;
+            color: #92400e;
+            animation: bounce 2s ease-in-out infinite;
+          }
+
+          &.assigned {
+            background: #dcfce7;
+            color: #166534;
+          }
+        }
+      }
+    }
+
+    // Pack Catalog Section
+    .pack-catalog {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .catalog-header {
+      text-align: center;
+      padding: 1rem 0;
+
+      .catalog-title {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .catalog-subtitle {
+        margin: 0;
+        font-size: 1rem;
+        color: #64748b;
+      }
+    } // Grid Layout for Packs
+    .pack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      padding: 0.5rem;
+      align-items: start;
+      // When cart is open, adjust grid to prevent overflow
+      @media (min-width: 1400px) {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+
+      @media (max-width: 1200px) {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 0.75rem;
+      }
+
+      // Marketplace Pack Card
+      ::ng-deep .marketplace-pack-card {
+        .pack-card {
+          height: 100%;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          cursor: pointer;
+
+          &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 150, 108, 0.2);
+          }
+
+          &.selected {
+            border-color: #00966c;
+            background: linear-gradient(135deg, #f0fdf9, #e0f2fe);
+            box-shadow: 0 8px 32px rgba(0, 150, 108, 0.25);
+          }
+        }
+      }
+
+      // Empty State
+      .empty-state {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        text-align: center;
+        color: #64748b;
+
+        i {
+          font-size: 4rem;
+          margin-bottom: 1.5rem;
+          color: #cbd5e1;
+        }
+
+        p {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        small {
+          font-size: 1rem;
+          color: #94a3b8;
+        }
+      }
+    }
+
+    // Loading State
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+
+      p {
+        margin-top: 1rem;
+        color: #64748b;
+        font-weight: 500;
+        font-size: 1.1rem;
+      }
+    }
+
+    // Assigned Packs Section (Collapsible)
+    .assigned-packs-section {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-top: 1rem;
+      overflow: hidden;
+    }
+
+    .assigned-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      }
+
+      .assigned-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .assigned-packs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      padding: 1.5rem;
+      background: #f8fafc;
+
+      ::ng-deep .assigned-pack-card {
+        .pack-card {
+          background: #ffffff;
+          border: 2px solid #dcfce7;
+
+          &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.15);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+// Responsive Design for Marketplace
+@media (max-width: 1400px) {
+  .pack-assignment-hub {
+    .pack-marketplace {
+      .pack-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .pack-assignment-hub {
+    .pack-marketplace {
+      .pack-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      .assigned-packs-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .pack-assignment-hub {
+    gap: 1.5rem;
+
+    .pack-marketplace {
+      gap: 1rem;
+
+      .filter-section {
+        padding: 1rem;
+
+        .filter-bar {
+          flex-direction: column;
+          align-items: stretch;
+
+          .search-input,
+          .category-dropdown {
+            width: 100%;
+            min-width: unset;
+          }
+        }
+
+        .pack-stats-bar {
+          flex-direction: column;
+          gap: 0.75rem;
+
+          .stat-badge {
+            justify-content: center;
+          }
+        }
+      }
+
+      .catalog-header {
+        .catalog-title {
+          font-size: 1.25rem;
+        }
+
+        .catalog-subtitle {
+          font-size: 0.9rem;
+        }
+      }
+
+      .pack-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0;
+      }
+
+      .assigned-packs-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .pack-assignment-hub {
+    .pack-marketplace {
+      .catalog-header {
+        padding: 0.5rem 0;
+
+        .catalog-title {
+          font-size: 1.1rem;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .catalog-subtitle {
+          font-size: 0.85rem;
+        }
+      }
+
+      .filter-section {
+        .filter-bar {
+          gap: 0.75rem;
+        }
+      }
+    }
+  }
+}

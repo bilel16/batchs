@@ -1,0 +1,174 @@
+<div class="detail-page" *ngIf="!loading && interim; else loadingTpl">
+
+  <!-- ═══ BACK HEADER ═══ -->
+  <div class="detail-top-bar">
+    <button pButton icon="pi pi-arrow-left" label="Retour aux délégations" class="p-button-text back-btn"
+            (click)="goBack()"></button>
+    <div class="top-bar-actions">
+      <button pButton icon="pi pi-times-circle" label="Annuler cette délégation" class="p-button-danger p-button-outlined"
+              *ngIf="canCancel()" (click)="cancelInterim()"></button>
+    </div>
+  </div>
+
+  <!-- ═══ DELEGATION RELATIONSHIP CARD ═══ -->
+  <div class="relationship-card">
+    <!-- Header with ID and status -->
+    <div class="rel-header">
+      <div class="rel-header-left">
+        <h2><i class="pi pi-sync"></i> Délégation #{{ interim.id }}</h2>
+      </div>
+      <div class="rel-header-right">
+        <app-interim-state-badge [etat]="interim.etat!"></app-interim-state-badge>
+        <span class="countdown-badge" *ngIf="interim.etat === EtatInterim.ACTIF">
+          <i class="pi pi-stopwatch"></i> {{ getCountdown() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Delegation flow: Source → Cible -->
+    <div class="rel-flow">
+      <div class="rel-user source">
+        <div class="rel-avatar"><i class="pi pi-user"></i></div>
+        <div class="rel-user-info">
+          <span class="rel-user-label">Source (remplacé)</span>
+          <span class="rel-user-matricule">{{ interim.matriculeSource }}</span>
+          <span class="rel-user-strc">Structure {{ interim.codStrcOrigine }}</span>
+        </div>
+      </div>
+
+      <div class="rel-arrow">
+        <div class="rel-arrow-line"></div>
+        <div class="rel-arrow-text">délègue ses droits à</div>
+        <i class="pi pi-arrow-down"></i>
+      </div>
+
+      <div class="rel-user cible">
+        <div class="rel-avatar cible-av"><i class="pi pi-user-plus"></i></div>
+        <div class="rel-user-info">
+          <span class="rel-user-label">Remplaçant</span>
+          <span class="rel-user-matricule">{{ interim.matriculeCible }}</span>
+          <span class="rel-user-strc">Structure {{ interim.codStrcDestination }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Period details -->
+    <div class="rel-period">
+      <div class="period-item">
+        <i class="pi pi-calendar"></i>
+        <span>{{ interim.dateDebutInterim }}</span>
+      </div>
+      <span class="period-arrow">→</span>
+      <div class="period-item">
+        <i class="pi pi-calendar-times"></i>
+        <span>{{ interim.dateFinInterim }}</span>
+      </div>
+      <span class="period-duration">({{ getDelegationDays() }} jours)</span>
+    </div>
+
+    <!-- Visual Timeline Bar -->
+    <div class="timeline-bar-section">
+      <div class="timeline-labels">
+        <span>{{ interim.dateDebutInterim }}</span>
+        <span>{{ interim.dateFinInterim }}</span>
+      </div>
+      <div class="timeline-bar">
+        <div class="timeline-bar-fill" [style.width.%]="timelineBarProgress"
+             [style.background]="timelineBarColor"></div>
+        <div class="timeline-bar-marker" [style.left.%]="timelineBarProgress"
+             *ngIf="interim.etat === EtatInterim.ACTIF">
+          <div class="marker-dot" [style.background]="timelineBarColor"></div>
+        </div>
+      </div>
+      <div class="timeline-status-labels">
+        <span>Créée</span>
+        <span *ngIf="interim.etat === EtatInterim.ACTIF">Période Active</span>
+        <span *ngIf="interim.etat === EtatInterim.TERMINE">Terminée</span>
+        <span *ngIf="interim.etat === EtatInterim.EN_ATTENTE">En attente d'activation</span>
+        <span *ngIf="interim.etat === EtatInterim.ANNULE">Annulée</span>
+        <span>Fin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP TIMELINE ═══ -->
+  <div class="step-timeline-card">
+    <h3><i class="pi pi-list"></i> Chronologie</h3>
+    <div class="step-timeline">
+      <div class="step-event" *ngFor="let evt of timelineEvents; let last = last"
+           [class.step-inactive]="!evt.active">
+        <div class="step-marker" [style.background]="evt.active ? evt.color : '#e5e7eb'">
+          <i [class]="evt.icon"></i>
+        </div>
+        <div class="step-content">
+          <span class="step-label">{{ evt.label }}</span>
+          <span class="step-date" *ngIf="evt.date">{{ evt.date }}</span>
+        </div>
+        <div class="step-line" *ngIf="!last"
+             [style.background]="evt.active ? evt.color : '#e5e7eb'"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PROFILE TRANSFER TABS ═══ -->
+  <div class="profiles-section">
+    <div class="profiles-tabs">
+      <button class="tab-btn" [class.tab-active]="activeTab === 0" (click)="activeTab = 0">
+        <i class="pi pi-shield"></i> Profils Attribués
+        <span class="tab-count">{{ grantedProfiles.length }}</span>
+      </button>
+      <button class="tab-btn" [class.tab-active]="activeTab === 1" (click)="activeTab = 1">
+        <i class="pi pi-database"></i> Profils Sauvegardés
+        <span class="tab-count">{{ backedUpProfiles.length }}</span>
+      </button>
+    </div>
+
+    <div class="profiles-content">
+      <!-- Granted Profiles Tab -->
+      <div *ngIf="activeTab === 0">
+        <div class="profile-info-banner granted">
+          <i class="pi pi-info-circle"></i>
+          <span>Ces profils ont été temporairement attribués au remplaçant ({{ interim.matriculeCible }})</span>
+        </div>
+        <app-table
+          [data]="grantedProfiles"
+          [config]="grantedTableConfig"
+          [showTotal]="true"
+          [totalLabel]="'Profils attribués'"
+          [loading]="false"
+          emptyMessage="Aucun profil attribué"
+          emptySubMessage="Les profils seront transférés lors de l'activation">
+        </app-table>
+      </div>
+
+      <!-- Backed-Up Profiles Tab -->
+      <div *ngIf="activeTab === 1">
+        <div class="profile-info-banner backup">
+          <i class="pi pi-info-circle"></i>
+          <span>Sauvegarde des profils de l'utilisateur source ({{ interim.matriculeSource }}) avant délégation</span>
+        </div>
+        <app-table
+          [data]="backedUpProfiles"
+          [config]="backupTableConfig"
+          [showTotal]="true"
+          [totalLabel]="'Profils sauvegardés'"
+          [loading]="false"
+          emptyMessage="Aucun profil sauvegardé"
+          emptySubMessage="La sauvegarde sera créée lors de l'activation">
+        </app-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading skeleton -->
+<ng-template #loadingTpl>
+  <div class="loading-page">
+    <p-skeleton width="40%" height="2.5rem" borderRadius="12px" class="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="20rem" borderRadius="16px" class="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem" borderRadius="16px" class="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="14rem" borderRadius="16px"></p-skeleton>
+  </div>
+</ng-template>
+
+<p-confirmDialog [style]="{ width: '480px' }"></p-confirmDialog>

@@ -1,0 +1,73 @@
+<!-- 
+  AnimatedDrawerComponent Template
+  
+  This template creates a drawer that morphs from a small square (like login squares)
+  into a full-height right-side panel. The animation mimics the login page square
+  transformations for UI consistency.
+-->
+
+<!-- Backdrop overlay with blur effect (only when drawer is visible) -->
+<div 
+  *ngIf="visible || animationPhase !== 'idle'"
+  class="drawer-backdrop"
+  [class.show-backdrop]="showBackdrop && (animationPhase === 'open' || animationPhase === 'growing')"
+  (click)="onBackdropClick($event)"
+  (keydown)="onKeyDown($event)"
+  tabindex="0">
+</div>
+
+<!-- Main drawer container -->
+<div 
+  *ngIf="visible || animationPhase !== 'idle'"
+  [class]="getDrawerClasses()"
+  [style.width]="width"
+  (click)="onDrawerClick($event)"
+  (animationstart)="onAnimationStart()"
+  (animationend)="onAnimationEnd()">
+
+  <!-- Initial square shape (appears first, then morphs) -->
+  <div 
+    *ngIf="showShape"
+    class="drawer-shape"
+    [class.morphing]="animationPhase === 'growing'"
+    [class.reverse-morphing]="animationPhase === 'shrinking'">
+  </div>
+
+  <!-- Drawer content (appears after morphing completes) -->
+  <div 
+    class="drawer-content-wrapper"
+    [class.content-visible]="animationPhase === 'open'"
+    [class.content-fading-in]="animationPhase === 'growing'">
+
+    <!-- Header section with title and close button -->
+    <div class="drawer-header">
+
+      <h3 class="drawer-title">
+        <span class="title-icon"></span>
+        {{ title }}
+      </h3>
+
+      <button 
+        type="button"
+        class="drawer-close-btn "
+        (click)="closeDrawer()"
+        [attr.aria-label]="'Fermer ' + title">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable body content -->
+    <div class="drawer-body">
+      <div class="body-content">
+        <!-- Content projection slot -->
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <!-- Optional footer section -->
+    <div class="drawer-footer">
+      <ng-content select="[slot=footer]"></ng-content>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,399 @@
+<!-- Profile Toolbar Component -->
+<app-profile-toolbar [selectedAppCode]="selectedAppCode" [showStatistics]="showStatistics"
+  [assignmentStatistics]="assignmentStatistics" [hasSelectedUser]="!!selectedUser"
+  (appSelectionChange)="onAppSelectionChange($event)" (appsLoaded)="onAppsLoaded($event)"
+  (statisticsToggle)="showStatistics = !showStatistics" (addProfile)="openNew()"
+  (cloneProfiles)="openProfileCloneDialog()">
+</app-profile-toolbar>
+<div class="card">
+  <!-- Show message when no application is selected -->
+  <div *ngIf="showNoAppMessage && !selectedAppCode" class="text-center p-4">
+    <i class="pi pi-info-circle text-primary" style="font-size: 3rem"></i>
+    <h4 class="mt-3">Sélectionner une application</h4>
+    <p class="text-muted">
+      Veuillez choisir une application pour afficher les profils.
+    </p>
+  </div>
+
+  <!-- PrimeNG Stepper for Profile Assignment Workflow -->
+  <div *ngIf="selectedAppCode" class="w-full">
+    <p-stepper [(value)]="activeStep" class="basis-[40rem]">
+      <p-step-list>
+        <ng-container *ngFor="let step of steps; let i = index">
+          <p-step [value]="step.value" class="flex flex-row flex-auto gap-2">
+            <ng-template #content let-activateCallback="activateCallback" let-value="value">
+              <button [ngStyle]="{'pointer-events':'none'}" class="bg-transparent border-0 inline-flex flex-col gap-2"
+                (click)="activateCallback()">
+                <span class="rounded-full border-2 w-12 h-12 inline-flex items-center justify-center" [ngClass]="{
+                            ' text-primary-contrast border-primary': value <= activeStep,
+                            'border-surface': value > activeStep
+                        }">
+                  <i [class]="'text-3xl step-icon ' + getStepIcon(step, value)" [ngClass]="{
+    'active': activeStep === value,
+    'completed': value < activeStep
+  }"></i>
+                  <br>
+                  <span *ngIf="value >= activeStep" class="text-icon text-sm font-medium transition-all duration-200"
+                    [ngClass]="{
+    'text-[#007F6D] font-semibold': activeStep === value,
+    'text-gray-600': activeStep !== value
+  }">
+                    {{ step.label }}
+                  </span>
+                </span>
+
+              </button>
+            </ng-template>
+          </p-step>
+        </ng-container>
+      </p-step-list>
+
+      <p-step-panels> <!-- Step 1: User Selection -->
+        <p-step-panel [value]="1">
+          <ng-template #content let-activateCallback="activateCallback">
+            <!-- User Selection Step Component -->
+            <app-user-selection-step [managedUsers]="managedUsers" [selectedUser]="selectedUser"
+              [filterValue]="filterValue" [isLoadingManagedUsers]="isLoadingManagedUsers" [isAdminUser]="isAdminUser"
+              [adminCurrentPage]="adminCurrentPage" [adminTotalPages]="adminTotalPages"
+              [adminTotalElements]="adminTotalElements" [adminPageSize]="adminPageSize"
+              [adminIsFirstPage]="adminIsFirstPage" [adminIsLastPage]="adminIsLastPage"
+              [adminSearchTerm]="adminSearchTerm" [adminStatusFilter]="adminStatusFilter"
+              [adminStructureFilter]="adminStructureFilter" [adminStructureTypeFilter]="adminStructureTypeFilter"
+              [adminSortBy]="adminSortBy" [adminSortDirection]="adminSortDirection"
+              [adminStatusOptions]="adminStatusOptions" [adminSortOptions]="adminSortOptions"
+              [structureOptions]="structureOptions" [structureTypeOptions]="structureTypeOptions"
+              (userSelect)="selectUserForStep($event)" (refreshUsers)="loadManagedUsers()" (nextPage)="nextPage()"
+              (previousPage)="previousPage()" (goToPage)="goToPage($event)" (pageSizeChange)="changePageSize($event)"
+              (adminSearchChange)="onAdminSearchChange($event)" (adminStatusChange)="onAdminStatusChange($event)"
+              (adminStructureChange)="onAdminStructureChange($event)"
+              (adminStructureTypeChange)="onAdminStructureTypeChange($event)"
+              (adminSortChange)="onAdminSortChange($event)" (adminFiltersReset)="resetAdminFilters()">
+            </app-user-selection-step>
+            <!-- Step Navigation -->
+            <div class="flex pt-6 button-stepper ">
+              <p-button label="Suivant" icon="pi pi-arrow-right" iconPos="right" [disabled]="!selectedUser"
+                (onClick)="activateCallback(2)" />
+            </div>
+          </ng-template>
+        </p-step-panel> <!-- Step 2: Profile Assignment -->
+        <p-step-panel [value]="2"> <ng-template #content let-activateCallback="activateCallback">
+            <!-- Profile Assignment Step Component --> <app-profile-assignment-step [selectedUser]="selectedUser"
+              [availableProfiles]="availableProfiles" [assignedProfiles]="assignedProfiles"
+              [filteredAvailableProfiles]="filteredAvailableProfiles"
+              [filteredAssignedProfiles]="filteredAssignedProfiles" [availableProfileFilters]="availableProfileFilters"
+              [assignedProfileFilters]="assignedProfileFilters" [levelFilterOptions]="levelFilterOptions"
+              [categoryFilterOptions]="categoryFilterOptions" [statusFilterOptions]="statusFilterOptions"
+              [selectedProfiles]="selectedProfiles" [newlyMovedProfiles]="newlyMovedProfiles" [dragState]="dragState"
+              [availablePacks]="filteredAvailablePacks" [assignedPacks]="filteredAssignedPacks"
+              [cartPacks]="packsToAssign" (profileDrop)="onDrop($event)"
+              (profileSelection)="toggleProfileSelection($event.profile, $event.listType)"
+              (profileAction)="onProfileAction($event.action, $event.profile, $event.event)"
+              (profileInfo)="showProfileInfo($event.profile, $event.event)"
+              (restoreProfile)="onRestoreProfile($event.profile, $event.event)" (packAssign)="onPackAssign($event)"
+              (packUnassign)="onPackUnassign($event)" (packInfo)="onPackInfo($event)" (packDrop)="onPackDrop($event)"
+              (batchPackAssign)="onBatchPackAssign($event)" (cartPacksChange)="onCartPacksChange($event)"
+              (availableFiltersChange)="availableProfileFilters = $event; applyAvailableProfileFilters()"
+              (assignedFiltersChange)="assignedProfileFilters = $event; applyAssignedProfileFilters()"
+              (clearAvailableFilters)="clearAvailableProfileFilters()"
+              (clearAssignedFilters)="clearAssignedProfileFilters()" (filterTabChange)="onFilterTabChange($event)"
+              (resetModifications)="resetAllModifications()">
+            </app-profile-assignment-step><!-- Step Navigation -->
+            <div class="flex pt-6 button-stepper">
+              <p-button label="Précédent" severity="secondary" icon="pi pi-arrow-left"
+                (onClick)="activateCallback(1)" />
+              <p-button label="Suivant - Confirmer" icon="pi pi-arrow-right" iconPos="right"
+                [disabled]="!hasChangesToSave()" (onClick)="goToConfirmationStep(activateCallback)" />
+            </div>
+          </ng-template>
+        </p-step-panel>
+        <!-- Step 3: Confirmation -->
+        <p-step-panel [value]="3">
+          <ng-template #content let-activateCallback="activateCallback"> <!-- Confirmation Step Component -->
+            <app-confirmation-step #confirmationStep [selectedUser]="selectedUser" [selectedAppCode]="selectedAppCode"
+              [newlyMovedProfiles]="newlyMovedProfiles" [packsToAssign]="packsToAssign" [allProfiles]="getAllProfiles()"
+              [loading]="loading" [assignmentResults]="assignmentResults" [isAssigning]="isAssigning"
+              [assignmentProgress]="assignmentProgress" (saveAssignments)="saveAssignments()">
+            </app-confirmation-step> <!-- Step Navigation -->
+            <div class="flex pt-6 button-stepper">
+              <p-button label="Précédent" severity="secondary" icon="pi pi-arrow-left"
+                (onClick)="activateCallback(2)" />
+              <p-button [label]="'Enregistrer (' + getTotalChangesCount() + ')'" icon="pi pi-save"
+                [disabled]="!hasChangesToSave()" [loading]="loading" (click)="saveAssignments()" />
+            </div>
+          </ng-template>
+        </p-step-panel>
+      </p-step-panels>
+    </p-stepper>
+  </div>
+</div>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+
+<!-- Profile Info Dialog -->
+<p-dialog [(visible)]="profileInfoDialog" [style]="{ width: '520px'}" header="Détails du profil" [modal]="true"
+  styleClass="p-fluid profile-info-dialog bna-style" [closable]="true">
+  <ng-template pTemplate="content">
+    <div *ngIf="selectedProfileInfo" class="profile-details">
+
+      <!-- Profile Header -->
+      <div class="profile-detail-header">
+        <div class="profile-avatar">
+          <i class="pi pi-id-card"></i>
+        </div>
+        <div class="profile-info">
+          <h3 class="profile-name">{{ selectedProfileInfo.displayName }}</h3>
+        </div>
+
+      </div>
+
+      <!-- Information Grid -->
+      <div class="profile-info-grid">
+
+        <div class="info-card" *ngIf="selectedProfileInfo.assignmentStatus">
+          <i class="pi pi-info-circle info-icon"></i>
+          <div class="info-content">
+            <label><b>Statut: </b></label>
+            <span class="badge" [class]="'badge-' + getStatusColor(selectedProfileInfo)">
+              <i [class]="'pi ' + getStatusIcon(selectedProfileInfo) + ' me-1'"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="info-card" *ngIf="selectedProfileInfo.categoryName">
+          <i class="pi pi-user info-icon"></i>
+          <div class="info-content">
+            <label><b>Catégorie:</b></label>
+            <span class="category-badge assigned">{{ selectedProfileInfo.categoryName }}</span>
+          </div>
+        </div>
+
+        <div class="info-card" *ngIf="selectedProfileInfo.accessHours">
+          <i class="pi pi-clock info-icon"></i>
+          <div class="info-content">
+            <label><b>Heures d accès: </b></label>
+            <span>{{ selectedProfileInfo.accessHours }}</span>
+          </div>
+        </div>
+
+        <div class="info-card" *ngIf="selectedProfileInfo.assignmentDates">
+          <i class="pi pi-calendar info-icon"></i>
+          <div class="info-content">
+            <label><b>Période d affectation:</b> {{ selectedProfileInfo.assignmentDates }}</label>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <i class="pi pi-star info-icon"></i>
+          <div class="info-content">
+            <label><b>Niveau d autorisation:</b></label>
+            <span class="level-description">
+              Niveau {{ selectedProfileInfo.codNivhPfl || '1' }} -
+              {{ getLevelDescription(selectedProfileInfo.codNivhPfl || '1') }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fermer" icon="pi pi-times" (click)="closeProfileInfo()"
+      styleClass="p-button-success rounded-button" />
+  </ng-template>
+</p-dialog>
+
+
+<!-- Old Utilized Dialog for legacy functionality -->
+<p-dialog [(visible)]="utilisateurProfilDialog" [style]="{ width: '450px' }" header="{{ dialogHeader }}" [modal]="true"
+  styleClass="p-fluid" [closable]="false">
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="profil">Profil <span class="required-asterisk">*</span></label>
+      <p-dropdown id="profil" [options]="listRols" [(ngModel)]="utilisateurProfil.codPflPfl" placeholder="Profil"
+        optionLabel="libpflpfl" optionValue="codPflPfl" [showClear]="true"></p-dropdown>
+    </div>
+
+    <div class="field">
+      <label for="matricule">Matricule <span class="required-asterisk">*</span></label>
+      <input pInputText id="matricule" [(ngModel)]="utilisateurProfil.numMatrUser" readonly />
+    </div>
+
+    <div class="field">
+      <label for="dateDebut">Date de début</label>
+      <p-calendar id="dateDebut" [(ngModel)]="utilisateurProfil.datFadhUtpr" [showIcon]="true" dateFormat="dd/mm/yy">
+      </p-calendar>
+    </div>
+
+    <div class="field">
+      <label for="dateFin">Date de fin</label>
+      <p-calendar id="dateFin" [(ngModel)]="utilisateurProfil.datdadhutpr" [showIcon]="true" dateFormat="dd/mm/yy">
+      </p-calendar>
+    </div>
+
+    <div class="field field-checkbox">
+      <p-checkbox id="etat" name="etat" binary="true" [(ngModel)]="utilisateurProfil.boolEtatUtpr"></p-checkbox>
+      <label for="etat">Actif</label>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Annuler" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+    <button pButton pRipple label="Enregistrer" icon="pi pi-check" class="p-button-text"
+      *ngIf="action === actionType.ADD" (click)="saveUtilisateurProfil()"></button>
+    <button pButton pRipple label="Modifier" icon="pi pi-check" class="p-button-text" *ngIf="action === actionType.EDIT"
+      (click)="updateUtilisateurProfil()"></button>
+  </ng-template>
+</p-dialog>
+
+
+<!-- Profile Assignment Dialog -->
+<p-dialog [(visible)]="profileAssignmentDialog" [style]="{ width: '500px' }" header="Détails d'affectation du profil"
+  [modal]="true" styleClass="p-fluid profile-assignment-dialog" [closable]="false">
+  <ng-template pTemplate="content">
+    <div class="assignment-form">
+      <!-- Profile Info -->
+      <div class="profile-info-section mb-4 p-3 bg-light rounded">
+        <h6 class="mb-2">
+          <i class="pi pi-id-card me-2"></i>
+          Profil(s) à assigner
+        </h6>
+        <p class="mb-0 text-muted">
+          <strong>{{ currentAssignmentForm.profileCode }}</strong>
+        </p>
+        <small class="text-muted" *ngIf="pendingProfileAssignments.length > 1">
+          Les mêmes dates et statut seront appliqués à tous les profils sélectionnés
+        </small>
+      </div>
+      <div class="date-wrapper">
+        <!-- Date Debut -->
+        <div class="field mb-3 assignDateDeb">
+          <label for="assignDateDebut">
+            <i class="pi pi-calendar me-1"></i>
+            Date de début <span class="text-danger">*</span>
+          </label>
+          <div class="date-deb-wrapper">
+            <p-calendar id="assignDateDebut" [iconDisplay]="'input'" [(ngModel)]="currentAssignmentForm.dateDebut"
+              [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Date de début" appendTo="body">
+            </p-calendar>
+            <small class="text-muted">Date à partir de laquelle le profil sera actif</small>
+          </div>
+        </div>
+
+        <!-- Date Fin -->
+        <div class="field mb-3 assignDateDeb">
+          <label for="assignDateFin">
+            <i class="pi pi-calendar me-1"></i>
+            Date de fin
+          </label>
+          <div class="date-deb-wrapper">
+            <p-calendar id="assignDateFin" [(ngModel)]="currentAssignmentForm.dateFin" [showIcon]="true"
+              [iconDisplay]="'input'" dateFormat="dd/mm/yy" [minDate]="currentAssignmentForm.dateDebut"
+              placeholder="Date de fin (optionnel)" appendTo="body">
+            </p-calendar>
+            <small class="text-muted">Laisser vide pour une affectation sans date de fin</small>
+          </div>
+        </div>
+      </div>
+      <!-- Warning Message -->
+      <div class="alert alert-info d-flex align-items-start" role="alert">
+        <i class="pi pi-info-circle me-2 mt-1"></i>
+        <div>
+          <strong>Information:</strong>
+          <span *ngIf="pendingProfileAssignments.length === 1">
+            Ce profil sera assigné à l'utilisateur avec les paramètres définis ci-dessus.
+          </span>
+          <span *ngIf="pendingProfileAssignments.length > 1">
+            Les {{ pendingProfileAssignments.length }} profils sélectionnés seront assignés avec les mêmes paramètres.
+          </span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Annuler" icon="pi pi-times" class="p-button-text p-button-secondary"
+      (click)="cancelProfileAssignment()">
+    </button>
+    <button pButton pRipple label="Confirmer l'affectation" icon="pi pi-check" class="p-button-success"
+      (click)="confirmProfileAssignment()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- Profile Restore Dialog -->
+<p-dialog [(visible)]="profileRestoreDialog" [style]="{ width: '600px', height: '80vh' }"
+  header="Réactiver le profil révoqué" [modal]="true" styleClass="p-fluid profile-restore-dialog" [closable]="false">
+  <ng-template pTemplate="content">
+    <div class="restore-form">
+      <div class="date-picker-content">
+        <!-- Profile Info -->
+        <div class="profile-info-section mb-4 p-3 bg-success-subtle rounded">
+          <div class="title">
+            <h6 class="mb-2 text-success">
+              <i class="pi pi-refresh me-2"></i>
+              Profil à réactiver
+            </h6>
+            <small class="text-muted">{{ selectedProfileToRestore?.codPflPfl }}</small>
+          </div>
+          <p class="mb-1">
+            <strong>{{ selectedProfileToRestore?.displayName }}</strong>
+          </p>
+
+        </div> <!-- Warning about current status -->
+        <div class="alert alert-warning d-flex align-items-start mb-3" role="alert">
+          <i class="pi pi-exclamation-triangle me-2 mt-1"></i>
+          <div>
+            <strong>Profil révoqué:</strong>
+            Ce profil est actuellement inactif. La réactivation rendra le profil disponible pour l'utilisateur.
+          </div>
+        </div>
+      </div>
+      <!-- Date Fields in Two Columns -->
+      <div class="row mb-3">
+        <!-- Date Debut -->
+        <div class="col-md-6">
+          <div class="field">
+            <label for="restoreDateDebut">
+              <i class="pi pi-calendar me-1"></i>
+              Nouvelle date de début <span class="text-danger">*</span>
+            </label>
+            <p-calendar id="restoreDateDebut" [(ngModel)]="restoreProfileForm.dateDebut" [showIcon]="true"
+              dateFormat="dd/mm/yy" placeholder="Sélectionner la date de début" styleClass="w-100"
+              [showClear]="false"><!-- Handle clearing the debut date -->
+            </p-calendar>
+          </div>
+        </div>
+
+        <!-- Date Fin -->
+        <div class="col-md-6">
+          <div class="field">
+            <label for="restoreDateFin">
+              <i class="pi pi-calendar me-1"></i>
+              Nouvelle date de fin <span class="text-danger">*</span>
+            </label>
+            <p-calendar id="restoreDateFin" [(ngModel)]="restoreProfileForm.dateFin" [showIcon]="true"
+              dateFormat="dd/mm/yy" [minDate]="restoreProfileForm.dateDebut" [showClear]="false"
+              placeholder="Sélectionner la date de fin" styleClass="w-100">
+            </p-calendar>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Annuler" icon="pi pi-times" class="p-button-text p-button-secondary"
+      (click)="cancelProfileRestore()" [disabled]="loading">
+    </button> <button pButton pRipple [label]="loading ? 'Réactivation en cours...' : 'Réactiver le profil'"
+      [icon]="loading ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'" class="p-button-success"
+      (click)="confirmProfileRestore()" [disabled]="loading">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- Profile Clone Dialog -->
+<app-profile-clone [(visible)]="profileCloneDialogVisible" [availableUsers]="allUsersForCloning"
+  [currentUser]="selectedUser" [sourceUserProfiles]="profilesForCloning" [loading]="cloningInProgress"
+  [appCode]="selectedAppCode" [cloningInProgress]="cloningInProgress" [externalCloneProgress]="cloneProgress"
+  [externalCloneResults]="cloneResults" (visibleChange)="onCloneDialogVisibleChange($event)"
+  (loadSourceProfiles)="onLoadSourceProfiles($event)" (clone)="onExecuteClone($event)">
+</app-profile-clone>

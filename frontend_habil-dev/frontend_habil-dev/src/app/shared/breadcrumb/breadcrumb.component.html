@@ -1,0 +1,21 @@
+<div class="bar-container">
+  <div class="bar-left">
+    <div class="bar-title">
+      <span>{{ currentPageTitle }}</span>
+    </div>
+    <div class="bar-actions-left">
+      <ng-content select="[bar-actions-left]"></ng-content>
+    </div>
+  </div>
+
+  <div class="bar-right">
+    <div class="bar-breadcrumb">
+      <p-breadcrumb [home]="home" [model]="items" styleClass="my-breadcrumb">
+        <ng-template pTemplate="separator"> / </ng-template>
+      </p-breadcrumb>
+    </div>
+    <div class="bar-actions-right">
+      <ng-content select="[bar-actions-right]"></ng-content>
+    </div>
+  </div>
+</div>

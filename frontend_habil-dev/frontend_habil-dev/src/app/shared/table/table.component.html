@@ -1,0 +1,171 @@
+<div class="table-container">
+  <!-- Header Section -->
+  <div class="table-header" *ngIf="showTotal">
+    <div class="table-title">
+      <h5>{{ totalLabel }}</h5>
+      <span class="table-count">{{ data.length || 0 }}</span>
+    </div>
+  </div>
+
+  <!-- Content Card -->
+  <div class="content-card">
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-bar" *ngIf="search">
+      <div class="search-box">
+        <p-floatlabel variant="on">
+          <input class="search-input" pInputText id="on_label" [(ngModel)]="searchTerm" (input)="onSearch()" autocomplete="off" />
+          <button *ngIf="searchTerm" pButton type="button" icon="pi pi-times"
+            class="p-button-rounded p-button-text clear-button" (click)="clearSearch()">
+          </button>
+          <label for="on_label">{{searchPlaceholder}}</label>
+        </p-floatlabel>
+      </div>
+
+
+      <div class="filter-actions">
+        <button pButton type="button" icon="pi pi-refresh" class="p-button-outlined refresh-button"
+          (click)="refreshData()" pTooltip="Actualiser" tooltipPosition="top">
+        </button>
+      </div>
+    </div> <!-- Data Table -->
+    <p-table #dt [value]="loading ? skeletonRows : filteredData" [paginator]="true" [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 20, 50]" styleClass="p-datatable-gridlines p-datatable-striped"
+      [tableStyle]="{'min-width': '60rem'}"
+      currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} entrées"
+      [showCurrentPageReport]="true" responsiveLayout="scroll" [rowHover]="true">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <ng-container *ngFor="let col of columns">
+            <th [pSortableColumn]="col.sortable ? col.field : null" [ngStyle]="getColumnStyle(col)">
+              <div class="header-content">
+                <span class="header-text">{{ col.header }}</span>
+                <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
+              </div>
+            </th>
+          </ng-container>
+
+          <th *ngIf="showActions" [ngStyle]="styleAction" class="actions-header">
+            Actions
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr (click)="handleRowClick(item)">
+          <td *ngFor="let col of columns">
+            <ng-container *ngIf="!loading; else skeletonCell">
+              <ng-container [ngSwitch]="col.type">
+                <!-- Text -->
+                <div *ngSwitchCase="'text'" class="cell-content">
+                  <span class="cell-text">
+                    {{ col.formatFn ? col.formatFn(getNestedValue(item, col.field)) : getNestedValue(item, col.field) }}
+                  </span>
+                </div>
+
+                <!-- Number -->
+                <div *ngSwitchCase="'number'" class="cell-content">
+                  <span class="cell-text">{{ getNestedValue(item, col.field) }}</span>
+                </div>
+
+                <!-- Date -->
+                <div *ngSwitchCase="'date'" class="cell-content">
+                  <span class="cell-text">{{ getNestedValue(item, col.field) | date : "dd/MM/yyyy" }}</span>
+                </div>
+
+                <!-- Boolean -->
+                <div *ngSwitchCase="'boolean'" class="cell-content cell-center">
+                  <p-tag [value]="getNestedValue(item, col.field) ? 'Actif' : 'Inactif'"
+                    [severity]="getNestedValue(item, col.field) ? 'success' : 'danger'" [rounded]="true">
+                  </p-tag>
+                </div>
+
+                <!-- Tag -->
+                <div *ngSwitchCase="'tag'" class="cell-content cell-center">
+                  <p-tag
+                    [value]="col.formatFn ? col.formatFn(getNestedValue(item, col.field)) : getNestedValue(item, col.field)"
+                    [severity]="col.severityFn ? col.severityFn(getNestedValue(item, col.field)) : 'info'"
+                    [rounded]="true">
+                  </p-tag>
+                </div>
+
+                <!-- Default fallback -->
+                <div *ngSwitchDefault class="cell-content">
+                  <span class="cell-text">{{ getNestedValue(item, col.field) }}</span>
+                </div>
+              </ng-container>
+            </ng-container>
+
+            <ng-template #skeletonCell>
+              <p-skeleton />
+            </ng-template>
+          </td>
+
+          <!-- Actions Column -->
+          <td *ngIf="showActions">
+            <div class="action-buttons">
+              <!-- View Button -->
+              <button *ngIf="actions.view" pButton type="button" icon="pi pi-eye" class="action-btn-view  action-btn"
+                (click)="onView.emit(item); $event.stopPropagation()" pTooltip="Voir les détails" tooltipPosition="top">
+              </button>
+
+              <!-- Edit Button -->
+              <button *ngIf="actions.edit" pButton type="button" icon="pi pi-pencil" class="action-btn-edit action-btn"
+                (click)="onEdit.emit(item); $event.stopPropagation()" pTooltip="Modifier" tooltipPosition="top">
+              </button>
+
+              <!-- Notification Button -->
+              <button *ngIf="actions.notification" pButton type="button" icon="pi pi-bell"
+                class="action-btn-notification action-btn notification-btn"
+                (click)="onNotification.emit(item); $event.stopPropagation()" pTooltip="Notifications"
+                tooltipPosition="top">
+                <span class="notification-badge">2</span>
+              </button>
+
+              <!-- Send Button -->
+              <button *ngIf="actions.send" pButton type="button" icon="pi pi-send" class="action-btn-send action-btn"
+                (click)="onSend.emit(item); $event.stopPropagation()" pTooltip="Envoyer" tooltipPosition="top">
+              </button>
+
+              <!-- Delete Button -->
+              <button *ngIf="actions.delete" class="action-btn action-btn-delete"
+                (click)="onDelete.emit(item); $event.stopPropagation()" pTooltip="Supprimer" tooltipPosition="top">
+                <svg class="trash-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Lid/Top -->
+                  <g class="trash-lid">
+                    <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </g>
+
+                  <!-- Body -->
+                  <g class="trash-body">
+                    <path d="M19 6v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+
+                    <!-- 3 Vertical Lines Inside -->
+                    <line x1="12" y1="10" x2="12" y2="17" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <line x1="9" y1="10" x2="9" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <line x1="15" y1="10" x2="15" y2="17" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </g>
+                </svg>
+              </button>
+
+            </div>
+          </td>
+        </tr>
+      </ng-template> <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="columns.length + (showActions ? 1 : 0)">
+            <div class="empty-state">
+              <i class="pi pi-inbox empty-icon"></i>
+              <h3>{{ emptyMessage }}</h3>
+              <p>{{ emptySubMessage }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

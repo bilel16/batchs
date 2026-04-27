@@ -1,0 +1,511 @@
+// ============================================================================
+// GOOEY TOAST — Pixel-perfect Angular clone of goey-toast (React)
+// Matches original CSS from node_modules/goey-toast/dist/index.css EXACTLY.
+//
+// KEY ARCHITECTURE:
+// - SVG <path> draws the blob shape (NO CSS border-radius on blob)
+// - SVG drop-shadow() provides depth (NO feGaussianBlur/feColorMatrix filter)
+// - Content padding matches original .gooey-contentCompact / .gooey-contentExpanded
+// - All colors, sizes, weights from original index.css
+// ============================================================================
+
+// ── Color tokens (EXACT from original goey-toast) ────────────────────────
+$gooey-success:  #4CAF50;
+$gooey-error:    #E53935;
+$gooey-warning:  #C49000;
+$gooey-info:     #1E88E5;
+$gooey-default:  #555;
+
+// Dark theme variants (EXACT)
+$gooey-success-dark:  #66BB6A;
+$gooey-error-dark:    #EF5350;
+$gooey-warning-dark:  #FFB300;
+$gooey-info-dark:     #42A5F5;
+$gooey-default-dark:  #ccc;
+
+// ── Host ──────────────────────────────────────────────────────────────────
+:host {
+  display: contents;
+}
+
+// ── Toaster container (positioning) ───────────────────────────────────────
+.gooey-toaster {
+  position: fixed;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  gap: var(--gooey-gap, 14px);
+
+  // ── 6 positions (reset opposing props for dynamic switching) ─────
+  &.pos-top-left {
+    top: var(--gooey-offset, 24px);
+    left: var(--gooey-offset, 24px);
+    bottom: auto; right: auto; transform: none;
+    align-items: flex-start;
+  }
+  &.pos-top-center {
+    top: var(--gooey-offset, 24px);
+    left: 50%;
+    bottom: auto; right: auto; transform: translateX(-50%);
+    align-items: center;
+  }
+  &.pos-top-right {
+    top: var(--gooey-offset, 24px);
+    right: var(--gooey-offset, 24px);
+    bottom: auto; left: auto; transform: none;
+    align-items: flex-end;
+  }
+  &.pos-bottom-left {
+    bottom: var(--gooey-offset, 24px);
+    left: var(--gooey-offset, 24px);
+    top: auto; right: auto; transform: none;
+    align-items: flex-start;
+    flex-direction: column-reverse;
+  }
+  &.pos-bottom-center {
+    bottom: var(--gooey-offset, 24px);
+    left: 50%;
+    top: auto; right: auto; transform: translateX(-50%);
+    align-items: center;
+    flex-direction: column-reverse;
+  }
+  &.pos-bottom-right {
+    bottom: var(--gooey-offset, 24px);
+    right: var(--gooey-offset, 24px);
+    top: auto; left: auto; transform: none;
+    align-items: flex-end;
+    flex-direction: column-reverse;
+  }
+}
+
+// ── Individual toast wrapper (matches .gooey-wrapper) ─────────────────────
+.gooey-toast-wrapper {
+  pointer-events: auto;
+  cursor: default;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    sans-serif;
+  position: relative;
+  width: fit-content;
+
+  // Hover → show close button
+  &:hover .gooey-close-btn {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// ── Blob SVG (matches .gooey-blobSvg) ─────────────────────────────────────
+// SVG contains a <path> that IS the blob shape — no border-radius needed.
+// drop-shadow applied here matches the original EXACTLY.
+.gooey-blob-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06)) drop-shadow(0 1px 4px rgba(0, 0, 0, 0.04));
+}
+
+// ── Content layer (matches .gooey-content) ────────────────────────────────
+.gooey-content {
+  position: relative;
+  z-index: 1;
+  transition: padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Compact pill state (matches .gooey-contentCompact: padding 7px 10px)
+.phase-pill .gooey-content {
+  padding: 7px 10px;
+}
+
+// Expanded state (matches .gooey-contentExpanded: padding 7px 10px 16px 10px)
+.phase-expanded .gooey-content {
+  padding: 7px 10px 16px 10px;
+  min-width: 300px;
+  max-width: 380px;
+}
+
+// ── Header row (matches .gooey-header) ────────────────────────────────────
+.gooey-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+}
+
+// ── Icon wrapper (matches .gooey-iconWrapper: 18×18) ──────────────────────
+.gooey-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  line-height: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// ── Title (matches .gooey-title: 12px/700/lh1) ───────────────────────────
+.gooey-title {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: inherit;
+  padding: 0 4px 0 2px;
+}
+
+// Per-type title colors (EXACT from original)
+.type-default .gooey-title  { color: $gooey-default; }
+.type-success .gooey-title  { color: $gooey-success; }
+.type-error .gooey-title    { color: $gooey-error; }
+.type-warning .gooey-title  { color: $gooey-warning; }
+.type-info .gooey-title     { color: $gooey-info; }
+.is-loading .gooey-title    { color: $gooey-default; }
+
+// Per-type icon colors
+.type-success .gooey-icon { color: $gooey-success; }
+.type-error .gooey-icon   { color: $gooey-error; }
+.type-warning .gooey-icon { color: $gooey-warning; }
+.type-info .gooey-icon    { color: $gooey-info; }
+.type-default .gooey-icon { color: $gooey-default; }
+
+// ── Timestamp (matches .gooey-timestamp) ──────────────────────────────────
+.gooey-timestamp {
+  font-size: 11px;
+  font-weight: 400;
+  color: #999;
+  white-space: nowrap;
+  line-height: 1;
+  padding-left: 6px;
+}
+
+// Timestamp inside description body (float right, matches original React render)
+.gooey-timestamp-body {
+  font-size: 11px;
+  font-weight: 400;
+  color: #999;
+  white-space: nowrap;
+  line-height: 1;
+  float: right;
+  margin-left: 10px;
+  margin-top: 3px;
+  padding-left: 0;
+}
+
+// ── Spinner (matches .gooey-spinnerSpin: 1s linear infinite) ──────────────
+.gooey-spinner {
+  svg {
+    animation: gooey-spin 1s linear infinite;
+  }
+  color: $gooey-default;
+}
+
+@keyframes gooey-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// ── Description (matches .gooey-description) ──────────────────────────────
+.gooey-description {
+  font-size: 13px;
+  font-weight: 400;
+  color: #444;
+  line-height: 1.55;
+  margin-top: 16px;
+  overflow: hidden;
+  text-align: left;
+  animation: gooey-fade-in 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes gooey-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Action wrapper (matches .gooey-actionWrapper) ─────────────────────────
+.gooey-action-wrapper {
+  margin-top: 12px;
+  overflow: hidden;
+  animation: gooey-fade-in 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation-delay: 100ms;
+  animation-fill-mode: backwards;
+}
+
+// ── Action button (matches .gooey-actionButton: full-width pill) ──────────
+.gooey-action-btn {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
+
+  &:focus:not(:focus-visible) { outline: none; }
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+// Per-type action button colors (EXACT from original)
+.type-default .gooey-action-btn {
+  background: #E8E8E8; color: $gooey-default;
+  &:hover { background: #DCDCDC; }
+  &:active { background: #D0D0D0; }
+}
+.type-success .gooey-action-btn {
+  background: #C8E6C9; color: $gooey-success;
+  &:hover { background: #A5D6A7; }
+  &:active { background: #81C784; }
+}
+.type-error .gooey-action-btn {
+  background: #FFCDD2; color: $gooey-error;
+  &:hover { background: #EF9A9A; }
+  &:active { background: #E57373; }
+}
+.type-warning .gooey-action-btn {
+  background: #FFECB3; color: $gooey-warning;
+  &:hover { background: #FFE082; }
+  &:active { background: #FFD54F; }
+}
+.type-info .gooey-action-btn {
+  background: #BBDEFB; color: $gooey-info;
+  &:hover { background: #90CAF9; }
+  &:active { background: #64B5F6; }
+}
+
+// ── Action success pill ───────────────────────────────────────────────────
+.gooey-action-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50px;
+  background: $gooey-success;
+  color: #fff;
+  animation: gooey-morph-success 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gooey-action-check {
+  width: 14px;
+  height: 14px;
+}
+
+@keyframes gooey-morph-success {
+  0%   { transform: scale(0.5); opacity: 0; border-radius: 4px; }
+  50%  { transform: scale(1.08); border-radius: 50px; }
+  100% { transform: scale(1); opacity: 1; border-radius: 50px; }
+}
+
+// ── Progress bar (matches .gooey-progressWrapper) ─────────────────────────
+.gooey-progress-track {
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 2px;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.06);
+  transition: opacity 0.2s ease;
+}
+
+// Use CSS animation like original (scaleX 1→0, paused on hover)
+// animation-delay: 600ms accounts for expand morph animation so progress bar
+// finishes at the same time as the auto-close timer fires.
+.gooey-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transform-origin: left center;
+  animation: gooey-progress-shrink var(--gooey-progress-duration, 4000ms) linear forwards;
+  animation-delay: 600ms;
+  animation-play-state: running;
+
+  &.progress-default { background: #999; }
+  &.progress-success { background: $gooey-success; }
+  &.progress-error   { background: $gooey-error; }
+  &.progress-warning { background: $gooey-warning; }
+  &.progress-info    { background: $gooey-info; }
+}
+
+// Pause progress on hover (exact match: .gooey-progressPaused .gooey-progressBar)
+.gooey-progress-paused .gooey-progress-fill {
+  animation-play-state: paused;
+}
+
+@keyframes gooey-progress-shrink {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+// ── Close button ──────────────────────────────────────────────────────────
+// NOTE: For right-aligned positions, the wrapper has scaleX(-1), so
+// CSS `right` becomes visual `left`. We use `left: -6px` inside mirrored
+// wrappers so the close button always appears on the visual top-right.
+.gooey-close-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50%;
+  background: #fff;
+  color: #94a3b8;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: all 180ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &:hover {
+    color: #475569;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: scale(1.1);
+  }
+}
+
+// When wrapper is mirrored (right-aligned), flip close btn to visual right
+.gooey-toaster {
+  &.pos-top-right, &.pos-bottom-right {
+    .gooey-close-btn {
+      right: auto;
+      left: -6px;
+    }
+  }
+}
+
+// ============================================================================
+// DARK THEME (matches .gooey-wrapper[data-theme=dark] EXACTLY)
+// ============================================================================
+
+.theme-dark {
+
+  .gooey-blob-svg {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  .type-default .gooey-title  { color: $gooey-default-dark; }
+  .type-success .gooey-title  { color: $gooey-success-dark; }
+  .type-error .gooey-title    { color: $gooey-error-dark; }
+  .type-warning .gooey-title  { color: $gooey-warning-dark; }
+  .type-info .gooey-title     { color: $gooey-info-dark; }
+  .is-loading .gooey-title    { color: $gooey-default-dark; }
+
+  .gooey-timestamp,
+  .gooey-timestamp-body {
+    color: #777;
+  }
+
+  .gooey-description {
+    color: #e0e0e0;
+  }
+
+  .type-default .gooey-action-btn {
+    background: #3a3a3a; color: $gooey-default-dark;
+    &:hover { background: #444; } &:active { background: #4e4e4e; }
+  }
+  .type-success .gooey-action-btn {
+    background: #1b5e20; color: $gooey-success-dark;
+    &:hover { background: #2e7d32; } &:active { background: #388e3c; }
+  }
+  .type-error .gooey-action-btn {
+    background: #b71c1c; color: $gooey-error-dark;
+    &:hover { background: #c62828; } &:active { background: #d32f2f; }
+  }
+  .type-warning .gooey-action-btn {
+    background: #4a3800; color: $gooey-warning-dark;
+    &:hover { background: #5c4600; } &:active { background: #6e5400; }
+  }
+  .type-info .gooey-action-btn {
+    background: #0d47a1; color: $gooey-info-dark;
+    &:hover { background: #1565c0; } &:active { background: #1976d2; }
+  }
+
+  .gooey-progress-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .gooey-progress-fill {
+    &.progress-default { background: #888; }
+    &.progress-success { background: $gooey-success-dark; }
+    &.progress-error   { background: $gooey-error-dark; }
+    &.progress-warning { background: $gooey-warning-dark; }
+    &.progress-info    { background: $gooey-info-dark; }
+  }
+
+  .gooey-close-btn {
+    background: #2a2a32; border-color: #3f3f48; color: #94a3b8;
+    &:hover { background: #353540; border-color: #52525e; color: #e2e8f0; }
+  }
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@media (max-width: 480px) {
+  .gooey-toaster {
+    &.pos-top-left, &.pos-top-right,
+    &.pos-bottom-left, &.pos-bottom-right {
+      left: var(--gooey-offset, 12px);
+      right: var(--gooey-offset, 12px);
+      align-items: stretch;
+    }
+    &.pos-top-center, &.pos-bottom-center {
+      left: var(--gooey-offset, 12px);
+      right: var(--gooey-offset, 12px);
+      transform: none;
+      align-items: stretch;
+    }
+  }
+  .gooey-toast-wrapper {
+    max-width: 100%;
+  }
+}
+
+// ============================================================================
+// ACCESSIBILITY — reduced motion
+// ============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  .gooey-content {
+    transition: none !important;
+  }
+  .gooey-description,
+  .gooey-action-wrapper,
+  .gooey-action-success {
+    animation: none !important;
+  }
+  .gooey-spinner svg {
+    animation-duration: 1.5s;
+  }
+}

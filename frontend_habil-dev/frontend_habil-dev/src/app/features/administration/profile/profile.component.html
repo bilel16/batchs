@@ -1,0 +1,628 @@
+<div class="profile-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section" data-aos="fade-right" data-aos-duration="500" data-aos-once="true">
+        <h1>
+          <i class="pi pi-users"></i>
+          Gestion des Profils
+        </h1>
+        <p class="subtitle">Gérez les profils utilisateurs de vos applications</p>
+      </div>
+      <div class="header-actions" data-aos="fade-left" data-aos-duration="500">
+        <button
+          pButton
+          type="button"
+          label="Nouveau Profil"
+          icon="pi pi-plus"
+          class="p-button-success create-button"
+          [disabled]="!selectedAppCode"
+          (click)="openNew()">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Selector Card -->
+  <div class="selector-card">
+    <div class="selector-content">
+      <div class="selector-label">
+        <i class="pi pi-desktop"></i>
+        <span>Sélectionner une application</span>
+      </div>
+      <div class="selector-input">
+        <app-application-selection
+          label=""
+          placeholder="Choisissez une application..."
+          (selectionChange)="onAppSelectionChange($event)"
+          (appsLoaded)="onAppsLoaded($event)">
+        </app-application-selection>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Filter Banner -->
+  <div *ngIf="isDashboardFilter && selectedAppCode" class="dashboard-filter-banner"
+       data-aos="fade-down" data-aos-easing="linear" data-aos-duration="500">
+    <div class="banner-content">
+      <div class="banner-icon">
+        <i class="pi pi-filter"></i>
+      </div>
+      <div class="banner-text">
+        <div class="banner-title">Filtre du Dashboard Appliqué</div>
+        <div class="banner-message">{{ getDashboardFilterMessage() }}</div>
+      </div>
+      <button
+        pButton
+        type="button"
+        label="Effacer les Filtres"
+        icon="pi pi-times"
+        class="p-button-sm p-button-outlined clear-filter-button"
+        (click)="clearDashboardFilters()">
+      </button>
+    </div>
+  </div>
+
+  <!-- No Application Selected Message -->
+  <div *ngIf="showNoAppMessage && !selectedAppCode" class="no-app-message"
+       data-aos="fade-down" data-aos-easing="linear" data-aos-duration="500">
+    <div class="message-icon">
+      <i class="pi pi-info-circle"></i>
+    </div>
+    <h3>Aucune application sélectionnée</h3>
+    <p>Veuillez sélectionner une application pour afficher les profils</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div *ngIf="!showNoAppMessage && selectedAppCode" class="stats-grid"
+       data-aos="fade-down" data-aos-easing="linear" data-aos-duration="500">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalProfiles }}</div>
+        <div class="stat-label">Total Profils</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon filtered">
+        <i class="pi pi-filter"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ filteredProfiles.length }}</div>
+        <div class="stat-label">Profils Affichés</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ activeProfiles }}</div>
+        <div class="stat-label">Profils Actifs</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon inactive">
+        <i class="pi pi-times-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ inactiveProfiles }}</div>
+        <div class="stat-label">Profils Inactifs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div *ngIf="!showNoAppMessage && selectedAppCode" class="content-card"
+       data-aos="fade-up" data-aos-duration="300">
+    <app-table
+      #profileTable
+      [data]="profiles"
+      [config]="tableConfig"
+      [totalLabel]="'Total des profils :'"
+      [showTotal]="false"
+      (onView)="viewProfile($event)"
+      (onEdit)="editProfil($event); drawer.openDrawer()"
+      (onDelete)="deleteProfil($event)"
+      (filteredDataChange)="filteredProfiles = $event"
+      [loading]="loading">
+    </app-table>
+  </div>
+</div>
+
+<!-- Animated Drawer for Add/Edit Profile -->
+<app-animated-drawer
+  #drawer
+  [title]="action === actionType.ADD ? 'Ajouter Profil' : 'Modifier Profil'">
+
+  <form class="profile-form">
+    <div class="form-group">
+      <label for="codPflPfl" class="form-label">Code Profil</label>
+      <input
+        type="text"
+        pInputText
+        id="codPflPfl"
+        name="codPflPfl"
+        [(ngModel)]="profile.codPflPfl"
+        (input)="removeSpaces($event)"
+        [disabled]="action === actionType.EDIT"
+        required
+        class="form-input"
+        placeholder="Saisissez le code profil (sans espaces)"
+        autocomplete="off"
+      />
+      <small class="form-hint">Le code ne doit pas contenir d'espaces</small>
+    </div>
+
+    <div class="form-group">
+      <label for="libpflpfl" class="form-label">Libellé Profil</label>
+      <input
+        type="text"
+        pInputText
+        id="libpflpfl"
+        name="libpflpfl"
+        [(ngModel)]="profile.libpflpfl"
+        required
+        class="form-input"
+        placeholder="Saisissez le libellé du profil"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="libhdebpfl" class="form-label">Heure début</label>
+        <p-inputNumber
+          inputId="libhdebpfl"
+          name="libhdebpfl"
+          [(ngModel)]="profile.libhdebpfl"
+          [min]="0"
+          [max]="24"
+          [showButtons]="true"
+          styleClass="w-full"
+        ></p-inputNumber>
+      </div>
+
+      <div class="form-group">
+        <label for="libhfinpfl" class="form-label">Heure fin</label>
+        <p-inputNumber
+          inputId="libhfinpfl"
+          name="libhfinpfl"
+          [(ngModel)]="profile.libhfinpfl"
+          [min]="0"
+          [max]="24"
+          [showButtons]="true"
+          styleClass="w-full"
+        ></p-inputNumber>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="codNivhPfl" class="form-label">Type Structure</label>
+      <p-dropdown
+        inputId="codNivhPfl"
+        name="codNivhPfl"
+        [(ngModel)]="profile.codNivhPfl"
+        [options]="CodeStructureOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner une structure"
+        styleClass="w-full"
+        (onChange)="onStructureChange($event.value)"
+      ></p-dropdown>
+    </div>
+
+    <div class="form-group">
+      <label for="codCatpPfl" class="form-label">Code Structure</label>
+      <input
+        type="text"
+        pInputText
+        id="codCatpPfl"
+        name="codCatpPfl"
+        [(ngModel)]="profile.codCatpPfl"
+        [disabled]="categoryDisabled"
+        class="form-input"
+        placeholder="Saisissez la catégorie"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="boolJouvPfl" class="form-label">Jour ouvrable</label>
+        <p-toggleButton
+          id="boolJouvPfl"
+          name="boolJouvPfl"
+          onLabel="Oui"
+          offLabel="Non"
+          onIcon="pi pi-check"
+          offIcon="pi pi-times"
+          [(ngModel)]="profile.boolJouvPfl"
+          styleClass="w-full"
+        ></p-toggleButton>
+      </div>
+
+      <div class="form-group">
+        <label for="boolEtatPfl" class="form-label">Actif</label>
+        <p-toggleButton
+          id="boolEtatPfl"
+          name="boolEtatPfl"
+          onLabel="Oui"
+          offLabel="Non"
+          onIcon="pi pi-check"
+          offIcon="pi pi-times"
+          [(ngModel)]="profile.boolEtatPfl"
+          styleClass="w-full"
+        ></p-toggleButton>
+      </div>
+    </div>
+  </form>
+
+  <div slot="footer">
+    <button
+      pButton
+      label="Fermer"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="drawer.closeDrawer()">
+    </button>
+
+    <ng-container [ngSwitch]="action">
+      <button
+        *ngSwitchCase="actionType.ADD"
+        type="button"
+        pButton
+        label="Enregistrer"
+        icon="pi pi-check"
+        class="btn-primary"
+        (click)="saveProfil(profile)">
+      </button>
+
+      <button
+        *ngSwitchCase="actionType.EDIT"
+        type="button"
+        pButton
+        label="Modifier"
+        icon="pi pi-check"
+        class="btn-primary"
+        (click)="edit(profile)">
+      </button>
+    </ng-container>
+  </div>
+</app-animated-drawer>
+
+<!-- Profile Details Dialog -->
+<p-dialog
+  [(visible)]="showProfileDetailsDialog"
+  [header]="'Détails du Profil: ' + (selectedProfileForDetails?.libpflpfl || '')"
+  [modal]="true"
+  [style]="{ width: '900px', maxWidth: '95vw' }"
+  [maximizable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="profile-details-dialog">
+
+  <div class="profile-details-content" *ngIf="selectedProfileForDetails">
+    <!-- Profile Info Section -->
+    <div class="profile-info-section">
+      <div class="info-header">
+        <i class="pi pi-info-circle"></i>
+        <h3>Informations du Profil</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Code Profil</span>
+          <span class="info-value">{{ selectedProfileForDetails.codPflPfl }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Libellé</span>
+          <span class="info-value">{{ selectedProfileForDetails.libpflpfl }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Application</span>
+          <span class="info-value">{{ selectedProfileForDetails.codAppApp }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Type Structure</span>
+          <span class="info-value">{{ getStructureLabel(selectedProfileForDetails.codNivhPfl || '') }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Heures</span>
+          <span class="info-value">{{ selectedProfileForDetails.libhdebpfl || '0' }}h - {{ selectedProfileForDetails.libhfinpfl || '24' }}h</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Statut</span>
+          <span class="info-value">
+            <p-tag
+              [value]="selectedProfileForDetails.boolEtatPfl ? 'Actif' : 'Inactif'"
+              [severity]="selectedProfileForDetails.boolEtatPfl ? 'success' : 'danger'">
+            </p-tag>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menus Section -->
+    <div class="menus-section">
+      <div class="menus-header">
+        <div class="header-left">
+          <i class="pi pi-list"></i>
+          <h3>Menus du Profil</h3>
+          <span class="menu-count-badge">{{ profileMenus.length }}</span>
+        </div>
+        <button
+          pButton
+          type="button"
+          label="Ajouter Menu"
+          icon="pi pi-plus"
+          class="p-button-success p-button-sm"
+          (click)="openAddMenuDialog()">
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loadingMenus" class="loading-menus">
+        <p-progressSpinner [style]="{width: '40px', height: '40px'}" strokeWidth="4"></p-progressSpinner>
+        <span>Chargement des menus...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loadingMenus && profileMenus.length === 0" class="empty-menus">
+        <i class="pi pi-inbox"></i>
+        <p>Aucun menu associé à ce profil</p>
+        <button
+          pButton
+          type="button"
+          label="Ajouter un menu"
+          icon="pi pi-plus"
+          class="p-button-outlined"
+          (click)="openAddMenuDialog()">
+        </button>
+      </div>
+
+      <!-- Menus Tabs -->
+      <p-tabs *ngIf="!loadingMenus && profileMenus.length > 0" styleClass="menus-tabview">
+        <p-tablist>
+          <p-tab value="0">
+            <i class="pi pi-check-circle tab-icon active"></i>
+            <span>Actifs</span>
+            <p-badge [value]="activeProfileMenus.length.toString()" severity="success" styleClass="ml-2"></p-badge>
+          </p-tab>
+          <p-tab value="1">
+            <i class="pi pi-times-circle tab-icon inactive"></i>
+            <span>Inactifs</span>
+            <p-badge [value]="inactiveProfileMenus.length.toString()" severity="danger" styleClass="ml-2"></p-badge>
+          </p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <!-- Active Menus Tab -->
+          <p-tabpanel value="0">
+            <div class="menus-list">
+              <div *ngIf="activeProfileMenus.length === 0" class="no-menus-message">
+                <p>Aucun menu actif</p>
+              </div>
+              <div *ngFor="let menu of activeProfileMenus" class="menu-item active">
+                <div class="menu-info">
+                  <div class="menu-icon">
+                    <i class="pi pi-bars"></i>
+                  </div>
+                  <div class="menu-details">
+                    <span class="menu-name">{{ menu.libMenuMenu || menu.codMenuMenu }}</span>
+                    <span class="menu-code">{{ menu.codMenuMenu }}</span>
+                    <span class="menu-structure">Structure: {{ menu.codTstrcTstrc }}</span>
+                  </div>
+                </div>
+                <div class="menu-actions">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-ban"
+                    class="p-button-rounded p-button-warning p-button-sm"
+                    pTooltip="Désactiver"
+                    tooltipPosition="top"
+                    (click)="deactivateMenu(menu)">
+                  </button>
+                  <button
+                    disabled
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger p-button-sm"
+                    pTooltip="Supprimer"
+                    tooltipPosition="top"
+                    (click)="removeMenuFromProfile(menu)">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </p-tabpanel>
+
+          <!-- Inactive Menus Tab -->
+          <p-tabpanel value="1">
+            <div class="menus-list">
+              <div *ngIf="inactiveProfileMenus.length === 0" class="no-menus-message">
+                <p>Aucun menu inactif</p>
+              </div>
+              <div *ngFor="let menu of inactiveProfileMenus" class="menu-item inactive">
+                <div class="menu-info">
+                  <div class="menu-icon inactive">
+                    <i class="pi pi-bars"></i>
+                  </div>
+                  <div class="menu-details">
+                    <span class="menu-name">{{ menu.libMenuMenu || menu.codMenuMenu }}</span>
+                    <span class="menu-code">{{ menu.codMenuMenu }}</span>
+                    <span class="menu-structure">Structure: {{ menu.codTstrcTstrc }}</span>
+                  </div>
+                </div>
+                <div class="menu-actions">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-check"
+                    class="p-button-rounded p-button-success p-button-sm"
+                    pTooltip="Activer"
+                    tooltipPosition="top"
+                    (click)="activateMenu(menu)">
+                  </button>
+                  <button
+                    disabled
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger p-button-sm"
+                    pTooltip="Supprimer"
+                    tooltipPosition="top"
+                    (click)="removeMenuFromProfile(menu)">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      label="Fermer"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="closeProfileDetailsDialog()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- Add Menu Dialog -->
+<p-dialog
+  [(visible)]="showAddMenuDialog"
+  header="Ajouter des Menus au Profil"
+  [modal]="true"
+  [style]="{ width: '700px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="add-menu-dialog">
+
+  <div class="add-menu-content">
+    <!-- Structure Selection -->
+    <div class="structure-selection-box">
+      <label class="structure-label">
+        <i class="pi pi-sitemap"></i>
+        Structure pour les nouveaux menus
+      </label>
+      <p-dropdown
+        [(ngModel)]="selectedStructureForNewMenus"
+        [options]="CodeStructureOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner une structure"
+        styleClass="w-full"
+        [showClear]="true">
+      </p-dropdown>
+    </div>
+
+    <!-- Search -->
+    <div class="menu-search-box">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="menuSearchTerm"
+        (ngModelChange)="filterAvailableMenus()"
+        placeholder="Rechercher un menu..."
+        class="menu-search-input"
+      />
+      <button
+        *ngIf="menuSearchTerm"
+        pButton
+        type="button"
+        icon="pi pi-times"
+        class="p-button-rounded p-button-text"
+        (click)="menuSearchTerm = ''; filterAvailableMenus()">
+      </button>
+    </div>
+
+    <!-- Selection Actions -->
+    <div class="selection-actions" *ngIf="filteredAvailableMenus.length > 0">
+      <span class="selection-info">
+        {{ selectedMenusToAdd.length }} menu(s) sélectionné(s)
+      </span>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Tout sélectionner"
+          icon="pi pi-check-square"
+          class="p-button-text p-button-sm"
+          (click)="selectAllAvailableMenus()">
+        </button>
+        <button
+          pButton
+          type="button"
+          label="Tout désélectionner"
+          icon="pi pi-times"
+          class="p-button-text p-button-sm"
+          [disabled]="selectedMenusToAdd.length === 0"
+          (click)="clearMenuSelection()">
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingAvailableMenus" class="loading-menus">
+      <p-progressSpinner [style]="{width: '40px', height: '40px'}" strokeWidth="4"></p-progressSpinner>
+      <span>Chargement des menus disponibles...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loadingAvailableMenus && filteredAvailableMenus.length === 0" class="empty-menus">
+      <i class="pi pi-inbox"></i>
+      <p *ngIf="availableMenus.length === 0">Tous les menus sont déjà associés à ce profil</p>
+      <p *ngIf="availableMenus.length > 0 && menuSearchTerm">Aucun menu trouvé pour "{{ menuSearchTerm }}"</p>
+    </div>
+
+    <!-- Available Menus List -->
+    <div class="available-menus-list" *ngIf="!loadingAvailableMenus && filteredAvailableMenus.length > 0">
+      <div
+        *ngFor="let menu of filteredAvailableMenus"
+        class="available-menu-item"
+        [class.selected]="isMenuSelectedToAdd(menu.codMenuMenu)"
+        (click)="toggleMenuToAdd(menu.codMenuMenu)">
+        <div class="menu-checkbox">
+          <i class="pi" [class.pi-check-square]="isMenuSelectedToAdd(menu.codMenuMenu)"
+             [class.pi-stop]="!isMenuSelectedToAdd(menu.codMenuMenu)"></i>
+        </div>
+        <div class="menu-info">
+          <span class="menu-name">{{ menu.libMenuMenu || menu.codMenuMenu }}</span>
+          <span class="menu-code">{{ menu.codMenuMenu }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      label="Annuler"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="closeAddMenuDialog()">
+    </button>
+    <button
+      pButton
+      label="Ajouter"
+      icon="pi pi-check"
+      class="p-button-success"
+      [disabled]="selectedMenusToAdd.length === 0 || !selectedStructureForNewMenus"
+      (click)="addMenusToProfile()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

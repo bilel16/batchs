@@ -1,0 +1,303 @@
+<div class="personnel-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section" data-aos="fade-right" data-aos-duration="500" data-aos-once="true">
+        <h1>
+          <i class="pi pi-users"></i>
+          Gestion du Personnel
+        </h1>
+        <p class="subtitle">Gérez les informations du personnel</p>
+      </div>
+      <div class="header-actions" data-aos="fade-left" data-aos-duration="500">
+        <button pButton type="button" label="Nouveau Personnel" icon="pi pi-plus"
+                class="p-button-success create-button" (click)="openNew()">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid" data-aos="fade-down" data-aos-easing="linear" data-aos-duration="500">
+    <div class="stat-card">
+      <div class="stat-icon total"><i class="pi pi-users"></i></div>
+      <div class="stat-content">
+        <ng-container *ngIf="!loading; else skeletonStat">
+          <div class="stat-value">{{ totalPersonnels }}</div>
+          <div class="stat-label">Total Personnel</div>
+        </ng-container>
+        <ng-template #skeletonStat>
+          <p-skeleton width="4rem" height="2.5rem" class="mb-2" borderRadius="8px" />
+          <p-skeleton width="8rem" height="1rem" borderRadius="8px" />
+        </ng-template>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon active"><i class="pi pi-filter"></i></div>
+      <div class="stat-content">
+        <ng-container *ngIf="!loading; else skeletonStatFiltered">
+          <div class="stat-value">{{ filteredPersonnels.length }}</div>
+          <div class="stat-label">Personnel Affiché</div>
+        </ng-container>
+        <ng-template #skeletonStatFiltered>
+          <p-skeleton width="4rem" height="2.5rem" class="mb-2" borderRadius="8px" />
+          <p-skeleton width="10rem" height="1rem" borderRadius="8px" />
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Filter Panel -->
+  <div class="admin-filter-wrapper" *ngIf="structureOptions.length > 0 && structureTypeOptions.length > 0">
+    <div class="admin-filter-panel">
+      <div class="filter-row">
+
+        <!-- Status Filter - 3-State Toggle -->
+        <div class="filter-item status-toggle-item">
+          <label>Statut</label>
+          <div class="status-toggle-switch" (click)="cycleStatusFilter()">
+            <div class="toggle-option active-option" [class.selected]="adminStatusFilter === true">
+              <i class="pi pi-check"></i>
+            </div>
+            <div class="toggle-slider-track"
+                 [class.position-active]="adminStatusFilter === true"
+                 [class.position-all]="adminStatusFilter === null"
+                 [class.position-inactive]="adminStatusFilter === false">
+              <div class="toggle-slider-circle">
+                <i class="pi" [ngClass]="{
+                  'pi-check': adminStatusFilter === true,
+                  'pi-minus': adminStatusFilter === null,
+                  'pi-times': adminStatusFilter === false
+                }"></i>
+              </div>
+            </div>
+            <div class="toggle-option inactive-option" [class.selected]="adminStatusFilter === false">
+              <i class="pi pi-times"></i>
+            </div>
+          </div>
+          <div class="toggle-label-text">
+            {{ adminStatusFilter === true ? 'Actifs' : (adminStatusFilter === false ? 'Inactifs' : 'Tous') }}
+          </div>
+        </div>
+
+        <!-- Structure Filter (Multi-Select) -->
+        <div class="filter-item" *ngIf="structureOptions.length > 0">
+          <label for="structureFilter">Structure</label>
+          <p-multiSelect
+            id="structureFilter"
+            [options]="structureOptions"
+            [(ngModel)]="adminStructureFilter"
+            (ngModelChange)="onAdminStructureChange($event)"
+            placeholder="Toutes les structures"
+            [filter]="true"
+            filterPlaceholder="Rechercher..."
+            [showClear]="true"
+            appendTo="body"
+            [style]="{'width': '100%'}"
+            [maxSelectedLabels]="2"
+            selectedItemsLabel="{0} structures sélectionnées">
+          </p-multiSelect>
+        </div>
+
+        <!-- Structure Type Filter -->
+        <div class="filter-item" *ngIf="structureTypeOptions.length > 0">
+          <label for="structureTypeFilter">Type de structure</label>
+          <p-dropdown
+            id="structureTypeFilter"
+            [options]="structureTypeOptions"
+            [ngModel]="adminStructureTypeFilter"
+            (ngModelChange)="onAdminStructureTypeChange($event)"
+            placeholder="Tous les types"
+            [showClear]="adminStructureTypeFilter !== null"
+            appendTo="body"
+            [style]="{'width': '100%'}">
+          </p-dropdown>
+        </div>
+
+        <!-- Sort Options -->
+        <div class="filter-item sort-item">
+          <label for="sortFilter">Trier par</label>
+          <div class="sort-controls">
+            <p-dropdown
+              id="sortFilter"
+              [options]="adminSortOptions"
+              [ngModel]="adminSortBy"
+              (ngModelChange)="onAdminSortChange($event)"
+              appendTo="body"
+              [style]="{'flex': '1'}">
+            </p-dropdown>
+            <button pButton type="button"
+                    [icon]="adminSortDirection === 'ASC' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"
+                    class="p-button-text p-button-sm sort-direction-btn"
+                    (click)="toggleSortDirection()"
+                    [title]="adminSortDirection === 'ASC' ? 'Croissant' : 'Décroissant'">
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset Filters Button -->
+        <div class="filter-item reset-item">
+          <button pButton type="button" icon="pi pi-filter-slash"
+                  class="p-button-outlined p-button-secondary p-button-sm"
+                  (click)="resetAdminFilters()"
+                  [disabled]="!hasActiveFilters()">
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Active Filters Summary -->
+      <div *ngIf="hasActiveFilters()" class="active-filters">
+        <span class="active-filters-label">Filtres actifs:</span>
+        <span class="filter-tag" *ngIf="adminStatusFilter !== null">
+          <i class="pi pi-circle-fill" [ngClass]="adminStatusFilter ? 'text-success' : 'text-danger'"></i>
+          {{ adminStatusFilter ? 'Actif' : 'Inactif' }}
+          <button class="remove-filter" (click)="onAdminStatusChange(null)">
+            <i class="pi pi-times"></i>
+          </button>
+        </span>
+        <span class="filter-tag" *ngIf="adminStructureFilter.length > 0">
+          <i class="pi pi-building"></i>
+          <ng-container *ngIf="getStructureFilterCount() <= 2">{{ getStructureFilterLabel() }}</ng-container>
+          <ng-container *ngIf="getStructureFilterCount() > 2">{{ getStructureFilterCount() }} structures sélectionnées</ng-container>
+          <button class="remove-filter" (click)="onAdminStructureChange([])">
+            <i class="pi pi-times"></i>
+          </button>
+        </span>
+        <span class="filter-tag" *ngIf="adminStructureTypeFilter !== null">
+          <i class="pi pi-sitemap"></i> {{ getStructureTypeFilterLabel() }}
+          <button class="remove-filter" (click)="onAdminStructureTypeChange(null)">
+            <i class="pi pi-times"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div class="content-card" data-aos="fade-up" data-aos-duration="300">
+    <app-table
+      [data]="filteredPersonnels"
+      [config]="tableConfig"
+      [showTotal]="false"
+      (onEdit)="editPersonnel($event)"
+      (onDelete)="deletePersonnel($event)"
+      [loading]="loading">
+    </app-table>
+  </div>
+</div>
+
+<!-- Animated Drawer -->
+<app-animated-drawer
+  #drawer
+  [width]="'50%'"
+  [title]="action === actionType.ADD ? 'Ajouter un Personnel' : 'Modifier Personnel'">
+
+  <form class="personnel-form">
+    <!-- HR Personnel CIN Search -->
+    <div class="form-group search-criteria" *ngIf="action === actionType.ADD">
+      <label for="cin_search" class="form-label">
+        <i class="pi pi-search"></i> Rechercher un Personnel (Base RH) *
+      </label>
+      <div class="cin-search-container">
+        <input type="text" pInputText id="cin_search" name="cin_search"
+               [(ngModel)]="cinSearchTerm" [disabled]="isHrPersonnelLoaded()"
+               class="cin-search-input" placeholder="Saisissez le CIN complet"
+               (keyup.enter)="searchHrPersonnelByCinExact()" />
+        <button pButton type="button" icon="pi pi-download" label="Importer"
+                class="p-button-primary cin-search-button"
+                [disabled]="!cinSearchTerm || cinSearchTerm.length < 8 || isHrPersonnelLoaded()"
+                [loading]="isSearchingHr" (click)="searchHrPersonnelByCinExact()">
+        </button>
+      </div>
+      <small class="form-hint" *ngIf="!isHrPersonnelLoaded() && !isSearchingHr">
+        <i class="pi pi-info-circle"></i> Saisissez le CIN complet puis cliquez sur "Importer"
+      </small>
+      <small class="form-warning" *ngIf="isSearchingHr">
+        <i class="pi pi-spin pi-spinner"></i> Recherche en cours dans la base RH...
+      </small>
+      <small class="form-success" *ngIf="isHrPersonnelLoaded() && selectedHrPersonnel">
+        <i class="pi pi-check-circle"></i>
+        Personnel {{ getHrFullName(selectedHrPersonnel!) }} importé depuis la base RH
+      </small>
+    </div>
+
+    <!-- Personnel Info Header -->
+    <div class="personnel-info-header" *ngIf="action === actionType.EDIT || isHrPersonnelLoaded()">
+      <h3 class="personnel-name">{{ personnel.nom_prenom }}</h3>
+    </div>
+
+    <div class="form-divider" *ngIf="isHrPersonnelLoaded()">
+      <span>Informations du Personnel (Lecture seule)</span>
+    </div>
+
+    <div class="personnel-info-grid" *ngIf="isHrPersonnelLoaded()">
+      <div class="info-item">
+        <span class="info-label"><i class="pi pi-id-card"></i> CIN</span>
+        <span class="info-value">{{ personnel.cin }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label"><i class="pi pi-hashtag"></i> Matricule</span>
+        <span class="info-value">{{ personnel.mat }}</span>
+      </div>
+      <div class="info-item full-width">
+        <span class="info-label"><i class="pi pi-user"></i> Nom & Prénom</span>
+        <span class="info-value">{{ personnel.nom_prenom }}</span>
+      </div>
+      <div class="info-item full-width">
+        <span class="info-label"><i class="pi pi-envelope"></i> Email</span>
+        <span class="info-value">{{ personnel.email }}</span>
+      </div>
+    </div>
+
+    <div class="form-divider" *ngIf="isHrPersonnelLoaded()">
+      <span>Configuration (Modifiable)</span>
+    </div>
+
+    <div class="editable-fields-grid" *ngIf="isHrPersonnelLoaded()">
+      <div class="form-group mb-4" *ngIf="structureOptions.length > 0">
+        <label for="cod_strc_strc" class="form-label">
+          <i class="pi pi-sitemap"></i> Structure *
+        </label>
+        <p-dropdown
+          id="cod_strc_strc"
+          name="cod_strc_strc"
+          [options]="structureOptions"
+          [(ngModel)]="personnel.cod_strc_strc"
+          placeholder="Sélectionnez une structure"
+          [filter]="true"
+          filterPlaceholder="Rechercher..."
+          [showClear]="true"
+          [style]="{'width': '100%'}"
+        >
+        </p-dropdown>
+      </div>
+      <div class="form-group mb-4">
+        <label for="cod_stat_user" class="form-label">
+          <i class="pi pi-check-circle"></i> Statut *
+        </label>
+        <p-dropdown
+          [options]="[{ label: 'Actif', value: true }, { label: 'Inactif', value: false }]"
+          [(ngModel)]="personnel.cod_stat_user"
+          optionLabel="label"
+          placeholder="Sélectionnez le statut"
+          inputId="cod_stat_user"
+          name="cod_stat_user"
+          class="form-dropdown">
+        </p-dropdown>
+      </div>
+    </div>
+  </form>
+
+  <div slot="footer">
+    <button pButton label="Fermer" icon="pi pi-times" class="p-button-secondary" (click)="drawer.closeDrawer()"></button>
+    <ng-container [ngSwitch]="action">
+      <button *ngSwitchCase="actionType.ADD" type="button" pButton label="Enregistrer"
+              icon="pi pi-check" class="btn-primary" (click)="savePersonnel(personnel)"></button>
+      <button *ngSwitchCase="actionType.EDIT" type="button" pButton label="Modifier"
+              icon="pi pi-check" class="btn-primary" (click)="updatePersonnel(personnel)"></button>
+    </ng-container>
+  </div>
+</app-animated-drawer>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

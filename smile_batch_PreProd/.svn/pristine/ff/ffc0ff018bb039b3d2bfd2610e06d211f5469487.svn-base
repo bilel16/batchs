@@ -1,0 +1,24 @@
+#LDAP Properties DEV
+
+ldap.searchBase=OU=BNA,DC=BNADEV,DC=COM
+ldap.filter=(sAMAccountName={0})
+ldap.initialContextFactory=com.sun.jndi.ldap.LdapCtxFactory
+ldap.providerUrl=ldap://10.1.9.3:389/
+ldap.securityPrincipal=CN=manager MANAGER,OU=Compte de services,OU=BNA,DC=BNADEV,DC=COM
+ldap.securityCredantial=mot2p@ss
+
+ldap.userDnPatterns=sAMAccountName={0},OU=BNA,DC=BNADEV,DC=COM
+ldap.defaultLdapAuthoritiesPopulator=OU=BNA,DC=BNADEV,DC=LOCAL
+
+
+#LDAP Properties PROD
+
+#ldap.searchBase=OU=BNA,DC=BNA,DC=LOCAL
+#ldap.filter=(sAMAccountName={0})
+#ldap.initialContextFactory=com.sun.jndi.ldap.LdapCtxFactory
+#ldap.providerUrl=ldap://bna.local:389/
+#ldap.securityPrincipal=CN=Application Habilitation,OU=Compte de services,OU=BNA,DC=BNA,DC=LOCAL
+#ldap.securityCredantial=libaH_ppA
+
+#ldap.userDnPatterns=sAMAccountName={0},OU=BNA,DC=BNA,DC=LOCAL
+#ldap.defaultLdapAuthoritiesPopulator=OU=BNA,DC=BNA,DC=LOCAL

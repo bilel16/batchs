@@ -1,0 +1,326 @@
+<!-- 
+  @fileoverview Pack Card Component Template
+  Visual card for displaying profile pack information
+-->
+
+<div class="pack-card" [class.selected]="isSelected" [class.assigned]="isAssigned" [class.compact]="compact"
+    [class.no-profiles]="!hasProfiles" (click)="onPackClick()"> <!-- Pack Header -->
+    <div class="pack-header">
+        <div class="pack-icon" [style.background]="getCategoryColor()">
+            <i class="pi" [ngClass]="getCategoryIcon()"></i>
+        </div>
+
+        <div class="pack-info">
+            <h5 class="pack-name" [title]="pack.name">{{ pack.name }}</h5>
+            <div class="pack-meta">
+                <span class="category-badge" [style.background]="getCategoryColor()">
+                    {{ pack.category }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pack Description -->
+    <div class="pack-description" [ngClass]="{ 'no-desc': !pack.description }">
+        <div *ngIf="pack.description; else noDescription">
+            <p>{{ pack.description }}</p>
+        </div>
+
+        <ng-template #noDescription>
+            <p>Ce pack ne contient aucune description !</p>
+        </ng-template>
+    </div> <!-- Pack Stats -->
+    <div class="pack-stats">
+        <div class="stat-item" [pTooltip]="getProfileTooltip()" tooltipPosition="top" [escape]="false"
+            tooltipStyleClass="profile-count-tooltip">
+            <i class="pi pi-shield"></i>
+            <span class="stat-info">
+                <span class="stat-value">{{ profileCount }}</span>
+                <span class="stat-label">Profils</span>
+            </span>
+        </div>
+
+        <!-- View Profiles Button -->
+        <button *ngIf="profileCount > 0" pButton pRipple type="button" icon="pi pi-eye"
+            class="action-btn action-btn-view" (click)="onViewProfiles($event)" pTooltip="Voir les profils"
+            tooltipPosition="top">
+        </button>
+    </div>
+
+    <!-- Profile Preview (Expandable) -->
+    <div class="profile-preview" *ngIf="showProfilePreview && profileCount > 0" @slideDown>
+        <div class="profile-preview-header">
+            <span class="preview-title">
+                <i class="pi pi-users"></i>
+                Profils inclus ({{ profileCount }})
+            </span>
+            <button pButton pRipple type="button" icon="pi pi-times"
+                class="p-button-text p-button-rounded p-button-sm close-preview-btn"
+                (click)="closeProfilePreview($event)">
+            </button>
+        </div>        <div class="profile-chips">
+            <span *ngFor="let profile of profilesPreviewCache; let i = index" class="profile-chip clickable"
+                [class.chip-inactive]="profile.isActive === false" [pTooltip]="'Cliquez pour voir les détails'"
+                tooltipPosition="top" (click)="onProfileChipClick(profile, $event)">
+                <i class="pi pi-user"></i>
+                {{ profile.name }}
+                <span *ngIf="profile.isActive === false" class="inactive-indicator">●</span>
+                <i class="pi pi-info-circle info-icon"></i>
+            </span>
+            <button *ngIf="profileCount > 3" class="profile-chip more-chip" pButton pRipple
+                [label]="'+' + (profileCount - 3) + ' plus'" (click)="onViewAllProfiles($event)">
+            </button>
+        </div>
+    </div> <!-- Pack Actions -->
+    <div class="pack-actions">
+        <!-- Assign/Unassign Button -->
+        <button *ngIf="!isAssigned" pButton pRipple type="button"
+            [icon]="mode === 'marketplace' ? (isSelected ? 'pi pi-check-circle' : 'pi pi-plus-circle') : 'pi pi-plus-circle'"
+            [label]="mode === 'marketplace' ? (isSelected ? 'Dans le panier' : 'Ajouter') : 'Assigner'"
+            [class]="isSelected && mode === 'marketplace' ? 'p-button-secondary p-button-sm btn-onhold' : 'p-button-success p-button-sm btn-affected'"
+            [disabled]="!canAssign" (click)="onAssignClick($event)"
+            [pTooltip]="!hasProfiles ? 'Ce pack ne contient aucun profil et ne peut pas être assigné' : (mode === 'marketplace' ? 'Ajouter au panier' : 'Assigner ce pack à l\'utilisateur')"
+            tooltipPosition="top">
+        </button>
+
+        <button *ngIf="isAssigned" pButton pRipple type="button" icon="pi pi-times-circle" label="Retirer"
+            class="p-button-danger p-button-sm" (click)="onUnassignClick($event)"
+            pTooltip="Retirer ce pack de l'utilisateur" tooltipPosition="top">
+        </button>
+    </div>
+
+    <!-- Selection Indicator -->
+    <div class="selection-indicator" *ngIf="isSelected">
+        <i class="pi pi-check"></i>
+    </div>
+</div>
+
+<!-- Profile Details Dialog -->
+<p-dialog [(visible)]="showProfileDetailsDialog" [modal]="true" [draggable]="false" [resizable]="false"
+    [dismissableMask]="true" [showHeader]="false" styleClass="profile-details-modal"
+    [style]="{width: '900px', maxHeight: '90vh'}">
+    <div class="profile-details-container" *ngIf="selectedProfileForDetails">
+
+        <!-- Custom Header with Close Button -->
+        <div class="modal-header-custom">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="pi pi-shield"></i>
+                </div>
+                <div class="header-text">
+                    <h2>Détails du profil</h2>
+                    <span class="header-subtitle">{{ selectedProfileForDetails.code }}</span>
+                </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="closeProfileDetailsDialog()" aria-label="Fermer">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loadingProfileDetails" class="loading-container">
+            <p-progressSpinner styleClass="custom-spinner"></p-progressSpinner>
+            <p>Chargement des détails du profil...</p>
+        </div>
+
+        <!-- Profile Details Content -->
+        <div *ngIf="!loadingProfileDetails && profileDetails" class="profile-details-content">
+
+            <!-- Hero Profile Card -->
+            <div class="profile-hero-card">
+                <div class="hero-background">
+                    <div class="hero-pattern"></div>
+                </div>
+                <div class="hero-content">
+                    <div class="profile-avatar-large">
+                        <i class="pi pi-user"></i>
+                        <span class="avatar-badge" *ngIf="profileDetails.boolEtatPfl === '1'">
+                            <i class="pi pi-check"></i>
+                        </span>
+                    </div>
+                    <div class="profile-main-info">
+                        <h3 class="profile-name">{{ profileDetails.libpflpfl || profileDetails.codPflPfl }}</h3>
+                        <div class="profile-meta">
+                            <span class="profile-code-badge">
+                                <i class="pi pi-tag"></i>
+                                {{ profileDetails.codPflPfl }}
+                            </span>
+                            <span class="profile-level-badge-hero" *ngIf="profileDetails.codNivhPfl">
+                                <i class="pi pi-shield"></i>
+                                Niveau {{ profileDetails.codNivhPfl }}
+                            </span>
+                            <span
+                                [class]="'status-badge status-' + (profileDetails.boolEtatPfl === '1' ? 'active' : 'inactive')">
+                                <i
+                                    [class]="'pi pi-' + (profileDetails.boolEtatPfl === '1' ? 'check-circle' : 'times-circle')"></i>
+                                {{ profileDetails.boolEtatPfl === '1' ? 'Actif' : 'Inactif' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Cards Grid -->
+            <div class="info-cards-grid">
+                <!-- Application Card -->
+                <div class="info-card-modern">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="pi pi-sitemap"></i>
+                    </div>
+                    <div class="card-content">
+                        <label>Application</label>
+                        <span class="card-value">{{ profileDetails.codAppApp || 'Non spécifiée' }}</span>
+                    </div>
+                </div> <!-- Structure Card -->
+                <div class="info-card-modern">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="pi pi-building"></i>
+                    </div>
+                    <div class="card-content">
+                        <label>Structure</label>
+                        <span class="card-value">{{ profileDetails.codCatpPfl || 'Standard' }}</span>
+                    </div>
+                </div>
+
+                <!-- Structure Type Card -->
+                <div class="info-card-modern">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="pi pi-sitemap"></i>
+                    </div>
+                    <div class="card-content">
+                        <label>Type Structure</label>
+                        <span class="card-value">{{ getStructureType(profileDetails.codNivhPfl) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Schedule Section -->
+            <div class="schedule-section">
+                <div class="section-header">
+                    <i class="pi pi-clock"></i>
+                    <h4>Horaires d'accès</h4>
+                </div>
+                <div class="schedule-content">
+                    <div class="time-range">
+                        <div class="time-item start">
+                            <div class="time-icon">
+                                <i class="pi pi-sign-in"></i>
+                            </div>
+                            <div class="time-info">
+                                <label>Début</label>
+                                <span class="time-value">{{ profileDetails.libhdebpfl || '--:--' }}h</span>
+                            </div>
+                        </div>
+                        <div class="time-separator">
+                            <i class="pi pi-arrow-right"></i>
+                        </div>
+                        <div class="time-item end">
+                            <div class="time-icon">
+                                <i class="pi pi-sign-out"></i>
+                            </div>
+                            <div class="time-info">
+                                <label>Fin</label>
+                                <span class="time-value">{{ profileDetails.libhfinpfl || '--:--' }}h</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="holiday-status">
+                        <div class="holiday-icon" [class.allowed]="profileDetails.boolJouvPfl === '1'">
+                            <i class="pi pi-calendar"></i>
+                        </div>
+                        <div class="holiday-info">
+                            <label>Accès jours fériés</label>
+                            <span
+                                [class]="'holiday-badge ' + (profileDetails.boolJouvPfl === '1' ? 'allowed' : 'denied')">
+                                {{ profileDetails.boolJouvPfl === '1' ? 'Autorisé' : 'Non autorisé' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description if available -->
+            <div class="profile-description" *ngIf="profileDetails.description">
+                <h4><i class="pi pi-file-edit"></i> Description</h4>
+                <p>{{ profileDetails.description }}</p>
+            </div>
+
+            <!-- Permissions Section (if available) -->
+            <div class="profile-permissions"
+                *ngIf="profileDetails.permissions && profileDetails.permissions.length > 0">
+                <h4><i class="pi pi-key"></i> Permissions</h4>
+                <div class="permissions-grid">
+                    <span *ngFor="let permission of profileDetails.permissions" class="permission-chip">
+                        <i class="pi pi-check-circle"></i>
+                        {{ permission }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="!loadingProfileDetails && !profileDetails" class="error-container">
+            <i class="pi pi-exclamation-triangle"></i>
+            <p>Impossible de charger les détails du profil</p>
+        </div>
+    </div> <!-- No footer needed anymore, close button is in custom header -->
+</p-dialog>
+
+<!-- All Profiles Dialog (for +X more button) -->
+<p-dialog [(visible)]="showAllProfilesDialog" [modal]="true" [draggable]="false" [resizable]="false"
+    [dismissableMask]="true" [showHeader]="false" styleClass="all-profiles-modal"
+    [style]="{width: '850px', maxHeight: '90vh'}">
+
+    <div class="all-profiles-container">
+        <!-- Custom Header with Close Button -->
+        <div class="modal-header-custom">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="pi pi-users"></i>
+                </div>
+                <div class="header-text">
+                    <h2>Tous les profils</h2>
+                    <span class="header-subtitle">{{ profileCount }} profil(s) au total</span>
+                </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="closeAllProfilesDialog()" aria-label="Fermer">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input type="text" pInputText [(ngModel)]="profileSearchTerm" (input)="filterAllProfiles()"
+                    placeholder="Rechercher un profil..." />
+            </span>
+        </div> <!-- Profiles List -->
+        <div class="profiles-list">
+            <div *ngFor="let profile of filteredAllProfiles" class="profile-list-item"
+                [class.profile-inactive]="!profile.isActive" (click)="onProfileItemClick(profile, $event)">
+                <div class="profile-item-icon">
+                    <i class="pi pi-user"></i>
+                </div>
+                <div class="profile-item-info">
+                    <h4>{{ profile.code }}</h4>
+                    <span class="profile-item-name">{{ profile.name || profile.code }}</span>
+                </div>
+                <span class="profile-status-badge" [class.status-active]="profile.isActive"
+                    [class.status-inactive]="!profile.isActive">
+                    {{ profile.isActive ? 'Actif' : 'Inactif' }}
+                </span>
+                <button pButton icon="pi pi-info-circle" class="p-button-rounded p-button-text p-button-sm"
+                    (click)="onProfileChipClick(profile, $event)" pTooltip="Voir les détails">
+                </button>
+            </div>
+            <!-- Empty State -->
+            <div *ngIf="filteredAllProfiles.length === 0" class="empty-state">
+                <i class="pi pi-search"></i>
+                <p>Aucun profil trouvé</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- No footer needed anymore, close button is in custom header -->
+</p-dialog>

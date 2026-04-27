@@ -1,0 +1,458 @@
+.table-container {
+  padding: 0;
+  background: transparent;
+
+  // ===== TABLE HEADER =====
+  .table-header {
+    margin-bottom: 1.5rem;
+
+    .table-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      h5 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .table-count {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // ===== CONTENT CARD =====
+  .content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    // Search and Filter Bar
+    .search-filter-bar {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+
+      .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+
+        .search-icon {
+          position: absolute;
+          left: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #9ca3af;
+          font-size: 1.125rem;
+          z-index: 1;
+        }
+
+        .search-input {
+          width: 100%;
+          padding: 0.75rem 3rem 0.75rem 3rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          font-size: 0.9375rem;
+          transition: all 0.3s ease;
+
+          &:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+          }
+
+          &::placeholder {
+            color: #848991;
+          }
+        }
+
+        .clear-button {
+          position: absolute;
+          right: 0.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #9ca3af;
+
+          &:hover {
+            color: #ef4444;
+          }
+        }
+      }
+
+      .filter-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+
+        .refresh-button {
+          &:hover {
+            background: #f3f4f6;
+          }
+        }
+      }
+    }
+
+    // Table Styles
+    ::ng-deep .p-datatable {
+      .p-datatable-thead > tr > th {
+        background: #f9fafb;
+        color: #374151;
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+        text-align: center;
+
+        .header-content {
+          display: flex;
+          align-items: start;
+          justify-content: start;
+          gap: 0.5rem;
+
+          .header-text {
+            font-size: 0.875rem;
+            font-weight: 900;
+            color: #374151;
+          }
+        }
+
+        &.actions-header {
+          text-align: center;
+          font-size: 0.875rem;
+          font-weight: 900;
+          color: #374151;
+        }
+      }
+
+      .p-datatable-tbody > tr {
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        &:hover {
+          background: #f9fafb;
+        }
+
+        > td {
+          padding: 1rem;
+          border-bottom: 1px solid #f3f4f6;
+
+          .cell-content {
+            display: flex;
+            align-items: center;
+
+            &.cell-center {
+              justify-content: start;
+            }
+
+            .cell-text {
+              color: #374151;
+              font-size: 0.875rem;
+            }
+          }
+
+          .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+
+            .action-btn {
+              transition: all 0.2s ease;
+
+              &:hover {
+                transform: scale(1.1);
+              }
+            }
+
+            .notification-btn {
+              position: relative;
+
+              .notification-badge {
+                position: absolute;
+                top: -8px;
+                right: -4px;
+                min-width: 18px;
+                height: 18px;
+                border-radius: 9px;
+                background-color: #ef4444;
+                color: white;
+                font-size: 10px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 4px;
+                border: 2px solid white;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                animation: pulse 1.5s infinite;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Empty State
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+
+      .empty-icon {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 1.5rem;
+      }
+
+      h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        color: #374151;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 1rem;
+      }
+    }
+
+    // Loading State
+    .loading-state {
+      text-align: center;
+      padding: 4rem 2rem;
+
+      p {
+        margin-top: 1rem;
+        color: #6b7280;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  // Animations
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    .search-filter-bar {
+      .search-box {
+        min-width: 100%;
+      }
+
+      .filter-actions {
+        width: 100%;
+      }
+    }
+
+    .content-card {
+      border-radius: 12px;
+    }
+
+    ::ng-deep .p-datatable {
+      .p-datatable-thead > tr > th {
+        padding: 0.75rem;
+
+        .header-content {
+          .header-text {
+            font-size: 0.8125rem;
+          }
+        }
+      }
+
+      .p-datatable-tbody > tr > td {
+        padding: 0.75rem;
+
+        .cell-content {
+          .cell-text {
+            font-size: 0.8125rem;
+          }
+        }
+
+        .action-buttons {
+          flex-wrap: wrap;
+          gap: 0.25rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    .table-header {
+      .table-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+    }
+
+    .search-filter-bar {
+      padding: 1rem;
+    }
+
+    ::ng-deep .p-datatable {
+      .p-datatable-thead > tr > th {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  // PrimeNG Overrides
+  ::ng-deep {
+    .p-button {
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &.p-button-outlined {
+        background: transparent;
+        border: 2px solid currentColor;
+
+        &:hover {
+          background: rgba(102, 126, 234, 0.05);
+        }
+      }
+
+      &.p-button-text {
+        background: transparent;
+
+        &:hover {
+          background: rgba(102, 126, 234, 0.1);
+        }
+      }
+
+      &.p-button-rounded {
+        &.p-button-info {
+          color: #0ea5e9;
+
+          &:hover {
+            background: rgba(14, 165, 233, 0.1);
+          }
+        }
+
+        &.p-button-warning {
+          color: #f59e0b;
+
+          &:hover {
+            background: rgba(245, 158, 11, 0.1);
+          }
+        }
+
+        &.p-button-danger {
+          color: #ef4444;
+
+          &:hover {
+            background: rgba(239, 68, 68, 0.1);
+          }
+        }
+
+        &.p-button-help {
+          color: #8b5cf6;
+
+          &:hover {
+            background: rgba(139, 92, 246, 0.1);
+          }
+        }
+
+        &.p-button-secondary {
+          color: #6b7280;
+
+          &:hover {
+            background: rgba(107, 114, 128, 0.1);
+          }
+        }
+      }
+    }
+
+    .p-inputtext {
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #d1d5db;
+      }
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+    }
+
+    .p-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+    }
+
+    .p-paginator {
+      background: transparent;
+      border: none;
+      padding: 1rem;
+
+      .p-paginator-pages {
+        .p-paginator-page {
+          min-width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 8px;
+          margin: 0 0.25rem;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: #f3f4f6;
+          }
+
+          &.p-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+          }
+        }
+      }
+
+      .p-paginator-first,
+      .p-paginator-prev,
+      .p-paginator-next,
+      .p-paginator-last {
+        min-width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 8px;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #f3f4f6;
+        }
+      }
+    }
+  }
+}

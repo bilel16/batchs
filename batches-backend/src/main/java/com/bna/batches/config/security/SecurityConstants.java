@@ -9,6 +9,8 @@ public class SecurityConstants {
     public static final List<String> PUBLIC_URLS = List.of(
             "/authenticate",
             "/api/authenticate",
+            "/ws/**",
+            "/ws/info/**",
             "/h2-console/**",
             "/swagger-ui/**",
             "/swagger-ui.html",

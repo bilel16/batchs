@@ -1,0 +1,127 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:string';
+@use 'sass:color';
+@use 'bootstrap/scss/bootstrap' as *;
+@use "./scss/settings/theme-variables" as theme;
+@use "./scss/themes/header_general";
+@use "./scss/themes/sidebar_general";
+@use "primeicons/primeicons.css";
+@use 'animate.css';
+@use 'aos/dist/aos.css';
+@use "./scss/components/action-buttons";
+@use "./scss/vendors/primeng-overrides";
+
+@function theme-color($key) {
+  @return map-get($theme-colors, $key);
+}
+
+
+
+@import url("./scss/font/cairo-font.scss");
+
+
+
+:root {
+  --p-highlight-background: #ecf2f8 !important;
+  --p-highlight-focus-background: #ecf2f8 !important;
+}
+
+* {
+  &:focus {
+    outline: none;
+  }
+}
+
+body {
+  font-family: theme.$theme-font-family;
+  font-size: theme.$theme-font-size;
+  color: theme.$theme-font-color;
+  font-weight: 400;
+  background: #e6e6e6;
+  position: relative;
+}
+
+a {
+  text-decoration: none;
+  &:hover {
+    outline: none;
+    text-decoration: none;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: theme.$theme-heading-color;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  font-size: 32px;
+}
+
+h3 {
+  font-size: 28px;
+}
+
+h4 {
+  font-size: 24px;
+}
+
+h5 {
+  font-size: 16px;
+}
+
+h6 {
+  font-size: 16px;
+  font-family: Cairo;
+  font-weight: 500;
+}
+
+p {
+  font-size: 13px;
+}
+
+b,
+strong {
+  font-weight: 600;
+}
+
+// ========================================
+// BACKDROP BLUR EFFECT (matching drawer component) generelized
+// ========================================
+.p-overlay-mask-enter {
+  background-color: rgba(22, 38, 54, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px); // Safari support
+  transition: all 0.4s ease;
+}
+/* ==========================    Media responsive   ====================== */
+/* ******************************************************************************* */
+
+@media only screen and (max-width: 1605px) and (max-height: 900px) {
+  .pcoded-main-container {
+    margin-left: 16.5rem;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .pcoded-content {
+    padding: 25px 15px;
+  }
+}
+.menu-img-icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 0.75rem;  /* spacing like Prime icons */
+  filter: invert(100%);    /* make black PNG white for dark sidebar */
+}

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="annualCalendar"
+		class="org.quartz.impl.calendar.AnnualCalendar">
+		<property name="daysExcluded">
+			<list>
+				<ref bean="twelveApril" />
+				<ref bean="dixSeptMai" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="twelveApril" class="java.util.GregorianCalendar">
+	
+		<constructor-arg index="0" value="2008" />
+		<constructor-arg index="1" value="04" />
+		<constructor-arg index="2" value="12" />
+	</bean>
+
+	<bean id="dixSeptMai" class="java.util.GregorianCalendar">
+		<constructor-arg index="0" value="2008"/>
+		<constructor-arg index="1" value="05"/>
+		<constructor-arg index="2" value="19" />
+	</bean>
+
+
+	<bean id="qrtzDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@BNABD:1541:bnaprod" />
+		<property name="username" value="schedulingadmin" />
+		<property name="password" value="sched" />
+<!--		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />-->
+<!--		<property name="url" value="jdbc:hsqldb:hsql://localhost" />-->
+<!--		<property name="username" value="sa" />-->
+<!--		<property name="password" value="" />-->
+		<property name="maxActive" value="100" />
+		<property name="maxIdle" value="30" />
+		<property name="maxWait" value="100" />
+		<property name="defaultAutoCommit" value="true" />
+		<property name="removeAbandoned" value="true" />
+		<property name="removeAbandonedTimeout" value="60" />
+	</bean>
+
+	<bean id="qrtzJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+		<constructor-arg index="0" ref="qrtzDataSource" />
+	</bean>
+
+	
+</beans>

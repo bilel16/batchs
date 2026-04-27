@@ -1,0 +1,29 @@
+.bna-logo-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  position: relative;
+  overflow: visible;
+
+  .bna-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: spinLogo 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 170, 0.4));
+  }
+}
+
+@keyframes spinLogo {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}

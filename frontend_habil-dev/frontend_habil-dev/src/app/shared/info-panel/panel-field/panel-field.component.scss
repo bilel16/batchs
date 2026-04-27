@@ -1,0 +1,105 @@
+/* Each Item in the Row */
+
+.panel-item {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  transition: background 0.2s;
+  gap: 0.15rem;
+}
+
+.panel-item:hover {
+  background: #e9ecef;
+}
+
+/* Full-width Items */
+.panel-item-full {
+  grid-column: 1 / -1 !important;
+}
+
+/* Panel Label */
+.panel-label {
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+/* Value Container */
+.panel-value {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: #222;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Link */
+.value-link {
+  color: #1365e9;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.value-link:hover {
+  text-decoration: underline;
+}
+
+/* Tag */
+p-tag {
+  font-size: 12px;
+}
+
+/* List */
+.value-list {
+  margin: 0;
+  padding-left: 0;
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+.value-list li {
+  white-space: nowrap;
+  padding: 4px 10px;
+  background-color: #e3f2fd;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+/* Text */
+.value-text {
+  word-break: break-word;
+}
+
+/* HTML */
+.value-html {
+  word-break: break-word;
+}
+
+/* Object/JSON */
+.value-object {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  overflow-x: auto;
+  margin: 0;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .panel-item {
+    padding: 10px;
+  }
+}

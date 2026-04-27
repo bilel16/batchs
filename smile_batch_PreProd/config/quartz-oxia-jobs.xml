@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<!--bean id="specifiedJob" parent="abstractJob">
+		<property name="jobClass"
+			value="com.oxia.scheduling.quartz.core.SpecifiedJob" />
+	</bean-->
+
+	<!--bean id="fileJob" parent="abstractFileJob">
+		<property name="jobClass"
+			value="com.oxia.scheduling.quartz.jobs.file.EmailFileJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="rootpath" value="C:\\reports"></entry>
+			</map>
+		</property>
+		<property name="jobListenerNames">
+			<list>
+				<value>OXIA_JOB_LISTNER</value>
+			</list>
+		</property>
+	</bean-->      
+        
+       
+        <bean id="moulinetteLiquidationAecheance"  parent="abstractJob" >
+          <property name="jobClass" value="com.bna.smile.batch.moulinette.MoulinetteLiquidationAecheance"/>
+        </bean>      
+        <bean id="moulinetteLiquidationAecheance1"  parent="abstractJob" >
+          <property name="jobClass" value="com.bna.smile.batch.moulinette.MoulinetteLiquidationAecheance"/>
+        </bean> 
+</beans>

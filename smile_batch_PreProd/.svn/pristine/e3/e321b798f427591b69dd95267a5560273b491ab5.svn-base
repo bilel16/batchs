@@ -1,0 +1,130 @@
+package com.bna.smile.model.domaineplacement.traitement;
+
+import com.bna.commun.model.AvancRembLiquid;
+import com.bna.commun.model.DetailsOperationPlacement;
+import com.bna.commun.model.OperationMoyPay;
+import com.bna.commun.traitements.InsertOperationMoyPayTrt;
+
+import com.bna.commun.traitements.Traitement;
+import com.bna.commun.util.StrHandler;
+import com.bna.smile.model.constant.Constants;
+
+import com.oxia.fwk.core.IValueObject;
+import com.oxia.fwk.core.ValueObject;
+
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.userdetails.UserDetails;
+
+public class InsertOperationMoyPayLiquidationPlacTrt extends Traitement{
+    public InsertOperationMoyPayLiquidationPlacTrt() {
+    }
+    
+    public IValueObject perform (IValueObject vo ) {
+        
+            DetailsOperationPlacement  detailsOperationPlacement  = (DetailsOperationPlacement )vo;
+            OperationMoyPay  operationMoyPayInserer = new OperationMoyPay();
+            if(detailsOperationPlacement.getAvancRembLiquid().getCodTyplArl().equalsIgnoreCase("T"))
+              this.setCroFlag(true); 
+            else this.setCroFlag(false); 
+            
+            try {           
+                ///*** insertion dans la table Operation_Moy_Pay dans le cas des produit CAT en dinars et en dinars convertible
+                InsertOperationMoyPayTrt insertOperationMoyPayTrt = new InsertOperationMoyPayTrt();
+                
+                if(detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CATDC_PLAC)
+                   || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CAT_PLAC)
+                   || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BNAPLC_PLAC)){                       
+                       operationMoyPayInserer = (OperationMoyPay)insertOperationMoyPayTrt.exec(detailsOperationPlacement.getOperationMoyPay()); 
+                }
+                
+                return operationMoyPayInserer;
+            } 
+            catch (Exception e) {
+                com.oxia.fwk.core.Error erreur = new com.oxia.fwk.core.Error();
+                StringBuffer text = 
+                    new StringBuffer("Erreur dans InsertOperationMoyPayAvancePlacTrt:");
+                text.append(e.getMessage());
+                erreur.setCode("300");
+                erreur.setDescription(text.toString());
+                erreur.setKey("InsertOperationMoyPayAvancePlacTrt");
+                operationMoyPayInserer.addError(erreur);
+                throw new RuntimeException();
+            }   
+        }
+        
+    public void genCroText(ValueObject vo) {
+            
+            DetailsOperationPlacement  detailsOperationPlacement  = (DetailsOperationPlacement )vo;
+            AvancRembLiquid avancRembLiquid = detailsOperationPlacement.getAvancRembLiquid();             
+              /* ---------------------- Garniture de la partie FIXE du CRO ----------------------------------- */
+
+               Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                        com.oxia.security.abc.model.Personnel user = null;
+                        if (obj instanceof UserDetails) {
+                            user = (com.oxia.security.abc.model.Personnel)obj;
+                       }
+              
+              if(detailsOperationPlacement.getOperationMoyPay().getNumOperOmp()!=null)
+                this.setNumRefCro(Long.valueOf(detailsOperationPlacement.getOperationMoyPay().getNumOperOmp()));
+              else this.setNumRefCro(avancRembLiquid.getContratPlacement().getNumBcCpla());
+              
+              this.setLibRefCro("SMILE.placement.Liquid");
+              this.setDatValCro(detailsOperationPlacement.getOperationMoyPay().getDatValOmp());
+              this.setCodeStructInitiatrice(avancRembLiquid.getContratPlacement().getContratCpt().getStructure().getCodStrcStrc().toString());              
+              this.setCodStrcImpt(avancRembLiquid.getContratPlacement().getContratCpt().getStructure().getCodStrcStrc());
+              this.setCodEtatCro(0);              
+              this.setCodeProduit(avancRembLiquid.getContratPlacement().getProduitPlacement().getCodPrdPlc().toString());
+              this.setOperationId(detailsOperationPlacement.getTache().getTacheId().getCodOperOper().toString());
+              this.setDateOperation(detailsOperationPlacement.getDatCompDopl());
+              SimpleDateFormat formater=new SimpleDateFormat("dd/MM/yyyy");
+              formater=new SimpleDateFormat("HH:mm:ss");
+              String heureString = formater.format(new Date());
+              this.setHeureOperation(heureString);
+              this.setTypeOperationCro("O");
+              this.setCodTachTach(Constants.COD_TACHE_VALIDATION_LIQUIDATION_ANTICIPE);
+              if (avancRembLiquid.getNumSeqArl()!=null){
+                this.setCodRefcOmp(avancRembLiquid.getNumSeqArl().toString());
+              }else this.setCodRefcOmp("0");
+              this.setDatExecCro(new Date());
+
+              this.setNumCinUser(user.getNumMatrUser());
+              this.setCodTypUser(user.getMatriculeTyp());
+              //this.setCodTypUser();  
+              //this.setNumCinUser();
+              
+                 /* ------------------Garniture de la partie VARIABLE du CRO----------------------------------  */
+            StringBuffer cro=new StringBuffer("");
+                
+                // contratClient
+            cro.append("numCptBna=");
+            cro.append(StrHandler.lpad(avancRembLiquid.getContratPlacement().getContratCpt().getContratCptId().getCodStrcStrc().toString(),'0',3)+StrHandler.lpad(avancRembLiquid.getContratPlacement().getContratCpt().getContratCptId().getCodPrdPrd().toString(),'0',4)+StrHandler.lpad(avancRembLiquid.getContratPlacement().getContratCpt().getContratCptId().getNumCcptCcpt().toString(),'0',6)+";");               
+                
+            if (avancRembLiquid.getContratPlacement().getNumSeqCpla()!= null){
+                    cro.append("CONTRAT_PLACEMENT.NUM_SEQ_CPLA=");
+                    cro.append(avancRembLiquid.getContratPlacement().getNumSeqCpla() +";");
+                }
+            if(avancRembLiquid.getNumSeqArl() != null){
+                cro.append("AVANC_REMB_LIQUID.NUM_SEQ_ARL=");
+                cro.append(avancRembLiquid.getNumSeqArl() +";");
+            }
+            
+            cro.append("CONTRAT_PLACEMENT.MONT_CAP_CPLA=");
+            cro.append(avancRembLiquid.getMontArlArl() +";");
+            
+            cro.append("AVANC_REMB_LIQUID.NUM_TAUI_ARL=");
+            cro.append(avancRembLiquid.getNumTauiArl() +";");
+            
+            
+            if (avancRembLiquid.getContratPlacement().getNumBcCpla()!= null){
+                cro.append("CONTRAT_PLACEMENT.NUM_BC_CPLA=");
+                cro.append(avancRembLiquid.getContratPlacement().getNumBcCpla() +";");
+            }
+             
+                this.setCroText(cro.toString());
+        }   
+
+}

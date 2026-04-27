@@ -1,0 +1,151 @@
+<div class="page-consultation">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Consultation</h1>
+      <p>Recherche et analyse des données de compensation</p>
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <div class="card form-card">
+    <div class="card-header"><i class="pi pi-search"></i> Critères de recherche</div>
+    <div class="card-body">
+      <div class="filter-grid">
+
+        <div class="field">
+          <label>Date début</label>
+          <input type="date" [(ngModel)]="filters.dateStart" class="form-input" />
+        </div>
+
+        <div class="field">
+          <label>Date fin</label>
+          <input type="date" [(ngModel)]="filters.dateEnd" class="form-input" />
+        </div>
+
+        <div class="field">
+          <label>Instrument</label>
+          <select [(ngModel)]="filters.instrument" class="form-input">
+            <option value="">Tous</option>
+            <option value="CHEQUE">Chèque</option>
+            <option value="EFFET">Effet</option>
+            <option value="PRELEVEMENT">Prélèvement</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Sens</label>
+          <select [(ngModel)]="filters.sens" class="form-input">
+            <option value="">Tous</option>
+            <option value="DEBIT">Débit</option>
+            <option value="CREDIT">Crédit</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Valeur</label>
+          <input type="text" [(ngModel)]="filters.valeur" class="form-input" placeholder="Ex: 2025-01-15" />
+        </div>
+
+        <div class="field">
+          <label>Agence (structure)</label>
+          <input type="text" [(ngModel)]="filters.agence" class="form-input" placeholder="Ex: 001, 042…" />
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-reset" (click)="reset()">
+          <i class="pi pi-times"></i> Réinitialiser
+        </button>
+        <button class="btn-search" (click)="search()" [disabled]="loading()">
+          @if (loading()) {
+            <i class="pi pi-spin pi-spinner"></i> Recherche…
+          } @else {
+            <i class="pi pi-search"></i> Rechercher
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert-error mt-3">
+      <i class="pi pi-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  <!-- Results -->
+  @if (searched()) {
+    <div class="card mt-3">
+      <div class="card-header">
+        <i class="pi pi-table"></i>
+        Résultats
+        <span class="result-count">{{ results().length }} ligne(s)</span>
+      </div>
+
+      @if (!results().length) {
+        <div class="empty-table">
+          <i class="pi pi-inbox"></i>
+          <p>Aucun résultat pour ces critères.</p>
+        </div>
+      } @else {
+        <!-- Summary -->
+        <div class="summary-row">
+          <div class="summary-item">
+            <span class="summary-label">Total opérations</span>
+            <span class="summary-value">{{ totalNombre() | number }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Montant total</span>
+            <span class="summary-value accent">{{ formatMontant(totalMontant()) }}</span>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Structure</th>
+                <th>Libellé</th>
+                <th>Instrument</th>
+                <th>Sens</th>
+                <th>Date opération</th>
+                <th class="num">Nb total</th>
+                <th class="num">Montant total</th>
+                <th class="num">Nb intra</th>
+                <th class="num">Montant intra</th>
+                <th class="num">Nb inter</th>
+                <th class="num">Montant inter</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of results(); track r.structure + r.dateOperation + r.instrument) {
+                <tr>
+                  <td class="mono">{{ r.structure }}</td>
+                  <td>{{ r.libStructure }}</td>
+                  <td><span class="badge-instrument">{{ r.instrument }}</span></td>
+                  <td>
+                    <span class="sens-badge" [class.sens-debit]="r.sens === 'DEBIT'" [class.sens-credit]="r.sens === 'CREDIT'">
+                      {{ r.sens }}
+                    </span>
+                  </td>
+                  <td>{{ r.dateOperation }}</td>
+                  <td class="num">{{ r.nombreTotal | number }}</td>
+                  <td class="num montant">{{ formatMontant(r.montantTotal) }}</td>
+                  <td class="num">{{ r.nombreIntra | number }}</td>
+                  <td class="num">{{ formatMontant(r.montantIntra) }}</td>
+                  <td class="num">{{ r.nombreInter | number }}</td>
+                  <td class="num">{{ formatMontant(r.montantInter) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+</div>

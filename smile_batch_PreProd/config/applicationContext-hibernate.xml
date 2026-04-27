@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+
+    <!-- Hibernate SessionFactory -->
+
+    
+
+    <!-- Hibernate Template Configuration 
+		*****************************************
+		*****************************************
+		*****************************************
+	-->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate" lazy-init="true">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+    
+    	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" lazy-init="true">
+		<!-- Mettre ici les fichiers de mappage Hibernate com/oxia/../xx.hbm. -->
+            <property name="mappingResources">
+                <list>
+                               
+                   
+              
+            </list>
+        </property>
+        
+        <property name="hibernateProperties">
+                    <props>
+                        <prop key="hibernate.dialect">org.hibernate.dialect.Oracle9Dialect</prop>
+                        <prop key="hibernate.show_sql">true</prop>
+                        <prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+                        <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+                        <prop key="hibernate.max_fetch_depth">2</prop>
+                    </props>
+        </property>
+                
+        <property name="dataSource">
+                    <ref bean="dataSource" />
+        </property>
+        
+    </bean>
+
+</beans>

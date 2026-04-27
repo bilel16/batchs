@@ -1,0 +1,192 @@
+<div class="page-launcher">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Lancement Batch</h1>
+      <p>Configurez et lancez un batch de télé-compensation</p>
+    </div>
+    @if (currentExecution()) {
+      <button class="btn-secondary" (click)="reset()">
+        <i class="pi pi-replay"></i> Nouveau batch
+      </button>
+    }
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert-error">
+      <i class="pi pi-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  <!-- Launch Form -->
+  @if (!currentExecution()) {
+    <div class="card form-card">
+      <div class="card-header"><i class="pi pi-sliders-h"></i> Paramètres du batch</div>
+      <div class="card-body">
+
+        <div class="form-grid">
+
+          <!-- Instrument -->
+          <div class="form-group">
+            <label class="form-label">Instrument</label>
+            <div class="radio-group">
+              @for (inst of ['CHEQUE','EFFET','PRELEVEMENT']; track inst) {
+                <label class="radio-card" [class.selected]="form.instrument === inst">
+                  <input type="radio" name="instrument" [value]="inst" [(ngModel)]="form.instrument" />
+                  <i class="pi" [class.pi-money-bill]="inst==='CHEQUE'" [class.pi-file]="inst==='EFFET'" [class.pi-credit-card]="inst==='PRELEVEMENT'"></i>
+                  <span>{{ inst === 'PRELEVEMENT' ? 'PRÉLÈVEMENT' : inst }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Phase -->
+          <div class="form-group">
+            <label class="form-label">Phase</label>
+            <div class="radio-group">
+              @for (phase of ['INSERTION','POSITION']; track phase) {
+                <label class="radio-card" [class.selected]="form.phase === phase">
+                  <input type="radio" name="phase" [value]="phase" [(ngModel)]="form.phase" />
+                  <i class="pi" [class.pi-database]="phase==='INSERTION'" [class.pi-chart-bar]="phase==='POSITION'"></i>
+                  <span>{{ phase }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Options -->
+        <div class="options-row">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="form.dryRun" />
+            <span class="toggle-track"></span>
+            <span>Mode simulation (dry run)</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="form.notifyEmail" />
+            <span class="toggle-track"></span>
+            <span>Notification e-mail</span>
+          </label>
+          <div class="retry-group">
+            <label class="form-label">Tentatives max</label>
+            <input type="number" class="input-small" [(ngModel)]="form.retryMax" min="0" max="5" />
+          </div>
+        </div>
+
+        <!-- Dry run banner -->
+        @if (form.dryRun) {
+          <div class="info-banner">
+            <i class="pi pi-info-circle"></i>
+            Mode simulation activé — aucune donnée ne sera modifiée en base.
+          </div>
+        }
+
+        <!-- Launch button -->
+        <div class="action-row">
+          <button class="btn-launch" (click)="launch()" [disabled]="launching()">
+            @if (launching()) {
+              <i class="pi pi-spin pi-spinner"></i> Lancement en cours…
+            } @else {
+              <i class="pi pi-play-circle"></i> Lancer le batch
+            }
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- Progress Panel -->
+  @if (currentExecution(); as exec) {
+    <div class="progress-panel">
+
+      <!-- Global status bar -->
+      @if (ws.batchStatus(); as bs) {
+        <div class="card global-status">
+          <div class="global-status-top">
+            <div class="gs-info">
+              <span class="gs-instrument">{{ bs.instrument }} — {{ bs.phase }}</span>
+              <span class="badge" [class]="statusClass(bs.status)">{{ statusLabel(bs.status) }}</span>
+              @if (exec.dryRun) { <span class="badge badge-warning">DRY RUN</span> }
+            </div>
+            <div class="gs-counters">
+              <span class="gs-counter ok">{{ bs.doneAgences }} terminées</span>
+              <span class="gs-counter err">{{ bs.errorAgences }} erreurs</span>
+              <span class="gs-counter total">{{ bs.totalAgences }} total</span>
+            </div>
+          </div>
+          <div class="global-bar-wrap">
+            <div class="global-bar">
+              <div class="global-fill" [style.width]="bs.globalProgress + '%'"></div>
+            </div>
+            <span class="global-pct">{{ bs.globalProgress }}%</span>
+          </div>
+          @if (bs.message) {
+            <div class="gs-message">{{ bs.message }}</div>
+          }
+          @if (isRunning()) {
+            <button class="btn-stop" (click)="stop()" [disabled]="stopping()">
+              <i class="pi pi-stop-circle"></i> Arrêter le batch
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="card global-status connecting">
+          <i class="pi pi-spin pi-spinner"></i> Connexion WebSocket en cours…
+        </div>
+      }
+
+      <!-- Agency table -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <i class="pi pi-list"></i> Progression par agence
+          <span class="ws-dot" [class.ws-connected]="ws.connected()" [class.ws-disconnected]="!ws.connected()"></span>
+          {{ ws.connected() ? 'Connecté' : 'Déconnecté' }}
+        </div>
+        @if (!ws.agenceProgress().length) {
+          <div class="empty-table">En attente des mises à jour…</div>
+        } @else {
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Structure</th>
+                  <th>Date comptable</th>
+                  <th>État</th>
+                  <th>Progression</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (ag of ws.agenceProgress(); track ag.structure) {
+                  <tr [class]="etatClass(ag.etat)">
+                    <td class="mono">{{ ag.structure }}</td>
+                    <td>{{ ag.dateComptable }}</td>
+                    <td>
+                      <span class="etat-badge etat-{{ ag.etat | lowercase }}">
+                        <i class="pi {{ etatIcon(ag.etat) }}"></i>
+                        {{ ag.etat }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="mini-bar-wrap">
+                        <div class="mini-bar"><div class="mini-fill" [style.width]="ag.progressPercent + '%'" [class.fill-err]="ag.etat === 'ERREUR'"></div></div>
+                        <span>{{ ag.progressPercent }}%</span>
+                      </div>
+                    </td>
+                    <td class="error-msg">{{ ag.errorMessage ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

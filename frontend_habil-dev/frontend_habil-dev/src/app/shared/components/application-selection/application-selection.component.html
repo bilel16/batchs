@@ -1,0 +1,22 @@
+<div class="flex align-items-center">
+  <label *ngIf="showLabel" [attr.for]="id" class="me-2 font-semibold" style="white-space: nowrap;">
+    {{ label }}
+  </label>
+
+  <p-dropdown
+    [inputId]="id"
+    panelStyleClass="ds-select--application"
+    [(ngModel)]="selectedCodApp"
+    [options]="applications"
+    optionLabel="libApp"
+    optionValue="codApp"
+    [placeholder]="placeholder"
+    [disabled]="disabled || loading"
+    [style]="{ width: width }"
+    (onChange)="onSelectionChange()"
+    appendTo="body"
+    [checkmark]="true" 
+    [showClear]="true"
+
+  ></p-dropdown>
+</div>

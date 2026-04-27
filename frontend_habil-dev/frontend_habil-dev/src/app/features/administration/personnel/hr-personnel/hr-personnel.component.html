@@ -1,0 +1,367 @@
+<!-- HR Personnel Component Template -->
+<!-- Based on user-selection-step design pattern -->
+
+<div class="hr-personnel-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="title-area">
+      <h2>
+        <i class="pi pi-users"></i>
+        Personnel RH
+      </h2>
+      <p class="subtitle">Consultation du personnel depuis le système RH externe</p>
+    </div>
+    
+    <div class="stats-badges">
+      <span class="badge badge-primary">
+        <i class="pi pi-users me-1"></i>
+        {{ totalElements }} employé(s) au total
+      </span>
+      
+      <span class="badge badge-info" *ngIf="hasActiveFilters()">
+        <i class="pi pi-filter me-1"></i>
+        {{ getActiveFilterCount() }} filtre(s) actif(s)
+      </span>
+      
+      <button pButton 
+              icon="pi pi-refresh" 
+              class="p-button-text p-button-rounded" 
+              (click)="refreshData()"
+              [disabled]="isLoading" 
+              pTooltip="Actualiser">
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <!-- Main Search Bar -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <i class="pi pi-search"></i>
+        <div class="floating-label">
+          <input 
+            type="text" 
+            id="hrSearch" 
+            [ngModel]="searchTerm"
+            (ngModelChange)="onSearchChange($event)" 
+            placeholder=" " />
+          <label for="hrSearch">Rechercher (matricule, nom, prénom, nom complet)</label>
+        </div>
+        <span class="result-count">
+          {{ totalElements }} résultat(s)
+        </span>
+      </div>
+      
+      <button pButton 
+              type="button"
+              [icon]="showAdvancedFilters ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+              [label]="showAdvancedFilters ? 'Masquer filtres' : 'Plus de filtres'"
+              class="p-button-outlined p-button-sm"
+              (click)="toggleAdvancedFilters()">
+      </button>
+    </div>
+
+    <!-- Advanced Filters Panel -->
+    <div class="advanced-filters" *ngIf="showAdvancedFilters" [@slideDown]>
+      <div class="filter-row">
+        <!-- CIN Filter -->
+        <div class="filter-item">
+          <label for="cinFilter">CIN</label>
+          <input 
+            pInputText 
+            id="cinFilter" 
+            [(ngModel)]="cinFilter"
+            (ngModelChange)="onCinFilterChange($event)"
+            placeholder="Numéro CIN exact"
+            [style]="{'width': '100%'}" />
+        </div>
+
+        <!-- Matricule Filter -->
+        <div class="filter-item">
+          <label for="matcleFilter">Matricule</label>
+          <input 
+            pInputText 
+            id="matcleFilter" 
+            [(ngModel)]="matcleFilter"
+            (ngModelChange)="onMatcleFilterChange($event)"
+            placeholder="Matricule"
+            [style]="{'width': '100%'}" />
+        </div>
+
+        <!-- Prenom Filter -->
+        <div class="filter-item">
+          <label for="prenomFilter">Prénom</label>
+          <input 
+            pInputText 
+            id="prenomFilter" 
+            [(ngModel)]="prenomFilter"
+            (ngModelChange)="onPrenomFilterChange($event)"
+            placeholder="Prénom"
+            [style]="{'width': '100%'}" />
+        </div>
+
+        <!-- Nom Filter -->
+        <div class="filter-item">
+          <label for="nomuseFilter">Nom</label>
+          <input 
+            pInputText 
+            id="nomuseFilter" 
+            [(ngModel)]="nomuseFilter"
+            (ngModelChange)="onNomuseFilterChange($event)"
+            placeholder="Nom"
+            [style]="{'width': '100%'}" />
+        </div>
+
+        <!-- Sort Options -->
+        <div class="filter-item sort-item">
+          <label for="sortFilter">Trier par</label>
+          <div class="sort-controls">
+            <p-dropdown 
+              id="sortFilter" 
+              [options]="sortOptions" 
+              [(ngModel)]="sortBy"
+              (ngModelChange)="onSortChange($event)" 
+              appendTo="body" 
+              [style]="{'flex': '1'}">
+            </p-dropdown>
+            <button pButton 
+                    type="button"
+                    [icon]="sortDirection === 'ASC' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"
+                    class="p-button-text p-button-sm sort-direction-btn" 
+                    (click)="toggleSortDirection()"
+                    [pTooltip]="sortDirection === 'ASC' ? 'Croissant' : 'Décroissant'">
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset Filters Button -->
+        <div class="filter-item reset-item">
+          <button pButton 
+                  type="button" 
+                  icon="pi pi-filter-slash"
+                  class="p-button-outlined p-button-secondary p-button-sm" 
+                  (click)="clearFilters()"
+                  [disabled]="!hasActiveFilters()"
+                  pTooltip="Réinitialiser les filtres">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Summary -->
+    <div *ngIf="hasActiveFilters()" class="active-filters">
+      <span class="active-filters-label">Filtres actifs:</span>
+      
+      <span class="filter-tag" *ngIf="searchTerm">
+        <i class="pi pi-search"></i> "{{ searchTerm }}"
+        <button class="remove-filter" (click)="removeFilter('search')">
+          <i class="pi pi-times"></i>
+        </button>
+      </span>
+      
+      <span class="filter-tag" *ngIf="cinFilter">
+        <i class="pi pi-id-card"></i> CIN: {{ cinFilter }}
+        <button class="remove-filter" (click)="removeFilter('cin')">
+          <i class="pi pi-times"></i>
+        </button>
+      </span>
+      
+      <span class="filter-tag" *ngIf="matcleFilter">
+        <i class="pi pi-hashtag"></i> Mat: {{ matcleFilter }}
+        <button class="remove-filter" (click)="removeFilter('matcle')">
+          <i class="pi pi-times"></i>
+        </button>
+      </span>
+      
+      <span class="filter-tag" *ngIf="prenomFilter">
+        <i class="pi pi-user"></i> Prénom: {{ prenomFilter }}
+        <button class="remove-filter" (click)="removeFilter('prenom')">
+          <i class="pi pi-times"></i>
+        </button>
+      </span>
+      
+      <span class="filter-tag" *ngIf="nomuseFilter">
+        <i class="pi pi-user"></i> Nom: {{ nomuseFilter }}
+        <button class="remove-filter" (click)="removeFilter('nomuse')">
+          <i class="pi pi-times"></i>
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Data Table -->
+  <div *ngIf="!isLoading" class="table-container">
+    <p-table 
+      [value]="hrPersonnelList"
+      [paginator]="false"
+      [rows]="pageSize"
+      [showCurrentPageReport]="true"
+      [rowsPerPageOptions]="pageSizeOptions"
+      [loading]="isLoading"
+      [rowHover]="true"
+      [responsive]="true"
+      styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+      [tableStyle]="{'min-width': '60rem'}">
+      
+      <!-- Table Header -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th scope="col" class="sortable-header" (click)="onColumnSort('matcle')" pSortableColumn="matcle">
+            Matricule
+            <i [class]="getSortIcon('matcle')"></i>
+          </th>
+          <th scope="col" class="sortable-header" (click)="onColumnSort('prenom')" pSortableColumn="prenom">
+            Prénom
+            <i [class]="getSortIcon('prenom')"></i>
+          </th>
+          <th scope="col" class="sortable-header" (click)="onColumnSort('nomuse')" pSortableColumn="nomuse">
+            Nom
+            <i [class]="getSortIcon('nomuse')"></i>
+          </th>
+          <th scope="col" class="sortable-header" (click)="onColumnSort('cin')" pSortableColumn="cin">
+            CIN
+            <i [class]="getSortIcon('cin')"></i>
+          </th>
+          <th scope="col" class="sortable-header" (click)="onColumnSort('lbjblg')" pSortableColumn="lbjblg">
+            Poste
+            <i [class]="getSortIcon('lbjblg')"></i>
+          </th>
+          <th scope="col" class="sortable-header" (click)="onColumnSort('lboulg')" pSortableColumn="lboulg">
+            Structure
+            <i [class]="getSortIcon('lboulg')"></i>
+          </th>
+        </tr>
+      </ng-template>
+      
+      <!-- Table Body -->
+      <ng-template pTemplate="body" let-personnel>
+        <tr [class.selected-row]="isSelected(personnel)" 
+            (click)="onRowSelect(personnel)"
+            class="clickable-row">
+          <td>
+            <span class="matricule-badge">{{ personnel.matcle }}</span>
+          </td>
+          <td>{{ personnel.prenom || '-' }}</td>
+          <td>{{ personnel.nomuse || '-' }}</td>
+          <td>
+            <span class="cin-text">{{ personnel.cin || '-' }}</span>
+          </td>
+          <td>
+            <span class="poste-badge" *ngIf="personnel.lbjblg">{{ personnel.lbjblg }}</span>
+            <span *ngIf="!personnel.lbjblg">-</span>
+          </td>
+          <td>
+            <span class="structure-text" *ngIf="personnel.lboulg">{{ personnel.lboulg }}</span>
+            <span *ngIf="!personnel.lboulg">-</span>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="pi pi-search" style="font-size: 3rem; color: #cbd5e0"></i>
+              <h4>Aucun personnel trouvé</h4>
+              <p class="text-muted">
+                <ng-container *ngIf="hasActiveFilters(); else noFilterMessage">
+                  Essayez de modifier ou réinitialiser vos filtres
+                </ng-container>
+                <ng-template #noFilterMessage>
+                  Aucune donnée disponible
+                </ng-template>
+              </p>
+              <button *ngIf="hasActiveFilters()" 
+                      pButton 
+                      label="Réinitialiser les filtres"
+                      icon="pi pi-filter-slash" 
+                      class="p-button-outlined p-button-sm mt-2" 
+                      (click)="clearFilters()">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Custom Pagination Controls -->
+  <div *ngIf="!isLoading && totalPages > 0" class="pagination-container">
+    <div class="pagination-info">
+      <span class="page-info">
+        Page {{ currentPage + 1 }} sur {{ totalPages }}
+        <span class="total-info">({{ totalElements }} employés)</span>
+      </span>
+    </div>
+
+    <div class="pagination-controls">
+      <!-- First Page -->
+      <button pButton 
+              icon="pi pi-angle-double-left" 
+              class="p-button-text p-button-sm" 
+              (click)="firstPage()"
+              [disabled]="isFirstPage" 
+              pTooltip="Première page">
+      </button>
+
+      <!-- Previous Page -->
+      <button pButton 
+              icon="pi pi-angle-left" 
+              class="p-button-text p-button-sm" 
+              (click)="previousPage()"
+              [disabled]="isFirstPage" 
+              pTooltip="Page précédente">
+      </button>
+
+      <!-- Page Numbers -->
+      <div class="page-numbers">
+        <button *ngFor="let page of getPageNumbers()" 
+                pButton 
+                [label]="(page + 1).toString()"
+                class="p-button-text p-button-sm" 
+                [ngClass]="{'p-button-primary': page === currentPage}"
+                (click)="goToPage(page)">
+        </button>
+      </div>
+
+      <!-- Next Page -->
+      <button pButton 
+              icon="pi pi-angle-right" 
+              class="p-button-text p-button-sm" 
+              (click)="nextPage()"
+              [disabled]="isLastPage" 
+              pTooltip="Page suivante">
+      </button>
+
+      <!-- Last Page -->
+      <button pButton 
+              icon="pi pi-angle-double-right" 
+              class="p-button-text p-button-sm"
+              (click)="lastPage()" 
+              [disabled]="isLastPage" 
+              pTooltip="Dernière page">
+      </button>
+    </div>
+
+    <!-- Page Size Selector -->
+    <div class="page-size-selector">
+      <label for="pageSize">Afficher:</label>
+      <p-dropdown 
+        [options]="pageSizeOptions" 
+        [(ngModel)]="pageSize"
+        (onChange)="onPageSizeChange($event.value)" 
+        [style]="{'width': '80px'}" 
+        appendTo="body">
+      </p-dropdown>
+      <span>par page</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+/* Main Container */
+.panel-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 14px;
+  color: #222;
+  border-left: 7px solid #115952;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Label Styling - Top Position (Default) */
+.label-top .panel-label {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgb(78, 78, 78);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+/* Label Styling - Left Position */
+.panel-container:not(.label-top) .panel-item {
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+}
+
+.panel-container:not(.label-top) .panel-label {
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: #333;
+  min-width: 120px;
+}
+
+.panel-container:not(.label-top) .panel-label::after {
+  content: ":";
+  margin-left: 2px;
+}
+
+.label-top .panel-label::after {
+  content: "";
+}

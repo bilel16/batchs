@@ -1,0 +1,1 @@
+Lanceur_Batch.bat com.bna.smile.batch.test.BatchMAJNSIActelFrame

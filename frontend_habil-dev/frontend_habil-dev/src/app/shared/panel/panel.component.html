@@ -1,0 +1,8 @@
+<div class="panel">
+  <div class="panel-header" [ngStyle]="{'background-color': config.headerBackgroundColor, color: config.headerTextColor}">
+    {{ config.title }}
+  </div>
+  <div class="panel-body">
+    <ng-content></ng-content>
+  </div>
+</div>

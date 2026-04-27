@@ -1,0 +1,568 @@
+/**
+ * AnimatedDrawerComponent Styles
+ *
+ * This stylesheet creates a drawer that morphs from a small square (inspired by login squares)
+ * into a full-height right-side panel. The animations maintain consistency with the login
+ * page square transformations that morph into navbar and sidebar.
+ *
+ * Color Scheme (BNA Habilitation UI):
+ * - Primary dark blue: #162636
+ * - Accent green: #37978f
+ * - Background: #f9fafb
+ * - Text: #1e293b
+ */
+
+// Global body class to prevent scrolling when drawer is open
+:host ::ng-deep body.drawer-open {
+  overflow: hidden;
+}
+
+// Backdrop overlay with blur effect
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(22, 38, 54, 0.4);
+  backdrop-filter: blur(0px);
+  z-index: 1199;
+  opacity: 0;
+  transition: all 0.4s ease;
+  pointer-events: none;
+
+  &.show-backdrop {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+    pointer-events: all;
+  }
+}
+
+// Main drawer container
+.animated-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 400px; // Default fallback width
+  max-width: 40vw; // Maximum 40% of viewport width (previous size as max)
+  min-width: 320px; // Minimum width for usability
+  z-index: 1200;
+  font-family: 'Cairo', sans-serif;
+
+  // Initial state (invisible)
+  &.idle {
+    opacity: 0;
+    pointer-events: none;
+  }
+  // Growing phase (square morphing into drawer)
+  &.growing {
+    animation: drawerGrowth 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+  // Open state
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  // Shrinking phase (drawer morphing back to square)
+  &.shrinking {
+    animation: drawerShrink 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+}
+
+// Initial square shape (mimics login squares)
+.drawer-shape {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 6em;
+  height: 6em;
+  background: #162636;
+  border-radius: 0.625rem;
+  transform-origin: top right;
+  z-index: -1;
+  opacity: 1;
+  transform: scale(0);
+
+  // When morphing into drawer (PHASE 2)
+  &.morphing {
+    animation:
+      squareAppear 0.1s ease-out forwards,
+      slideDownAndExpand 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) 0.1s forwards;
+  }
+
+  // When reverse morphing back to square
+  &.reverse-morphing {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    border-radius: 0;
+    animation: shrinkAndSlideUp 1.9s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+}
+
+// Drawer content wrapper
+.drawer-content-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #162636 0%, #f9fafb 8%, #ffffff 100%);
+  border-top-left-radius: 16px;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.25), -4px 0 16px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+
+  // Content becomes visible after morphing (PHASE 3)
+  &.content-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+    transition: all 0.6s ease; // Smooth transition when becoming visible
+  }
+}
+
+// Header section
+.drawer-header {
+  background: #162636;
+  color: #ffffff;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 55px;
+  position: relative;
+  border-top-left-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateX(100%);
+
+  // Header slides in when parent content becomes visible (PHASE 3)
+  .content-visible & {
+    animation: headerSlideIn 0.6s ease 0.2s forwards; // Slight delay after content appears
+  }
+
+  .drawer-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #ffffff;
+    padding-left: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+
+    // Square icon (mimics login squares)
+    .title-icon {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #37978f;
+      margin-right: 12px;
+      border-radius: 2px;
+      transform: rotate(45deg);
+      animation: titleIconPulse 2s ease-in-out infinite;
+    }
+  }
+
+  .drawer-close-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 12px 20px;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    height: 56px;
+    width: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0);
+      transition: all 0.3s ease;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+
+      &::before {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      i {
+        transform: rotate(90deg);
+        color: #00ab86;
+      }
+    }
+
+    i {
+      font-size: 1.25rem;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+  }
+}
+
+// Scrollable body content
+.drawer-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .body-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background: #ffffff;
+    position: relative;
+
+    // Subtle top gradient
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(55, 151, 143, 0.3) 50%, transparent 100%);
+    }
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: #94a3b8;
+      }
+    }
+  }
+}
+
+// Footer section - FIXED
+.drawer-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom-left-radius: 16px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  display: flex !important;
+  flex-direction: row;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 70px;
+
+  // Target ng-content projection
+  ::ng-deep > * {
+    display: flex !important;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  ::ng-deep button {
+    min-width: 100px;
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Keyframe animations (inspired by login squares)
+
+// 1. Square appears on top-right
+@keyframes squareAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+// 2. Square slides down and expands to form sidebar
+@keyframes slideDownAndExpand {
+  0% {
+    width: 6em;
+    height: 6em;
+    top: 12px;
+    right: 12px;
+    border-radius: 0.625rem;
+    transform: rotate(0deg);
+  }
+  30% {
+    top: 50px;
+    transform: rotate(180deg) scale(1.1);
+  }
+  60% {
+    width: 100%;
+    height: 40%;
+    top: 0;
+    right: 0;
+    border-radius: 0.625rem 0 0 0;
+    transform: rotate(270deg) scale(1);
+  }
+  100% {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    border-radius: 0;
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+// 3. Content slides in from bottom
+@keyframes contentSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 4. Header slides in from right
+@keyframes headerSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Reverse animations for closing
+@keyframes shrinkAndSlideUp {
+  0% {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    border-radius: 0;
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  40% {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    border-radius: 0.625rem 0 0 0;
+    // transform: rotate(-90deg) scale(1);
+  }
+  70% {
+    top: 50px;
+    // transform: rotate(-180deg) scale(1.1);
+  }
+  100% {
+    width: 3em !important;
+    height: 100%;
+    top: 12px;
+    right: 12px;
+    border-radius: 0.625rem;
+    // transform: rotate(-360deg) scale(0);
+    opacity: 0;
+  }
+}
+
+// Growth animation for entire drawer
+@keyframes drawerGrowth {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  30% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Shrink animation for entire drawer
+@keyframes drawerShrink {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+// Content fade-in animation
+@keyframes contentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Title icon pulse animation
+@keyframes titleIconPulse {
+  0%, 100% {
+    background: #37978f;
+    transform: rotate(45deg) scale(1);
+  }
+  50% {
+    background: #00ab86;
+    transform: rotate(45deg) scale(1.2);
+  }
+}
+
+// Responsive design
+@media (max-width: 1024px) {
+  .animated-drawer {
+    width: 50% !important;
+    max-width: 50vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .animated-drawer {
+    width: 100% !important;
+    max-width: 100vw;
+
+    .drawer-shape {
+      width: 4em;
+      height: 4em;
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  .drawer-header {
+    height: 56px;
+
+    .drawer-title {
+      font-size: 1rem;
+      padding-left: 16px;
+    }
+
+    .drawer-close-btn {
+      height: 56px;
+      width: 56px;
+    }
+  }
+
+  .drawer-body .body-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .drawer-footer {
+    padding: 1rem;
+    flex-direction: column;
+
+    ::ng-deep > * {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    ::ng-deep button {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .animated-drawer {
+    width: 100% !important;
+    max-width: 100vw;
+  }
+
+  .drawer-shape {
+    width: 3em !important;
+    height: 3em !important;
+    top: 6px !important;
+    right: 6px !important;
+  }
+
+  .drawer-footer {
+    padding: 0.75rem;
+  }
+
+  // Adjust morphing animation for mobile
+  @keyframes morphToDrawer {
+    0% {
+      width: 3em;
+      height: 3em;
+      top: 6px;
+      right: 6px;
+    }
+    100% {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      right: 0;
+    }
+  }
+
+  @keyframes morphToSquare {
+    0% {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      right: 0;
+    }
+    100% {
+      width: 3em;
+      height: 3em;
+      top: 6px;
+      right: 6px;
+    }
+  }
+}

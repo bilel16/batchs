@@ -1,0 +1,115 @@
+$primary: #162636;
+$accent: #37978f;
+
+.page-consultation { padding: 0; }
+
+.page-header {
+  margin-bottom: 1.75rem;
+  h1 { font-size: 1.6rem; font-weight: 700; color: $primary; margin: 0 0 0.25rem; }
+  p  { color: #6c757d; font-size: 0.875rem; margin: 0; }
+}
+
+/* ── Card ── */
+.card {
+  background: white; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden;
+  &.mt-3 { margin-top: 1.25rem; }
+}
+.card-header {
+  padding: 0.9rem 1.25rem; border-bottom: 1px solid #e9ecef; font-weight: 600;
+  color: $primary; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;
+  i { color: $accent; }
+}
+.card-body { padding: 1.5rem; }
+
+/* ── Filter Grid ── */
+.filter-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.field {
+  display: flex; flex-direction: column; gap: 0.35rem;
+  label { font-size: 0.78rem; font-weight: 600; color: #6c757d;
+          text-transform: uppercase; letter-spacing: 0.05em; }
+}
+
+.form-input {
+  padding: 0.5rem 0.75rem; border: 1.5px solid #dee2e6; border-radius: 7px;
+  font-size: 0.875rem; color: #343a40; background: white;
+  &:focus { outline: none; border-color: $accent; box-shadow: 0 0 0 3px rgba(55,151,143,0.12); }
+  select { appearance: none; }
+}
+
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  padding-top: 1rem; border-top: 1px solid #f1f3f5;
+}
+
+.btn-reset {
+  display: flex; align-items: center; gap: 0.4rem; background: white; color: #6c757d;
+  border: 1.5px solid #dee2e6; padding: 0.5rem 1rem; border-radius: 7px; cursor: pointer; font-size: 0.875rem;
+  &:hover { background: #f8f9fa; }
+}
+
+.btn-search {
+  display: flex; align-items: center; gap: 0.4rem; background: $accent; color: white;
+  border: none; padding: 0.5rem 1.4rem; border-radius: 7px; cursor: pointer;
+  font-size: 0.875rem; font-weight: 600; transition: opacity 0.2s;
+  &:hover { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.alert-error {
+  background: #fff0f0; border: 1px solid #f5c2c2; color: #b91c1c;
+  border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.875rem;
+}
+
+/* ── Results ── */
+.result-count {
+  margin-left: auto; background: #f0fdf4; color: #166534;
+  font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 20px;
+}
+
+.summary-row {
+  display: flex; gap: 2rem; padding: 0.9rem 1.25rem; background: #f8f9fa; border-bottom: 1px solid #e9ecef;
+}
+.summary-item {
+  display: flex; flex-direction: column; gap: 0.15rem;
+  .summary-label { font-size: 0.75rem; color: #6c757d; text-transform: uppercase; font-weight: 600; }
+  .summary-value { font-size: 1.1rem; font-weight: 700; color: $primary;
+    &.accent { color: $accent; } }
+}
+
+.empty-table {
+  padding: 3rem; text-align: center; color: #adb5bd;
+  i { display: block; font-size: 2.5rem; margin-bottom: 0.75rem; }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+/* ── Table ── */
+.table-wrapper { overflow-x: auto; }
+.data-table {
+  width: 100%; border-collapse: collapse; font-size: 0.82rem;
+  thead tr { background: #f8f9fa; }
+  th { padding: 0.65rem 0.85rem; text-align: left; font-weight: 600; color: #495057; font-size: 0.75rem;
+       text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e9ecef;
+       &.num { text-align: right; } }
+  td { padding: 0.65rem 0.85rem; border-bottom: 1px solid #f1f3f5; color: #343a40;
+       &.num { text-align: right; }
+       &.montant { font-weight: 600; color: $primary; } }
+  tbody tr:hover { background: #f8f9fa; }
+  tbody tr:last-child td { border-bottom: none; }
+}
+
+.mono { font-family: 'Courier New', monospace; font-size: 0.8rem; }
+
+.badge-instrument {
+  display: inline-block; background: #f0fdf4; color: #166534; font-family: monospace;
+  font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.55rem; border-radius: 4px;
+}
+
+.sens-badge {
+  display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  &.sens-debit  { background: #fee2e2; color: #991b1b; }
+  &.sens-credit { background: #d1fae5; color: #065f46; }
+}

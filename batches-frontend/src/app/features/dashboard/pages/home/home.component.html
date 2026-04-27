@@ -1,0 +1,143 @@
+<div class="page-home">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Tableau de bord</h1>
+      <p>Vue globale de la télé-compensation BNA</p>
+    </div>
+    <button class="btn-refresh" (click)="loadStats()" [disabled]="loading()">
+      <i class="pi" [class.pi-refresh]="!loading()" [class.pi-spin]="loading()" [class.pi-spinner]="loading()"></i>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert-error">
+      <i class="pi pi-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  <!-- Loading skeleton -->
+  @if (loading() && !stats()) {
+    <div class="kpi-grid skeleton-grid">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="kpi-card skeleton"></div>
+      }
+    </div>
+  }
+
+  @if (stats(); as s) {
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-cheque"><i class="pi pi-money-bill"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-value">{{ s.totalCheque | number }}</span>
+          <span class="kpi-label">Chèques traités</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-effet"><i class="pi pi-file"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-value">{{ s.totalEffet | number }}</span>
+          <span class="kpi-label">Effets traités</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-prelevement"><i class="pi pi-credit-card"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-value">{{ s.totalPrelevement | number }}</span>
+          <span class="kpi-label">Prélèvements traités</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-health" [class.kpi-health-ok]="s.healthScore >= 80" [class.kpi-health-warn]="s.healthScore >= 50 && s.healthScore < 80" [class.kpi-health-bad]="s.healthScore < 50">
+          <i class="pi pi-heart"></i>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-value">{{ s.healthScore }}%</span>
+          <span class="kpi-label">Score de santé</span>
+        </div>
+        <div class="health-bar">
+          <div class="health-fill" [style.width]="s.healthScore + '%'" [class.fill-ok]="s.healthScore >= 80" [class.fill-warn]="s.healthScore >= 50 && s.healthScore < 80" [class.fill-bad]="s.healthScore < 50"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info row -->
+    <div class="info-row">
+      <span><i class="pi pi-clock"></i> Dernière exécution : <strong>{{ formatDate(s.lastExecution) }}</strong></span>
+      <span class="badge" [class]="statusClass(s.lastExecutionStatus)">{{ statusLabel(s.lastExecutionStatus) }}</span>
+      @if (s.activeJobs > 0) {
+        <span class="badge badge-info"><i class="pi pi-spin pi-spinner"></i> {{ s.activeJobs }} job(s) actif(s)</span>
+      }
+    </div>
+
+    <!-- Volume Trend -->
+    @if (s.volumeTrend?.length) {
+      <div class="card mt-4">
+        <div class="card-header"><i class="pi pi-chart-bar"></i> Volume 7 derniers jours</div>
+        <div class="card-body trend-chart">
+          @for (day of s.volumeTrend; track day.date) {
+            <div class="trend-day">
+              <div class="trend-bars">
+                <div class="trend-bar bar-cheque" [style.height]="barWidth(day.cheque, maxTrend(s))" title="Chèque: {{ day.cheque }}"></div>
+                <div class="trend-bar bar-effet" [style.height]="barWidth(day.effet, maxTrend(s))" title="Effet: {{ day.effet }}"></div>
+                <div class="trend-bar bar-prev" [style.height]="barWidth(day.prelevement, maxTrend(s))" title="Prélèvement: {{ day.prelevement }}"></div>
+              </div>
+              <span class="trend-label">{{ day.date | slice:5 }}</span>
+            </div>
+          }
+          <div class="trend-legend">
+            <span><span class="dot dot-cheque"></span>Chèque</span>
+            <span><span class="dot dot-effet"></span>Effet</span>
+            <span><span class="dot dot-prev"></span>Prélèvement</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Recent Executions -->
+    <div class="card mt-4">
+      <div class="card-header"><i class="pi pi-history"></i> Exécutions récentes</div>
+      @if (!s.recentExecutions?.length) {
+        <div class="empty-table">Aucune exécution récente.</div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Instrument</th>
+                <th>Phase</th>
+                <th>Statut</th>
+                <th>Lancé par</th>
+                <th>Début</th>
+                <th>Agences</th>
+                <th>Erreurs</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (exec of s.recentExecutions; track exec.executionId) {
+                <tr>
+                  <td class="mono">{{ exec.executionId | slice:0:8 }}…</td>
+                  <td><span class="badge badge-instrument">{{ exec.instrument }}</span></td>
+                  <td>{{ exec.phase }}</td>
+                  <td><span class="badge" [class]="statusClass(exec.status)">{{ statusLabel(exec.status) }}</span></td>
+                  <td>{{ exec.launchedBy }}</td>
+                  <td>{{ formatDate(exec.startTime) }}</td>
+                  <td>{{ exec.doneAgences }} / {{ exec.totalAgences }}</td>
+                  <td [class.text-danger]="exec.errorAgences > 0">{{ exec.errorAgences }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+  }
+</div>

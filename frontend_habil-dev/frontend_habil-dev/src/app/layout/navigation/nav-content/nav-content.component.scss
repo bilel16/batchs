@@ -1,0 +1,33 @@
+.user-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px; 
+  flex-shrink: 0;      
+  height: 40px;
+  border-radius: 50px;
+
+  background-color: #eee;  
+  color: #333;         
+  font-size: 1.2rem;    
+}
+
+.username {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+#more-details {
+    font-size: 12px;
+    span {
+        font-weight: bold;
+    }
+
+}
+
+
+#more-details-poste{
+font-size: smaller;
+font-weight: 700;
+color: bisque;
+    }

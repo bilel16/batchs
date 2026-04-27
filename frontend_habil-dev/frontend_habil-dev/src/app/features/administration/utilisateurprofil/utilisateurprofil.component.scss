@@ -1,0 +1,1298 @@
+.button-stepper {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+}
+
+.button-first-step {
+background: linear-gradient(135deg, #00b49e, #00866a) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 150, 108, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+// ============================================
+// MODERN BUTTON STYLING - ENREGISTRER
+// ============================================
+::ng-deep .p-button-success {
+  background: none;
+  border: none;
+  color: black;
+}
+::ng-deep .button-stepper {
+  .p-button {
+    height: 48px;
+    border-radius: 12px;
+    font-weight: 600;
+    min-width: 140px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+
+    // Enregistrer (Save) but ton - Modern gradient
+    &:not([severity="secondary"]) {
+      background: linear-gradient(135deg, #00b49e, #00866a) !important;
+      border: none !important;
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(0, 150, 108, 0.25);
+      position: relative;
+      overflow: hidden;
+
+      // Animated gradient overlay
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 150, 108, 0.4);
+
+        &::before {
+          left: 100%;
+        }
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0px);
+        box-shadow: 0 4px 12px rgba(0, 150, 108, 0.3);
+      }
+
+      &:disabled {
+        background: linear-gradient(135deg, #cbd5e1, #94a3b8) !important;
+        box-shadow: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .p-button-label {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+
+      .p-button-icon {
+        font-size: 1.125rem;
+      }
+    }
+
+    // Précédent (Previous) button - Outlined style
+    &[severity="secondary"] {
+      background: white !important;
+      border: 2px solid #e5e7eb !important;
+      color: #64748b !important;
+
+      &:hover:not(:disabled) {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #475569 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0px);
+      }
+    }
+  }
+}
+
+::ng-deep .p-dialog.profile-info-dialog {
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+
+  .p-dialog-header {
+    background: #162636;
+    color: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: #0f172a;
+    .p-dialog-title {
+      color: white;
+      flex: 2;
+      text-align: center;
+      font-size: xx-large;
+    }
+    .p-dialog-header-actions {
+      .p-dialog-close-button {
+        background: rgba(255, 255, 255, 0.1);
+        .p-component :hover {
+          transform: rotate(90deg);
+          color: #00ab86;
+        }
+      }
+    }
+  }
+
+  .p-dialog-content {
+    background: #ffffff;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    .profile-details {
+      .profile-detail-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        .profile-avatar {
+          text-align: center;
+          .pi {
+            font-size: xx-large;
+          }
+        }
+        .profile-info {
+          flex: 2;
+        }
+      }
+    }
+  }
+
+  .p-dialog-footer {
+    background: #f9fafb;
+    border-top: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+  }
+}
+/* ============================
+   Icon + Text Alignment
+===============================*/
+::ng-deep .info-icon {
+  color: #00966c;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ============================
+   Profile Count Tooltip
+===============================*/
+::ng-deep .profile-count-tooltip {
+  .p-tooltip-text {
+    max-width: 300px;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+
+    .profile-tooltip-content {
+      font-size: 0.85rem;
+      line-height: 1.6;
+
+      strong {
+        color: #60a5fa;
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-item {
+        color: #e2e8f0;
+        display: block;
+        padding: 0.15rem 0;
+        padding-left: 0.5rem;
+      }
+
+      .more-profiles {
+        color: #fbbf24;
+        font-style: italic;
+        display: block;
+        margin-top: 0.25rem;
+        padding-left: 0.5rem;
+      }
+    }
+  }
+}
+
+/* ============================
+   Info Cards Grid
+===============================*/
+::ng-deep .profile-info-dialog .info-card {
+  display: flex;
+  align-items: center;
+  margin: 5px;
+  justify-content: flex-start;
+  background: #f9fafb;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  transition: all 0.2s ease-in-out;
+  gap: 0.6rem;
+
+  &:hover {
+    background: #f3fdfa;
+    border-color: #b7e4ce;
+  }
+}
+
+// ============================================
+// PRIMENG COMPONENT OVERRIDES
+// ============================================
+.bna-style {
+  .p-dialog {
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .p-dialog-header {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .p-dialog-content {
+    background: #ffffff;
+    padding: 1.5rem 1.75rem !important;
+  }
+
+  .p-dialog-footer {
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+    text-align: right;
+
+    .p-button-success {
+      background: #00966c;
+      border: none;
+      font-weight: 600;
+      transition: 0.2s ease;
+      &:hover {
+        background: #007a58;
+      }
+    }
+
+    .rounded-button {
+      border-radius: 10px;
+    }
+  }
+  /* HEADER SECTION */
+  .profile-detail-header {
+    display: flex;
+    gap: 1.2rem;
+
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1rem;
+
+    .profile-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00966c, #00b67a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.75rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+
+      i {
+        font-size: 1.2rem;
+        color: #00966c;
+      }
+
+      .profile-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+      }
+    }
+
+    .level-pill {
+      background: #e6f8f2;
+      color: #00966c;
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      border: 1px solid #b2e4cf;
+    }
+  }
+  /* ============================
+   Info Cards Grid
+===============================*/
+
+  .profile-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+
+    .info-card {
+      display: flex;
+      margin: 5px;
+      align-items: center;
+      justify-content: flex-start;
+      background: #f9fafb;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background: #f3fdfa;
+        border-color: #b7e4ce;
+      }
+
+      .info-icon {
+        color: #00966c;
+        font-size: 1rem;
+        margin-right: 0.6rem;
+        flex-shrink: 0;
+      }
+
+      .info-content {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+
+        label {
+          font-weight: 600;
+          color: #334155;
+          font-size: 0.9rem;
+          margin-right: 0.3rem;
+          .b {
+            font-weight: 700 !important;
+            margin-right: 5px;
+          }
+        }
+
+        span {
+          font-size: 0.9rem;
+          color: #1e293b;
+        }
+
+        .badge,
+        .category-badge {
+          display: inline-flex;
+          align-items: center;
+          font-size: 0.8rem;
+          padding: 0.25rem 0.6rem;
+          border-radius: 8px;
+          border: 1px solid transparent;
+        }
+
+        .badge-success {
+          background: #dcfce7;
+          color: #166534;
+          border-color: #bbf7d0;
+        }
+
+        .badge-warning {
+          background: #fef3c7;
+          color: #92400e;
+          border-color: #fde68a;
+        }
+
+        .badge-danger {
+          background: #fee2e2;
+          color: #991b1b;
+          border-color: #fecaca;
+        }
+
+        .badge-info {
+          background: #dbeafe;
+          color: #1e40af;
+          border-color: #bfdbfe;
+        }
+      }
+    }
+  }
+}
+
+/* Dialog animation */
+.p-dialog {
+  animation: fadeInUp 0.25s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+:host ::ng-deep {
+  .text-icon {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 10px;
+    &.hover {
+      color: #007f6d; // green for completed
+    }
+  }
+
+  .step-icon {
+    font-size: 1.5rem;
+    color: #666;
+    transition: color 0.3s ease, transform 0.2s ease;
+
+    &.active {
+      color: #007f6d;
+      transform: scale(1.1);
+    }
+
+    &.completed {
+      color: #007f6d; // green for completed
+    }
+  }
+  /* Dialog Form Styles */
+  .p-dialog {
+    .p-dialog-content {
+      // For PrimeFlex v3
+      .field {
+        margin-bottom: 1.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+        }
+
+        input,
+        textarea {
+          width: 100%;
+        }
+      }
+    } // When using p-fluid class
+    &.p-fluid {
+      .p-inputtext,
+      .p-inputtextarea,
+      .p-dropdown,
+      .p-calendar,
+      .p-inputnumber,
+      .p-inputmask {
+        width: 100%;
+      }
+    }
+  }
+
+  /* Form field styling */
+  .field {
+    &.field-checkbox {
+      display: flex;
+      align-items: center;
+
+      input[type="checkbox"] {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  .required-asterisk {
+    color: #ef4444;
+    font-weight: bold;
+  }
+
+  /* Button spacing in dialog footer */
+  .p-dialog-footer {
+    .p-button + .p-button {
+      margin-left: 0.5rem;
+    }
+  }
+
+  /* Custom Tooltip Styling */
+  .custom-tooltip {
+    max-width: 300px !important;
+    font-size: 0.85rem !important;
+
+    .p-tooltip-text {
+      background: linear-gradient(135deg, #1e293b, #334155) !important;
+      border-radius: 8px !important;
+      padding: 1rem !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    .profile-tooltip {
+      h5 {
+        margin: 0 0 0.5rem 0;
+        color: #60a5fa;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .tooltip-section,
+      .assignment-section {
+        margin: 0.5rem 0;
+        padding-top: 0.5rem;
+        border-top: 1px solid #475569;
+
+        &:first-child {
+          border-top: none;
+          padding-top: 0;
+        }
+
+        h6 {
+          margin: 0 0 0.5rem 0;
+          color: #fbbf24;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+
+        strong {
+          color: #e2e8f0;
+        }
+      }
+    }
+
+    &.assigned-tooltip .p-tooltip-text {
+      background: linear-gradient(135deg, #065f46, #047857) !important;
+    }
+  }
+  /* Mobile responsive styles */
+  @media screen and (max-width: 960px) {
+    /* Dialog responsive */
+    .p-dialog {
+      width: 95vw !important;
+      max-width: 500px;
+    }
+  }
+}
+
+// ============================================
+// DIALOG BLUR EFFECT
+// ============================================
+
+:host ::ng-deep .dialog-open-blur {
+  filter: blur(2px);
+  transition: filter 0.3s ease;
+}
+
+// ============================================
+// CUSTOM BADGES
+// ============================================
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+
+  &.badge-success {
+    background: #10b981;
+    color: white;
+  }
+  &.badge-warning {
+    background: #f59e0b;
+    color: white;
+  }
+  &.badge-danger {
+    background: #ef4444;
+    color: white;
+  }
+  &.badge-info {
+    background: #06b6d4;
+    color: white;
+  }
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+
+  &.assigned {
+    background: #d1fae5;
+    color: #065f46;
+  }
+}
+
+// ============================================
+// RESPONSIVE DESIGN
+// ============================================
+
+@media (max-width: 768px) {
+  /* Dialog responsive */
+  .p-dialog {
+    width: 95vw !important;
+    max-width: 500px;
+  }
+}
+
+// ============================================
+// PROFILE INFO DIALOG STYLES
+// ============================================
+
+.profile-info-dialog {
+  .p-dialog-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  .p-dialog-content {
+    background: #ffffff;
+    padding: 1.5rem 1.75rem !important;
+  }
+
+  .profile-detail-header {
+    display: flex;
+    align-items: center;
+
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+
+    .profile-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .profile-info {
+      flex: 1;
+      margin-left: 1rem;
+
+      .profile-name {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .profile-code {
+        margin: 0.25rem 0 0;
+        font-size: 0.85rem;
+        color: #64748b;
+        font-family: "Courier New", monospace;
+      }
+    }
+    .level-pill {
+      background: #eef2ff;
+      color: #4338ca;
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+/* ============================
+   Responsive Layout
+===============================*/
+@media (max-width: 768px) {
+  ::ng-deep .p-dialog.profile-info-dialog .p-dialog-content {
+    padding: 1rem;
+  }
+
+  ::ng-deep .profile-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .profile-info {
+      justify-content: flex-start;
+    }
+  }
+
+  ::ng-deep .info-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// ============================================
+// PROFILE RESTORE DIALOG STYLES
+// ============================================
+
+:host ::ng-deep .profile-restore-dialog {
+  .p-dialog {
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+  }
+
+  .p-dialog-header {
+    background: #e5ebf1;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+    font-weight: 600;
+    flex-shrink: 0;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    .p-dialog-title {
+      margin: auto;
+    }
+  }
+
+  .p-dialog-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    background: #ffffff;
+    padding: 1.5rem !important;
+  }
+
+  .p-dialog-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+  }
+
+  .restore-form {
+    .profile-info-section {
+      background: #d1fae5 !important;
+      border: 1px solid #6ee7b7;
+      flex: 1;
+      h6 {
+        font-weight: 600;
+        color: #065f46;
+        text-align: -webkit-left;
+        .pi {
+          margin-right: 0 !important;
+        }
+      }
+
+      strong {
+        color: #047857;
+      }
+
+      small {
+        color: #fff !important;
+        font-family: "Courier New", monospace;
+        background: #000000;
+        border-radius: 12px;
+        margin-left: 2%;
+        text-align: center;
+        flex: 1;
+        padding: 4px;
+        font-size: large;
+      }
+
+      .mb-1 {
+        margin-top: 1rem !important;
+        font-size: medium;
+      }
+    }
+
+    .alert {
+      border-radius: 8px;
+      font-size: 0.9rem;
+      flex: 1;
+      strong {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+    }
+
+    .field {
+      label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+
+        .pi {
+          color: #00966c;
+        }
+      }
+    }
+  }
+}
+.date-picker-content {
+  display: flex;
+  gap: 0.5rem;
+  .title {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+}
+
+// ============================================
+// DIALOG BLUR EFFECT
+// ============================================
+
+// ============================================
+// REVOKED PROFILES WARNING DIALOG
+// ============================================
+::ng-deep .p-confirm-dialog {
+  .revoked-profiles-warning {
+    max-height: 400px;
+    overflow-y: auto;
+
+    p {
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .pack-conflicts-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0;
+
+      > li {
+        background: #fff8e6;
+        border: 1px solid #ffd666;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+
+        strong {
+          color: #b7791f;
+          font-size: 1rem;
+        }
+
+        .profile-list {
+          list-style: none;
+          padding: 0;
+          margin: 0.5rem 0 0 0;
+
+          li {
+            padding: 0.25rem 0;
+            color: #744210;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+
+            .pi-exclamation-triangle {
+              color: #d69e2e;
+              font-size: 0.85rem;
+            }
+          }
+        }
+      }
+    }
+
+    .text-warning {
+      color: #b7791f;
+      font-size: 0.95rem;
+      background: #fffbeb;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      border-left: 4px solid #f6ad55;
+    }
+  }
+}
+.assignDateDeb{
+      display: flex
+;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .date-deb-wrapper{
+      text-align: end;
+      display: flex;
+      flex-direction:column;
+    }
+}
+
+// ============================================
+// CREATIVE PROFILE STATUS TOGGLE - REFINED
+// ============================================
+// Override any PrimeNG or Bootstrap checkbox/switch styles
+:host ::ng-deep {
+  .profile-status-toggle {
+    // Prevent PrimeNG p-inputswitch bleeding through
+    .p-inputswitch,
+    .p-checkbox,
+    .p-togglebutton {
+      display: none !important;
+    }
+
+    // Ensure our custom checkbox is completely hidden
+    input[type="checkbox"] {
+      position: absolute !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+      z-index: -999 !important;
+      left: -9999px !important;
+    }
+  }
+}
+
+.profile-status-toggle {
+  position: relative;
+  
+  // Prevent any background elements from showing
+  * {
+    box-sizing: border-box;
+  }
+
+  .toggle-container {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    
+    &:hover {
+      border-color: #00b49e;
+      box-shadow: 0 2px 12px rgba(0, 180, 158, 0.08);
+    }
+  }
+
+  .toggle-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    
+    .pi {
+      font-size: 1.2rem;
+      color: #00966c;
+    }
+    
+    .toggle-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      letter-spacing: 0.2px;
+    }
+  }
+  // Hide the native checkbox completely
+  .toggle-checkbox {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    z-index: -999 !important;
+  }
+
+  .custom-toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .toggle-label {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    cursor: pointer;
+    user-select: none;
+    padding: 0;
+    background: transparent;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    overflow: hidden;
+  }
+
+  // The sliding toggle switch
+  .toggle-slider {
+    position: relative;
+    width: 68px;
+    height: 50px;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    border-radius: 12px 0 0 12px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;    // The sliding circle
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      width: 34px;
+      height: 34px;
+      background: white;
+      border-radius: 10px;
+      transform: translateY(-50%);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      z-index: 2;
+    }
+
+    .slider-icon {
+      position: absolute;
+      top: 50%;
+      left: 25px; /* Center: 8px + (34px/2) = 25px */
+      transform: translate(-50%, -50%);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #64748b;
+      font-size: 1rem;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .pi {
+        display: block;
+      }
+    }
+  }
+
+  // Active state for toggle
+  .toggle-checkbox:checked + .toggle-label {
+    .toggle-slider {
+      background: linear-gradient(135deg, #00b49e, #00866a);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+
+      &::before {
+        left: calc(100% - 42px); /* 68px - 34px - 8px (right padding) = 26px from left */
+        box-shadow: 0 2px 10px rgba(0, 134, 106, 0.35);
+      }
+
+      .slider-icon {
+        left: calc(100% - 25px); /* Move to right side center */
+        color: white;
+      }
+    }
+  }
+
+  // Hover effects
+  .toggle-checkbox:not(:checked) + .toggle-label:hover .toggle-slider {
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+    transform: scale(1.02);
+  }
+
+  .toggle-checkbox:checked + .toggle-label:hover .toggle-slider {
+    background: linear-gradient(135deg, #00c5ad, #00966c);
+    transform: scale(1.02);
+  }
+
+  // Active press animation
+  .toggle-checkbox:active + .toggle-label .toggle-slider::before {
+    width: 34px;
+  }
+  // Text labels
+  .toggle-text {
+    display: flex;
+    gap: 0;
+    flex: 1;
+    align-items: stretch;
+    border: 2px solid #e2e8f0;
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    overflow: hidden;
+  }
+
+  .status-inactive,
+  .status-active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    border-right: 1px solid #e2e8f0;
+    background: #f8fafc;
+
+    &:last-child {
+      border-right: none;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .pi {
+      font-size: 1.1rem;
+      transition: transform 0.3s ease;
+    }
+
+    // Inactive state styling
+    &:not(.active) {
+      opacity: 0.5;
+      color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    &.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .status-inactive {
+    &.active {
+      color: #991b1b;
+      background: #fee2e2;
+      border-color: #fca5a5;
+      font-weight: 700;
+
+      .pi {
+        animation: pulseIcon 2s ease-in-out infinite;
+      }
+    }
+  }
+
+  .status-active {
+    &.active {
+      color: #065f46;
+      background: #d1fae5;
+      border-color: #6ee7b7;
+      font-weight: 700;
+
+      .pi {
+        animation: pulseIcon 2s ease-in-out infinite;
+      }
+    }
+  }
+
+  // Hint text with icons
+  .toggle-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #475569;
+    margin-top: 0;
+    padding: 0.875rem 1rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #cbd5e1;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    font-weight: 500;
+
+    &::before {
+      content: '⚠';
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    &.active-hint {
+      color: #065f46;
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      border-left-color: #10b981;
+
+      &::before {
+        content: '✓';
+        color: #10b981;
+      }
+    }
+  }
+
+  // Pulse animation for icons
+  @keyframes pulseIcon {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
+
+  // Subtle glow for active toggle
+  .toggle-checkbox:checked + .toggle-label .toggle-slider {
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08), 
+                0 0 0 3px rgba(0, 180, 158, 0.15),
+                0 4px 12px rgba(0, 180, 158, 0.1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .profile-status-toggle {
+    .toggle-container {
+      padding: 1rem 1.25rem;
+    }
+
+    .toggle-label {
+      flex-direction: row;
+      gap: 1rem;
+      padding: 0.5rem;
+    }
+
+    .toggle-slider {
+      width: 64px;
+      height: 32px;
+
+      &::before {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    .toggle-checkbox:checked + .toggle-label .toggle-slider {
+      &::before {
+        left: 35px;
+      }
+
+      .slider-icon {
+        left: 39px;
+      }
+    }
+
+    .toggle-text {
+      width: 100%;
+      gap: 0.75rem;
+    }
+
+    .status-inactive,
+    .status-active {
+      flex: 1;
+      justify-content: center;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      min-width: 100px;
+    }
+
+    .toggle-hint {
+      font-size: 0.85rem;
+      padding: 0.75rem;
+    }
+  }
+}

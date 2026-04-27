@@ -1,0 +1,55 @@
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="d-flex align-items-center">
+      <label class="me-2 fw-semibold" style="white-space: nowrap">
+        Sélectionner une application
+      </label>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="center">
+    <app-application-selection 
+      label="" 
+      placeholder="Sélectionner une application"
+      (selectionChange)="onAppSelectionChange($event)" 
+      (appsLoaded)="onAppsLoaded($event)">
+    </app-application-selection>
+  </ng-template>  <ng-template pTemplate="end">
+    <div class="toolbar-actions">
+      <!-- Clone Profiles Button - Prominent styled button -->
+      <button pButton pRipple 
+        label="Cloner" 
+        icon="pi pi-clone" 
+        class="clone-button"
+        (click)="onCloneProfiles()" 
+        [disabled]="!selectedAppCode || !hasSelectedUser"
+        pTooltip="Cloner les profils vers d'autres utilisateurs"
+        tooltipPosition="bottom">
+      </button>
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!-- Statistics Panel (optional, toggleable) -->
+<div class="statistics-panel mb-3" *ngIf="showStatistics && assignmentStatistics">
+  <div class="stat-card">
+    <i class="pi pi-users"></i>
+    <div class="stat-content">
+      <span class="stat-value">{{ assignmentStatistics.totalManagedUsers }}</span>
+      <span class="stat-label">Utilisateurs gérés</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <i class="pi pi-sitemap"></i>
+    <div class="stat-content">
+      <span class="stat-value">{{ assignmentStatistics.totalStructures }}</span>
+      <span class="stat-label">Structures</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <i class="pi pi-check-circle"></i>
+    <div class="stat-content">
+      <span class="stat-value">{{ assignmentStatistics.totalActiveProfiles }}</span>
+      <span class="stat-label">Profils actifs</span>
+    </div>
+  </div>
+</div>

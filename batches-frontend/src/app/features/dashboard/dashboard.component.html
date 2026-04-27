@@ -1,17 +1,18 @@
 <div class="app-layout" [class.sidebar-collapsed]="sidebarCollapsed">
 
-  <!-- Navbar -->
+  <!-- ── Navbar ── -->
   <header class="navbar">
     <div class="navbar-left">
       <button class="sidebar-toggle" (click)="toggleSidebar()">
         <i class="pi pi-bars"></i>
       </button>
       <span class="app-title">BATCHES</span>
+      <span class="app-subtitle">Télé-compensation BNA</span>
     </div>
     <div class="navbar-right">
       <span class="user-info">
         <i class="pi pi-user"></i>
-        {{ user()?.prenom }} {{ user()?.nom }}
+        <span class="user-name">{{ user()?.prenom }} {{ user()?.nom }}</span>
       </span>
       <button class="logout-btn" (click)="logout()">
         <i class="pi pi-sign-out"></i>
@@ -20,37 +21,46 @@
     </div>
   </header>
 
-  <!-- Sidebar -->
+  <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <nav class="sidebar-nav">
       <ul>
-        <li class="nav-item active">
-          <a href="#">
+        <li class="nav-item">
+          <a routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
             <i class="pi pi-home"></i>
             <span class="nav-label">Tableau de bord</span>
           </a>
         </li>
+        <li class="nav-divider"><span class="nav-label">Compensation</span></li>
         <li class="nav-item">
-          <a href="#">
-            <i class="pi pi-cog"></i>
-            <span class="nav-label">Paramètres</span>
+          <a routerLink="batch-launcher" routerLinkActive="active">
+            <i class="pi pi-play-circle"></i>
+            <span class="nav-label">Lancement Batch</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="consultation" routerLinkActive="active">
+            <i class="pi pi-search"></i>
+            <span class="nav-label">Consultation</span>
+          </a>
+        </li>
+        <li class="nav-divider"><span class="nav-label">Administration</span></li>
+        <li class="nav-item">
+          <a routerLink="audit" routerLinkActive="active">
+            <i class="pi pi-list"></i>
+            <span class="nav-label">Journal d'audit</span>
           </a>
         </li>
       </ul>
     </nav>
+    <div class="sidebar-footer">
+      <span class="nav-label">v2.0 — Refonte 2026</span>
+    </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- ── Main Content (child routes render here) ── -->
   <main class="main-content">
-    <div class="content-header">
-      <h1>Tableau de bord</h1>
-      <p>Bienvenue dans l'application BATCHES</p>
-    </div>
-
-    <div class="empty-state">
-      <i class="pi pi-inbox empty-icon"></i>
-      <h3>Contenu à venir</h3>
-      <p>Le tableau de bord sera disponible prochainement.</p>
-    </div>
+    <router-outlet></router-outlet>
   </main>
+
 </div>

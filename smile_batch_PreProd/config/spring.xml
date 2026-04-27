@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="50" />
+	</bean>
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>./config/jdbc.properties</value>
+				<value>./config/ldap.properties</value>
+
+			</list>
+		</property>
+	</bean>
+
+	<bean id="resources" class="com.oxia.fwk.context.Resources">
+		<property name="log4jPath"
+			value="./config/AppLog4j.properties" />
+	</bean>
+
+	<!-- Data Source Configuration ******************************* ******************************* 
+		******************************* -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		lazy-init="true">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="60" />
+		<property name="maxIdle" value="20" />
+		<property name="removeAbandoned" value="true" />
+		<property name="removeAbandonedTimeout" value="5" />
+	</bean>
+
+	<bean id="connexion"
+		class="com.bna.commun.conditiondebanque.traitement.Connexion">
+		<property name="dataSourceCB">
+			<ref bean="dataSource" />
+		</property>
+
+	</bean>
+
+	<bean id="dataSourceCB"
+		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		lazy-init="true">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+
+
+	<!-- Session Factory Configuration ***************************************** 
+		***************************************** ***************************************** -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"
+		lazy-init="true">
+		<!-- Mettre ici les fichiers de mappage Hibernate com/oxia/../xx.hbm. -->
+		<property name="mappingResources">
+			<list>
+				<value>com/bna/commun/model/DemandeCarte.hbm.xml</value>
+				<value>com/bna/commun/model/TravellerCheque.hbm.xml</value>
+				<value>com/bna/commun/model/Qualite.hbm.xml</value>
+				<value>com/bna/commun/model/DeleguePouvoirs.hbm.xml</value>
+				<value>com/bna/commun/model/RegimeMatrimonial.hbm.xml</value>
+				<value>com/bna/commun/model/Etudes.hbm.xml</value>
+				<value>com/bna/commun/model/DemandeChequeMandatPersonne.hbm.xml</value>
+				<value>com/bna/commun/model/NatureBlocage.hbm.xml</value>
+				<value>com/bna/commun/model/SclasActivite.hbm.xml</value>
+				<value>com/bna/commun/model/PIExpl.hbm.xml</value>
+				<value>com/bna/commun/model/MandatPersonne.hbm.xml</value>
+				<value>com/bna/commun/model/DetailSeqProduit.hbm.xml</value>
+				<value>com/bna/commun/model/PropSpecs.hbm.xml</value>
+				<value>com/bna/commun/model/TypeMoyenPaiement.hbm.xml</value>
+				<value>com/bna/commun/model/Tribunal.hbm.xml</value>
+				<value>com/bna/commun/model/FamilleProduit.hbm.xml</value>
+				<value>com/bna/commun/model/ParamChangeMse.hbm.xml</value>
+				<value>com/bna/commun/model/CoursChange.hbm.xml</value>
+				<value>com/bna/commun/model/TypeStadeEtudes.hbm.xml</value>
+				<value>com/bna/commun/model/Blocage.hbm.xml</value>
+				<value>com/bna/commun/model/ClasActivite.hbm.xml</value>
+				<value>com/bna/commun/model/TypePiece.hbm.xml</value>
+				<value>com/bna/commun/model/Avis.hbm.xml</value>
+				<value>com/bna/commun/model/PropGars.hbm.xml</value>
+				<value>com/bna/commun/model/LignCondGen.hbm.xml</value>
+				<value>com/bna/commun/model/GroupeProfession.hbm.xml</value>
+				<value>com/bna/commun/model/PersClient.hbm.xml</value>
+				<value>com/bna/commun/model/TypePers.hbm.xml</value>
+				<value>com/bna/commun/model/DemandeCarteMandatPersonne.hbm.xml</value>
+				<value>com/bna/commun/model/Caisse.hbm.xml</value>
+				<value>com/bna/commun/model/RecapSpecs.hbm.xml</value>
+				<value>com/bna/commun/model/PersonnelVisite.hbm.xml</value>
+				<value>com/bna/commun/model/Activite.hbm.xml</value>
+				<value>com/bna/commun/model/NPAgricole.hbm.xml</value>
+				<value>com/bna/commun/model/Incident.hbm.xml</value>
+				<value>com/bna/commun/model/ContratCpt.hbm.xml</value>
+				<value>com/bna/commun/model/CategpFormj.hbm.xml</value>
+				<value>com/bna/commun/model/EtatContrat.hbm.xml</value>
+				<value>com/bna/commun/model/CategoriePersonne.hbm.xml</value>
+				<value>com/bna/commun/model/Gouvernorat.hbm.xml</value>
+				<value>com/bna/commun/model/ProduitsLies.hbm.xml</value>
+				<value>com/bna/commun/model/MouvementChange.hbm.xml</value>
+				<value>com/bna/commun/model/TypeProps.hbm.xml</value>
+				<value>com/bna/commun/model/PieceAnnexe.hbm.xml</value>
+				<value>com/bna/commun/model/Groupe.hbm.xml</value>
+				<value>com/bna/commun/model/SeqAgence.hbm.xml</value>
+				<value>com/bna/commun/model/TypeCrdPrimes.hbm.xml</value>
+				<value>com/bna/commun/model/Capital.hbm.xml</value>
+				<value>com/bna/commun/model/ValIndicEtuds.hbm.xml</value>
+				<value>com/bna/commun/model/Decisions.hbm.xml</value>
+				<value>com/bna/commun/model/NatureDemandes.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsProdDecisions.hbm.xml</value>
+				<value>com/bna/commun/model/CodePostal.hbm.xml</value>
+				<value>com/bna/commun/model/GroupeFonds.hbm.xml</value>
+				<value>com/bna/commun/model/TypeStadeDemandes.hbm.xml</value>
+				<value>com/bna/commun/model/DetailOperCarte.hbm.xml</value>
+				<value>com/bna/commun/model/OppMoypMandPers.hbm.xml</value>
+				<value>com/bna/commun/model/SousFamilleProduit.hbm.xml</value>
+				<value> com/bna/commun/model/Profession.hbm.xml</value>
+				<value>com/bna/commun/model/NiveauInstruction.hbm.xml</value>
+				<value> com/bna/commun/model/Demarchage.hbm.xml</value>
+				<value>com/bna/commun/model/MandatOperation.hbm.xml</value>
+				<value> com/bna/commun/model/Solvabilite.hbm.xml</value>
+				<value> com/bna/commun/model/SclasSegment.hbm.xml</value>
+				<value> com/bna/commun/model/EligibiliteFng.hbm.xml</value>
+				<value>com/bna/commun/model/DetailMouvementChange.hbm.xml</value>
+				<value> com/bna/commun/model/ReglGestion.hbm.xml</value>
+				<value> com/bna/commun/model/CheptelVifEt.hbm.xml</value>
+				<value> com/bna/commun/model/Prospect.hbm.xml</value>
+				<value> com/bna/commun/model/BatiementEt.hbm.xml</value>
+				<value> com/bna/commun/model/InfPatr.hbm.xml</value>
+				<value> com/bna/commun/model/TypeBatiements.hbm.xml</value>
+				<value> com/bna/commun/model/SousProduits.hbm.xml</value>
+				<value> com/bna/commun/model/Pays.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsTranchesDs.hbm.xml</value>
+				<value>com/bna/commun/model/PersonnelNavigation.hbm.xml</value>
+				<value>com/bna/commun/model/CoTitulaire.hbm.xml</value>
+				<value> com/bna/commun/model/PopConcern.hbm.xml</value>
+				<value> com/bna/commun/model/Projets.hbm.xml</value>
+				<value> com/bna/commun/model/TestTbses.hbm.xml</value>
+				<value> com/bna/commun/model/EtatProps.hbm.xml</value>
+				<value> com/bna/commun/model/NatResHydr.hbm.xml</value>
+				<value> com/bna/commun/model/ObjetDemandes.hbm.xml</value>
+				<value> com/bna/commun/model/SeqOracle.hbm.xml</value>
+				<value> com/bna/commun/model/GroupeProduit.hbm.xml</value>
+				<value>com/bna/commun/model/SousGroupeOperation.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsPropositions.hbm.xml</value>
+				<value> com/bna/commun/model/UniteProds.hbm.xml</value>
+				<value> com/bna/commun/model/Commission.hbm.xml</value>
+				<value>com/bna/commun/model/TypeStadePropositions.hbm.xml</value>
+				<value> com/bna/commun/model/InfFinancier.hbm.xml</value>
+				<value> com/bna/commun/model/TypeCheptels.hbm.xml</value>
+				<value> com/bna/commun/model/Visite.hbm.xml</value>
+				<value> com/bna/commun/model/Propositions.hbm.xml</value>
+				<value>com/bna/commun/model/CompagnieNavigation.hbm.xml</value>
+				<value> com/bna/commun/model/ModeCalcTa.hbm.xml</value>
+				<value> com/bna/commun/model/TypeAdrs.hbm.xml</value>
+				<value> com/bna/commun/model/ClasSegment.hbm.xml</value>
+				<value>com/bna/commun/model/GroupeOperation.hbm.xml</value>
+				<value> com/bna/commun/model/Fonds.hbm.xml</value>
+				<value> com/bna/commun/model/ListeDocument.hbm.xml</value>
+				<value>com/bna/commun/model/HistoriqueCaisse.hbm.xml</value>
+				<value> com/bna/commun/model/BanqueProspect.hbm.xml</value>
+				<value>com/bna/commun/model/LocalisationProjets.hbm.xml</value>
+				<value> com/bna/commun/model/Diplome.hbm.xml</value>
+				<value> com/bna/commun/model/ProduitVisit.hbm.xml</value>
+				<value> com/bna/commun/model/AllocationAvRs.hbm.xml</value>
+				<value>com/bna/commun/model/DetailOperDemCart.hbm.xml</value>
+				<value> com/bna/commun/model/ShemasInvest.hbm.xml</value>
+				<value>com/bna/commun/model/OperationCompte.hbm.xml</value>
+				<value> com/bna/commun/model/MotifRejet.hbm.xml</value>
+				<value> com/bna/commun/model/Demandes.hbm.xml</value>
+				<value> com/bna/commun/model/Mandat.hbm.xml</value>
+				<value> com/bna/commun/model/Regions.hbm.xml</value>
+				<value> com/bna/commun/model/Segment.hbm.xml</value>
+				<value> com/bna/commun/model/ParamCreditAcc.hbm.xml</value>
+				<value>com/bna/commun/model/CaisseDeviseAgence.hbm.xml</value>
+				<value> com/bna/commun/model/MotifEtat.hbm.xml</value>
+				<value> com/bna/commun/model/Domaine.hbm.xml</value>
+				<value> com/bna/commun/model/SaisieArret.hbm.xml</value>
+				<value> com/bna/commun/model/TraceOperSaisieArret.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsDecisions.hbm.xml</value>
+				<value> com/bna/commun/model/Chequier.hbm.xml</value>
+				<value>com/bna/commun/model/MandatPersOperationCompte.hbm.xml</value>
+				<value> com/bna/commun/model/TauxInt.hbm.xml</value>
+				<value> com/bna/commun/model/NatureDevise.hbm.xml</value>
+				<value> com/bna/commun/model/CarteBancaire.hbm.xml</value>
+				<value> com/bna/commun/model/Produit.hbm.xml</value>
+				<value> com/bna/commun/model/OccupSolEt.hbm.xml</value>
+				<value>com/bna/commun/model/OppositionMoyenPaiement.hbm.xml</value>
+				<value> com/bna/commun/model/Personne.hbm.xml</value>
+				<value> com/bna/commun/model/Operation.hbm.xml</value>
+				<value> com/bna/commun/model/Categorie.hbm.xml</value>
+				<value>com/bna/commun/model/PassageStadePropositions.hbm.xml</value>
+				<value>com/bna/commun/model/PassageStadeEtudes.hbm.xml</value>
+				<value> com/bna/commun/model/Periodes.hbm.xml</value>
+				<value>com/bna/commun/model/SeqProduitAgence.hbm.xml</value>
+				<value> com/bna/commun/model/CatSocProf.hbm.xml</value>
+				<value>com/bna/commun/model/DetailEtatContrat.hbm.xml</value>
+				<value>com/bna/commun/model/Structure.hbm.xml</value>
+				<value>com/bna/commun/model/Regime.hbm.xml</value>
+				<value>com/bna/commun/model/ContratPrets.hbm.xml</value>
+				<value>com/bna/commun/model/CondGen.hbm.xml</value>
+				<value>com/bna/commun/model/Devise.hbm.xml</value>
+				<value>com/bna/commun/model/Client.hbm.xml</value>
+				<value>com/bna/commun/model/Banque.hbm.xml</value>
+				<value>com/bna/commun/model/InciCcpt.hbm.xml</value>
+				<value>com/bna/commun/model/Delegations.hbm.xml</value>
+				<value>com/bna/commun/model/TypePropGar.hbm.xml</value>
+				<value>com/bna/commun/model/SousDelegataire.hbm.xml</value>
+				<value>com/bna/commun/model/BatchRejetVirNSI.hbm.xml</value>
+				<value>com/bna/commun/model/TmpBatchVirNSI.hbm.xml</value>
+				<value>com/bna/commun/model/BatchVirFileCpy.hbm.xml</value>
+				<value>com/bna/commun/model/DepPersonnel.hbm.xml</value>
+
+				<value>com/bna/commun/model/RevenuAn.hbm.xml</value>
+				<value>com/bna/commun/model/TypeConduites.hbm.xml</value>
+				<value>com/bna/commun/model/NatureGars.hbm.xml</value>
+				<value>com/bna/commun/model/TypeProduits.hbm.xml</value>
+				<value>com/bna/commun/model/EtatPropGar.hbm.xml</value>
+				<value>com/bna/commun/model/MoyenContacts.hbm.xml</value>
+				<value>com/bna/commun/model/DemandeCheque.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsSchema.hbm.xml</value>
+				<value>com/bna/commun/model/DetailMandatPersonne.hbm.xml</value>
+				<value>com/bna/commun/model/Garanties.hbm.xml</value>
+				<value>com/bna/commun/model/ResHydrEt.hbm.xml</value>
+				<value>com/bna/commun/model/FormeJuridique.hbm.xml</value>
+				<value>com/bna/commun/model/DetailCatCpt.hbm.xml</value>
+				<value>com/bna/commun/model/DiplomesPersonne.hbm.xml</value>
+				<value>com/bna/commun/model/TypeConfection.hbm.xml</value>
+				<value>com/bna/commun/model/Personnel.hbm.xml</value>
+				<value>com/bna/commun/model/TypeGars.hbm.xml</value>
+				<value>com/bna/commun/model/IndicEtudes.hbm.xml</value>
+				<value>com/bna/commun/model/BienPatDom.hbm.xml</value>
+				<value>com/bna/commun/model/CheptelMortEt.hbm.xml</value>
+				<value>com/bna/commun/model/DetailOperationChequier.hbm.xml</value>
+				<value>com/bna/commun/model/ObjectifDemarche.hbm.xml</value>
+				<value>com/bna/commun/model/TypeCarte.hbm.xml</value>
+				<value>com/bna/commun/model/TypeStructure.hbm.xml</value>
+				<value>com/bna/commun/model/TypeAvis.hbm.xml</value>
+				<value>com/bna/commun/model/Parametres.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsTranchesDp.hbm.xml</value>
+				<value>com/bna/commun/model/Regle.hbm.xml</value>
+				<value>com/bna/commun/model/EcheancesProps.hbm.xml</value>
+				<value>com/bna/commun/model/TypcrdRegle.hbm.xml</value>
+				<value>com/bna/commun/model/EcheancesDecs.hbm.xml</value>
+				<value>com/bna/commun/model/CentreDecision.hbm.xml</value>
+				<value>com/bna/commun/model/TypeDecision.hbm.xml</value>
+				<value>com/bna/commun/model/RisqueAgricole.hbm.xml</value>
+				<value>com/bna/commun/model/Cro.hbm.xml</value>
+
+				<value>com/bna/commun/model/Credits.hbm.xml</value>
+				<value>com/bna/commun/model/EchancierContrats.hbm.xml</value>
+				<value>com/bna/commun/model/EcheancierCrds.hbm.xml</value>
+				<value>com/bna/commun/model/OperationsEch.hbm.xml</value>
+				<value>com/bna/commun/model/PassageStadeDemandes.hbm.xml</value>
+				<value>com/bna/commun/model/TranchesCrd.hbm.xml</value>
+				<value>com/bna/commun/model/TypeOperationsEch.hbm.xml</value>
+                <value>com/bna/commun/model/TraceFraisPack.hbm.xml</value>
+				<!-- MAPPAGE cci -->
+
+				<value>com/bna/commun/model/Creditcci.hbm.xml</value>
+				<value>com/bna/commun/model/Decisionscci.hbm.xml</value>
+				<value>com/bna/commun/model/Demandecci.hbm.xml</value>
+				<value>com/bna/commun/model/EtatCredit.hbm.xml</value>
+				<value>com/bna/commun/model/EtatEch.hbm.xml</value>
+				<value>com/bna/commun/model/EtatTranche.hbm.xml</value>
+				<value>com/bna/commun/model/Objetdemcci.hbm.xml</value>
+				<value>com/bna/commun/model/PropGarcci.hbm.xml</value>
+				<value>com/bna/commun/model/Propositioncci.hbm.xml</value>
+				<value>com/bna/commun/model/Tranchecci.hbm.xml</value>
+				<value>com/bna/commun/model/Echeanciercci.hbm.xml</value>
+				<value>com/bna/commun/model/CommDecCci.hbm.xml</value>
+				<value>com/bna/commun/model/EtatDecision.hbm.xml</value>
+				<value>com/bna/commun/model/Remboursementscci.hbm.xml</value>
+				<value>com/bna/commun/model/Mouvementscci.hbm.xml</value>
+				<value>com/bna/commun/model/CommTrCci.hbm.xml</value>
+				<value>com/bna/commun/model/CessionDroit.hbm.xml</value>
+				<value>com/bna/commun/model/Objet.hbm.xml</value>
+				<value>com/bna/commun/model/ObjetProduit.hbm.xml</value>
+
+				<value>com/bna/commun/model/TranchecciHist.hbm.xml</value>
+				<value>com/bna/commun/model/EcheanciercciHist.hbm.xml</value>
+
+
+				<value>com/bna/commun/model/EtatReamenagement.hbm.xml</value>
+				<value>com/bna/commun/model/EtatTrfAg.hbm.xml</value>
+				<value>com/bna/commun/model/Reamenagementcci.hbm.xml</value>
+				<value>com/bna/commun/model/TransfertAgCci.hbm.xml</value>
+				<value>com/bna/commun/model/ComReamCci.hbm.xml</value>
+				<value>com/bna/commun/model/TranchecciTmp.hbm.xml</value>
+
+				<value>com/bna/commun/model/TransfertsCtx.hbm.xml</value>
+				<value>com/bna/commun/model/EtatTrfc.hbm.xml</value>
+
+
+
+
+
+
+				<!-- fin mappage automatique -->
+				<value>com/bna/commun/model/DetailOperMoyPaiement.hbm.xml</value>
+				<value>com/bna/commun/model/DetailOrdreVirement.hbm.xml</value>
+				<value>com/bna/commun/model/DetailRenouvellementMandat.hbm.xml</value>
+				<value>com/bna/commun/model/DetailSignatures.hbm.xml</value>
+				<value>com/bna/commun/model/Employeur.hbm.xml</value>
+				<value>com/bna/commun/model/SousClasseEmployeur.hbm.xml</value>
+				<value>com/bna/commun/model/ClasseEmployeur.hbm.xml</value>
+				<value>com/bna/commun/model/DecisionGelAvoirs.hbm.xml</value>
+               <value>com/bna/commun/model/DetailDecisionGelAvoirs.hbm.xml</value>
+				<value>com/bna/commun/model/LivretEpargne.hbm.xml</value>
+				<value>com/bna/commun/model/MandPersOperMoy.hbm.xml</value>
+				<value>com/bna/commun/model/MandPersOrdreVir.hbm.xml</value>
+				<value>com/bna/commun/model/ModificationDonnees.hbm.xml</value>
+				<value>com/bna/commun/model/MontantMiseDiposition.hbm.xml</value>
+				<value>com/bna/commun/model/NatureVirement.hbm.xml</value>
+				<value>com/bna/commun/model/NomencElemtCondition.hbm.xml</value>
+				<value>com/bna/commun/model/OperationMoyPay.hbm.xml</value>
+				<value>com/bna/commun/model/OrdreVirement.hbm.xml</value>
+				<value>com/bna/commun/model/RegleGestionContrat.hbm.xml</value>
+				<value>com/bna/commun/model/Signature.hbm.xml</value>
+				<value>com/bna/commun/model/TraceContrat.hbm.xml</value>
+				<value>com/bna/commun/model/TraceMandat.hbm.xml</value>
+				<value>com/bna/commun/model/TypeElementCondition.hbm.xml</value>
+				<value>com/bna/commun/model/TypeModification.hbm.xml</value>
+				<value>com/bna/commun/model/TypeRegleContrat.hbm.xml</value>
+				<value>com/bna/commun/model/TypeVirement.hbm.xml</value>
+				<value>com/bna/commun/model/EcheanciercciTMP.hbm.xml</value>
+				<value>com/bna/commun/model/CommTrfagCci.hbm.xml</value>
+
+				<value>com/bna/commun/model/CategorieParPrd.hbm.xml</value>
+				<value>com/bna/commun/model/CategoriePrd.hbm.xml</value>
+				<value>com/bna/commun/model/DecisionscciComp.hbm.xml</value>
+
+
+				<value>com/bna/commun/model/AvancRembLiquid.hbm.xml</value>
+				<value>com/bna/commun/model/CompteAdmin.hbm.xml</value>
+				<value>com/bna/commun/model/CompteTitre.hbm.xml</value>
+				<value>com/bna/commun/model/ContratPlacement.hbm.xml</value>
+				<value>com/bna/commun/model/DemandeDecision.hbm.xml</value>
+				<value>com/bna/commun/model/DetailEtatCptPlac.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsOperationPlacement.hbm.xml</value>
+				<value>com/bna/commun/model/InteretServi.hbm.xml</value>
+				<value>com/bna/commun/model/MandPersOperPlac.hbm.xml</value>
+				<value>com/bna/commun/model/OperationEpargnes.hbm.xml</value>
+				<value>com/bna/commun/model/HistoriqueDemandePlacement.hbm.xml</value>
+				<value>com/bna/commun/model/BonDeCaisse.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsBc.hbm.xml</value>
+				<value>com/bna/commun/model/AbonnementPlacement.hbm.xml</value>
+				<value>com/bna/commun/model/ReajustAvrembliq.hbm.xml</value>
+
+				<!--value>com/bna/commun/model/MatriceProduitPlacement.hbm.xml</value -->
+
+				<value>com/bna/commun/model/InterditChq.hbm.xml</value>
+				<value>com/bna/commun/model/Tache.hbm.xml</value>
+				<value>com/bna/commun/model/ProduitPlacement.hbm.xml</value>
+				<!-- gestion des caisses -->
+				<value>com/bna/commun/model/CaisseStrc.hbm.xml</value>
+				<value>com/bna/commun/model/JourneeCaisse.hbm.xml</value>
+				<value>com/bna/commun/model/SessionJrnCaisse.hbm.xml</value>
+				<value>com/bna/commun/model/MouvementSessionCaisse.hbm.xml</value>
+				<value>com/bna/commun/model/DetailSessionCaisse.hbm.xml</value>
+				<value>com/bna/commun/model/CoupureDevise.hbm.xml</value>
+				<value>com/bna/commun/model/CoupureDevJrn.hbm.xml</value>
+				<value>com/bna/commun/model/CommandeCaisse.hbm.xml</value>
+				<value>com/bna/commun/model/CommandeDevise.hbm.xml</value>
+				<value>com/bna/commun/model/CoupureDevCmd.hbm.xml</value>
+				<value>com/bna/commun/model/OperationSpecCaisse.hbm.xml</value>
+
+				<!--value>com/bna/commun/model/FauBillArgen.hbm.xml</value -->
+				<!-- ************************************************* -->
+
+				<value>com/bna/commun/model/JourneeStructure.hbm.xml</value>
+				<value>com/bna/commun/model/SynchronisePascal.hbm.xml</value>
+				<value>com/bna/commun/model/ContratRejete.hbm.xml</value>
+				<value>com/bna/commun/model/CommRembCci.hbm.xml</value>
+				<value>com/bna/commun/model/CompteInterne.hbm.xml</value>
+
+				<!-- cloture de domaine -->
+				<value>com/bna/commun/model/DomaineMetier.hbm.xml</value>
+				<value>com/bna/commun/model/TypeDomaine.hbm.xml</value>
+				<value>com/bna/commun/model/JourneeStructureDomaine.hbm.xml</value>
+				<value>com/bna/commun/model/DomaineStructure.hbm.xml</value>
+
+				<value>com/bna/commun/model/BatchMetier.hbm.xml</value>
+				<value>com/bna/commun/model/JourneeStructureBatch.hbm.xml</value>
+				<value>com/bna/commun/model/BatchStructure.hbm.xml</value>
+
+				<!-- Agent economique -->
+				<value>com/bna/commun/model/AgentEconomique.hbm.xml</value>
+				<value>com/bna/commun/model/ClasAgEconomique.hbm.xml</value>
+
+				<!-- gestion de la TVA -->
+				<value>com/bna/commun/model/ExonerationCltTva.hbm.xml</value>
+				<value>com/bna/commun/model/TraceExoTva.hbm.xml</value>
+
+				<!-- Cond Banq -->
+				<value>com/bna/commun/model/TauxReference.hbm.xml</value>
+				<value>com/bna/commun/model/HistTauxReference.hbm.xml</value>
+				<value>com/bna/commun/model/MouvementInterne.hbm.xml</value>
+
+				<!-- Tables Batch -->
+				<value>com/bna/commun/model/BatchExeptionPlac.hbm.xml</value>
+				<value>com/bna/commun/model/BatchStatPlacement.hbm.xml</value>
+
+
+				<!-- Tables Assurance Vie -->
+				<value>com/bna/commun/model/AdhesionAssVie.hbm.xml</value>
+				<value>com/bna/commun/model/DetailAdhesion.hbm.xml</value>
+				<value>com/bna/commun/model/TarifAssVie.hbm.xml</value>
+				<value>com/bna/commun/model/Assureur.hbm.xml</value>
+				<value>com/bna/commun/model/TraceAssuranceVieDecouvert.hbm.xml</value>
+				
+				<!-- Tables Assurance Capital -->
+				<value>com/bna/commun/model/AdhesionAssCapi.hbm.xml</value>
+				<value>com/bna/commun/model/TraceAssuranceCapi.hbm.xml</value>
+				<value>com/bna/commun/model/BeneficiaireCapi.hbm.xml</value>
+				<value>com/bna/commun/model/SouscripteurCapi.hbm.xml</value>
+				<value>com/bna/commun/model/AssureCapi.hbm.xml</value>
+				<value>com/bna/commun/model/DetailAdhesionCapi.hbm.xml</value>
+				
+				<!-- Moyens de payement : Accuse ADT -->
+				<value>com/bna/commun/model/Valeur.hbm.xml</value>
+				<value>com/bna/commun/model/RecapValeur.hbm.xml</value>
+				<value>com/bna/commun/model/Consultation.hbm.xml</value>
+				<value>com/bna/commun/model/ConsultationRapport.hbm.xml</value>
+				<value>com/bna/commun/model/PariteOfficielle.hbm.xml</value>
+				<value>com/bna/commun/model/TraceCoursChange.hbm.xml</value>
+				<value>com/bna/commun/model/TracePariteOfficielle.hbm.xml</value>
+
+
+				<!-- Virement -->
+				<value>com/bna/commun/model/GlobalVirement.hbm.xml</value>
+				<value>com/bna/commun/model/DetailVirement.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsOperationVirement.hbm.xml</value>
+				<value>com/bna/commun/model/AgenceBct.hbm.xml</value>
+				<value>com/bna/commun/model/TraceOperVirement.hbm.xml</value>
+				<value>com/bna/commun/model/PersCotitVirement.hbm.xml</value>
+				<value>com/bna/commun/model/MandantPersVirement.hbm.xml</value>
+				<value>com/bna/commun/model/TraceVirement.hbm.xml</value>
+				<value>com/bna/commun/model/FluxComptVirement.hbm.xml</value>
+				<value>com/bna/commun/model/EnvoiCtx.hbm.xml</value>
+				<value>com/bna/commun/model/JourneeSGMT.hbm.xml</value>
+				<value>com/bna/commun/model/VirSgmt.hbm.xml</value>
+				<value>com/bna/commun/model/BeneficiaireOrdreVirement.hbm.xml</value>
+
+				<!-- Guichet -->
+				<value>com/bna/commun/model/MouvementGuichet.hbm.xml</value>
+				<!-- Retrait -->
+				<value>com/bna/commun/model/CotitOmp.hbm.xml</value>
+
+				<!-- Certification Chèque -->
+				<value>com/bna/commun/model/CertificationCheques.hbm.xml</value>
+				<value>com/bna/commun/model/CertifChqMandPers.hbm.xml</value>
+				<value>com/bna/commun/model/CertifChqCotit.hbm.xml</value>
+
+				<!-- Incidents De Paiements -->
+				<value>com/bna/commun/model/Amende.hbm.xml</value>
+				<value>com/bna/commun/model/Anr.hbm.xml</value>
+				<value>com/bna/commun/model/Arp.hbm.xml</value>
+				<value>com/bna/commun/model/Cheque.hbm.xml</value>
+				<value>com/bna/commun/model/Cheque30.hbm.xml</value>
+				<value>com/bna/commun/model/Cheque31.hbm.xml</value>
+				<value>com/bna/commun/model/Cheque32.hbm.xml</value>
+				<value>com/bna/commun/model/Cheque33.hbm.xml</value>
+				<value>com/bna/commun/model/Cnp.hbm.xml</value>
+				<value>com/bna/commun/model/ComplementPapillon.hbm.xml</value>
+				<value>com/bna/commun/model/ComplementCnp.hbm.xml</value>
+				<value>com/bna/commun/model/MouvementCompensation.hbm.xml</value>
+				<value>com/bna/commun/model/Papillon.hbm.xml</value>
+				<value>com/bna/commun/model/Preavis.hbm.xml</value>
+				<value>com/bna/commun/model/SuiviHn.hbm.xml</value>
+				<value>com/bna/commun/model/TypeRejet.hbm.xml</value>
+				<value>com/bna/commun/model/MotifRejetChq.hbm.xml</value>
+				<value>com/bna/commun/model/TraceCheque.hbm.xml</value>
+				<value>com/bna/commun/model/Decompte.hbm.xml</value>
+				<value>com/bna/commun/model/Signataire.hbm.xml</value>
+				<value>com/bna/commun/model/BlocageCheque.hbm.xml</value>
+				<value>com/bna/commun/model/ErrorMigration.hbm.xml</value>
+				<!-- <value>com/bna/commun/model/MigrationCheque.hbm.xml</value> -->
+
+
+
+				<!-- Prelevement -->
+
+				<value>com/bna/commun/model/ContratDomiciliations.hbm.xml</value>
+				<value>com/bna/commun/model/OppositionPrelevements.hbm.xml</value>
+				<value>com/bna/commun/model/Emetteur.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsPrelevements.hbm.xml</value>
+				<value>com/bna/commun/model/MvtPrelevements.hbm.xml</value>
+				<value>com/bna/commun/model/MotifRejetPrelev.hbm.xml</value>
+				<value>com/bna/commun/model/TraceContDomiciliations.hbm.xml</value>
+				<value>com/bna/commun/model/DetailDomiciliationTemp.hbm.xml</value>
+
+				<value>com/bna/commun/model/Allocation.hbm.xml</value>
+				<value>com/bna/commun/model/DetailAllocation.hbm.xml</value>
+				<value>com/bna/commun/model/FraisAllocation.hbm.xml</value>
+				<value>com/bna/commun/model/MouvementChg.hbm.xml</value>
+
+				<value>com/bna/commun/model/PortAttache.hbm.xml</value>
+
+				<value>com/bna/commun/model/SoldePersonnelNavigant.hbm.xml</value>
+				<value>com/bna/commun/model/TypeAcquisition.hbm.xml</value>
+				<value>com/bna/commun/model/TypeAllocation.hbm.xml</value>
+				<value>com/bna/commun/model/TypeMateriel.hbm.xml</value>
+				<value>com/bna/commun/model/MaterielOctroye.hbm.xml</value>
+				<value>com/bna/commun/model/TypeRetrocession.hbm.xml</value>
+				<value>com/bna/commun/model/NatureRetrocession.hbm.xml</value>
+				<value>com/bna/commun/model/Retrocession.hbm.xml</value>
+				<value>com/bna/commun/model/CotitMvg.hbm.xml</value>
+				<value>com/bna/commun/model/MandPersMvg.hbm.xml</value>
+				<value>com/bna/commun/model/TraceBlocageMontantContrat.hbm.xml</value>
+
+
+
+				<!-- Encaissement Effet -->
+				<value>com/bna/commun/model/DetailEffet.hbm.xml</value>
+				<value>com/bna/commun/model/GlobalEffet.hbm.xml</value>
+				<value>com/bna/commun/model/MouvementCompensationEffet.hbm.xml</value>
+				<value>com/bna/commun/model/EffetRecu.hbm.xml</value>
+				<value>com/bna/commun/model/EffetRecuTmp.hbm.xml</value>
+				<value>com/bna/commun/model/PapillonEffet.hbm.xml</value>
+				<value>com/bna/commun/model/SuiviHnEff.hbm.xml</value>
+				<value>com/bna/commun/model/BlocageEffet.hbm.xml</value>
+				<value>com/bna/commun/model/TraceEffetRecu.hbm.xml</value>
+				<value>com/bna/commun/model/EffetRecuTmpEsc.hbm.xml</value>
+				<value>com/bna/commun/model/SuiviFileTeleCompensation.hbm.xml</value>
+
+				<value>com/bna/commun/model/ContratGod.hbm.xml</value>
+				<value>com/bna/commun/model/TraceOperationGod.hbm.xml</value>
+				<value>com/bna/commun/model/DeblocageGod.hbm.xml</value>
+				<value>com/bna/commun/model/BlocageGod.hbm.xml</value>
+
+				<!-- BATCH -->
+				<value>com/bna/commun/model/TraceBatch.hbm.xml</value>
+				<value>com/bna/commun/model/ComplementEffetRecu.hbm.xml</value>
+				<value>com/bna/commun/model/TraceBatchEnvoiSms.hbm.xml</value>
+
+				<!-- Tables Assurance Voyage -->
+				<value>com/bna/commun/model/StructureAssurance.hbm.xml</value>
+				<value>com/bna/commun/model/Assurances.hbm.xml</value>
+				<value>com/bna/commun/model/ExamenMedicale.hbm.xml</value>
+				<value>com/bna/commun/model/ContratAssurance.hbm.xml</value>
+				<value>com/bna/commun/model/TarifAssurance.hbm.xml</value>
+
+				<value>com/bna/commun/model/ContratAssuranceVoyage.hbm.xml</value>
+				<value>com/bna/commun/model/TarifAssuranceVoyage.hbm.xml</value>
+				<value>com/bna/commun/model/TraceAssuranceVoyage.hbm.xml</value>
+				<value>com/bna/commun/model/ContratDetail.hbm.xml</value>
+				<value>com/bna/commun/model/DetailAssuranceVoyage.hbm.xml</value>
+
+				<!-- Tables Assurance Agricole -->
+				<value>com/bna/commun/model/ContratAssuranceAgricole.hbm.xml</value>
+
+
+
+				<!-- Tables IBS -->
+                <value>com/bna/commun/model/CentreFortIBS.hbm.xml</value>
+                <value>com/bna/commun/model/MouvementCaisseCentraleIBS.hbm.xml</value>
+				<value>com/bna/commun/model/CaisseCentraleIBS.hbm.xml</value>
+				 
+				<value>com/bna/commun/model/ReclamationIBS.hbm.xml</value>
+                <value>com/bna/commun/model/TypeReclamationIBS.hbm.xml</value>
+                
+				<value>com/bna/commun/model/GlobalCollectIBS.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsCollectIBS.hbm.xml</value>
+				<value>com/bna/commun/model/ClientIBS.hbm.xml</value>
+				<value>com/bna/commun/model/StructureCentreFort.hbm.xml</value>
+				
+				<value>com/bna/commun/model/GlobalFactureIBS.hbm.xml</value>
+				<value>com/bna/commun/model/DetailsFactureIBS.hbm.xml</value>
+				<value>com/bna/commun/model/NatureFactureIBS.hbm.xml</value>
+				
+				<value>com/bna/commun/model/ReglementFraisIBS.hbm.xml</value>
+				<value>com/bna/commun/model/ContratCPTIBS.hbm.xml</value>
+				<value>com/bna/commun/model/DetailMsgReclamation.hbm.xml</value>
+				
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle9Dialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+				<prop key="hibernate.max_fetch_depth">2</prop>
+			</props>
+		</property>
+
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+
+	<!-- Hibernate Template Configuration ***************************************** 
+		***************************************** ***************************************** -->
+	<bean id="hibernateTemplate"
+		class="org.springframework.orm.hibernate3.HibernateTemplate"
+		lazy-init="true">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<!-- Framework Configuration ******************************* ******************************* 
+		******************************* -->
+	<bean id="basicActionImpl" class="com.oxia.daoImpl.Hibernate3Impl"
+		lazy-init="true">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate" />
+		</property>
+	</bean>
+
+	<bean id="createBasic"
+		class="com.oxia.fwk.beans.integration.BasicCreateDAO" lazy-init="true">
+		<property name="basicAction">
+			<ref bean="basicActionImpl" />
+		</property>
+	</bean>
+
+	<bean id="updateBasic"
+		class="com.oxia.fwk.beans.integration.BasicUpdateDAO" lazy-init="true">
+		<property name="basicAction">
+			<ref bean="basicActionImpl" />
+		</property>
+	</bean>
+
+	<bean id="removeBasic"
+		class="com.oxia.fwk.beans.integration.BasicRemoveDAO" lazy-init="true">
+		<property name="basicAction">
+			<ref bean="basicActionImpl" />
+		</property>
+	</bean>
+
+	<!-- Transaction manager Configuration ***************************************** 
+		***************************************** ***************************************** -->
+   <bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+		abstract="false" lazy-init="false" autowire="default"
+		dependency-check="default">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean> 
+
+
+	<!-- Basic service configuration ***************************************** 
+		***************************************** ***************************************** -->
+	<bean id="basicService"
+		class="com.oxia.fwk.beans.service.BasicService" lazy-init="true">
+
+		<property name="daoCreate">
+			<ref bean="createBasic" />
+		</property>
+
+		<property name="daoRemove">
+			<ref bean="removeBasic" />
+		</property>
+
+		<property name="daoUpdate">
+			<ref bean="updateBasic" />
+		</property>
+
+	</bean>
+
+	<!-- Crud Service configuration ***************************************** 
+		***************************************** ***************************************** -->
+	<bean id="crudservice" parent="txProxyTemplate">
+		<property name="target">
+			<bean
+				class="com.bna.smile.model.domainecommun.service.CRUDservice"
+				parent="basicService">
+			</bean>
+		</property>
+	</bean>
+	<bean id="crudserviceFrw" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.oxia.fwk.crudservice.CrudService"
+				parent="basicService">
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="CURService" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.bna.commun.service.CURService"
+				parent="basicService">
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="crudservice1"
+		class="com.bna.smile.model.domainecommun.service.CRUDservice"
+		parent="basicService" lazy-init="true" />
+
+	<!-- Search Engine configuration ***************************************** 
+		***************************************** ***************************************** -->
+	<bean id="searchEngine"
+		class="com.oxia.fwk.searchengine.SearchEngine" lazy-init="true">
+		<property name="searchEngineDAO">
+			<ref bean="searchEngineDAO" />
+		</property>
+	</bean>
+
+	<bean id="searchEngineDAO"
+		class="com.oxia.fwk.searchengine.SearchEngineDAO" lazy-init="true">
+		<property name="basicAction">
+			<ref bean="basicActionImpl" />
+		</property>
+	</bean>
+
+	<bean id="criteria" class="com.oxia.daoImpl.CriteriaImpl"
+		singleton="false" />
+	<bean id="expression" class="com.oxia.daoImpl.ExpressionImpl"
+		lazy-init="true" />
+
+
+
+</beans>
+

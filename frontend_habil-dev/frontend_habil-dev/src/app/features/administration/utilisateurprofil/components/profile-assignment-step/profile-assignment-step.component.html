@@ -1,0 +1,121 @@
+<div class="profile-assignment-step">
+    <div class="mb-4">
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle mb-3">
+            <!-- Toggle Bar -->
+            <app-tab-toggle [tabs]="['Profils individuels', 'Packs de profils']" [selectedIndex]="selectedTabIndex"
+                (tabChange)="onTabChanged($event)" class="box1"></app-tab-toggle>
+
+        </div>
+
+        <button pButton label="Annuler modifications" icon="pi pi-undo"
+            class="p-button-outlined p-button-secondary btn-compact" (click)="onResetModifications()"
+            [disabled]="!selectedUser && newlyMovedCount === 0"
+            title="Restaurer tous les profils à leurs positions originales">
+        </button>
+        <div class="step-actions" *ngIf="currentViewMode === 'profiles'">
+            <!-- Profile Filters with Tab Toggle -->
+            <app-profile-filters [profileFilters]="currentProfileFilters" [levelFilterOptions]="levelFilterOptions"
+                [categoryFilterOptions]="categoryFilterOptions" [statusFilterOptions]="statusFilterOptions"
+                (filtersChange)="onFiltersChange($event)" (clearAllFilters)="onClearFilters()"
+                (tabChange)="onFilterTabChange($event)">
+            </app-profile-filters>
+        </div>
+    </div>
+
+    <!-- Profiles View -->
+    <div class="shadow-sm dragdrop-container" *ngIf="currentViewMode === 'profiles'">
+        <!-- Legend for revoked profiles -->
+        <div class="profile-status-legend">
+            <div class="legend-item">
+                <i class="pi pi-exclamation-triangle text-danger"></i>
+                <span>Profil révoqué (inactif)</span>
+            </div>
+        </div>
+        <!-- Drag & Drop Profiles Interface -->
+        <div class="profiles-wrapper">
+            <!-- Profils disponibles -->
+            <div class="profiles-column">
+                <div class="section-header">
+                    <h4 class="section-title">
+                        <i class="pi pi-users text-primary me-2"></i>
+                        Profils disponibles
+                        <span class="count-badge">{{ filteredAvailableProfiles.length }}/{{ availableProfiles.length
+                            }}</span>
+                    </h4>
+                </div>
+                <div cdkDropList [cdkDropListData]="availableProfiles" class="profile-list"
+                    cdkDropListConnectedTo="assignedList" id="availableList" (cdkDropListDropped)="onDrop($event)">
+
+                    <app-profile-badge *ngFor="let profile of filteredAvailableProfiles; trackBy: trackByProfileCode"
+                        [profile]="profile" [listType]="'available'"
+                        [isSelected]="isProfileSelected(profile, 'available')"
+                        [isNewlyMoved]="isProfileNewlyMoved(profile, 'available')"
+                        [isDraggingMultiple]="isDraggingMultiple(profile, 'available')"
+                        [selectedCount]="selectedProfiles.available.size"
+                        (profileClick)="onProfileSelection(profile, 'available')"
+                        (actionClick)="onProfileAction($event.action, $event.profile, $event.event)"
+                        (profileInfo)="onProfileInfo($event.profile, $event.event)" cdkDrag
+                        [cdkDragDisabled]="profile.boolEtatUtpr === 0" [cdkDragData]="profile">
+                    </app-profile-badge>
+
+                    <div *ngIf="filteredAvailableProfiles.length === 0 && availableProfiles.length > 0"
+                        class="empty-state">
+                        <i class="pi pi-filter"></i>
+                        <span>Aucun profil ne correspond aux filtres</span>
+                    </div>
+
+                    <div *ngIf="availableProfiles.length === 0" class="empty-state">
+                        <i class="pi pi-info-circle"></i>
+                        <span>Aucun profil disponible</span>
+                    </div>
+                </div>
+            </div> <!-- Profils assignés -->
+            <div class="profiles-column">
+                <div class="section-header">
+                    <h4 class="section-title">
+                        <i class="pi pi-shield text-success me-2"></i>
+                        Profils assignés
+                        <span class="count-badge assigned">{{ filteredAssignedProfiles.length }}/{{
+                            assignedProfiles.length }}</span>
+                    </h4>
+
+                </div>
+                <div cdkDropList [cdkDropListData]="assignedProfiles" class="profile-list assigned"
+                    cdkDropListConnectedTo="availableList" id="assignedList" (cdkDropListDropped)="onDrop($event)">
+                    <app-profile-badge *ngFor="let profile of filteredAssignedProfiles; trackBy: trackByProfileCode"
+                        [profile]="profile" [listType]="'assigned'"
+                        [isSelected]="isProfileSelected(profile, 'assigned')"
+                        [isNewlyMoved]="isProfileNewlyMoved(profile, 'assigned')"
+                        [isDraggingMultiple]="isDraggingMultiple(profile, 'assigned')"
+                        [selectedCount]="selectedProfiles.assigned.size"
+                        (profileClick)="onProfileSelection(profile, 'assigned')"
+                        (actionClick)="onProfileAction($event.action, $event.profile, $event.event)"
+                        (profileInfo)="onProfileInfo($event.profile, $event.event)"
+                        (restoreProfile)="onRestoreProfile($event.profile, $event.event)" cdkDrag
+                        [cdkDragDisabled]="profile.boolEtatUtpr === 0" [cdkDragData]="profile">
+                    </app-profile-badge>
+
+                    <div *ngIf="filteredAssignedProfiles.length === 0 && assignedProfiles.length > 0"
+                        class="empty-state">
+                        <i class="pi pi-filter"></i>
+                        <span>Aucun profil ne correspond aux filtres</span>
+                    </div>
+
+                    <div *ngIf="assignedProfiles.length === 0" class="empty-state">
+                        <i class="pi pi-info-circle"></i>
+                        <span>Aucun profil assigné</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Packs View -->
+    <div class="pack-view-container" *ngIf="currentViewMode === 'packs'">
+        <app-pack-selector [availablePacks]="availablePacks" [assignedPacks]="assignedPacks"
+            [selectedUser]="selectedUser" [cartPacks]="cartPacks" [isAssigning]="false"
+            (packAssign)="onPackAssign($event)" (packUnassign)="onPackUnassign($event)" (packInfo)="onPackInfo($event)"
+            (packDrop)="onPackDrop($event)" (batchAssign)="onBatchPackAssign($event)"
+            (cartChange)="onCartChange($event)">
+        </app-pack-selector>
+    </div>
+</div>

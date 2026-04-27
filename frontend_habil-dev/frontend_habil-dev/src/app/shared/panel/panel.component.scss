@@ -1,0 +1,25 @@
+.panel {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.panel-header {
+  background-color: #115952;
+  color: white;
+  padding: 10px 23px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+}
+.panel-body {
+  background-color: #ffffff;
+  padding: 5px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.panel-body ::ng-deep .p-button {
+  font-size: 16px;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}

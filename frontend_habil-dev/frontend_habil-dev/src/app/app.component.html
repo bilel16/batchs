@@ -1,0 +1,52 @@
+<!-- Gooey Toast v2 — reactive config via GooeyToastModule.forRoot() -->
+<gooey-toast-container></gooey-toast-container>
+
+<!-- Global Toast for Enhanced Error Handling (visually hidden — replaced by gooey-toaster above) -->
+<p-toast
+  position="top-right"
+  [style]="{visibility: 'hidden', position: 'absolute', pointerEvents: 'none', zIndex: '-1'}"
+  styleClass="enhanced-toast-container"
+  [showTransformOptions]="'translateX(100%)'"
+  [hideTransformOptions]="'translateX(100%)'"
+  [showTransitionOptions]="'300ms ease-out'"
+  [hideTransitionOptions]="'250ms ease-in'">
+
+  <!-- Custom Toast Template for Enhanced Backend Integration -->
+  <ng-template let-message pTemplate="message">
+    <div class="enhanced-toast-message" [ngClass]="'toast-' + message.severity">
+      <div class="toast-icon-wrapper">
+        <i [class]="getToastIcon(message.severity)" [ngClass]="'icon-' + message.severity"></i>
+      </div>
+      <div class="toast-content">
+        <div class="toast-summary">{{ message.summary }}</div>
+        <div class="toast-detail" [innerHTML]="message.detail"></div>
+        <div class="toast-timestamp" *ngIf="message.data?.timestamp">
+          {{ formatTimestamp(message.data.timestamp) }}
+        </div>
+      </div>
+      <div class="toast-actions" *ngIf="message.data?.actions">
+        <button
+          *ngFor="let action of message.data.actions"
+          pButton
+          [label]="action.label"
+          [icon]="action.icon"
+          class="p-button-sm p-button-text"
+          (click)="executeToastAction(action)">
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<app-header *ngIf="!isLoginUrl()" class="navbar pcoded-header navbar-expand-lg navbar-light" (onNavCollapse)="this.navCollapsed = !this.navCollapsed;" (onNavHeaderMobCollapse)="navMobClick()"></app-header>
+<app-navigation *ngIf="!isLoginUrl()" class="pcoded-navbar menupos-fixed" [ngClass]="{'navbar-collapsed' : navCollapsed, 'theme-horizontal': this.flatConfig['layout'] === 'horizontal', 'mob-open' : navCollapsedMob}" (onNavMobCollapse)="navMobClick()"></app-navigation>
+
+<div [ngClass]="!isLoginUrl() ? 'pcoded-main-container' : ''">
+  <div [ngClass]="!isLoginUrl() ? 'pcoded-content' : ''">
+    <router-outlet>
+    </router-outlet>
+  </div>
+</div>
+
+
+

@@ -1,0 +1,5 @@
+<div class="toggle-container">
+    <button *ngFor="let tab of tabs; let i = index" [ngClass]="{ active: i === selectedIndex }" (click)="selectTab(i)">
+        {{ getLabel(tab) }}
+    </button>
+</div>

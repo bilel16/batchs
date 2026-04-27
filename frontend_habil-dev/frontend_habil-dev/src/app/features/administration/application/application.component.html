@@ -1,0 +1,201 @@
+<div class="application-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section"  data-aos="fade-right" data-aos-duration="500" data-aos-once="true">
+        <h1>
+          <i class="pi pi-desktop"></i>
+          Gestion des Applications
+        </h1>
+        <p class="subtitle">Gérez vos applications et leurs configurations</p>
+      </div>
+      <div class="header-actions" data-aos="fade-left" data-aos-duration="500">
+        <button
+          pButton
+          type="button"
+          label="Nouvelle Application"
+          icon="pi pi-plus"
+          class="p-button-success create-button"
+          (click)="openNew()">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid" data-aos="fade-down"
+       data-aos-easing="linear"
+       data-aos-duration="500">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="pi pi-desktop"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalApplications }}</div>
+        <div class="stat-label">Total Applications</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="pi pi-filter"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ filteredApplications.length }}</div>
+        <div class="stat-label">Applications Affichées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div class="content-card"    data-aos="fade-up"
+     data-aos-duration="300">
+    <!-- Data Table -->
+    <app-table
+      [data]="applications"
+      [config]="tableConfig"
+      [totalLabel]="'Total des applications :'"
+      [showTotal]="false"
+      (onEdit)="editApplication($event); drawer.openDrawer()"
+      (onDelete)="deleteApplication($event)"
+      (filteredDataChange)="filteredApplications = $event"
+      [loading]="loading">
+    </app-table>
+  </div>
+</div>
+
+<!-- Animated Drawer -->
+<app-animated-drawer
+  #drawer
+  [title]="action === actionType.ADD ? 'Ajouter une Application' : 'Modifier Application'">
+
+  <form class="application-form">
+    <div class="form-group">
+      <label for="codApp" class="form-label">Code Application</label>
+      <input
+        type="text"
+        pInputText
+        id="codApp"
+        name="codApp"
+        [(ngModel)]="application.codApp"
+        [disabled]="action === actionType.EDIT"
+        required
+        class="form-input"
+        placeholder="Saisissez le code application"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="libApp" class="form-label">Libellé Application</label>
+      <input
+        type="text"
+        pInputText
+        id="libApp"
+        name="libApp"
+        [(ngModel)]="application.libApp"
+        required
+        class="form-input"
+        placeholder="Saisissez le libellé application"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="libLab" class="form-label">Libellé Lab</label>
+      <textarea
+        id="libLab"
+        name="libLab"
+        pInputTextarea
+        [(ngModel)]="application.libLab"
+        rows="4"
+        class="form-textarea"
+        placeholder="Saisissez la description (optionnel)"
+      ></textarea>
+    </div>
+
+    <!-- Profile Type Toggle Buttons -->
+    <div class="form-group">
+      <label class="form-label">Types des structures</label>
+
+      <div class="profiles-group">
+        <div class="profiles-title">
+          <i class="pi pi-users"></i>
+          Sélection des structures
+        </div>
+
+        <div class="toggle-grid">
+          <div class="toggle-card">
+            <p-toggleButton
+              [(ngModel)]="application.central"
+              name="central"
+              onLabel="Oui"
+              offLabel="Non"
+              onIcon="pi pi-check"
+              offIcon="pi pi-times"
+              styleClass="toggle-centrale">
+            </p-toggleButton>
+            <div class="toggle-hint">Centrale</div>
+          </div>
+
+          <div class="toggle-card">
+            <p-toggleButton
+              [(ngModel)]="application.regional"
+              name="regional"
+              onLabel="Oui"
+              offLabel="Non"
+              onIcon="pi pi-check"
+              offIcon="pi pi-times"
+              styleClass="toggle-regional">
+            </p-toggleButton>
+            <div class="toggle-hint">Régional</div>
+          </div>
+
+          <div class="toggle-card">
+            <p-toggleButton
+              [(ngModel)]="application.agence"
+              name="agence"
+              onLabel="Oui"
+              offLabel="Non"
+              onIcon="pi pi-check"
+              offIcon="pi pi-times"
+              styleClass="toggle-agence">
+            </p-toggleButton>
+            <div class="toggle-hint">Agence</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div slot="footer">
+    <button
+      pButton
+      label="Fermer"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="drawer.closeDrawer()">
+    </button>
+
+    <ng-container [ngSwitch]="action">
+      <button
+        *ngSwitchCase="actionType.ADD"
+        type="button"
+        pButton
+        label="Enregistrer"
+        icon="pi pi-check"
+        class="btn-primary"
+        (click)="saveApplication(application)">
+      </button>
+
+      <button
+        *ngSwitchCase="actionType.EDIT"
+        type="button"
+        pButton
+        label="Modifier"
+        icon="pi pi-check"
+        class="btn-primary"
+        (click)="edit(application)">
+      </button>
+    </ng-container>
+  </div>
+</app-animated-drawer>
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

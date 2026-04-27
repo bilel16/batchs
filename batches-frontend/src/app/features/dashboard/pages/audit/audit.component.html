@@ -1,0 +1,87 @@
+<div class="page-audit">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Journal d'audit</h1>
+      <p>Historique de toutes les actions effectuées dans le système</p>
+    </div>
+    <button class="btn-refresh" (click)="load()" [disabled]="loading()">
+      <i class="pi" [class.pi-refresh]="!loading()" [class.pi-spin]="loading()" [class.pi-spinner]="loading()"></i>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert-error">
+      <i class="pi pi-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-field">
+      <i class="pi pi-user"></i>
+      <input type="text" [(ngModel)]="filters.user" placeholder="Filtrer par utilisateur…" class="filter-input" />
+    </div>
+    <div class="filter-field">
+      <i class="pi pi-tag"></i>
+      <input type="text" [(ngModel)]="filters.action" placeholder="Filtrer par action…" class="filter-input" />
+    </div>
+    <button class="btn-clear" (click)="reset()" title="Réinitialiser">
+      <i class="pi pi-times"></i>
+    </button>
+    <span class="log-count">{{ filtered().length }} entrée(s)</span>
+  </div>
+
+  <!-- Table -->
+  <div class="card mt-3">
+    @if (loading()) {
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i> Chargement…
+      </div>
+    } @else if (!filtered().length) {
+      <div class="empty-table">
+        <i class="pi pi-list"></i>
+        <p>Aucun log trouvé.</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Horodatage</th>
+              <th>Utilisateur</th>
+              <th>Action</th>
+              <th>Détail</th>
+              <th>Adresse IP</th>
+              <th>Résultat</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of filtered(); track log.id) {
+              <tr>
+                <td class="mono timestamp">{{ formatDate(log.timestamp) }}</td>
+                <td>
+                  <span class="user-chip">
+                    <i class="pi pi-user"></i> {{ log.username }}
+                  </span>
+                </td>
+                <td>
+                  <span class="action-badge" [class]="actionColor(log.action)">{{ log.action }}</span>
+                </td>
+                <td class="detail-cell">{{ log.detail }}</td>
+                <td class="mono ip">{{ log.ip }}</td>
+                <td>
+                  <span class="badge" [class]="resultClass(log.result)">{{ log.result }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+</div>

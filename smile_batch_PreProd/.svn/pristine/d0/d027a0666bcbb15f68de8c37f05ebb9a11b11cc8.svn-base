@@ -1,0 +1,23 @@
+# Properties file with JDBC-related settings.
+# Applied by PropertyPlaceholderConfigurer from "applicationContext.xml".
+# Targeted at system administrators, to avoid touching the context XML files.
+
+#jdbc.driverClassName=org.hsqldb.jdbcDriver
+#jdbc.url=jdbc:hsqldb:hsql://localhost
+#jdbc.username=sa
+#jdbc.password=
+
+jdbc.driverClassName=oracle.jdbc.OracleDriver
+#---- base fonctionelle test
+#jdbc.url=jdbc:oracle:thin:@10.1.9.1:1521:projet
+#---- base fonctionelle developpement
+#jdbc.url=jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(HOST=10.1.9.212)(PROTOCOL=TCP)(PORT=1551))(CONNECT_DATA=(SERVICE_NAME=SMILE.bna.tn)(SERVER=DEDICATED)))
+#jdbc.url=jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(HOST=10.1.9.214)(PROTOCOL=TCP)(PORT=1551))(CONNECT_DATA=(SERVICE_NAME=SMILE.bna.tn)(SERVER=DEDICATED)))
+
+jdbc.url=jdbc:oracle:thin:@BNABD:1541:bnaprod
+#jdbc.url=jdbc:oracle:thin:@//192.168.241.22:1521/projet
+jdbc.username=smile
+jdbc.password=smile
+
+
+imageDatabase.lobHandler=oracleLobHandler

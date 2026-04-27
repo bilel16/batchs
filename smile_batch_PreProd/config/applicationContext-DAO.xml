@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+
+
+
+	<!--Initialize Abstract Class Traitement -->
+
+
+	<!-- DAO Configuration ******************************* ******************************* 
+		******************************* -->
+	<bean id="produitDAO"
+		class="com.bna.smile.model.domainecontratcompte.souscriptioncontratcompte.dao.ProduitDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select max(num_seq_pers)+1 from   PERSONNE  ]]>
+			</value>
+		</property>
+	</bean>
+	
+		<bean id="assVieEpargneDAO"
+		class="com.bna.smile.model.assVieEpargneEtude.dao.AssVieEpargneDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+	
+	
+
+	<bean id="personneDAO"
+		class="com.bna.smile.model.domainecontratcompte.souscriptioncontratcompte.dao.PersonneDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   PERSONNE  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="operationCompteDAO"
+		class="com.bna.smile.model.domainecontratcompte.souscriptioncontratcompte.dao.OperationCompteDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   Operation_Compte  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="mandatDAO"
+		class="com.bna.smile.model.domainecontratcompte.procuration.dao.MandatDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   Mandat  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="sequenceDAO" class="com.bna.smile.model.domainecommun.dao.SequenceDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   ETAT_CONTRAT  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="creditDAO" class="com.bna.smile.model.domainecommun.dao.CreditDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   tranchecci  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="demandeChequeDAO"
+		class="com.bna.smile.model.domainecontratcompte.moyensPaiement.dao.DemandeChequeDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   DEMANDE_CHEQUE  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="guichetDAO" class="com.bna.smile.model.domaineguichet.dao.GuichetDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   Operation  ]]>
+			</value>
+		</property>
+	</bean>
+
+
+	<bean id="demandeCarteDAO"
+		class="com.bna.smile.model.domainecontratcompte.moyensPaiement.dao.DemandeCarteDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   DEMANDE_CARTE  ]]>
+			</value>
+		</property>
+	</bean>
+
+
+	<bean id="oppositionMoyPaiementDAO"
+		class="com.bna.smile.model.domainecontratcompte.moyensPaiement.dao.OppositionMoyPaiementDAO">
+
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   OPPOSITION_MOYEN_PAIEMENT  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="journeeDAO" class="com.bna.commun.vo.JourneeDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   DEMANDE_CARTE  ]]>
+			</value>
+		</property>
+	</bean>
+
+
+	<bean id="caisseDAO" class="com.bna.smile.model.domainecaisse.dao.CaisseDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="tableauDeBordDAO" class="com.bna.smile.model.statistique.dao.TableauDeBordDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="statistiqueSouscriptionDAO"
+		class="com.bna.smile.model.statistique.dao.StatistiqueSouscriptionDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="statistiqueProcurationDAO"
+		class="com.bna.smile.model.statistique.dao.StatistiqueProcurationDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="statistiqueMoyenPayementDAO"
+		class="com.bna.smile.model.statistique.dao.StatistiqueMoyenPayementDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+
+	</bean>
+	<bean id="statistiqueModificationDonneeDAO"
+		class="com.bna.smile.model.statistique.dao.StatistiqueModificationDonneeDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+
+	</bean>
+
+	<bean id="statistiqueCarnetDeChequeDAO"
+		class="com.bna.smile.model.statistique.dao.StatistiqueCarnetDeChequeDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="statistiqueCarteDAO" class="com.bna.smile.model.statistique.dao.StatistiqueCarteDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="statistiqueOppositionDAO"
+		class="com.bna.smile.model.statistique.dao.StatistiqueOppositionDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="modificationDonneeClientDAO"
+		class="com.bna.smile.model.domainecontratcompte.modificationdonneesclient.dao.ModificationDonneeClientDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   MOUVEMENTS_CAISSES  ]]>
+			</value>
+		</property>
+	</bean>
+
+
+	<bean id="placementDAO" class="com.bna.smile.model.domaineplacement.dao.PlacementDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   PRODUIT_PLACEMENT  ]]>
+			</value>
+		</property>
+	</bean>
+
+
+	<bean id="croDAO" class="com.bna.commun.vo.CroDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from CRO  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="journeeDAOFrm" class="com.bna.commun.dao.JourneeDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from journee_structure ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="operationMoyPaiDAO" class="com.bna.commun.vo.OperationMoyPaiDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from OPERATION_MOY_PAY  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="virementGlobalDAO" class="com.bna.smile.model.virement.dao.VirementGlobalDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from GLOBAL_VIREMENT  ]]>
+			</value>
+		</property>
+	</bean>
+
+
+
+	<bean id="prelevementDAO" class="com.bna.smile.model.prelevement.dao.PrelevementDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from details_prelevements  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="compensationDAO"
+		class="com.bna.smile.model.domainecompensation.gestionrejet.dao.CompensationDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from CHEQUE  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="rejetDAO"
+		class="com.bna.smile.model.traitementCompensationRecu.dao.RejetDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   Operation  ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="migrationSoldeCompteDAO"
+		class="com.bna.smile.model.histSoldePascale.dao.MigrationSoldeCompteDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from structure ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="discordanceCompEffetDAO"
+		class="com.bna.smile.model.domainecompensation.gestionrejet.dao.DiscordanceCompEffetDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from structure ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="discordanceSoldeDAO"
+		class="com.bna.smile.model.domainecompensation.gestionrejet.dao.DiscordanceSoldeDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from structure ]]>
+			</value>
+		</property>
+	</bean>
+	<bean id="histSoldePascalDAO"
+		class="com.bna.smile.model.histSoldePascale.dao.HistSoldePascaleDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select count(*) from structure ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="AFBDAO" class="com.bna.smile.model.domainecommun.dao.AFBDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select *  from dual  ]]>
+			</value>
+		</property>
+	</bean>
+	
+	<bean id="TelexDAO" class="com.bna.smile.model.telex.dao.TelexDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select *  from dual  ]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="godDAO" class="com.bna.smile.model.compteGod.dao.GodDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+				<![CDATA[ select count(*) from   BLOCAGE_GOD  ]]>
+			</value>
+		</property>
+	</bean>
+	
+	<bean id="envoiSmsDAO" class="com.bna.smile.model.SMS.dao.EnvoiSmsDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlQuery">
+			<value>
+					<![CDATA[ select *  from dual  ]]>
+			</value>
+		</property>
+	</bean>
+	
+	<bean id="assuranceVoyageDAO" class="com.bna.smile.model.banqueAssurance.dao.AssuranceVoyageDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+	
+	<bean id="assuranceAmiSereniteDAO"
+		class="com.bna.smile.model.banqueAssurance.dao.AssuranceSereniteDAO">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+
+</beans>

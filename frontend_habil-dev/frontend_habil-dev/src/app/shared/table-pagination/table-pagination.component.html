@@ -1,0 +1,289 @@
+<div class="card">
+
+  <div class="flex items-center justify-between">
+    <h5 class="m-0" style="font-weight: 600">
+      Total des lignes :
+      <span style="font-weight: 700">{{ totalRecords }}</span>
+    </h5>
+  </div>
+
+  <p-table
+    #dt
+    [value]="data"
+    [lazy]="true"
+    (onLazyLoad)="lazyLoad.emit($event)"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    showGridlines
+    [paginator]="true"
+    [tableStyle]="{ 'min-width': '100%' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} données"
+    [showCurrentPageReport]="true"
+    [autoLayout]="true"
+    [filterDelay]="500"
+    [loading]="false"
+  >
+  <!------------- Start Header ------------------->
+    <ng-template #header>
+      <tr class="custom-tr">
+        <th scope="col">#</th>
+        @for (col of columns; track col.field) {
+          <ng-container>
+            <th [pSortableColumn]="col.field" [ngStyle]="getColumnStyle(col)">
+              <div class="flex justify-between items-center">
+                {{ col.header }}
+                @if(col.sortable) {
+                  <p-sortIcon [field]="col.field" />
+                }
+              </div>
+            </th>
+          </ng-container>
+        }
+        @if(showActions) {
+          <th [ngStyle]="styleAction" style="font-weight: bold; font-size: 15px">Actions</th>
+        }
+      </tr>
+      <tr>
+        <th scope="col"></th>
+        @for (col of columns; track col.field) {
+          <th style="background-color: white" scope="col">
+            @if(col.filter) {
+              <div class="input-icon-wrapper" [ngStyle]="col.filterStyle">
+                @if(col.filterType === 'input') {
+                  <i class="pi pi-filter search-icon"></i>
+                  @if(isFiltered[col.field]) {
+                    <i class="pi pi-filter-fill search-icon" [class.active]="isFiltered[col.field]"></i>
+                  }
+                  <input
+                    type="text"
+                    [style]="col.filterStyle"
+                    pInputText
+                    placeholder="Rechercher ..."
+                    [(ngModel)]="filterValues[col.field]"
+                    (ngModelChange)="onFilterChange(col.field, 'input')"
+                  />
+                }
+                @if(col.filterType === 'select') {
+                  <p-select
+                    [options]="getDropdownOptions(col.filterOptions)"
+                    [(ngModel)]="filterValues[getFieldKey(col.field)]"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    [filterBy]="'label'"
+                    [showClear]="hasFilterValue(col)"
+                    [style]="col.filterStyle"
+                    [panelStyle]="col.filterSelectStyle"
+                    appendTo="body"
+                    (onChange)="onFilterChange(col.field, 'select')"
+                    >
+                    <ng-template pTemplate="selectedItem" let-selectedOption>
+                      <div>{{ selectedOption?.label }}</div>
+                    </ng-template>
+
+                    <ng-template pTemplate="item" let-option>
+                      <div>{{ option.label }}</div>
+                    </ng-template>
+                  </p-select>
+                }
+            </div>
+            }
+          </th>
+        }
+        @if(showActions) {
+          <th scope="col"></th>
+        }
+      </tr>
+    </ng-template>
+
+    <!------------- End Header ------------------->
+
+    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+      <tr (click)="onRowClick(item)" style="cursor: pointer">
+        <td>{{ rowIndex + 1 }}</td>
+        @for (col of columns; track col.field) {
+          <td>
+            <ng-container [ngSwitch]="col.type">
+              <!-- Text -->
+              <span *ngSwitchCase="'text'">
+                {{ getNestedValue(item, col.field) }}</span
+              >
+
+              <!-- Number -->
+              <span *ngSwitchCase="'number'">
+                {{ getNestedValue(item, col.field) }}</span
+              >
+
+              <!-- Date -->
+              <span *ngSwitchCase="'date'">{{
+                getNestedValue(item, col.field) | date : "mediumDate"
+              }}</span>
+
+              <!-- Tag (PrimeNG p-tag component) -->
+              <ng-container *ngSwitchCase="'tag'">
+                @if(getNestedValue(item, col.field)) {
+                  <p-tag [value]="getNestedValue(item, col.field)"
+                         [severity]=" col.severityFn ? col.severityFn(getNestedValue(item, col.field)) : 'info'"
+                  ></p-tag>
+                }
+                @if(!getNestedValue(item, col.field)) {
+                  <!-- Show placeholder when null -->
+                  <span class="text-muted">-</span>
+                }
+              </ng-container>
+              <!-- TagBoolean (PrimeNG p-tag component) -->
+              <p-tag
+                class="tagBoolean"
+                *ngSwitchCase="'tagBoolean'"
+                [value]="getNestedValue(item, col.field) | booleanToFrench"
+                [severity]="
+                  col.severityFn
+                    ? col.severityFn(getNestedValue(item, col.field))
+                    : 'info'
+                "
+              ></p-tag>
+
+              <!-- Default fallback -->
+              <span *ngSwitchDefault>{{ getNestedValue(item, col.field) }}</span>
+            </ng-container>
+          </td>
+        }
+
+        @if(showActions) {
+          <td>
+            <div class="actions">
+              <!-- View Button -->
+              @if(actions.view) {
+                <button
+                  class="action-btn action-btn-view"
+                  (click)="onView.emit(item)"
+                  title="View">
+                  <i class="pi pi-eye"></i>
+                </button>
+              }
+
+              @if(actions.edit) {
+                <!-- Edit Button -->
+                <button
+                  class="action-btn action-btn-edit"
+                  (click)="onEdit.emit(item)"
+                  title="Edit"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+              }
+              @if(actions.notification) {
+                <!-- Notification Button -->
+                <button
+                  class="action-btn action-btn-notification"
+                  (click)="onNotification.emit(item)"
+                  title="Notification"
+                >
+                  <i class="pi pi-bell"></i>
+                  <span class="notification-badge"> 2 </span>
+                </button>
+              }
+              @if(actions.send) {
+                <!-- Send Button -->
+                <button
+                  class="action-btn action-btn-send"
+                  (click)="onSend.emit(item)"
+                  title="Send"
+                >
+                  <i class="pi pi-send"></i>
+                </button>
+              }
+
+              @if(actions.delete) {
+              <!-- Delete Button -->
+                <button
+                  class="action-btn action-btn-delete"
+                  (click)="onDelete.emit(item)"
+                  title="Delete"
+                >
+                  <svg
+                    class="trash-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <!-- Lid/Top -->
+                    <g class="trash-lid">
+                      <path
+                        d="M3 6h18"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                      <path
+                        d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </g>
+
+                    <!-- Body -->
+                    <g class="trash-body">
+                      <path
+                        d="M19 6v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+
+                      <!-- 3 Vertical Lines Inside -->
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="17"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                      <line
+                        x1="9"
+                        y1="10"
+                        x2="9"
+                        y2="17"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                      <line
+                        x1="15"
+                        y1="10"
+                        x2="15"
+                        y2="17"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </g>
+                  </svg>
+                </button>
+              }
+            </div>
+          </td>
+        }
+
+      </tr>
+    </ng-template>
+
+    <!-------- End Loading template ( body ) --------->
+
+    <!---------------- Empty Message    change it to @empty ----------------->
+    <ng-template #emptymessage>
+      <tr>
+        <td style="text-align: center" [attr.colspan]="columns.length + 1">
+          Aucune donnée trouvée.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,33 @@
+.toggle-container {
+  display: flex;
+  background-color: #f8f9fa;
+border-radius: 0px 25px 0px 20px; 
+ padding: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  width: fit-content;
+}
+
+/* Default tab button */
+.toggle-container button {
+  flex: 0 0 auto; /* auto width based on text */
+  border: none;
+  white-space: nowrap;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 8px 28px;
+  /* border-radius: 25px 0px 20px;  OLD VALUE IF EVER NEEDED WHO KNOWS*/
+border-radius: 0px 25px 0px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+   white-space: normal;   /* allows line break if too long */
+  word-break: break-word; /* break words if needed */
+  text-align: center;     /* optional: center text on multiple lines */
+}
+
+/* Active (selected) tab */
+.toggle-container button.active {
+  background: linear-gradient(to right, #6ee7b7, #10b981);
+  color: white;
+border-radius: 0px 25px 0px 20px;  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}

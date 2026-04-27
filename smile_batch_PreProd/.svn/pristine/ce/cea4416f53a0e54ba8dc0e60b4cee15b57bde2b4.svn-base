@@ -1,0 +1,465 @@
+package com.bna.smile.model.domaineplacement.traitement;
+
+import com.bna.commun.model.AvancRembLiquid;
+import com.bna.commun.model.ContratCpt;
+import com.bna.commun.model.ContratCptId;
+import com.bna.commun.model.DetailsOperationPlacement;
+import com.bna.commun.model.InteretServi;
+import com.bna.commun.model.MandPersOperPlac;
+//import com.bna.commun.model.Personnel;
+import com.bna.commun.model.MandatOperation;
+import com.bna.commun.model.OperationMoyPay;
+import com.bna.commun.model.StructureDomaine;
+import com.bna.commun.model.Tache;
+import com.bna.commun.model.TacheId;
+import com.bna.commun.model.TraceMandat;
+import com.bna.commun.service.ICrudService;
+import com.bna.commun.traitements.InsertOperationMoyPayTrt;
+import com.bna.commun.traitements.Traitement;
+import com.bna.commun.traitements.UpdateSoldTrt;
+import com.bna.commun.util.ContextHandler;
+import com.bna.commun.util.DateHandler;
+import com.bna.commun.util.StrHandler;
+import com.bna.commun.vo.ContratCptSold;
+import com.bna.smile.model.constant.Constants;
+import com.bna.smile.model.domainecommun.model.Listes;
+import com.bna.smile.model.domainecontratcompte.procuration.traitement.UpdateMandatOperationTrt;
+import com.bna.smile.model.domaineplacement.model.ParamAbonnementement;
+import com.bna.smile.model.domaineplacement.model.ParamContratPlacement;
+
+
+import com.bna.smile.model.domaineplacement.model.ParamLiquidation;
+
+import com.oxia.fwk.context.Context;
+import com.oxia.fwk.core.ISearchEngine;
+import com.oxia.fwk.core.IValueObject;
+import com.oxia.fwk.core.ValueObject;
+
+//import com.oxia.security.abc.model.Personnel;
+
+import com.oxia.fwk.searchengine.SearchEngine;
+
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+import java.util.Iterator;
+
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.userdetails.UserDetails;
+
+
+
+import org.springframework.orm.hibernate3.HibernateTemplate;
+
+public class ValiderLiquidationPlacementTrt extends Traitement{
+    public ValiderLiquidationPlacementTrt() {
+    }
+    
+    
+    public IValueObject perform (IValueObject vo ) {     
+     
+    Context context = ContextHandler.getContext();
+    ParamLiquidation paramLiquidation = (ParamLiquidation)vo;             
+    ICrudService crudService =(ICrudService)context.getBean("CURService");
+         
+       try{ 
+       
+            this.setCroFlag(false);  
+                ///----------- création détails opération  ----------------------                
+                DetailsOperationPlacement detailsOperationPlacement        = new DetailsOperationPlacement();
+                DetailsOperationPlacement ancienDetailsOperationPlacement  = new DetailsOperationPlacement();
+                
+                Tache tache = new Tache();
+                TacheId tacheId = new TacheId();
+                
+                if(!paramLiquidation.getAvancRembLiquid().getDetailsOperationPlacements().equals(null)){
+                
+                    for (Iterator it = paramLiquidation.getAvancRembLiquid().getDetailsOperationPlacements().iterator();it.hasNext(); ) { 
+                        DetailsOperationPlacement detailsOperationPlacementTemp = (DetailsOperationPlacement)it.next();
+                        if (detailsOperationPlacementTemp.getNumSeqDopl()==null){
+                            detailsOperationPlacement =detailsOperationPlacementTemp;
+                            detailsOperationPlacement.setAvancRembLiquid(paramLiquidation.getAvancRembLiquid());
+                            detailsOperationPlacement.setContratPlacement(paramLiquidation.getAvancRembLiquid().getContratPlacement());                            
+ 
+                           //break;
+                        }else ancienDetailsOperationPlacement=detailsOperationPlacementTemp;
+
+                    }
+
+                    ///----------- création opération Moyen de payement ----------------------                
+                     if(ancienDetailsOperationPlacement.getTypePieceByCodTpssTpce() != null){
+                        detailsOperationPlacement.getOperationMoyPay().setTypePieceDemandeur(ancienDetailsOperationPlacement.getTypePieceByCodTpssTpce());
+                        detailsOperationPlacement.getOperationMoyPay().setNumPcedOmp(ancienDetailsOperationPlacement.getNumNpssDopl());
+                     }
+                    /*if(ancienDetailsOperationPlacement.getMandPersOperPlacs()!=null && ancienDetailsOperationPlacement.getMandPersOperPlacs().size()>0 ){
+                        if (detailsOperationPlacement.getMandatOperation()!=null){ ///*** mandat special (maj enveloppe utilisée)
+                            detailsOperationPlacement.getMandatOperation().setMontUtilMaop(detailsOperationPlacement.getMandatOperation().getMontUtilMaop()+avancRembLiquid.getMontArlArl());
+                            UpdateMandatOperationTrt updateMandatOperationTrt =new UpdateMandatOperationTrt();
+                            MandatOperation mandatOperation = (MandatOperation)updateMandatOperationTrt.exec(detailsOperationPlacement.getMandatOperation()) ;
+                            detailsOperationPlacement.getOperationMoyPay().setMandatOperation(mandatOperation);
+                        }
+                    }*/
+                    
+                    if(ancienDetailsOperationPlacement.getMandPersOperPlacs().size()>0){
+                        detailsOperationPlacement.getOperationMoyPay().setCodDemOmp("M");
+                    }else if(ancienDetailsOperationPlacement.getCoTitulaire()!=null){
+                       detailsOperationPlacement.getOperationMoyPay().setCodDemOmp("C");                        
+                    }
+                    
+                    InsertOperationMoyPayLiquidationPlacTrt insertOperationMoyPayLiquidationPlacTrt = new InsertOperationMoyPayLiquidationPlacTrt();
+                    detailsOperationPlacement.getOperationMoyPay().setCodRefbOmp(detailsOperationPlacement.getOperationMoyPay().getCodRefbOmp()+"/"+paramLiquidation.getAvancRembLiquid().getNumSeqArl());
+                    
+                    if(paramLiquidation.getAvancRembLiquid().getCodToprArl().equals(Constants.CODE_LIQUIDATION_ECHEANCE)){
+                        // cas de la liquidation à echeance...
+                         this.setVerifDomaine(false);
+                         tacheId.setCodTachTach(Constants.COD_TACHE_DEMANDE_LIQUIDATION_ANTICIPE);
+                         tacheId.setCodOperOper(Constants.COD_OPER_LIQUID_AECH_PLAC);
+                         tache.setTacheId(tacheId);
+                         detailsOperationPlacement.setTache(tache);
+                         
+                        if (paramLiquidation.getAvancRembLiquid().getNumSeqArl()==null){                       
+                            HibernateTemplate  hibernateTemplate = (HibernateTemplate) context.getBean("hibernateTemplate");
+                            hibernateTemplate.evict(paramLiquidation.getAvancRembLiquid());
+                            crudService.create(paramLiquidation.getAvancRembLiquid());
+                        }
+                    }
+                    
+                    OperationMoyPay operationMoyPay = (OperationMoyPay)insertOperationMoyPayLiquidationPlacTrt.exec(detailsOperationPlacement);
+                    
+                  // Fin de l'opération principale : Liq Anticipée ou à échéance ( 309 - 311)  
+                    
+                    ///----------- création opération Moyen de payement (interet) ----------------------                
+                if(!paramLiquidation.getAvancRembLiquid().getCodTypiArl().equals("N")){///***
+                 OperationMoyPay operationMoyPayPrincipal = new OperationMoyPay();
+                    if(operationMoyPay.getNumOperOmp() != null){
+                    //dans le cas ou il ya eu insertion de l'operation moyen de paiement CAT  - CATDC
+                        HibernateTemplate  hibernateTemplate = (HibernateTemplate) context.getBean("hibernateTemplate");
+                        hibernateTemplate.evict(operationMoyPay);                        
+                        
+                        operationMoyPayPrincipal.setNumOperOmp(operationMoyPay.getNumOperOmp());
+                        operationMoyPay.setOperationMoyPayM(operationMoyPayPrincipal);
+                        detailsOperationPlacement.setOperationMoyPay(operationMoyPayPrincipal);
+                        operationMoyPay.setMontSoldCcpt(operationMoyPay.getMontApreOmp());
+                    }else {
+                        //dans le cas ou il n' ya pas eu insertion de l'operation moyen de paiement BC  - BCDC
+                        operationMoyPay = detailsOperationPlacement.getOperationMoyPay();
+                        operationMoyPay.setMontSoldCcpt(paramLiquidation.getAvancRembLiquid().getContratPlacement().getContratCpt().getMontSoldCcpt());
+                    } 
+                    
+                    tacheId.setCodTachTach(Constants.COD_TACHE_INTERET_LIQUID_ANTICIPE);                    
+                    operationMoyPay.setTache(tache);
+                    operationMoyPay.setMontDinOmp(new Long(new Double(new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue()).longValue()));                    
+                    operationMoyPay.setDatValOmp(paramLiquidation.getAvancRembLiquid().getDatValiArl());///*** date valeur interet
+                    paramLiquidation.setDateValInteretServLiq(paramLiquidation.getAvancRembLiquid().getDatValiArl());
+                     
+                    
+                    if(paramLiquidation.getAvancRembLiquid().getCodTypiArl().equals("P")){
+                      // si type de payement precompté alors les interets seront perçus  
+                        tacheId.setCodOperOper(Long.valueOf(paramLiquidation.getOperationInteretLiq()));
+                        operationMoyPay.setCodSensOmp(Constants.COD_SENS_DB);
+                        if(operationMoyPay.getNumOperOmp() != null){
+                          operationMoyPay.setMontApreOmp(Long.valueOf(new Long(new Double(((new Double(operationMoyPay.getMontApreOmp()).doubleValue())-(new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue())) ).longValue())));
+                        }else{
+                          operationMoyPay.setMontApreOmp(Long.valueOf(new Long(new Double(((new Double(operationMoyPay.getMontSoldCcpt()).doubleValue())-(new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue())) ).longValue())));
+                          detailsOperationPlacement.setOperationMoyPay(operationMoyPay);
+                        }
+                    }else {
+                        // si type de payement postCompté alors les interets seront servis 
+                         if(paramLiquidation.getAvancRembLiquid().getCodToprArl().equals(Constants.CODE_LIQUIDATION_ANTICIPE)){
+                           tacheId.setCodOperOper(Long.valueOf(paramLiquidation.getOperationInteretLiq()));  
+                         }else{
+                             tacheId.setCodOperOper(Constants.OPER_INT_POST_SOUSC_PLAC);  
+                         }                        
+                        operationMoyPay.setCodSensOmp(Constants.COD_SENS_CR);
+                        if(operationMoyPay.getNumOperOmp() != null){
+                          operationMoyPay.setMontApreOmp(Long.valueOf(new Long(new Double(((new Double(operationMoyPay.getMontApreOmp()).doubleValue())+(new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue())) ).longValue())));
+                        }else{
+                          operationMoyPay.setMontApreOmp(Long.valueOf(new Long(new Double(((new Double(operationMoyPay.getMontSoldCcpt()).doubleValue())+(new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue())) ).longValue())));
+                          detailsOperationPlacement.setOperationMoyPay(operationMoyPay);
+                        } 
+                    }
+                    
+                    tache.setTacheId(tacheId);                   
+                    InsertOperationMoyPayTrt insertOperationMoyPayTrt = new InsertOperationMoyPayTrt(); 
+                    OperationMoyPay  operationMoyPayInserer = new OperationMoyPay();
+                    operationMoyPayInserer = (OperationMoyPay)insertOperationMoyPayTrt.exec(operationMoyPay);
+                    
+                  }
+
+                    ///*** MAJ du montant actualisé dans le contrat compte                    
+                    ContratCptId contratCptId = paramLiquidation.getAvancRembLiquid().getContratPlacement().getContratCpt().getContratCptId();
+                    ISearchEngine searchEngine = (SearchEngine)context.getBean("searchEngine");
+                    /* Charger le ContratCpt existante */
+                    ContratCpt contratCpt =(ContratCpt) searchEngine.get(ContratCpt.class,contratCptId);
+                    paramLiquidation.setContratCpt(contratCpt);
+                    ContratCptSold contratCptSold = new ContratCptSold();
+                    contratCptSold.setContratCpt(contratCpt);
+                    if(paramLiquidation.getAvancRembLiquid().getCodTypiArl().equals("P")){
+                        //si type de payement precompté alors les interets seront perçus  
+                       if(detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CATDC_PLAC)
+                            || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CAT_PLAC)
+                            || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BNAPLC_PLAC)){                       
+                            // CAT DIN DC alors on met à jour le solde par le capital - interet percus
+                             contratCptSold.setSens("C");
+                            contratCptSold.setSolde(Long.valueOf(new Long(new Double(((new Double(paramLiquidation.getAvancRembLiquid().getMontArlArl()).doubleValue())-(new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue())) ).longValue())));                      
+                       }else if(detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BC_PLAC)
+                           // BC DIN DC alors on met à jour le solde par  (- interet percus) 
+                            || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BCDC_PLAC)){                       
+                           contratCptSold.setSens("D");
+                           contratCptSold.setSolde(Long.valueOf(new Long(new Double(((new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue()))).longValue())));                      
+                          }
+                    }else {
+                        contratCptSold.setSens("C");
+                        if(detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CATDC_PLAC)
+                             || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CAT_PLAC)              
+                             || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BNAPLC_PLAC)){
+                             // CAT DIN DC alors on met à jour le solde par le capital - interet percus
+                              contratCptSold.setSolde(Long.valueOf(new Long(new Double(((new Double(paramLiquidation.getAvancRembLiquid().getMontArlArl()).doubleValue())+ (new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue())) ).longValue())));                      
+                        }else if(detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BC_PLAC)
+                            // BC DIN DC alors on met à jour le solde par  (- interet percus) 
+                             || detailsOperationPlacement.getAvancRembLiquid().getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BCDC_PLAC)){                                                   
+                            contratCptSold.setSolde(Long.valueOf(new Long(new Double(((new Double(paramLiquidation.getAvancRembLiquid().getMontInetArl()).doubleValue()))).longValue())));                      
+                         }                        
+                    } 
+                    
+                    UpdateSoldTrt updateSoldTrt = new UpdateSoldTrt();
+                    contratCpt = (ContratCpt)updateSoldTrt.exec(contratCptSold);
+
+                    
+                    if(paramLiquidation.getAvancRembLiquid().getCodTypiArl().equals("N")){
+                       // le cas d'un placement precompté, liquidé à échance ( besoin du batch ) (pas d'opération de moyen de paiement)
+                        detailsOperationPlacement.setOperationMoyPay(null);                       
+                    }
+                    
+                    crudService.create(detailsOperationPlacement);         
+                    
+                } 
+           ///--------------------------------------------------------------
+           ///----------- MAJ avance sur capital  et affectation détails opération ----------------------
+           ///--------------------------------------------------------------
+                
+            if(!paramLiquidation.getAvancRembLiquid().equals(null)){
+              
+                ///*** MAJ du montant actualisé dans le contrat placement
+                if(!paramLiquidation.getAvancRembLiquid().getContratPlacement().equals(null)){
+                    if(paramLiquidation.getAvancRembLiquid().getCodTyplArl().equals(String.valueOf("T"))){
+                     // si la liquidation est totale alors l'etat du placement sera LIQUIDE, sinon il reste encore valide.
+                      paramLiquidation.getAvancRembLiquid().getContratPlacement().setCodEtatCpla(Constants.ETAT_CPT_PLACEMENT_LIQUIDE);
+                      paramLiquidation.getAvancRembLiquid().getContratPlacement().setDatLiqCpla(paramLiquidation.getDateComptLiquidation());
+                    }
+                    
+                    crudService.update(paramLiquidation.getAvancRembLiquid().getContratPlacement()); 
+                }
+                ///*** Insertion de mand_pers_oper_plac du montant actualisé dans le contrat placement
+                if(ancienDetailsOperationPlacement.getMandPersOperPlacs()!=null && ancienDetailsOperationPlacement.getMandPersOperPlacs().size()>0 ){
+                    InsertMandPersOperPlacTrt insertMandPersOperPlacTrt = new InsertMandPersOperPlacTrt();
+                    for (Iterator it = ancienDetailsOperationPlacement.getMandPersOperPlacs().iterator();it.hasNext(); ) { 
+                        MandPersOperPlac mandPersOperPlac = (MandPersOperPlac)it.next();
+                        mandPersOperPlac.getMandPersOperPlacId().setNumSeqDopl(detailsOperationPlacement.getNumSeqDopl());
+                        HibernateTemplate  hibernateTemplate = (HibernateTemplate)context.getBean("hibernateTemplate");
+                        hibernateTemplate.evict(mandPersOperPlac);
+
+                        mandPersOperPlac = (MandPersOperPlac)insertMandPersOperPlacTrt.exec(mandPersOperPlac);
+                    }
+                }
+            } 
+                paramLiquidation.setInteretServi(affecterDonneesInteretServi(paramLiquidation.getAvancRembLiquid()));
+               
+                
+                if(paramLiquidation.getAvancRembLiquid().getCodToprArl().equals(Constants.CODE_LIQUIDATION_ANTICIPE)){
+                    if (paramLiquidation.getAvancRembLiquid().getNumSeqArl()!=null){
+                        crudService.update(paramLiquidation.getAvancRembLiquid()); 
+                    }
+                }
+                
+                                
+                ///*---------------------------- réajustement de l'abonnement ------
+                 if(paramLiquidation.getAvancRembLiquid().getCodToprArl().equals(Constants.CODE_LIQUIDATION_ANTICIPE)){
+                     if(paramLiquidation.getAvancRembLiquid().getCodTyplArl().equalsIgnoreCase("T")){
+                         ParamAbonnementement paramAbonnementement = new ParamAbonnementement();
+                         paramAbonnementement.setDatDebAbpl(paramLiquidation.getAvancRembLiquid().getContratPlacement().getDatCreCpla());
+                         paramAbonnementement.setDateLiquidationAnticipe(paramLiquidation.getDateComptLiquidation());
+                         paramAbonnementement.setDateValeurLiquidation(paramLiquidation.getDateValInteretServLiq());
+                         paramAbonnementement.setMontTotAbpl(Long.valueOf(paramLiquidation.getAvancRembLiquid().getMontArlArl().longValue()));
+                         paramAbonnementement.setNumSeqArl(paramLiquidation.getAvancRembLiquid().getNumSeqArl());
+                         paramAbonnementement.setContratPlacement(paramLiquidation.getAvancRembLiquid().getContratPlacement());
+                         paramAbonnementement.setAvancRembLiquid(paramLiquidation.getAvancRembLiquid());
+                         paramAbonnementement.setTypeOperation("LA");
+                         paramAbonnementement.setCodeOperation(Long.valueOf(paramLiquidation.getOperationInteretLiq()));
+                         paramAbonnementement.setDureeReelPlc(paramLiquidation.getDureeReelPlacement());
+                         paramAbonnementement.setInteretsReelPlc(paramLiquidation.getInteretReelPlacement());
+                         paramAbonnementement.setNumTauiCpla(paramLiquidation.getAvancRembLiquid().getNumTauiArl());
+                         ReajusterAbonnementLiquidationTrt reajusterAbonnementLiquidationTrt = new ReajusterAbonnementLiquidationTrt();
+                         paramAbonnementement = (ParamAbonnementement)reajusterAbonnementLiquidationTrt.exec(paramAbonnementement);
+                     }
+                 }else if(paramLiquidation.getAvancRembLiquid().getCodToprArl().equals(Constants.CODE_LIQUIDATION_ECHEANCE)){
+                     if(paramLiquidation.getContratPlacement().getCodPintCpla().equals(Constants.PLACEMENT_POSTCOMPTE)){
+                         // generer le CRO de l'opeartion 613  en cas de placement postcompté dans le cas d'une operation de liq à echeance   
+                       this.setCroFlag(true);   
+                     }
+                     
+                   // opération d'extourne d'abonnement en cas de liquidation à échéance...
+                    ExtourneAbonnInteretServiLiqTrt extourneAbonnInteretServiLiqTrt = new ExtourneAbonnInteretServiLiqTrt();
+                    paramLiquidation = (ParamLiquidation)extourneAbonnInteretServiLiqTrt.exec(paramLiquidation);                     
+                                     
+                 }
+
+            }
+                  
+        
+         catch (Exception e) {
+                com.oxia.fwk.core.Error erreur=new com.oxia.fwk.core.Error();
+                erreur.setCode("Technique");
+                erreur.setDescription("ValiderLiquidationPlacementTrt  "+e.getMessage());;
+                paramLiquidation.getAvancRembLiquid().addError(erreur);
+                logger.error("Exception : ",e);   
+                throw new RuntimeException(e);
+        } 
+        return (paramLiquidation.getAvancRembLiquid());
+    }
+    
+   
+    /***
+     * Fonction qui retourne un objet InteretServi
+     * appelé par l'Action qui insére le contrat placement dans la base
+     */
+
+    public InteretServi affecterDonneesInteretServi(AvancRembLiquid avancRembLiquid ) {
+        
+        Context context = ContextHandler.getContext();                
+        ICrudService crudService =(ICrudService)context.getBean("CURService");
+        InteretServi interetServi = new InteretServi();
+        try{
+        
+        if(avancRembLiquid.getCodTypiArl().equals("S")){
+           // interêt servis...(cas d'un contrat de placement postcompté)
+            interetServi.setMontIsrvIsrv(Math.round(avancRembLiquid.getMontInetArl()));            
+            if(avancRembLiquid.getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BC_PLAC)
+               || avancRembLiquid.getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_CAT_PLAC)
+               || avancRembLiquid.getContratPlacement().getProduitPlacement().getCodPrdPlc().equals(Constants.COD_PRD_BNAPLC_PLAC)){
+              // IRC en cas de produits plc en dinars
+              interetServi.setMontBrutIsrv(Math.round(avancRembLiquid.getMontInetArl()/ (1 - (Constants.TAUX_IRC/100))));
+              interetServi.setMontIrcIsrv(Math.round(interetServi.getMontBrutIsrv() *  (Constants.TAUX_IRC/100)));
+             }else{
+               // pas de IRC en c cas de produits PLc en dinars convertibles...
+                 interetServi.setMontBrutIsrv(Math.round(avancRembLiquid.getMontInetArl()));   
+                 interetServi.setMontIrcIsrv(Long.valueOf(0));
+             }
+             
+            interetServi.setDatIsrvIsrv(avancRembLiquid.getDatArlArl());
+            interetServi.setDatValIsrv(avancRembLiquid.getDatValiArl());
+            interetServi.setContratPlacement(avancRembLiquid.getContratPlacement());
+            InsertInteretServiTrt insertInteretServiTrt =new InsertInteretServiTrt();
+            interetServi = (InteretServi)insertInteretServiTrt.exec(interetServi);
+            
+        }else if(avancRembLiquid.getCodTypiArl().equals("P")){
+            // interets percu
+            //mise à jour de la table IntretServi (ajouter le taux d'interet perçu et la date)  (cas d'un contrat de placement précompté)          
+            GetListInteretServiTrt getListInteretServiTrt = new GetListInteretServiTrt();
+            Listes listeIntretServi = new Listes();
+            listeIntretServi = (Listes) getListInteretServiTrt.exec(avancRembLiquid.getContratPlacement());
+            if(listeIntretServi !=null && listeIntretServi.getList().size() >0 ){
+                
+                for (Iterator it =  listeIntretServi.getList().iterator();it.hasNext(); ) { 
+                    InteretServi interetServis = (InteretServi)it.next();
+                    interetServis.setMontIresIsrv(new Long(new Double(new Double(avancRembLiquid.getMontInetArl()).doubleValue()).longValue()));
+                    interetServis.setDatIresIsrv(avancRembLiquid.getDatValiArl());
+                    crudService.update(avancRembLiquid); 
+                }
+            }
+            
+        }
+        
+        return  interetServi;
+        
+        } catch (Exception e) {
+               logger.error("Exception dans souscriptionContratPlacementAction / Methode : affecterDonnéesInteretServi:  ",e);  
+               throw new RuntimeException(e);               
+        } 
+       
+    }
+   
+    public void genCroText(ValueObject vo) {
+          ParamLiquidation paramLiquidation = (ParamLiquidation)vo;       
+          AvancRembLiquid avancRembLiquid = paramLiquidation.getAvancRembLiquid();             
+              /* ---------------------- Garniture de la partie FIXE du CRO ----------------------------------- */
+
+               Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                        com.oxia.security.abc.model.Personnel user = null;
+                        if (obj instanceof UserDetails) {
+                            user = (com.oxia.security.abc.model.Personnel)obj;
+                       }
+              
+              this.setNumRefCro(Long.valueOf(avancRembLiquid.getNumSeqArl()));
+              this.setLibRefCro("SMILE.plac.int.Liq.Ech");
+              this.setDatValCro(paramLiquidation.getDateValInteretServLiq());
+              this.setCodeStructInitiatrice(avancRembLiquid.getContratPlacement().getContratCpt().getStructure().getCodStrcStrc().toString());              
+              this.setCodStrcImpt(avancRembLiquid.getContratPlacement().getContratCpt().getStructure().getCodStrcStrc());
+              this.setCodEtatCro(0);              
+              this.setCodeProduit(avancRembLiquid.getContratPlacement().getProduitPlacement().getCodPrdPlc().toString());
+              this.setOperationId(Constants.OPER_INT_POST_SOUSC_PLAC.toString());
+              this.setDateOperation(paramLiquidation.getDateComptLiquidation());
+              SimpleDateFormat formater=new SimpleDateFormat("dd/MM/yyyy");
+              formater=new SimpleDateFormat("HH:mm:ss");
+              String heureString = formater.format(new Date());
+              this.setHeureOperation(heureString);
+              this.setTypeOperationCro("O");
+              this.setCodTachTach(Constants.COD_TACHE_INTERET_LIQUID_ANTICIPE);
+              if (avancRembLiquid.getNumSeqArl()!=null)
+              this.setCodRefcOmp(avancRembLiquid.getNumSeqArl().toString());
+              this.setDatExecCro(new Date());
+
+              this.setNumCinUser(user.getNumMatrUser());
+              this.setCodTypUser(user.getMatriculeTyp());
+              //this.setCodTypUser();  
+              //this.setNumCinUser();
+                                /* ------------------Garniture de la partie VARIABLE du CRO----------------------------------  */
+            StringBuffer cro=new StringBuffer("");
+                
+                // contratClient
+            cro.append("numCptBna=");
+            cro.append(StrHandler.lpad(avancRembLiquid.getContratPlacement().getContratCpt().getContratCptId().getCodStrcStrc().toString(),'0',3)+StrHandler.lpad(avancRembLiquid.getContratPlacement().getContratCpt().getContratCptId().getCodPrdPrd().toString(),'0',4)+StrHandler.lpad(avancRembLiquid.getContratPlacement().getContratCpt().getContratCptId().getNumCcptCcpt().toString(),'0',6)+";");               
+                
+            if (avancRembLiquid.getContratPlacement().getNumSeqCpla()!= null){
+                cro.append("CONTRAT_PLACEMENT.NUM_SEQ_CPLA=");
+                cro.append(avancRembLiquid.getContratPlacement().getNumSeqCpla() +";");
+            }
+             
+            cro.append("AVANC_REMB_LIQUID.NUM_SEQ_ARL=");
+            cro.append(avancRembLiquid.getNumSeqArl() +";");
+
+            cro.append("INTERET_SERVI.MONT_ISRV_ISRV=");
+            cro.append(paramLiquidation.getInteretServi().getMontIsrvIsrv() +";");
+            
+            cro.append("INTERET_SERVI.MONT_BRUT_ISRV=");
+            cro.append(paramLiquidation.getInteretServi().getMontBrutIsrv() +";");
+            
+            cro.append("INTERET_SERVI.MONT_IRC_ISRV=");
+            cro.append(paramLiquidation.getInteretServi().getMontIrcIsrv() +";");
+                      
+            if (avancRembLiquid.getContratPlacement().getNumBcCpla()!= null){
+                cro.append("CONTRAT_PLACEMENT.NUM_BC_CPLA=");
+                cro.append(avancRembLiquid.getContratPlacement().getNumBcCpla() +";");
+            }
+             
+                this.setCroText(cro.toString());
+      }
+   
+   
+
+    public IValueObject getNumeroDomaine(IValueObject vo){
+        StructureDomaine structureDomaine = new StructureDomaine();
+        ParamLiquidation paramLiquidation = (ParamLiquidation)vo;              
+        structureDomaine.setCodDomDomm(Constants.COD_DOM_PLACEMENT);
+        structureDomaine.setCodStrcStrc(paramLiquidation.getAvancRembLiquid().getContratPlacement().getContratCpt().getContratCptId().getCodStrcStrc());
+        return structureDomaine;
+    }
+
+    public String getNumeroTache(IValueObject vo) {
+        
+        return(Constants.COD_OPER_DEMANDE_LIQUID_ANTICIPE.toString()+
+        StrHandler.lpad(Constants.COD_TACHE_VALIDATION_LIQUIDATION_ANTICIPE.toString(),'0',2));
+    }
+
+
+}

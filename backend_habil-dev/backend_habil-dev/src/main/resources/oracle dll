@@ -1,0 +1,32 @@
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BACKUP TABLE: Stores the matriculeCible's original profiles before interim
+-- ═══════════════════════════════════════════════════════════════════════════
+
+CREATE TABLE habil.INTERIM_PROFIL_BACKUP (
+    ID                  NUMBER PRIMARY KEY,
+    INTERIM_ID          NUMBER NOT NULL,
+    NUM_MATR_USER       VARCHAR2(20) NOT NULL,       -- matriculeCible
+    COD_PFL_PFL         VARCHAR2(50) NOT NULL,       -- original profile code
+    BOOL_ETAT_UTPR      NUMBER(1) NOT NULL,          -- original state (was active=1)
+    DAT_DADH_UTPR       DATE,                        -- original start date
+    DAT_FADH_UTPR       DATE,                        -- original end date
+    BOOL_CUSTOM_PROFIL  NUMBER(1),                   -- original custom flag
+    DATE_BACKUP         TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+
+    CONSTRAINT FK_BACKUP_INTERIM
+        FOREIGN KEY (INTERIM_ID)
+        REFERENCES habil.INTERIM_HABIL(ID),
+
+    CONSTRAINT UK_BACKUP_INTERIM_PROFILE
+        UNIQUE (INTERIM_ID, NUM_MATR_USER, COD_PFL_PFL)
+);
+
+CREATE SEQUENCE habil.SEQ_INTERIM_PROFIL_BACKUP
+    START WITH 1
+    INCREMENT BY 1;
+
+CREATE INDEX IDX_BACKUP_INTERIM_ID
+    ON habil.INTERIM_PROFIL_BACKUP (INTERIM_ID);
+
+CREATE INDEX IDX_BACKUP_USER
+    ON habil.INTERIM_PROFIL_BACKUP (NUM_MATR_USER);

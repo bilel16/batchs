@@ -1,0 +1,86 @@
+<perfect-scrollbar
+  *ngIf="isVerticalLayout()"
+  (clickOutside)="navMob()"
+  id="nav-ps-flat-able"
+  ngClass="flat-able-scroll"
+  [style.max-width]="'300px'"
+  [style.max-height]="'calc(100vh - 50px)'"
+  [usePSClass]="true"
+>
+  <div class="navbar-content">
+    <div class="">
+      <div class="main-menu-header">
+        <i class="pi pi-user user-circle"></i>
+
+        <div class="user-details" (click)="toggleNavProfile()">
+          @if (hasUserName()) {
+            <span class="username">{{ displayName() }}</span>
+          } @else {
+            <span class="username">Chargement...</span>
+          }
+          <div id="more-details">
+            <span>Matricule : </span>{{ displayMatricule() }}
+          </div>
+          <div id="more-details">
+            <span>Structure : </span>{{ displayStructure() }}
+          </div>
+          <div id="more-details-poste">{{ displayFonction() }}</div>
+        </div>
+      </div>
+    </div>
+    <ul class="nav pcoded-inner-navbar" (clickOutside)="fireOutClick()">
+      @for (item of filteredNavigation(); track item) {
+        @if (item.type === 'group') {
+          <app-nav-group [item]="item"></app-nav-group>
+        }
+        @if (item.type === 'collapse') {
+          <app-nav-collapse [item]="item"></app-nav-collapse>
+        }
+        @if (item.type === 'item') {
+          <app-nav-item [item]="item"></app-nav-item>
+        }
+      }
+    </ul>
+  </div>
+</perfect-scrollbar>
+
+<div
+  *ngIf="isHorizontalLayout()"
+  #navbarWrapper
+  class="navbar-content sidenav-horizontal"
+  id="layout-sidenav"
+>
+  <a
+    href="javascript:"
+    class="sidenav-horizontal-prev"
+    [ngClass]="prevDisabled()"
+    (click)="scrollMinus()"
+  ></a>
+  <div class="sidenav-horizontal-wrapper">
+    <ul
+      #navbarContent
+      id="side-nav-horizontal"
+      class="nav pcoded-inner-navbar sidenav-inner"
+      (clickOutside)="fireLeave()"
+      (mouseleave)="fireLeave()"
+    >
+      @for (item of filteredNavigation(); track item) {
+        @if (item.type === 'group') {
+          <app-nav-group [item]="item"></app-nav-group>
+        }
+        @if (item.type === 'collapse') {
+          <app-nav-collapse [item]="item"></app-nav-collapse>
+        }
+        @if (item.type === 'item') {
+          <app-nav-item [item]="item"></app-nav-item>
+        }
+      }
+    </ul>
+  </div>
+  <a
+    href="javascript:"
+    class="sidenav-horizontal-next"
+    [ngClass]="nextDisabled()"
+    (click)="scrollPlus()"
+  ></a>
+</div>
