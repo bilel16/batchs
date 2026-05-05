@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation - Canva Agricole</title>
+  <style>
+    :root {
+      --green-dark: #1b5e20;
+      --green-mid: #2e7d32;
+      --green-light: #43a047;
+      --green-pale: #e8f5e9;
+      --green-accent: #81c784;
+      --gold: #f9a825;
+      --gold-light: #fff8e1;
+      --text: #1a1a1a;
+      --text-muted: #555;
+      --border: #c8e6c9;
+      --white: #ffffff;
+      --bg: #f5f5f5;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ───── HEADER ───── */
+    header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+      color: var(--white);
+      padding: 48px 40px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 260px; height: 260px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    header::after {
+      content: '';
+      position: absolute; bottom: -40px; left: 200px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    header .logo-badge {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--green-dark);
+      font-weight: 800;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    header p.subtitle {
+      font-size: 1.05rem;
+      opacity: 0.88;
+      max-width: 680px;
+    }
+    .header-meta {
+      margin-top: 24px;
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .meta-chip {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    /* ───── NAV ───── */
+    nav {
+      background: var(--green-dark);
+      padding: 0 40px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    nav a {
+      color: rgba(255,255,255,0.80);
+      text-decoration: none;
+      padding: 14px 18px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      transition: color 0.2s, border-bottom 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+    nav a:hover {
+      color: var(--white);
+      border-bottom-color: var(--gold);
+    }
+
+    /* ───── MAIN LAYOUT ───── */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* ───── SECTION ───── */
+    section {
+      margin-bottom: 56px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .section-icon {
+      width: 46px; height: 46px;
+      background: var(--green-mid);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .section-title h2 {
+      font-size: 1.55rem;
+      color: var(--green-dark);
+      font-weight: 800;
+      border-left: 4px solid var(--green-light);
+      padding-left: 14px;
+    }
+
+    /* ───── CARDS ───── */
+    .card {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 28px 32px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      color: var(--green-dark);
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--green-pale);
+    }
+    .card p { color: var(--text-muted); margin-bottom: 10px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    /* ───── GRID ───── */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+
+    /* ───── FEATURE CARDS ───── */
+    .feature-card {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 26px 24px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .feature-card .icon {
+      font-size: 1.8rem;
+      margin-bottom: 14px;
+    }
+    .feature-card h4 {
+      font-size: 1rem;
+      color: var(--green-dark);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ───── BADGES & PILLS ───── */
+    .badge {
+      display: inline-block;
+      padding: 3px 11px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin: 3px 3px 3px 0;
+    }
+    .badge-green { background: var(--green-pale); color: var(--green-dark); border: 1px solid var(--border); }
+    .badge-gold { background: var(--gold-light); color: #6d4c00; border: 1px solid #ffe082; }
+    .badge-blue { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+    .badge-purple { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
+    .badge-orange { background: #fff3e0; color: #bf360c; border: 1px solid #ffcc80; }
+
+    /* ───── TECH STACK BOXES ───── */
+    .tech-block {
+      background: var(--white);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+    .tech-block-header {
+      background: var(--green-mid);
+      color: var(--white);
+      padding: 16px 24px;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tech-block-body {
+      padding: 22px 24px;
+    }
+    .tech-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--green-pale);
+      font-size: 0.88rem;
+    }
+    .tech-row:last-child { border-bottom: none; }
+    .tech-row-label { font-weight: 600; color: var(--text); }
+    .tech-row-value { color: var(--text-muted); text-align: right; max-width: 55%; }
+
+    /* ───── ARCHITECTURE DIAGRAM ───── */
+    .arch-diagram {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: var(--card-shadow);
+    }
+    .arch-layer {
+      margin-bottom: 12px;
+    }
+    .arch-layer-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .arch-boxes {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .arch-box {
+      flex: 1;
+      min-width: 150px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      border: 2px solid;
+    }
+    .arch-box-angular { background: #fce4ec; border-color: #e91e63; color: #880e4f; }
+    .arch-box-spring { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
+    .arch-box-auth { background: #e8eaf6; border-color: #3f51b5; color: #1a237e; }
+    .arch-box-oracle { background: #fff3e0; border-color: #ff9800; color: #bf360c; }
+    .arch-box-keycloak { background: #f3e5f5; border-color: #9c27b0; color: #4a148c; }
+    .arch-box-ldap { background: #e0f2f1; border-color: #009688; color: #004d40; }
+    .arch-arrow {
+      text-align: center;
+      font-size: 1.4rem;
+      color: var(--green-light);
+      margin: 6px 0;
+    }
+
+    /* ───── TABLE ───── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      background: var(--white);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+    .data-table thead { background: var(--green-mid); color: var(--white); }
+    .data-table th { padding: 14px 18px; text-align: left; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.5px; }
+    .data-table td { padding: 12px 18px; border-bottom: 1px solid var(--green-pale); vertical-align: top; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:nth-child(even) td { background: var(--green-pale); }
+    .data-table code {
+      background: #f1f8e9;
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      color: var(--green-dark);
+    }
+
+    /* ───── ENDPOINT BLOCKS ───── */
+    .endpoint {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: var(--green-pale);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+    .method {
+      font-weight: 800;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 5px;
+      min-width: 52px;
+      text-align: center;
+    }
+    .method-get { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+    .method-post { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+    .method-put { background: #fff8e1; color: #6d4c00; border: 1px solid #ffe082; }
+    .method-delete { background: #fce4ec; color: #880e4f; border: 1px solid #f48fb1; }
+    .endpoint-path { font-family: 'Courier New', monospace; color: var(--text); font-weight: 600; }
+    .endpoint-desc { color: var(--text-muted); margin-left: auto; font-size: 0.80rem; }
+
+    /* ───── CALLOUT BOX ───── */
+    .callout {
+      border-left: 5px solid var(--green-light);
+      background: var(--green-pale);
+      padding: 18px 22px;
+      border-radius: 0 10px 10px 0;
+      margin-bottom: 20px;
+      font-size: 0.93rem;
+    }
+    .callout strong { color: var(--green-dark); }
+    .callout-gold {
+      border-left-color: var(--gold);
+      background: var(--gold-light);
+    }
+
+    /* ───── FLOW STEPS ───── */
+    .flow {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .flow-step {
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--green-dark);
+      position: relative;
+      margin: 6px 0;
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+    }
+    .flow-step + .flow-step::before {
+      content: '→';
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--green-light);
+      font-size: 1.1rem;
+    }
+
+    /* ───── PORT MAP ───── */
+    .port-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .port-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+    }
+    .port-number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--green-mid);
+    }
+    .port-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 4px;
+      color: var(--text);
+    }
+    .port-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ───── STAT BAR ───── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--green-mid);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ───── FOOTER ───── */
+    footer {
+      background: var(--green-dark);
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 24px 40px;
+      font-size: 0.82rem;
+      margin-top: 60px;
+    }
+    footer strong { color: var(--white); }
+
+    /* ───── UTILS ───── */
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    ul.check-list { list-style: none; padding: 0; }
+    ul.check-list li { padding: 6px 0; padding-left: 22px; position: relative; font-size: 0.9rem; color: var(--text-muted); }
+    ul.check-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green-light); font-weight: 700; }
+
+    @media (max-width: 640px) {
+      header { padding: 32px 20px; }
+      header h1 { font-size: 1.7rem; }
+      main { padding: 24px 16px; }
+      nav { padding: 0 16px; }
+      .flow-step + .flow-step::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="logo-badge">BNA &mdash; Banque Nationale Agricole</div>
+  <h1>Canva Agricole</h1>
+  <p class="subtitle">
+    Plateforme de gestion du financement agricole &mdash; de l&rsquo;instruction du dossier jusqu&rsquo;au suivi des engagements bancaires.
+  </p>
+  <div class="header-meta">
+    <span class="meta-chip">Version 05/05/2026</span>
+    <span class="meta-chip">Spring Boot 3.2 &bull; Angular 17</span>
+    <span class="meta-chip">Oracle DB</span>
+    <span class="meta-chip">OAuth2 / JWT / SSO</span>
+  </div>
+</header>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <a href="#overview">Vue d&rsquo;ensemble</a>
+  <a href="#fonctionnel">Fonctionnel</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#backend">Backend</a>
+  <a href="#frontend">Frontend</a>
+  <a href="#database">Base de données</a>
+  <a href="#securite">Sécurité</a>
+  <a href="#api">API</a>
+  <a href="#deploiement">Déploiement</a>
+</nav>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+
+  <!-- STATS BAR -->
+  <div class="stats-row" style="margin-top:8px;">
+    <div class="stat-card"><div class="stat-number">4</div><div class="stat-label">Modules applicatifs</div></div>
+    <div class="stat-card"><div class="stat-number">43</div><div class="stat-label">Entités JPA</div></div>
+    <div class="stat-card"><div class="stat-number">40+</div><div class="stat-label">Contrôleurs REST</div></div>
+    <div class="stat-card"><div class="stat-number">28</div><div class="stat-label">Services Angular</div></div>
+    <div class="stat-card"><div class="stat-number">80+</div><div class="stat-label">DTOs</div></div>
+    <div class="stat-card"><div class="stat-number">40+</div><div class="stat-label">Pages UI</div></div>
+  </div>
+
+  <!-- ─── VUE D'ENSEMBLE ─── -->
+  <section id="overview">
+    <div class="section-title">
+      <div class="section-icon">🌾</div>
+      <h2>Vue d&rsquo;ensemble du projet</h2>
+    </div>
+
+    <div class="callout">
+      <strong>Canva Agricole</strong> est une plateforme web métier développée pour la <strong>Banque Nationale Agricole (BNA)</strong>.
+      Elle couvre l&rsquo;intégralité du cycle de vie d&rsquo;un projet de financement agricole : création du canevas de projet,
+      instruction financière, gestion des garanties, analyse financière, suivi des engagements et production documentaire.
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Contexte métier</h3>
+        <p>La BNA finance des projets agricoles variés (élevage, culture, irrigation, foncier). Les agents bancaires
+        utilisent cette application pour créer un <em>canevas</em> &mdash; dossier numérique structuré &mdash; pour chaque demande de crédit.</p>
+        <p>Ce canevas concentre les informations du client, les données d&rsquo;exploitation, les crédits sollicités,
+        les garanties proposées et l&rsquo;analyse financière complète.</p>
+      </div>
+      <div class="card">
+        <h3>Objectifs de la plateforme</h3>
+        <ul class="check-list">
+          <li>Dématérialiser et centraliser l&rsquo;instruction des dossiers de crédit agricole</li>
+          <li>Automatiser le calcul des analyses financières et des ratios</li>
+          <li>Gérer les engagements bancaires (BNA &amp; BCT) en temps réel</li>
+          <li>Assurer la traçabilité des avis et des décisions</li>
+          <li>Faciliter la gestion des documents et des garanties</li>
+          <li>Offrir un portail SSO multi-applications sécurisé</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FONCTIONNEL ─── -->
+  <section id="fonctionnel">
+    <div class="section-title">
+      <div class="section-icon">⚙️</div>
+      <h2>Description fonctionnelle</h2>
+    </div>
+
+    <div class="grid-3">
+      <div class="feature-card">
+        <div class="icon">📋</div>
+        <h4>Gestion des Canevas</h4>
+        <p>Création, modification et suivi des canevas agricoles. Chaque canevas regroupe toutes les informations
+        du projet financé : client, exploitation, sites, crédits, garanties.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">💳</div>
+        <h4>Crédits Agricoles</h4>
+        <p>Prise en charge de 3 types de crédits : <strong>Court Terme</strong> (saisonniers),
+        <strong>Investissement</strong> (équipements, infrastructure) et <strong>Achat de Terrain</strong>.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📊</div>
+        <h4>Analyse Financière</h4>
+        <p>Génération automatique du <strong>bilan comptable</strong>, de l&rsquo;<strong>état de trésorerie</strong>,
+        des <strong>ratios financiers</strong> et de l&rsquo;<strong>analyse activité-rentabilité</strong>.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🏦</div>
+        <h4>Garanties &amp; Sûretés</h4>
+        <p>Proposition et validation des garanties (foncières, mobilières, etc.). Calcul de la couverture
+        et suivi des conditions de mise en jeu.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🐄</div>
+        <h4>Données d&rsquo;Exploitation</h4>
+        <p>Saisie du cheptel, des spéculations (cultures), des rendements végétaux, des ressources hydriques
+        et des besoins fourragers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📌</div>
+        <h4>Engagements Bancaires</h4>
+        <p>Suivi des engagements <strong>BNA</strong> et <strong>BCT</strong>, avec historique de classification
+        et de retour de classe, en temps quasi-réel.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🗺️</div>
+        <h4>Géolocalisation</h4>
+        <p>Hiérarchie géographique complète : Zone → Région → Gouvernorat → Délégation → Imada.
+        Sélection des sites via carte interactive (Leaflet).</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">👥</div>
+        <h4>Gestion des Affectations</h4>
+        <p>Affectation des agents BNA aux dossiers. Suivi des responsables de dossier et des superviseurs.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📁</div>
+        <h4>Gestion Documentaire</h4>
+        <p>Attachement de pièces justificatives (PDF, images) aux dossiers. Export PDF des canevas
+        et des analyses financières.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">✅</div>
+        <h4>Circuit des Avis</h4>
+        <p>Saisie des avis pour chaque section du dossier (garanties, crédit court terme, investissement,
+        achat terrain). Traçabilité complète des décisions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">💧</div>
+        <h4>Ressources Hydriques</h4>
+        <p>Évaluation des besoins et disponibilités en eau pour les projets d&rsquo;irrigation et d&rsquo;élevage.
+        Calcul du bilan hydrique prévisionnel.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔐</div>
+        <h4>SSO Multi-Applications</h4>
+        <p>Portail d&rsquo;authentification unique (SSO) pour accès sécurisé à plusieurs applications BNA.
+        Gestion des sessions, habilitations et permissions par profil.</p>
+      </div>
+    </div>
+
+    <!-- Workflow principal -->
+    <div class="card mt-24">
+      <h3>Workflow principal &mdash; Cycle de vie d&rsquo;un dossier</h3>
+      <div class="flow">
+        <div class="flow-step">1. Création du Canevas</div>
+        <div class="flow-step">2. Fiche Signaléti&shy;que Client</div>
+        <div class="flow-step">3. Données d&rsquo;Exploitation</div>
+        <div class="flow-step">4. Saisie des Crédits</div>
+        <div class="flow-step">5. Garanties Proposées</div>
+        <div class="flow-step">6. Analyse Financière</div>
+        <div class="flow-step">7. Circuit des Avis</div>
+        <div class="flow-step">8. Décision &amp; Suivi</div>
+      </div>
+    </div>
+
+    <!-- Rôles utilisateurs -->
+    <div class="card mt-16">
+      <h3>Profils utilisateurs</h3>
+      <div class="grid-4">
+        <div style="padding:14px; background:var(--green-pale); border-radius:10px; text-align:center;">
+          <div style="font-size:1.5rem;">👨‍💼</div>
+          <div style="font-weight:700; margin-top:8px; font-size:0.88rem;">Agent bancaire</div>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Création &amp; gestion des dossiers</div>
+        </div>
+        <div style="padding:14px; background:var(--green-pale); border-radius:10px; text-align:center;">
+          <div style="font-size:1.5rem;">📈</div>
+          <div style="font-weight:700; margin-top:8px; font-size:0.88rem;">Analyste financier</div>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Analyse financière &amp; ratios</div>
+        </div>
+        <div style="padding:14px; background:var(--green-pale); border-radius:10px; text-align:center;">
+          <div style="font-size:1.5rem;">✍️</div>
+          <div style="font-weight:700; margin-top:8px; font-size:0.88rem;">Décideur</div>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Validation &amp; approbation</div>
+        </div>
+        <div style="padding:14px; background:var(--green-pale); border-radius:10px; text-align:center;">
+          <div style="font-size:1.5rem;">🛠️</div>
+          <div style="font-weight:700; margin-top:8px; font-size:0.88rem;">Administrateur</div>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Habilitations &amp; référentiels</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ARCHITECTURE ─── -->
+  <section id="architecture">
+    <div class="section-title">
+      <div class="section-icon">🏗️</div>
+      <h2>Architecture technique</h2>
+    </div>
+
+    <div class="arch-diagram">
+      <div class="arch-layer">
+        <div class="arch-layer-label">Couche Présentation</div>
+        <div class="arch-boxes">
+          <div class="arch-box arch-box-angular">Angular 17<br/><small>SPA &bull; PrimeNG &bull; Bootstrap 5</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Couche Authentification &amp; Autorisation</div>
+        <div class="arch-boxes">
+          <div class="arch-box arch-box-auth">Authorization Server<br/><small>Spring Boot 3 &bull; JWT &bull; Port 7070</small></div>
+          <div class="arch-box arch-box-keycloak">Keycloak<br/><small>OAuth2 / OIDC &bull; Port 8080</small></div>
+          <div class="arch-box arch-box-ldap">BNA Auth (LDAP)<br/><small>Spring Boot 2 &bull; Port 8082</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Couche Métier (API REST)</div>
+        <div class="arch-boxes">
+          <div class="arch-box arch-box-spring">Backend SAEB<br/><small>Spring Boot 3.2 &bull; JPA &bull; Port 8081</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Couche Persistance</div>
+        <div class="arch-boxes">
+          <div class="arch-box arch-box-oracle">Oracle DB Primaire<br/><small>10.1.9.214:1561 &bull; SAEB.bna.tn</small></div>
+          <div class="arch-box arch-box-oracle">Oracle DB Secondaire<br/><small>10.1.224.10:1541 &bull; bnaprod</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-gold mt-24">
+      <strong>Architecture microservices légère :</strong> Le projet est découpé en modules Maven indépendants.
+      L&rsquo;authentification est externalisée dans deux services dédiés (Authorization Server + legacy LDAP BNA),
+      tandis que la logique métier est entièrement concentrée dans le module <code>backend-saeb</code>.
+    </div>
+  </section>
+
+  <!-- ─── BACKEND ─── -->
+  <section id="backend">
+    <div class="section-title">
+      <div class="section-icon">☕</div>
+      <h2>Backend &mdash; Détail technique</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="tech-block">
+        <div class="tech-block-header">⚙️ Backend SAEB (Port 8081)</div>
+        <div class="tech-block-body">
+          <div class="tech-row"><span class="tech-row-label">Framework</span><span class="tech-row-value">Spring Boot 3.2.2</span></div>
+          <div class="tech-row"><span class="tech-row-label">Langage</span><span class="tech-row-value">Java 17</span></div>
+          <div class="tech-row"><span class="tech-row-label">ORM</span><span class="tech-row-value">Spring Data JPA / Hibernate (Oracle Dialect)</span></div>
+          <div class="tech-row"><span class="tech-row-label">Sécurité</span><span class="tech-row-value">OAuth2 Resource Server (JWT)</span></div>
+          <div class="tech-row"><span class="tech-row-label">Cache</span><span class="tech-row-value">Caffeine (500 items max, TTL 24h)</span></div>
+          <div class="tech-row"><span class="tech-row-label">Mapping</span><span class="tech-row-value">ModelMapper 3.2.2</span></div>
+          <div class="tech-row"><span class="tech-row-label">Docs API</span><span class="tech-row-value">SpringDoc OpenAPI 2.5.0</span></div>
+          <div class="tech-row"><span class="tech-row-label">Connexion DB</span><span class="tech-row-value">HikariCP (multi-datasource)</span></div>
+          <div class="tech-row"><span class="tech-row-label">Build</span><span class="tech-row-value">Maven 3</span></div>
+        </div>
+      </div>
+      <div class="tech-block">
+        <div class="tech-block-header">🔐 Authorization Server (Port 7070)</div>
+        <div class="tech-block-body">
+          <div class="tech-row"><span class="tech-row-label">Framework</span><span class="tech-row-value">Spring Boot 3.2.0</span></div>
+          <div class="tech-row"><span class="tech-row-label">JWT</span><span class="tech-row-value">JJWT 0.12.3</span></div>
+          <div class="tech-row"><span class="tech-row-label">Access Token TTL</span><span class="tech-row-value">1 heure (3 600 000 ms)</span></div>
+          <div class="tech-row"><span class="tech-row-label">Refresh Token TTL</span><span class="tech-row-value">7 jours (604 800 000 ms)</span></div>
+          <div class="tech-row"><span class="tech-row-label">Session SSO</span><span class="tech-row-value">8 heures (28 800 000 ms)</span></div>
+          <div class="tech-row"><span class="tech-row-label">CORS autorisés</span><span class="tech-row-value">localhost:60959 / 4301 / 4302 / 4303</span></div>
+          <div class="tech-row"><span class="tech-row-label">Auth externe</span><span class="tech-row-value">http://localhost:8082/auth/signin/multiple</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entités principales -->
+    <div class="card mt-24">
+      <h3>Principales entités JPA (module backend-saeb)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Entité</th><th>Table Oracle</th><th>Rôle métier</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Caneva</code></td><td><code>CANEVAS_AGRICOLE</code></td><td>Canevas principal d&rsquo;un projet agricole</td></tr>
+          <tr><td><code>Site</code></td><td><code>SITES</code></td><td>Localisation géographique du projet</td></tr>
+          <tr><td><code>CreditCourtTerme</code></td><td><code>CREDIT_COURT_TERME</code></td><td>Crédits de campagne / saisonniers</td></tr>
+          <tr><td><code>CreditInvestissement</code></td><td><code>CREDIT_INVESTISSEMENT</code></td><td>Crédits équipements &amp; infrastructure</td></tr>
+          <tr><td><code>CreditAchatTerrain</code></td><td><code>CREDIT_ACHAT_TERRAIN</code></td><td>Financement foncier agricole</td></tr>
+          <tr><td><code>GarantiePropose</code></td><td>&mdash;</td><td>Garanties proposées par le client</td></tr>
+          <tr><td><code>Avis</code></td><td>&mdash;</td><td>Avis bancaire sur le dossier</td></tr>
+          <tr><td><code>Affectation</code></td><td>&mdash;</td><td>Affectation d&rsquo;un agent à un canevas</td></tr>
+          <tr><td><code>Elevage</code></td><td>&mdash;</td><td>Données cheptel (bovins, ovins, etc.)</td></tr>
+          <tr><td><code>RendementVegital</code></td><td>&mdash;</td><td>Rendements agricoles par spéculation</td></tr>
+          <tr><td><code>RessourceHydrique</code></td><td>&mdash;</td><td>Besoins &amp; disponibilités en eau</td></tr>
+          <tr><td><code>Materiel</code></td><td>&mdash;</td><td>Inventaire des équipements du projet</td></tr>
+          <tr><td><code>Batiment</code></td><td>&mdash;</td><td>Bâtiments et constructions du projet</td></tr>
+          <tr><td><code>DocumentCanevaFile</code></td><td>&mdash;</td><td>Pièces justificatives attachées</td></tr>
+          <tr><td><code>RefZone / RefRegion / RefGouvernorat / RefDelegation / RefImada</code></td><td>Tables REF_*</td><td>Référentiels géographiques hiérarchiques</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Caches -->
+    <div class="card mt-16">
+      <h3>Configuration du cache Caffeine</h3>
+      <div class="grid-2">
+        <div>
+          <p><strong>Caches configurés :</strong></p>
+          <ul class="check-list">
+            <li><code>engagementBNA</code> &mdash; Engagements BNA</li>
+            <li><code>engagementBCT</code> &mdash; Engagements BCT</li>
+            <li><code>historiqueClasseBNA</code> &mdash; Historique classification BNA</li>
+            <li><code>historiqueClasseBCT</code> &mdash; Historique classification BCT</li>
+            <li><code>historiqueRetourClasseBct</code> &mdash; Retour de classe BCT</li>
+            <li><code>montantTerme</code> &mdash; Montants à terme</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Paramètres :</strong></p>
+          <ul class="check-list">
+            <li>Taille maximale : 500 entrées</li>
+            <li>Expiration : 24 heures après écriture</li>
+            <li>Éviction : LFU (Least Frequently Used)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FRONTEND ─── -->
+  <section id="frontend">
+    <div class="section-title">
+      <div class="section-icon">🖥️</div>
+      <h2>Frontend Angular &mdash; Détail technique</h2>
+    </div>
+
+    <div class="tech-block">
+      <div class="tech-block-header">🅰️ Stack Frontend</div>
+      <div class="tech-block-body">
+        <div class="tech-row"><span class="tech-row-label">Framework</span><span class="tech-row-value">Angular 17.1.0</span></div>
+        <div class="tech-row"><span class="tech-row-label">Langage</span><span class="tech-row-value">TypeScript 5.3.2</span></div>
+        <div class="tech-row"><span class="tech-row-label">UI Components</span><span class="tech-row-value">PrimeNG 17.14.1 &bull; Angular Material 17.3.10</span></div>
+        <div class="tech-row"><span class="tech-row-label">CSS Framework</span><span class="tech-row-value">Bootstrap 5.3.2 &bull; PrimeFlex 3.3.1</span></div>
+        <div class="tech-row"><span class="tech-row-label">Auth</span><span class="tech-row-value">Keycloak-Angular 15.2.1 / Custom JWT Auth</span></div>
+        <div class="tech-row"><span class="tech-row-label">Cartographie</span><span class="tech-row-value">Leaflet 1.9.4</span></div>
+        <div class="tech-row"><span class="tech-row-label">Export PDF</span><span class="tech-row-value">jsPDF 3.0.1 &bull; jspdf-autotable 5.0.2 &bull; html2canvas 1.4.1</span></div>
+        <div class="tech-row"><span class="tech-row-label">Réactivité</span><span class="tech-row-value">RxJS 7.8.0 &bull; Angular Signals</span></div>
+        <div class="tech-row"><span class="tech-row-label">Formulaires</span><span class="tech-row-value">Reactive Forms &amp; Template Forms</span></div>
+        <div class="tech-row"><span class="tech-row-label">Tests</span><span class="tech-row-value">Karma 6.4.0 &bull; Jasmine 5.1.0</span></div>
+        <div class="tech-row"><span class="tech-row-label">Build</span><span class="tech-row-value">Angular CLI 17.1.1</span></div>
+      </div>
+    </div>
+
+    <!-- Structure des dossiers -->
+    <div class="card mt-24">
+      <h3>Structure des modules Angular</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Dossier</th><th>Contenu</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>_components/layout/</code></td><td>Composants de mise en page : header, footer, sidebar, topbar</td></tr>
+          <tr><td><code>_components/pages/canvas.agricole/</code></td><td>40+ pages métier du canevas (canevas, crédits, garanties, analyse...)</td></tr>
+          <tr><td><code>_services/</code></td><td>28 services HTTP de communication avec le backend</td></tr>
+          <tr><td><code>_models/</code></td><td>Interfaces TypeScript correspondant aux DTOs Java</td></tr>
+          <tr><td><code>_helpers/</code></td><td>Intercepteurs HTTP (injection du JWT) &amp; utilitaires</td></tr>
+          <tr><td><code>core/guards/</code></td><td>Guards de protection des routes (Keycloak &amp; custom auth)</td></tr>
+          <tr><td><code>core/services/</code></td><td>TokenStorageService, services d&rsquo;infrastructure</td></tr>
+          <tr><td><code>features/auth-callback/</code></td><td>Composant de callback OAuth2 (gestion du code exchange)</td></tr>
+          <tr><td><code>directives/</code></td><td>TokenCheckDirective, ScrollToTopDirective</td></tr>
+          <tr><td><code>habilitation/</code></td><td>Gestion des habilitations et permissions utilisateurs</td></tr>
+          <tr><td><code>dashboard/</code></td><td>Tableau de bord principal</td></tr>
+          <tr><td><code>credits/ / clients/ / product/</code></td><td>Modules fonctionnels secondaires</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pages clés -->
+    <div class="card mt-16">
+      <h3>Pages principales du module Canevas Agricole</h3>
+      <div class="grid-3">
+        <div>
+          <p><strong>Gestion des dossiers</strong></p>
+          <div class="badge badge-green">Fiche Signaléti­que (x2)</div>
+          <div class="badge badge-green">Liste des Canevas</div>
+          <div class="badge badge-green">Ajout Canevas</div>
+          <div class="badge badge-green">Affectation</div>
+          <div class="badge badge-green">Associés</div>
+          <div class="badge badge-green">Exploitation</div>
+        </div>
+        <div>
+          <p><strong>Crédits</strong></p>
+          <div class="badge badge-gold">Crédit Sollicité</div>
+          <div class="badge badge-gold">Crédit Retenu (x4)</div>
+          <div class="badge badge-gold">Schéma Financement</div>
+          <div class="badge badge-gold">Condition Banque</div>
+          <div class="badge badge-gold">Effort Table</div>
+        </div>
+        <div>
+          <p><strong>Analyse &amp; Suivi</strong></p>
+          <div class="badge badge-blue">Bilan Comptable</div>
+          <div class="badge badge-blue">État Trésorerie</div>
+          <div class="badge badge-blue">Ratios Financiers</div>
+          <div class="badge badge-blue">Activité-Rentabilité</div>
+          <div class="badge badge-blue">Engagements BCT/BNA</div>
+          <div class="badge badge-blue">Historique Classes</div>
+        </div>
+        <div>
+          <p><strong>Terrain &amp; Nature</strong></p>
+          <div class="badge badge-purple">Cheptel (Élevage)</div>
+          <div class="badge badge-purple">Ressources Hydriques</div>
+          <div class="badge badge-purple">Bilan Fourrager</div>
+          <div class="badge badge-purple">Matériel Projet</div>
+          <div class="badge badge-purple">Map Picker</div>
+        </div>
+        <div>
+          <p><strong>Garanties &amp; Avis</strong></p>
+          <div class="badge badge-orange">Garanties</div>
+          <div class="badge badge-orange">Garanties Proposées</div>
+          <div class="badge badge-orange">Avis Général</div>
+          <div class="badge badge-orange">Avis Crédit CT</div>
+          <div class="badge badge-orange">Avis Investissement</div>
+          <div class="badge badge-orange">Avis Achat Terrain</div>
+        </div>
+        <div>
+          <p><strong>Documents</strong></p>
+          <div class="badge badge-green">Upload Documents</div>
+          <div class="badge badge-green">Export PDF</div>
+          <div class="badge badge-green">Client &amp; Canevas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authentification duale -->
+    <div class="card mt-16">
+      <h3>Système d&rsquo;authentification dual</h3>
+      <div class="grid-2">
+        <div>
+          <p><strong>Mode Keycloak</strong> (<code>AUTH_MODE = 'keycloak'</code>)</p>
+          <ul class="check-list">
+            <li>Realm : <code>canvaAgricole</code></li>
+            <li>Client ID : <code>angualr_client</code></li>
+            <li>Serveur : <code>http://localhost:8080</code></li>
+            <li>Gestion via <code>keycloak-angular 15.2.1</code></li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Mode Auth Personnalisé</strong></p>
+          <ul class="check-list">
+            <li>Callback OAuth2 via <code>AuthCallbackComponent</code></li>
+            <li>Stockage token via <code>TokenStorageService</code></li>
+            <li>Intercepteur HTTP auto-injection du JWT</li>
+            <li>Gestion expiration &amp; session idle</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DATABASE ─── -->
+  <section id="database">
+    <div class="section-title">
+      <div class="section-icon">🗄️</div>
+      <h2>Base de données Oracle</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Connexions Oracle</h3>
+        <table class="data-table">
+          <thead><tr><th>Source</th><th>Détails</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Primaire</strong></td><td><code>10.1.9.214:1561 / SAEB.bna.tn</code> &mdash; user: <code>saeb</code></td></tr>
+            <tr><td><strong>Secondaire</strong></td><td><code>10.1.224.10:1541 / bnaprod</code> &mdash; user: <code>saeb</code></td></tr>
+            <tr><td><strong>Pool</strong></td><td>HikariCP (gestion automatique des connexions)</td></tr>
+            <tr><td><strong>Schémas</strong></td><td><code>SAEB</code>, <code>SMILE</code>, <code>HABIL</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Tables principales</h3>
+        <ul class="check-list">
+          <li><code>CANEVAS_AGRICOLE</code> &mdash; Table centrale des canevas</li>
+          <li><code>SITES</code> &mdash; Localisation géographique</li>
+          <li><code>CANEVA_SITE_PROJET</code> &mdash; Jonction canevas-sites</li>
+          <li><code>CREDIT_ACHAT_TERRAIN</code></li>
+          <li><code>CREDIT_COURT_TERME</code></li>
+          <li><code>CREDIT_INVESTISSEMENT</code></li>
+          <li><code>ITEM_ACHAT_TERRAIN / ITEM_INVESTISSEMENT</code></li>
+          <li><code>VENDEUR</code> &mdash; Informations vendeurs terrains</li>
+          <li>Tables REF_* &mdash; Référentiels géographiques</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout mt-16">
+      <strong>Relations clés :</strong> Un <em>Canevas</em> est lié à plusieurs <em>Sites</em> (Many-to-Many),
+      à plusieurs types de crédits (One-to-Many), à des garanties, des documents et des données d&rsquo;exploitation.
+      Les tables de référence géographiques forment une hiérarchie stricte : Zone &gt; Région &gt; Gouvernorat &gt; Délégation &gt; Imada.
+    </div>
+  </section>
+
+  <!-- ─── SÉCURITÉ ─── -->
+  <section id="securite">
+    <div class="section-title">
+      <div class="section-icon">🔒</div>
+      <h2>Sécurité &amp; Authentification</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Flux OAuth2 / SSO</h3>
+        <ul class="check-list">
+          <li>Authorization Code Flow (PKCE)</li>
+          <li>JWT Access Token (1h) + Refresh Token (7j)</li>
+          <li>Session SSO unique jusqu&rsquo;à 8h</li>
+          <li>Échange de code sécurisé via <code>/api/auth/exchange-code</code></li>
+          <li>Déconnexion centralisée via <code>/api/auth/logout</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Legacy LDAP (BNA Auth)</h3>
+        <ul class="check-list">
+          <li>Annuaire BNA : <code>ldap://10.1.6.1:389/</code></li>
+          <li>Spring Security LDAP</li>
+          <li>Spring Boot 2.0.5 / Java 8 (legacy)</li>
+          <li>Point d&rsquo;entrée : <code>/auth/signin/multiple</code></li>
+          <li>Intégration transparente via External Auth Provider</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mt-16">
+      <h3>Intégration habilitations (HABIL2)</h3>
+      <p>Le système s&rsquo;intègre avec le référentiel d&rsquo;habilitations HABIL de la BNA pour la gestion fine des
+      permissions (menus, ressources, applications). Les profils utilisateurs, rôles et permissions sont
+      synchronisés depuis la base HABIL via des appels inter-services.</p>
+    </div>
+  </section>
+
+  <!-- ─── API ─── -->
+  <section id="api">
+    <div class="section-title">
+      <div class="section-icon">🔌</div>
+      <h2>API REST &mdash; Endpoints principaux</h2>
+    </div>
+
+    <div class="card">
+      <h3>Backend SAEB &mdash; <code>http://localhost:8081/api</code></h3>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/canevas/user/{matricule}</span><span class="endpoint-desc">Canevas d&rsquo;un agent</span></div>
+      <div class="endpoint"><span class="method method-post">POST</span><span class="endpoint-path">/api/canevas</span><span class="endpoint-desc">Créer un canevas</span></div>
+      <div class="endpoint"><span class="method method-put">PUT</span><span class="endpoint-path">/api/canevas/{id}</span><span class="endpoint-desc">Modifier un canevas</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/credits</span><span class="endpoint-desc">Liste des crédits</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/garanties</span><span class="endpoint-desc">Garanties du dossier</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/engagements</span><span class="endpoint-desc">Engagements BNA/BCT</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/analyses</span><span class="endpoint-desc">Analyse financière</span></div>
+      <div class="endpoint"><span class="method method-post">POST</span><span class="endpoint-path">/api/documents</span><span class="endpoint-desc">Upload pièce justificative</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/references</span><span class="endpoint-desc">Référentiels géographiques</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/avis</span><span class="endpoint-desc">Avis bancaires</span></div>
+      <p style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);">Documentation Swagger disponible à <code>/swagger-ui.html</code></p>
+    </div>
+
+    <div class="card mt-16">
+      <h3>Authorization Server &mdash; <code>http://localhost:7070/api</code></h3>
+      <div class="endpoint"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/login</span><span class="endpoint-desc">Connexion utilisateur</span></div>
+      <div class="endpoint"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/refresh</span><span class="endpoint-desc">Renouvellement du token</span></div>
+      <div class="endpoint"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/exchange-code</span><span class="endpoint-desc">Échange code OAuth2</span></div>
+      <div class="endpoint"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/logout</span><span class="endpoint-desc">Déconnexion SSO</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/auth/me</span><span class="endpoint-desc">Profil utilisateur courant</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/portal</span><span class="endpoint-desc">Applications accessibles</span></div>
+      <div class="endpoint"><span class="method method-get">GET</span><span class="endpoint-path">/api/sessions</span><span class="endpoint-desc">Gestion des sessions SSO</span></div>
+    </div>
+  </section>
+
+  <!-- ─── DEPLOIEMENT ─── -->
+  <section id="deploiement">
+    <div class="section-title">
+      <div class="section-icon">🚀</div>
+      <h2>Déploiement &amp; Configuration</h2>
+    </div>
+
+    <div class="port-map">
+      <div class="port-card">
+        <div class="port-number">4200</div>
+        <div class="port-name">Frontend Angular</div>
+        <div class="port-desc">ng serve (développement)</div>
+      </div>
+      <div class="port-card">
+        <div class="port-number">8081</div>
+        <div class="port-name">Backend SAEB</div>
+        <div class="port-desc">API REST principale</div>
+      </div>
+      <div class="port-card">
+        <div class="port-number">7070</div>
+        <div class="port-name">Auth Server</div>
+        <div class="port-desc">JWT / SSO / OAuth2</div>
+      </div>
+      <div class="port-card">
+        <div class="port-number">8080</div>
+        <div class="port-name">Keycloak</div>
+        <div class="port-desc">Realm: canvaAgricole</div>
+      </div>
+      <div class="port-card">
+        <div class="port-number">8082</div>
+        <div class="port-name">BNA Auth (LDAP)</div>
+        <div class="port-desc">Legacy authentication</div>
+      </div>
+    </div>
+
+    <div class="grid-2 mt-24">
+      <div class="card">
+        <h3>Lancement Backend (Maven)</h3>
+        <pre style="background:#f1f8e9;padding:14px;border-radius:8px;font-size:0.82rem;overflow:auto;border:1px solid var(--border);">
+# Backend SAEB
+cd backend-saeb
+mvn spring-boot:run
+
+# Authorization Server
+cd authorization-server-be
+mvn spring-boot:run
+
+# Legacy Auth
+cd bnaauthentication
+mvn spring-boot:run</pre>
+      </div>
+      <div class="card">
+        <h3>Lancement Frontend (Angular)</h3>
+        <pre style="background:#f1f8e9;padding:14px;border-radius:8px;font-size:0.82rem;overflow:auto;border:1px solid var(--border);">
+# Installer les dépendances
+cd frontend-app1
+npm install
+
+# Démarrer en développement
+ng serve
+
+# Build de production
+ng build --configuration=production</pre>
+      </div>
+    </div>
+
+    <div class="card mt-16">
+      <h3>Paramètres d&rsquo;upload</h3>
+      <ul class="check-list">
+        <li>Répertoire de stockage : <code>./uploads</code> (configurable)</li>
+        <li>Taille maximale par fichier : <strong>10 MB</strong></li>
+        <li>Formats supportés : PDF, images (JPG, PNG)</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Canva Agricole &mdash; BNA</strong> &mdash; Documentation technique &amp; fonctionnelle &mdash; Générée le 05/05/2026
+</footer>
+
+</body>
+</html>

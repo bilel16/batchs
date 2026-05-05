@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Améliorations Techniques — Canva Agricole</title>
+  <style>
+    :root {
+      --red:       #c62828; --red-bg:    #ffebee; --red-border: #ef9a9a;
+      --orange:    #e65100; --orange-bg: #fff3e0; --orange-border: #ffcc80;
+      --blue:      #1565c0; --blue-bg:   #e3f2fd; --blue-border: #90caf9;
+      --green:     #1b5e20; --green-bg:  #e8f5e9; --green-border: #a5d6a7;
+      --purple:    #4a148c; --purple-bg: #f3e5f5; --purple-border: #ce93d8;
+      --teal:      #004d40; --teal-bg:   #e0f2f1; --teal-border: #80cbc4;
+      --gray:      #37474f; --gray-bg:   #eceff1; --gray-border: #b0bec5;
+      --dark:      #1a1a2e;
+      --text:      #1c1c1c;
+      --muted:     #546e7a;
+      --border:    #dce3e8;
+      --white:     #ffffff;
+      --bg:        #f0f4f8;
+      --shadow:    0 2px 12px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b2a4a 55%, #1a3a5c 100%);
+      color: #fff; padding: 52px 48px 40px; position: relative; overflow: hidden;
+    }
+    header::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    header::after {
+      content: ''; position: absolute; bottom: -50px; left: 300px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+    .header-tag {
+      display: inline-block; background: #e53935; color: #fff;
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 18px;
+    }
+    header h1 { font-size: 2.3rem; font-weight: 800; margin-bottom: 10px; }
+    header p.sub { font-size: 1rem; opacity: 0.82; max-width: 680px; margin-bottom: 28px; }
+    .legend {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+      padding: 7px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot-crit   { background: #ef5350; }
+    .dot-high   { background: #fb8c00; }
+    .dot-medium { background: #42a5f5; }
+    .dot-low    { background: #66bb6a; }
+
+    /* ── NAV ── */
+    nav {
+      background: #1a2744; padding: 0 48px; display: flex; gap: 2px;
+      flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+    nav a {
+      color: rgba(255,255,255,0.72); text-decoration: none;
+      padding: 13px 16px; font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.4px; border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s; white-space: nowrap;
+    }
+    nav a:hover { color: #fff; border-bottom-color: #42a5f5; }
+
+    /* ── MAIN ── */
+    main { max-width: 1300px; margin: 0 auto; padding: 44px 32px; }
+
+    /* ── SUMMARY STATS ── */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px; margin-bottom: 48px;
+    }
+    .stat {
+      background: var(--white); border-radius: 14px; padding: 22px 16px;
+      text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border);
+    }
+    .stat-num { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+    .stat-num.red    { color: var(--red); }
+    .stat-num.orange { color: var(--orange); }
+    .stat-num.blue   { color: var(--blue); }
+    .stat-num.green  { color: var(--green); }
+    .stat-label { font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+
+    /* ── SECTION ── */
+    section { margin-bottom: 60px; }
+    .section-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-icon {
+      width: 50px; height: 50px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+      background: linear-gradient(135deg, #1b2a4a, #1a3a5c);
+      color: #fff;
+    }
+    .section-header h2 { font-size: 1.55rem; font-weight: 800; color: #0d1b2a; }
+    .section-header .count {
+      margin-left: auto; background: #e3f2fd; color: var(--blue);
+      font-size: 0.75rem; font-weight: 700; padding: 4px 12px;
+      border-radius: 20px; border: 1px solid var(--blue-border); white-space: nowrap;
+    }
+
+    /* ── ITEM CARD ── */
+    .item-card {
+      background: var(--white); border-radius: 14px; border: 1px solid var(--border);
+      box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .item-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
+
+    .item-header {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 20px 24px 0;
+    }
+    .priority-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.8px;
+      text-transform: uppercase; flex-shrink: 0; margin-top: 2px;
+    }
+    .p-critical { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+    .p-high     { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); }
+    .p-medium   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+    .p-low      { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+
+    .item-title {
+      font-size: 1.02rem; font-weight: 700; color: var(--dark); margin-bottom: 4px;
+    }
+    .item-meta { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+
+    .item-body { padding: 14px 24px 20px 24px; }
+    .item-body p { font-size: 0.88rem; color: var(--muted); margin-bottom: 12px; }
+
+    /* ── PROBLEM / SOLUTION ── */
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    @media(max-width:640px){ .ps-grid { grid-template-columns: 1fr; } }
+    .ps-box {
+      padding: 14px 16px; border-radius: 10px; font-size: 0.83rem;
+    }
+    .ps-box strong { display: block; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; font-weight: 800; }
+    .ps-problem { background: #fff5f5; border: 1px solid #ffcdd2; }
+    .ps-problem strong { color: #b71c1c; }
+    .ps-solution { background: #f1f8e9; border: 1px solid #c5e1a5; }
+    .ps-solution strong { color: #33691e; }
+
+    /* ── CODE ── */
+    .code-block {
+      background: #0d1117; color: #c9d1d9; border-radius: 10px;
+      padding: 16px 18px; font-family: 'Cascadia Code','Fira Code','Courier New', monospace;
+      font-size: 0.78rem; overflow-x: auto; margin-bottom: 12px;
+      border: 1px solid #30363d; line-height: 1.7;
+    }
+    .code-block .cmt  { color: #8b949e; }
+    .code-block .kw   { color: #ff7b72; }
+    .code-block .str  { color: #a5d6ff; }
+    .code-block .ann  { color: #ffa657; }
+    .code-block .cls  { color: #79c0ff; }
+    .code-block .num  { color: #79c0ff; }
+    .code-block .ok   { color: #56d364; }
+    .code-block .bad  { color: #ff7b72; }
+
+    /* ── TAGS ── */
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .tag {
+      padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    }
+    .tag-tech    { background: var(--gray-bg);   color: var(--gray);   border: 1px solid var(--gray-border); }
+    .tag-effort  { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-border); }
+    .tag-impact  { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-left: 4px solid; padding: 14px 18px; border-radius: 0 10px 10px 0;
+      font-size: 0.86rem; margin-bottom: 14px;
+    }
+    .callout-red    { border-color: var(--red);    background: var(--red-bg); color: #7f0000; }
+    .callout-orange { border-color: var(--orange); background: var(--orange-bg); color: #7a3000; }
+    .callout-blue   { border-color: var(--blue);   background: var(--blue-bg); color: #0d3b8c; }
+
+    /* ── GRID 2 ── */
+    .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+
+    /* ── SEPARATOR ── */
+    .sep { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0d1b2a; color: rgba(255,255,255,0.6);
+      text-align: center; padding: 28px 40px; font-size: 0.8rem;
+    }
+    footer strong { color: #fff; }
+
+    @media(max-width:640px){
+      header { padding: 32px 20px; }
+      main { padding: 24px 16px; }
+      nav { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="header-tag">Audit Technique — Canva Agricole</div>
+  <h1>Points d'amélioration &amp; bonnes pratiques</h1>
+  <p class="sub">
+    Analyse des axes d'amélioration du projet Canva Agricole (BNA) selon les standards
+    modernes : sécurité, qualité, maintenabilité, performance et observabilité.
+  </p>
+  <div class="legend">
+    <div class="legend-item"><div class="dot dot-crit"></div> Critique — À corriger immédiatement</div>
+    <div class="legend-item"><div class="dot dot-high"></div> Priorité haute — Court terme</div>
+    <div class="legend-item"><div class="dot dot-medium"></div> Priorité moyenne — Moyen terme</div>
+    <div class="legend-item"><div class="dot dot-low"></div> Amélioration — Long terme</div>
+  </div>
+</header>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <a href="#securite">🔒 Sécurité</a>
+  <a href="#backend">☕ Backend</a>
+  <a href="#frontend">🅰️ Frontend</a>
+  <a href="#database">🗄️ Base de données</a>
+  <a href="#tests">🧪 Tests</a>
+  <a href="#architecture">🏗️ Architecture</a>
+  <a href="#qualite">📐 Qualité code</a>
+  <a href="#cicd">🚀 CI/CD</a>
+  <a href="#perf">⚡ Performance</a>
+  <a href="#observabilite">📊 Observabilité</a>
+  <a href="#roadmap">🗺️ Roadmap</a>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main>
+
+  <!-- STATS -->
+  <div class="summary">
+    <div class="stat"><div class="stat-num red">5</div><div class="stat-label">Points critiques</div></div>
+    <div class="stat"><div class="stat-num orange">11</div><div class="stat-label">Priorité haute</div></div>
+    <div class="stat"><div class="stat-num blue">14</div><div class="stat-label">Priorité moyenne</div></div>
+    <div class="stat"><div class="stat-num green">8</div><div class="stat-label">Améliorations</div></div>
+    <div class="stat"><div class="stat-num" style="color:#1a237e">38</div><div class="stat-label">Total points</div></div>
+    <div class="stat"><div class="stat-num" style="color:#4a148c">10</div><div class="stat-label">Catégories</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SÉCURITÉ
+  ════════════════════════════════════════ -->
+  <section id="securite">
+    <div class="section-header">
+      <div class="section-icon">🔒</div>
+      <h2>Sécurité</h2>
+      <span class="count">6 points</span>
+    </div>
+
+    <!-- S1 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-critical">🔴 Critique</span>
+        <div>
+          <div class="item-title">Secrets en clair dans les fichiers de configuration</div>
+          <div class="item-meta">application.properties · application.yml</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les mots de passe Oracle, la clé secrète JWT et les credentials LDAP sont écrits en clair dans les fichiers de configuration versionnés. C'est la vulnérabilité la plus critique du projet.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Problème actuel</strong>spring.datasource.password=motDePasse<br/>jwt.secret=monSecretJWT123</div>
+          <div class="ps-box ps-solution"><strong>Solution</strong>Utiliser des variables d'environnement OS ou un vault (HashiCorp Vault, Spring Cloud Config Server avec encryption).</div>
+        </div>
+        <div class="code-block">
+<span class="cmt"># application.properties — MAUVAISE pratique</span>
+<span class="bad">spring.datasource.password=saeb_password_prod</span>
+
+<span class="cmt"># BONNE pratique — variables d'environnement</span>
+<span class="ok">spring.datasource.password=${DB_PASSWORD}</span>
+<span class="ok">spring.datasource.url=${DB_URL}</span>
+<span class="ok">jwt.secret=${JWT_SECRET}</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">Spring Cloud Config</span>
+          <span class="tag tag-tech">HashiCorp Vault</span>
+          <span class="tag tag-effort">Effort: Faible</span>
+          <span class="tag tag-impact">Impact: Maximal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-critical">🔴 Critique</span>
+        <div>
+          <div class="item-title">Absence de HTTPS / TLS en production</div>
+          <div class="item-meta">Tous les services — HTTP non chiffré</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Aucune configuration SSL/TLS n'est présente dans les fichiers de config. Le trafic entre le frontend Angular, les backends Spring Boot et la base Oracle circule en clair.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Risque</strong>Interception de tokens JWT, credentials DB, données clients agricoles sensibles sur le réseau interne BNA.</div>
+          <div class="ps-box ps-solution"><strong>Solution</strong>Configurer SSL sur Spring Boot (keystore PKCS12) ou placer un reverse proxy Nginx/Apache avec certificat TLS devant chaque service.</div>
+        </div>
+        <div class="code-block">
+<span class="cmt"># application.properties — Activer HTTPS Spring Boot</span>
+<span class="ok">server.ssl.enabled=true</span>
+<span class="ok">server.ssl.key-store=classpath:keystore.p12</span>
+<span class="ok">server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}</span>
+<span class="ok">server.ssl.key-store-type=PKCS12</span>
+<span class="ok">server.port=8443</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">TLS/SSL</span><span class="tag tag-tech">Nginx</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Critique</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-critical">🔴 Critique</span>
+        <div>
+          <div class="item-title">Absence de validation des entrées (@Valid)</div>
+          <div class="item-meta">Tous les contrôleurs REST du backend-saeb</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les contrôleurs REST ne valident pas les données reçues. Des payloads malformés, des injections SQL ou des valeurs hors limites peuvent atteindre la couche service.</p>
+        <div class="code-block">
+<span class="cmt">// AVANT — Aucune validation</span>
+<span class="ann">@PostMapping</span>
+<span class="kw">public</span> ResponseEntity createCaneva(<span class="ann">@RequestBody</span> CanevaDto dto) { ... }
+
+<span class="cmt">// APRÈS — Validation Bean Validation + handler global</span>
+<span class="ann">@PostMapping</span>
+<span class="kw">public</span> ResponseEntity createCaneva(<span class="ann">@Valid @RequestBody</span> CanevaDto dto) { ... }
+
+<span class="cmt">// DTO annoté</span>
+<span class="kw">public class</span> <span class="cls">CanevaDto</span> {
+    <span class="ann">@NotBlank</span> <span class="ann">@Size(max = 200)</span>
+    <span class="kw">private</span> String titre;
+    <span class="ann">@NotNull @Positive</span>
+    <span class="kw">private</span> BigDecimal montantTotal;
+    <span class="ann">@NotNull</span>
+    <span class="kw">private</span> Long clientId;
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">Bean Validation</span><span class="tag tag-tech">@Valid</span><span class="tag tag-tech">@ControllerAdvice</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Critique</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Absence de protection brute-force sur l'authentification</div>
+          <div class="item-meta">authorization-server-be · bnaauthentication</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les endpoints <code>/api/auth/login</code> et <code>/auth/signin/multiple</code> ne sont pas protégés contre les attaques par force brute. Il n'y a pas de rate limiting ni de verrouillage de compte.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Risque</strong>Tentatives illimitées de connexion sur les comptes BNA des agents.</div>
+          <div class="ps-box ps-solution"><strong>Solution</strong>Bucket4J (rate limiting par IP/username) + verrouillage temporaire après N échecs + Spring Boot Actuator metrics.</div>
+        </div>
+        <div class="code-block">
+<span class="cmt">// Rate limiting avec Bucket4J</span>
+<span class="ann">@PostMapping</span>(<span class="str">"/api/auth/login"</span>)
+<span class="kw">public</span> ResponseEntity login(<span class="ann">@RequestBody</span> LoginRequest req, HttpServletRequest httpReq) {
+    String ip = httpReq.getRemoteAddr();
+    <span class="kw">if</span> (!rateLimiter.tryConsume(ip)) {
+        <span class="kw">return</span> ResponseEntity.status(<span class="num">429</span>).body(<span class="str">"Trop de tentatives"</span>);
+    }
+    <span class="cmt">// ... logique auth</span>
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">Bucket4J</span><span class="tag tag-tech">Spring Security</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Élevé</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Validation insuffisante des fichiers uploadés</div>
+          <div class="item-meta">DocumentClientCanvaController · Upload endpoint</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>La validation des uploads se limite à la taille (10MB). Le type MIME réel du fichier, la présence de malware et le nom de fichier ne sont pas validés côté serveur.</p>
+        <div class="code-block">
+<span class="cmt">// Validation renforcée à ajouter</span>
+<span class="kw">private static final</span> List&lt;String&gt; ALLOWED_TYPES =
+    List.of(<span class="str">"application/pdf"</span>, <span class="str">"image/jpeg"</span>, <span class="str">"image/png"</span>);
+
+<span class="kw">private void</span> validateFile(MultipartFile file) {
+    <span class="kw">if</span> (!ALLOWED_TYPES.contains(file.getContentType()))
+        <span class="kw">throw new</span> <span class="cls">InvalidFileException</span>(<span class="str">"Type non autorisé"</span>);
+    String safeName = StringUtils.cleanPath(file.getOriginalFilename());
+    <span class="kw">if</span> (safeName.contains(<span class="str">".."</span>))
+        <span class="kw">throw new</span> <span class="cls">InvalidFileException</span>(<span class="str">"Nom de fichier invalide"</span>);
+    <span class="cmt">// Scanner avec Apache Tika pour vérifier le type réel</span>
+    Tika tika = <span class="kw">new</span> <span class="cls">Tika</span>();
+    String detected = tika.detect(file.getInputStream());
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">Apache Tika</span><span class="tag tag-tech">MIME validation</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Élevé</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Absence de journal d'audit des opérations sensibles</div>
+          <div class="item-meta">backend-saeb — toutes les opérations d'écriture</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les créations, modifications et suppressions de canevas, crédits et garanties ne sont pas auditées. En cas d'incident, il est impossible de savoir qui a fait quoi et quand.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-solution"><strong>Solution</strong>Spring Data Auditing (<code>@CreatedBy</code>, <code>@LastModifiedBy</code>, <code>@CreatedDate</code>) + table d'audit dédiée ou AOP pour les actions critiques.</div>
+          <div class="ps-box ps-solution"><strong>Alternative</strong>Envers (Hibernate Envers) pour historiser automatiquement toutes les modifications d'entités JPA.</div>
+        </div>
+        <div class="code-block">
+<span class="cmt">// Activer Spring Data Auditing</span>
+<span class="ann">@EntityListeners</span>(AuditingEntityListener.<span class="kw">class</span>)
+<span class="ann">@MappedSuperclass</span>
+<span class="kw">public abstract class</span> <span class="cls">AuditableEntity</span> {
+    <span class="ann">@CreatedBy</span>   <span class="kw">private</span> String createdBy;
+    <span class="ann">@LastModifiedBy</span> <span class="kw">private</span> String updatedBy;
+    <span class="ann">@CreatedDate</span> <span class="kw">private</span> LocalDateTime createdAt;
+    <span class="ann">@LastModifiedDate</span> <span class="kw">private</span> LocalDateTime updatedAt;
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">Spring Data Auditing</span><span class="tag tag-tech">Hibernate Envers</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Élevé</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════
+       BACKEND
+  ════════════════════════════════════════ -->
+  <section id="backend">
+    <div class="section-header">
+      <div class="section-icon">☕</div>
+      <h2>Backend Spring Boot</h2>
+      <span class="count">7 points</span>
+    </div>
+
+    <!-- B1 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-critical">🔴 Critique</span>
+        <div>
+          <div class="item-title">Coexistence Java 8 / Java 17 et Spring Boot 2 / Spring Boot 3</div>
+          <div class="item-meta">bnaauthentication (Java 8, SB 2.0.5) vs backend-saeb (Java 17, SB 3.2)</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Le module <code>bnaauthentication</code> utilise Spring Boot 2.0.5 (EOL depuis novembre 2023) et Java 8 (EOL commercial). Cela représente des failles de sécurité non patchées et une incompatibilité grandissante avec le reste du projet.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Risque</strong>Spring Boot 2.0.5 n'est plus maintenu. Les CVE connues ne seront jamais corrigées. Java 8 manque des features critiques de sécurité de Java 17+.</div>
+          <div class="ps-box ps-solution"><strong>Plan de migration</strong>1. Migrer vers Spring Boot 2.7.x (LTS) en premier, puis vers 3.x. 2. Migrer vers Java 17. 3. Remplacer spring-security-ldap par la version compatible Spring Boot 3.</div>
+        </div>
+        <div class="tags">
+          <span class="tag tag-tech">Spring Boot 3.x</span><span class="tag tag-tech">Java 17</span><span class="tag tag-tech">Migration LDAP</span>
+          <span class="tag tag-effort">Effort: Élevé</span><span class="tag tag-impact">Impact: Critique</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B2 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Absence de gestionnaire global des exceptions</div>
+          <div class="item-meta">backend-saeb — couche web</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Sans <code>@ControllerAdvice</code> global, les exceptions non gérées exposent des stack traces Java complètes à l'API client, révélant la structure interne du code.</p>
+        <div class="code-block">
+<span class="ann">@RestControllerAdvice</span>
+<span class="kw">public class</span> <span class="cls">GlobalExceptionHandler</span> {
+
+    <span class="ann">@ExceptionHandler</span>(EntityNotFoundException.<span class="kw">class</span>)
+    <span class="ann">@ResponseStatus</span>(HttpStatus.NOT_FOUND)
+    <span class="kw">public</span> <span class="cls">ApiError</span> handleNotFound(<span class="cls">EntityNotFoundException</span> ex) {
+        <span class="kw">return new</span> <span class="cls">ApiError</span>(<span class="str">"NOT_FOUND"</span>, ex.getMessage(), LocalDateTime.now());
+    }
+
+    <span class="ann">@ExceptionHandler</span>(MethodArgumentNotValidException.<span class="kw">class</span>)
+    <span class="ann">@ResponseStatus</span>(HttpStatus.BAD_REQUEST)
+    <span class="kw">public</span> <span class="cls">ApiError</span> handleValidation(<span class="cls">MethodArgumentNotValidException</span> ex) {
+        List&lt;String&gt; errors = ex.getBindingResult().getFieldErrors()
+            .stream().map(e -> e.getField() + <span class="str">": "</span> + e.getDefaultMessage()).toList();
+        <span class="kw">return new</span> <span class="cls">ApiError</span>(<span class="str">"VALIDATION_ERROR"</span>, errors, LocalDateTime.now());
+    }
+
+    <span class="ann">@ExceptionHandler</span>(Exception.<span class="kw">class</span>)
+    <span class="ann">@ResponseStatus</span>(HttpStatus.INTERNAL_SERVER_ERROR)
+    <span class="kw">public</span> <span class="cls">ApiError</span> handleGeneric(<span class="cls">Exception</span> ex) {
+        log.error(<span class="str">"Unhandled exception"</span>, ex); <span class="cmt">// Log complet côté serveur</span>
+        <span class="kw">return new</span> <span class="cls">ApiError</span>(<span class="str">"INTERNAL_ERROR"</span>, <span class="str">"Une erreur est survenue"</span>, LocalDateTime.now());
+    }
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">@ControllerAdvice</span><span class="tag tag-tech">RFC 7807 Problem Details</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Élevé</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B3 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Absence de pagination sur les endpoints de liste</div>
+          <div class="item-meta">CanevaController · ClientController · et autres listes</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les endpoints retournant des listes (<code>GET /api/canevas</code>) renvoient vraisemblablement toutes les données sans pagination. Sur une base de données BNA en production avec des milliers de dossiers, cela peut provoquer des timeouts et une surcharge mémoire.</p>
+        <div class="code-block">
+<span class="cmt">// AVANT — Pas de pagination</span>
+<span class="ann">@GetMapping</span>
+<span class="kw">public</span> List&lt;CanevaDto&gt; getAll() { <span class="kw">return</span> canevaService.findAll(); }
+
+<span class="cmt">// APRÈS — Pagination Spring Data</span>
+<span class="ann">@GetMapping</span>
+<span class="kw">public</span> Page&lt;CanevaDto&gt; getAll(
+    <span class="ann">@RequestParam</span>(defaultValue=<span class="str">"0"</span>) <span class="kw">int</span> page,
+    <span class="ann">@RequestParam</span>(defaultValue=<span class="str">"20"</span>) <span class="kw">int</span> size,
+    <span class="ann">@RequestParam</span>(defaultValue=<span class="str">"createdAt,desc"</span>) String sort) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sort.split(<span class="str">","</span>)));
+    <span class="kw">return</span> canevaService.findAll(pageable);
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">Spring Data Pageable</span><span class="tag tag-tech">Page&lt;T&gt;</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Élevé</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B4 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Remplacer ModelMapper par MapStruct</div>
+          <div class="item-meta">backend-saeb — MapperConfig.java · tous les services</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>ModelMapper utilise la réflexion à l'exécution : lent, non type-safe, et les erreurs de mapping ne sont détectées qu'au runtime. MapStruct génère du code Java à la compilation, zéro réflexion, 10-20x plus rapide.</p>
+        <div class="code-block">
+<span class="cmt">// MapStruct — génération à la compilation</span>
+<span class="ann">@Mapper</span>(componentModel = <span class="str">"spring"</span>)
+<span class="kw">public interface</span> <span class="cls">CanevaMapper</span> {
+    CanevaDto toDto(Caneva entity);
+    Caneva toEntity(CanevaDto dto);
+    List&lt;CanevaDto&gt; toDtoList(List&lt;Caneva&gt; entities);
+
+    <span class="ann">@Mapping</span>(target = <span class="str">"clientNom"</span>, source = <span class="str">"client.nom"</span>)
+    CanevaDto toDtoWithClient(Caneva entity);
+}
+<span class="cmt">// pom.xml dependency</span>
+<span class="cmt">&lt;artifactId&gt;mapstruct&lt;/artifactId&gt;&lt;version&gt;1.5.5.Final&lt;/version&gt;</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">MapStruct</span><span class="tag tag-tech">APT</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Performance + Type Safety</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B5 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Versionner l'API REST (/api/v1/...)</div>
+          <div class="item-meta">Tous les contrôleurs — /api/* sans version</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Sans versionnage, toute modification breaking d'un endpoint impacte immédiatement tous les clients Angular. Un versionnage dès maintenant protège contre les régressions futures.</p>
+        <div class="code-block">
+<span class="cmt">// Ajouter /v1 dans tous les RequestMapping</span>
+<span class="ann">@RequestMapping</span>(<span class="str">"/api/v1/canevas"</span>)
+<span class="kw">public class</span> <span class="cls">CanevaController</span> { ... }
+
+<span class="cmt">// Ou via propriété globale dans application.properties</span>
+<span class="ok">spring.mvc.pathmatch.use-suffix-pattern=false</span>
+<span class="ok">api.version=v1</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">API Versioning</span><span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Maintenabilité</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B6 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Profils Spring par environnement (dev/staging/prod)</div>
+          <div class="item-meta">application.properties — configuration unique</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Un seul fichier <code>application.properties</code> pour tous les environnements force à modifier manuellement les configs entre dev et prod. Risque de push accidentel de configs de production.</p>
+        <div class="code-block">
+<span class="cmt"># Structure recommandée</span>
+application.properties          <span class="cmt"># Valeurs communes</span>
+application-dev.properties      <span class="cmt"># DB locale, logs DEBUG, Swagger actif</span>
+application-staging.properties  <span class="cmt"># DB staging, logs INFO</span>
+application-prod.properties     <span class="cmt"># DB prod, logs WARN, Swagger désactivé</span>
+
+<span class="cmt"># Activation</span>
+<span class="ok">spring.profiles.active=${SPRING_PROFILE:dev}</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">Spring Profiles</span><span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Élevé</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B7 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Configurer les timeouts et circuit breakers sur les appels Feign</div>
+          <div class="item-meta">spring-cloud-starter-openfeign — clients inter-services</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les clients OpenFeign (appels vers d'autres microservices) n'ont pas de timeout configuré ni de circuit breaker. Un service tombé peut bloquer indéfiniment le backend SAEB et épuiser le pool de threads.</p>
+        <div class="code-block">
+<span class="cmt"># application.properties — Timeouts Feign</span>
+<span class="ok">feign.client.config.default.connectTimeout=3000</span>
+<span class="ok">feign.client.config.default.readTimeout=5000</span>
+
+<span class="cmt">// Circuit Breaker avec Resilience4j</span>
+<span class="ann">@FeignClient</span>(name=<span class="str">"bna-auth"</span>, fallback=BnaAuthFallback.<span class="kw">class</span>)
+<span class="kw">public interface</span> <span class="cls">BnaAuthClient</span> {
+    <span class="ann">@PostMapping</span>(<span class="str">"/auth/signin/multiple"</span>)
+    AuthResponse authenticate(<span class="ann">@RequestBody</span> AuthRequest req);
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">Resilience4j</span><span class="tag tag-tech">OpenFeign</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Résilience</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FRONTEND
+  ════════════════════════════════════════ -->
+  <section id="frontend">
+    <div class="section-header">
+      <div class="section-icon">🅰️</div>
+      <h2>Frontend Angular</h2>
+      <span class="count">6 points</span>
+    </div>
+
+    <!-- F1 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Risque de fuites mémoire — Observables non désabonnés</div>
+          <div class="item-meta">Tous les composants Angular utilisant subscribe()</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Si les composants Angular utilisent <code>.subscribe()</code> sans désabonnement dans <code>ngOnDestroy</code>, chaque navigation crée des souscriptions fantômes qui restent en mémoire et déclenchent des appels HTTP sur des composants détruits.</p>
+        <div class="code-block">
+<span class="cmt">// RISQUE — subscribe sans cleanup</span>
+<span class="bad">this.canevaService.getAll().subscribe(data => this.canevas = data);</span>
+
+<span class="cmt">// BONNE PRATIQUE — takeUntilDestroyed (Angular 16+)</span>
+<span class="kw">private</span> destroyRef = inject(DestroyRef);
+
+this.canevaService.getAll()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(data => this.canevas = data);
+
+<span class="cmt">// Ou AsyncPipe dans le template (désabonnement automatique)</span>
+<span class="cmt">// canevas$ = this.canevaService.getAll()</span>
+<span class="cmt">// Template: *ngFor="let c of canevas$ | async"</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">takeUntilDestroyed</span><span class="tag tag-tech">AsyncPipe</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Stabilité</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F2 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Absence d'intercepteur global d'erreurs HTTP</div>
+          <div class="item-meta">_helpers/auth.interceptor.ts — gestion erreurs manquante</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>L'intercepteur actuel injecte le JWT mais ne gère pas les erreurs HTTP globalement (401 → redirect login, 403 → message, 500 → toast, réseau → retry). Chaque service doit gérer ses propres erreurs.</p>
+        <div class="code-block">
+<span class="ann">@Injectable</span>()
+<span class="kw">export class</span> <span class="cls">ErrorInterceptor</span> <span class="kw">implements</span> HttpInterceptor {
+    intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt; {
+        <span class="kw">return</span> next.handle(req).pipe(
+            retry({ count: <span class="num">1</span>, delay: <span class="num">1000</span> }), <span class="cmt">// 1 retry sur erreur réseau</span>
+            catchError((err: HttpErrorResponse) => {
+                <span class="kw">if</span> (err.status === <span class="num">401</span>) this.auth.logout();
+                <span class="kw">if</span> (err.status === <span class="num">403</span>) this.toast.warn(<span class="str">'Accès refusé'</span>);
+                <span class="kw">if</span> (err.status >= <span class="num">500</span>) this.toast.error(<span class="str">'Erreur serveur'</span>);
+                <span class="kw">return</span> throwError(() => err);
+            })
+        );
+    }
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">HttpInterceptor</span><span class="tag tag-tech">RxJS catchError</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: UX + Sécurité</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F3 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Double bibliothèque UI — PrimeNG + Angular Material</div>
+          <div class="item-meta">package.json — deux librairies de composants</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>PrimeNG (17.14.1) et Angular Material (17.3.10) sont toutes deux installées. Cela représente ~800KB de CSS et JS supplémentaire non nécessaire, des styles conflictuels et une incohérence visuelle.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Impact</strong>Bundle size gonflé, chargement initial plus lent, styles incohérents, double courbe d'apprentissage pour les développeurs.</div>
+          <div class="ps-box ps-solution"><strong>Solution</strong>Choisir une seule librairie (PrimeNG recommandé car plus utilisé dans le projet) et migrer les composants Material vers PrimeNG équivalents.</div>
+        </div>
+        <div class="tags">
+          <span class="tag tag-tech">PrimeNG</span><span class="tag tag-tech">Bundle optimization</span>
+          <span class="tag tag-effort">Effort: Élevé</span><span class="tag tag-impact">Impact: Performance + UX</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F4 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Unifier le système d'authentification (Keycloak vs Custom)</div>
+          <div class="item-meta">auth.service.ts — dual authentication mode</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Le frontend supporte deux modes d'auth (Keycloak et Custom) via une condition sur <code>AUTH_MODE</code>. Cela double la complexité du code d'auth, des guards et des intercepteurs, et multiplie les chemins de test.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Problème</strong>Code conditionnel partout, deux types de tokens, deux guards, deux flows de refresh — difficile à maintenir et à tester.</div>
+          <div class="ps-box ps-solution"><strong>Solution</strong>Adopter Keycloak comme seul fournisseur SSO, retirer le mode custom, ou encapsuler les deux dans une interface commune <code>AuthStrategy</code> (Strategy pattern).</div>
+        </div>
+        <div class="tags">
+          <span class="tag tag-tech">Strategy Pattern</span><span class="tag tag-tech">Keycloak</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Maintenabilité</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F5 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Ajouter ESLint + Prettier avec règles strictes</div>
+          <div class="item-meta">frontend-app1 — pas de linting configuré</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Sans linting et formatage automatique, la qualité du code TypeScript est incohérente entre développeurs. Des bugs courants (any implicite, == au lieu de ===, variables non utilisées) ne sont pas détectés.</p>
+        <div class="code-block">
+<span class="cmt"># Installation</span>
+ng add @angular-eslint/schematics
+npm install --save-dev prettier eslint-config-prettier
+
+<span class="cmt">// .eslintrc.json — règles importantes</span>
+{
+  <span class="str">"rules"</span>: {
+    <span class="str">"@typescript-eslint/no-explicit-any"</span>: <span class="str">"error"</span>,
+    <span class="str">"@typescript-eslint/no-unused-vars"</span>: <span class="str">"error"</span>,
+    <span class="str">"@angular-eslint/no-empty-lifecycle-method"</span>: <span class="str">"error"</span>
+  }
+}</div>
+        <div class="tags">
+          <span class="tag tag-tech">ESLint</span><span class="tag tag-tech">Prettier</span><span class="tag tag-tech">@angular-eslint</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Qualité code</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F6 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-low">🟢 Amélioration</span>
+        <div>
+          <div class="item-title">Ajouter le support i18n (Arabe / Français)</div>
+          <div class="item-meta">frontend-app1 — interface uniquement en français</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>L'interface est en français uniquement. Les agents et clients BNA peuvent nécessiter une interface en arabe. Angular i18n ou ngx-translate permettent de supporter les deux langues avec direction RTL pour l'arabe.</p>
+        <div class="code-block">
+<span class="cmt">// ngx-translate — approche flexible</span>
+npm install @ngx-translate/core @ngx-translate/http-loader
+
+<span class="cmt">// assets/i18n/fr.json</span>
+{ <span class="str">"CANEVAS.TITLE"</span>: <span class="str">"Liste des Canevas"</span> }
+
+<span class="cmt">// assets/i18n/ar.json</span>
+{ <span class="str">"CANEVAS.TITLE"</span>: <span class="str">"قائمة النماذج"</span> }
+
+<span class="cmt">// Template</span>
+&lt;h1&gt;{{ 'CANEVAS.TITLE' | translate }}&lt;/h1&gt;</div>
+        <div class="tags">
+          <span class="tag tag-tech">ngx-translate</span><span class="tag tag-tech">RTL support</span>
+          <span class="tag tag-effort">Effort: Élevé</span><span class="tag tag-impact">Impact: Accessibilité</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════
+       BASE DE DONNÉES
+  ════════════════════════════════════════ -->
+  <section id="database">
+    <div class="section-header">
+      <div class="section-icon">🗄️</div>
+      <h2>Base de données Oracle</h2>
+      <span class="count">4 points</span>
+    </div>
+
+    <!-- D1 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-critical">🔴 Critique</span>
+        <div>
+          <div class="item-title">Aucun outil de migration de schéma (Flyway / Liquibase)</div>
+          <div class="item-meta">sqlSchema · V1_gpt__Initial_schema.sql — scripts manuels</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les scripts SQL sont appliqués manuellement. Sans outil de migration, il est impossible de savoir quelle version du schéma est appliquée sur quel environnement, et les migrations en équipe créent des conflits.</p>
+        <div class="ps-grid">
+          <div class="ps-box ps-problem"><strong>Risques actuels</strong>Schéma prod différent du schéma dev. Rollback impossible. Historique des changements perdu. Migrations non rejouables.</div>
+          <div class="ps-box ps-solution"><strong>Solution : Flyway</strong>Nommer les scripts V1__init.sql, V2__add_index.sql. Flyway les applique dans l'ordre et trace chaque migration dans FLYWAY_SCHEMA_HISTORY.</div>
+        </div>
+        <div class="code-block">
+<span class="cmt"># Structure Flyway recommandée</span>
+src/main/resources/db/migration/
+├── V1__initial_schema.sql
+├── V2__add_credit_indexes.sql
+├── V3__add_audit_columns.sql
+└── V4__add_garantie_table.sql
+
+<span class="cmt"># application.properties</span>
+<span class="ok">spring.flyway.enabled=true</span>
+<span class="ok">spring.flyway.locations=classpath:db/migration</span>
+<span class="ok">spring.flyway.baseline-on-migrate=true</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">Flyway</span><span class="tag tag-tech">Liquibase</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Critique</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- D2 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Documenter et optimiser les index Oracle</div>
+          <div class="item-meta">Tables CANEVAS_AGRICOLE · CREDIT_* · GARANTIE_*</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Les requêtes fréquentes de recherche de canevas par agent (matricule), par client, par date et par statut n'ont pas d'index documentés. Sur une table avec des milliers de dossiers, les full table scans dégradent les performances.</p>
+        <div class="code-block">
+<span class="cmt">-- Index recommandés sur CANEVAS_AGRICOLE</span>
+<span class="ok">CREATE INDEX idx_canevas_agent       ON CANEVAS_AGRICOLE(MATRICULE_AGENT);</span>
+<span class="ok">CREATE INDEX idx_canevas_client      ON CANEVAS_AGRICOLE(CLIENT_ID);</span>
+<span class="ok">CREATE INDEX idx_canevas_date_stat   ON CANEVAS_AGRICOLE(DATE_CREATION, STATUT);</span>
+<span class="ok">CREATE INDEX idx_credit_canevas      ON CREDIT_COURT_TERME(CANEVAS_ID);</span>
+<span class="ok">CREATE INDEX idx_garantie_canevas    ON GARANTIE_PROPOSEE(CANEVAS_ID);</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">Oracle Indexes</span><span class="tag tag-tech">EXPLAIN PLAN</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Performance</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- D3 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-medium">🔵 Moyenne</span>
+        <div>
+          <div class="item-title">Configurer le monitoring du pool HikariCP</div>
+          <div class="item-meta">DataSourceConfig.java — multi-datasource</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Le pool de connexions HikariCP n'expose pas ses métriques (connexions actives, en attente, temps de réponse). En cas de fuite de connexions ou de saturation, le problème sera détecté trop tard.</p>
+        <div class="code-block">
+<span class="cmt"># Exposer les métriques HikariCP via Actuator</span>
+<span class="ok">management.endpoints.web.exposure.include=health,metrics,hikaricp</span>
+<span class="ok">management.metrics.enable.hikaricp=true</span>
+
+<span class="cmt"># Tuning recommandé pour Oracle production</span>
+<span class="ok">spring.datasource.hikari.maximum-pool-size=20</span>
+<span class="ok">spring.datasource.hikari.minimum-idle=5</span>
+<span class="ok">spring.datasource.hikari.connection-timeout=30000</span>
+<span class="ok">spring.datasource.hikari.idle-timeout=600000</span>
+<span class="ok">spring.datasource.hikari.max-lifetime=1800000</span>
+<span class="ok">spring.datasource.hikari.leak-detection-threshold=60000</span></div>
+        <div class="tags">
+          <span class="tag tag-tech">HikariCP</span><span class="tag tag-tech">Spring Actuator</span>
+          <span class="tag tag-effort">Effort: Faible</span><span class="tag tag-impact">Impact: Stabilité</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- D4 -->
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-low">🟢 Amélioration</span>
+        <div>
+          <div class="item-title">Documenter la stratégie de sauvegarde (backup) Oracle</div>
+          <div class="item-meta">Infrastructure — non visible dans le projet</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Aucune stratégie de backup n'est documentée dans le projet. Les données financières agricoles sont critiques. Un RMAN (Recovery Manager Oracle) avec backup quotidien incrémental et test de restauration mensuel est indispensable.</p>
+        <div class="tags">
+          <span class="tag tag-tech">Oracle RMAN</span><span class="tag tag-tech">Data Guard</span>
+          <span class="tag tag-effort">Effort: Infrastructure</span><span class="tag tag-impact">Impact: Business Continuity</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TESTS
+  ════════════════════════════════════════ -->
+  <section id="tests">
+    <div class="section-header">
+      <div class="section-icon">🧪</div>
+      <h2>Tests &amp; Qualité</h2>
+      <span class="count">4 points</span>
+    </div>
+
+    <div class="callout callout-orange">
+      <strong>Situation actuelle :</strong> Aucun test unitaire ni d'intégration n'est visible dans le projet. Pour un système bancaire gérant des crédits agricoles, c'est un risque majeur à chaque déploiement.
+    </div>
+
+    <div class="g2">
+      <!-- T1 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-high">🟠 Haute</span>
+          <div><div class="item-title">Tests unitaires — Services Java</div><div class="item-meta">backend-saeb/service/</div></div>
+        </div>
+        <div class="item-body">
+          <p>Tester les calculs financiers, les règles métier (validation de crédits, calcul de garanties) avec JUnit 5 + Mockito. Objectif : 70% de couverture sur la couche service.</p>
+          <div class="code-block">
+<span class="ann">@ExtendWith</span>(MockitoExtension.<span class="kw">class</span>)
+<span class="kw">class</span> <span class="cls">CanevaServiceTest</span> {
+    <span class="ann">@Mock</span> <span class="kw">private</span> CanevaRepository repo;
+    <span class="ann">@InjectMocks</span> <span class="kw">private</span> CanevaService service;
+
+    <span class="ann">@Test</span>
+    <span class="kw">void</span> createCaneva_shouldPersistAndReturnDto() {
+        <span class="cmt">// given / when / then</span>
+    }
+}</div>
+          <div class="tags"><span class="tag tag-tech">JUnit 5</span><span class="tag tag-tech">Mockito</span><span class="tag tag-effort">Effort: Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- T2 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-high">🟠 Haute</span>
+          <div><div class="item-title">Tests d'intégration — Repositories + API</div><div class="item-meta">backend-saeb — couche repo + contrôleurs</div></div>
+        </div>
+        <div class="item-body">
+          <p>Tester les repositories avec <code>@DataJpaTest</code> sur une DB H2 en mémoire, et les contrôleurs REST avec <code>@SpringBootTest</code> + MockMvc ou RestAssured.</p>
+          <div class="code-block">
+<span class="ann">@SpringBootTest</span>
+<span class="ann">@AutoConfigureMockMvc</span>
+<span class="kw">class</span> <span class="cls">CanevaControllerIT</span> {
+    <span class="ann">@Autowired</span> MockMvc mvc;
+
+    <span class="ann">@Test</span>
+    <span class="kw">void</span> getAll_shouldReturn200() <span class="kw">throws</span> Exception {
+        mvc.perform(get(<span class="str">"/api/canevas"</span>)
+            .header(<span class="str">"Authorization"</span>, <span class="str">"Bearer "</span> + testToken))
+            .andExpect(status().isOk());
+    }
+}</div>
+          <div class="tags"><span class="tag tag-tech">@SpringBootTest</span><span class="tag tag-tech">MockMvc</span><span class="tag tag-tech">RestAssured</span></div>
+        </div>
+      </div>
+
+      <!-- T3 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Tests unitaires Angular (services + composants)</div><div class="item-meta">frontend-app1 — fichiers *.spec.ts vides</div></div>
+        </div>
+        <div class="item-body">
+          <p>Les fichiers spec.ts générés par Angular CLI sont probablement vides. Tester en priorité les services (<code>canevas.service.ts</code>, <code>analyseFinanciere.service.ts</code>) et les composants avec des données complexes.</p>
+          <div class="tags"><span class="tag tag-tech">Jasmine</span><span class="tag tag-tech">Karma</span><span class="tag tag-tech">Testing Library</span></div>
+        </div>
+      </div>
+
+      <!-- T4 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-low">🟢 Amélioration</span>
+          <div><div class="item-title">Tests E2E — Parcours utilisateur critiques</div><div class="item-meta">Cypress ou Playwright</div></div>
+        </div>
+        <div class="item-body">
+          <p>Automatiser les parcours critiques : créer un canevas, saisir un crédit, générer l'analyse financière, exporter en PDF. Ces tests E2E détectent les régressions de bout en bout.</p>
+          <div class="tags"><span class="tag tag-tech">Cypress</span><span class="tag tag-tech">Playwright</span><span class="tag tag-effort">Effort: Élevé</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       ARCHITECTURE
+  ════════════════════════════════════════ -->
+  <section id="architecture">
+    <div class="section-header">
+      <div class="section-icon">🏗️</div>
+      <h2>Architecture</h2>
+      <span class="count">4 points</span>
+    </div>
+
+    <div class="g2">
+      <!-- A1 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-high">🟠 Haute</span>
+          <div><div class="item-title">Containeriser avec Docker + Docker Compose</div><div class="item-meta">Aucun Dockerfile présent</div></div>
+        </div>
+        <div class="item-body">
+          <p>Sans Docker, le démarrage en local nécessite d'installer manuellement Java 17 + Java 8 + Node + Oracle. Un <code>docker-compose.yml</code> permet à un nouveau développeur de démarrer l'ensemble du projet en une commande.</p>
+          <div class="code-block">
+<span class="cmt"># docker-compose.yml</span>
+services:
+  backend-saeb:
+    build: ./backend-saeb
+    ports: [<span class="str">"8081:8081"</span>]
+    environment:
+      - DB_URL=${DB_URL}
+  auth-server:
+    build: ./authorization-server-be
+    ports: [<span class="str">"7070:7070"</span>]
+  frontend:
+    build: ./frontend-app1
+    ports: [<span class="str">"4200:80"</span>]</div>
+          <div class="tags"><span class="tag tag-tech">Docker</span><span class="tag tag-tech">Docker Compose</span><span class="tag tag-effort">Effort: Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- A2 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Ajouter un API Gateway</div><div class="item-meta">Spring Cloud Gateway ou Nginx</div></div>
+        </div>
+        <div class="item-body">
+          <p>Le frontend appelle directement chaque service sur son port. Un API Gateway centralise le routing, le rate limiting, l'authentification et les CORS en un seul point d'entrée.</p>
+          <div class="code-block">
+<span class="cmt"># Avant — Frontend appelle N ports directs</span>
+<span class="bad">http://localhost:8081/api/canevas</span>
+<span class="bad">http://localhost:7070/api/auth/login</span>
+
+<span class="cmt"># Après — Tout via le gateway</span>
+<span class="ok">http://localhost:8090/api/canevas  → backend-saeb:8081</span>
+<span class="ok">http://localhost:8090/auth/login   → auth-server:7070</span></div>
+          <div class="tags"><span class="tag tag-tech">Spring Cloud Gateway</span><span class="tag tag-tech">Nginx</span></div>
+        </div>
+      </div>
+
+      <!-- A3 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Spring Boot Actuator — Health checks complets</div><div class="item-meta">backend-saeb · authorization-server-be</div></div>
+        </div>
+        <div class="item-body">
+          <p>Les endpoints Actuator (<code>/actuator/health</code>, <code>/actuator/info</code>) permettent aux load balancers et outils de monitoring de vérifier l'état des services automatiquement.</p>
+          <div class="code-block">
+<span class="ok">management.endpoints.web.exposure.include=health,info,metrics</span>
+<span class="ok">management.endpoint.health.show-details=when-authorized</span>
+<span class="ok">management.health.db.enabled=true</span>
+<span class="ok">management.health.diskspace.enabled=true</span></div>
+          <div class="tags"><span class="tag tag-tech">Spring Actuator</span><span class="tag tag-tech">Health Indicators</span></div>
+        </div>
+      </div>
+
+      <!-- A4 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-low">🟢 Amélioration</span>
+          <div><div class="item-title">Configurer un serveur Eureka centralisé</div><div class="item-meta">Eureka Client présent sans serveur visible</div></div>
+        </div>
+        <div class="item-body">
+          <p>Le backend SAEB est configuré comme client Eureka mais le serveur Eureka n'est pas visible dans le projet. Il faut soit ajouter un module <code>eureka-server</code>, soit retirer la dépendance si non utilisée.</p>
+          <div class="tags"><span class="tag tag-tech">Netflix Eureka</span><span class="tag tag-tech">Service Discovery</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       QUALITÉ CODE
+  ════════════════════════════════════════ -->
+  <section id="qualite">
+    <div class="section-header">
+      <div class="section-icon">📐</div>
+      <h2>Qualité du code</h2>
+      <span class="count">3 points</span>
+    </div>
+
+    <div class="g2">
+      <!-- Q1 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-high">🟠 Haute</span>
+          <div><div class="item-title">Intégrer SonarQube / SonarLint</div><div class="item-meta">Pas d'analyse statique de code</div></div>
+        </div>
+        <div class="item-body">
+          <p>SonarQube détecte les bugs potentiels, les code smells, les vulnérabilités connues et la duplication de code. SonarLint (plugin IDE) les détecte en temps réel pendant le développement.</p>
+          <div class="code-block">
+<span class="cmt"># pom.xml — Plugin SonarQube</span>
+&lt;plugin&gt;
+  &lt;groupId&gt;org.sonarsource.scanner.maven&lt;/groupId&gt;
+  &lt;artifactId&gt;sonar-maven-plugin&lt;/artifactId&gt;
+&lt;/plugin&gt;
+
+<span class="cmt"># Analyse</span>
+mvn sonar:sonar -Dsonar.host.url=http://sonarqube:9000</div>
+          <div class="tags"><span class="tag tag-tech">SonarQube</span><span class="tag tag-tech">SonarLint</span><span class="tag tag-effort">Effort: Faible</span></div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Standardiser la nomenclature (Java + TypeScript)</div><div class="item-meta">Mélange de nommage FR/EN visible dans le code</div></div>
+        </div>
+        <div class="item-body">
+          <p>Les entités et DTOs utilisent un mélange de français et d'anglais (<code>Caneva</code>, <code>AvisDTO</code>, <code>SchemaCredit</code>, <code>numSeqPers</code>). Adopter une convention unique (anglais recommandé pour le code, français pour les libellés métier).</p>
+          <div class="tags"><span class="tag tag-tech">Checkstyle</span><span class="tag tag-tech">Naming conventions</span></div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-low">🟢 Amélioration</span>
+          <div><div class="item-title">Ajouter OWASP Dependency Check</div><div class="item-meta">pom.xml — dépendances non scannées</div></div>
+        </div>
+        <div class="item-body">
+          <p>Scanner automatiquement les dépendances Maven/npm pour détecter les CVE connues. S'intègre dans le build Maven et bloque le build si une vulnérabilité critique est trouvée.</p>
+          <div class="code-block">
+<span class="cmt"># Plugin Maven OWASP</span>
+&lt;plugin&gt;
+  &lt;groupId&gt;org.owasp&lt;/groupId&gt;
+  &lt;artifactId&gt;dependency-check-maven&lt;/artifactId&gt;
+  &lt;version&gt;9.0.0&lt;/version&gt;
+&lt;/plugin&gt;
+
+mvn dependency-check:check</div>
+          <div class="tags"><span class="tag tag-tech">OWASP</span><span class="tag tag-tech">npm audit</span><span class="tag tag-effort">Effort: Faible</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       CI/CD
+  ════════════════════════════════════════ -->
+  <section id="cicd">
+    <div class="section-header">
+      <div class="section-icon">🚀</div>
+      <h2>CI/CD — Intégration &amp; Déploiement</h2>
+      <span class="count">3 points</span>
+    </div>
+
+    <div class="callout callout-red">
+      <strong>Aucun pipeline CI/CD visible</strong> dans le projet. Chaque déploiement est probablement manuel, ce qui augmente le risque d'erreurs humaines et ralentit les livraisons.
+    </div>
+
+    <div class="item-card">
+      <div class="item-header">
+        <span class="priority-badge p-high">🟠 Haute</span>
+        <div>
+          <div class="item-title">Mettre en place un pipeline CI/CD (GitLab CI ou Jenkins)</div>
+          <div class="item-meta">Pas de .gitlab-ci.yml ni de Jenkinsfile</div>
+        </div>
+      </div>
+      <div class="item-body">
+        <p>Un pipeline CI automatise : compilation, tests, analyse SonarQube, build Docker, déploiement en staging. Chaque push déclenche automatiquement la validation.</p>
+        <div class="code-block">
+<span class="cmt"># .gitlab-ci.yml — Pipeline minimal</span>
+stages: [build, test, analyze, deploy]
+
+build-backend:
+  stage: build
+  script: [mvn clean package -DskipTests]
+  artifacts: { paths: [<span class="str">"*/target/*.jar"</span>] }
+
+test-backend:
+  stage: test
+  script: [mvn test]
+  coverage: <span class="str">'/Total.*?([0-9]{1,3})%/'</span>
+
+sonar-analysis:
+  stage: analyze
+  script: [mvn sonar:sonar]
+
+build-frontend:
+  stage: build
+  script: [npm ci, ng build --configuration=production]</div>
+        <div class="tags">
+          <span class="tag tag-tech">GitLab CI</span><span class="tag tag-tech">Jenkins</span><span class="tag tag-tech">GitHub Actions</span>
+          <span class="tag tag-effort">Effort: Moyen</span><span class="tag tag-impact">Impact: Qualité livraisons</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Environnements séparés (dev / staging / prod)</div><div class="item-meta">Infrastructure — non formalisée</div></div>
+        </div>
+        <div class="item-body">
+          <p>Formaliser 3 environnements distincts : <strong>dev</strong> (local), <strong>staging</strong> (copie de prod pour tests), <strong>prod</strong>. Les déploiements en prod doivent passer par staging validé.</p>
+          <div class="tags"><span class="tag tag-tech">Environment management</span><span class="tag tag-tech">Git Flow</span></div>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-low">🟢 Amélioration</span>
+          <div><div class="item-title">Semantic versioning + CHANGELOG automatique</div><div class="item-meta">Commits non conventionnels</div></div>
+        </div>
+        <div class="item-body">
+          <p>Adopter les Conventional Commits (<code>feat:</code>, <code>fix:</code>, <code>chore:</code>) pour générer automatiquement les CHANGELOGs et les numéros de version semver avec <code>semantic-release</code>.</p>
+          <div class="tags"><span class="tag tag-tech">Conventional Commits</span><span class="tag tag-tech">semantic-release</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       PERFORMANCE
+  ════════════════════════════════════════ -->
+  <section id="perf">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <h2>Performance</h2>
+      <span class="count">3 points</span>
+    </div>
+
+    <div class="g2">
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Éviter le problème N+1 avec @EntityGraph ou JOIN FETCH</div><div class="item-meta">Repositories JPA — relations One-to-Many</div></div>
+        </div>
+        <div class="item-body">
+          <p>Un canevas avec 20 sites, 10 crédits et 5 garanties peut générer 35+ requêtes SQL si Hibernate charge les collections en mode LAZY sans stratégie optimisée.</p>
+          <div class="code-block">
+<span class="cmt">// @EntityGraph pour charger les relations en une requête</span>
+<span class="ann">@EntityGraph</span>(attributePaths = {<span class="str">"sites"</span>, <span class="str">"credits"</span>, <span class="str">"garanties"</span>})
+<span class="ann">@Query</span>(<span class="str">"SELECT c FROM Caneva c WHERE c.id = :id"</span>)
+Optional&lt;Caneva&gt; findWithRelations(<span class="ann">@Param</span>(<span class="str">"id"</span>) Long id);</div>
+          <div class="tags"><span class="tag tag-tech">@EntityGraph</span><span class="tag tag-tech">JOIN FETCH</span><span class="tag tag-tech">spring.jpa.show-sql</span></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Optimiser le bundle Angular (lazy loading strict)</div><div class="item-meta">frontend-app1 — 40+ composants dans un module</div></div>
+        </div>
+        <div class="item-body">
+          <p>S'assurer que tous les modules fonctionnels (analyse financière, garanties, crédits) sont chargés en lazy loading strict. Activer la compression Brotli sur le serveur web et le tree-shaking agressif.</p>
+          <div class="code-block">
+<span class="cmt">// angular.json — Production build optimisé</span>
+{
+  <span class="str">"optimization"</span>: <span class="kw">true</span>,
+  <span class="str">"sourceMap"</span>: <span class="kw">false</span>,
+  <span class="str">"namedChunks"</span>: <span class="kw">false</span>,
+  <span class="str">"aot"</span>: <span class="kw">true</span>,
+  <span class="str">"buildOptimizer"</span>: <span class="kw">true</span>,
+  <span class="str">"budgets"</span>: [{ <span class="str">"type"</span>: <span class="str">"initial"</span>, <span class="str">"maximumWarning"</span>: <span class="str">"1mb"</span> }]
+}</div>
+          <div class="tags"><span class="tag tag-tech">Lazy Loading</span><span class="tag tag-tech">Bundle Analyzer</span><span class="tag tag-tech">Brotli</span></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-low">🟢 Amélioration</span>
+          <div><div class="item-title">Stratégie de cache cohérente</div><div class="item-meta">Caffeine backend + Service Worker frontend</div></div>
+        </div>
+        <div class="item-body">
+          <p>Le cache Caffeine backend (24h pour les engagements BNA/BCT) devrait s'accompagner d'un mécanisme d'invalidation explicite. Côté frontend, un Service Worker peut mettre en cache les assets statiques.</p>
+          <div class="tags"><span class="tag tag-tech">Cache Invalidation</span><span class="tag tag-tech">Service Worker</span><span class="tag tag-tech">@CacheEvict</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       OBSERVABILITÉ
+  ════════════════════════════════════════ -->
+  <section id="observabilite">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <h2>Observabilité — Logs, Métriques &amp; Traces</h2>
+      <span class="count">4 points</span>
+    </div>
+
+    <div class="callout callout-blue">
+      <strong>Observabilité = Logs + Métriques + Traces distribuées.</strong> Sans ces 3 piliers, diagnostiquer un incident en production sur ce système multi-services est très difficile.
+    </div>
+
+    <div class="g2">
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-high">🟠 Haute</span>
+          <div><div class="item-title">Logging structuré (JSON) centralisé</div><div class="item-meta">Tous les services Spring Boot</div></div>
+        </div>
+        <div class="item-body">
+          <p>Configurer Logback pour produire des logs JSON (avec Logstash Logback Encoder) et les envoyer vers un stack ELK (Elasticsearch + Logstash + Kibana) ou Loki + Grafana.</p>
+          <div class="code-block">
+<span class="cmt"># logback-spring.xml — JSON structured logging</span>
+&lt;encoder <span class="kw">class</span>=<span class="str">"net.logstash.logback.encoder.LogstashEncoder"</span>/&gt;
+
+<span class="cmt">// Logs enrichis avec MDC (contexte utilisateur)</span>
+MDC.put(<span class="str">"userId"</span>, currentUser.getMatricule());
+MDC.put(<span class="str">"canevasId"</span>, canevasId.toString());
+log.info(<span class="str">"Canevas created successfully"</span>);</div>
+          <div class="tags"><span class="tag tag-tech">Logback</span><span class="tag tag-tech">ELK</span><span class="tag tag-tech">Loki</span><span class="tag tag-tech">MDC</span></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-high">🟠 Haute</span>
+          <div><div class="item-title">Métriques applicatives — Prometheus + Grafana</div><div class="item-meta">Spring Boot Actuator + Micrometer</div></div>
+        </div>
+        <div class="item-body">
+          <p>Exposer les métriques métier (nombre de canevas créés/jour, taux d'erreur API, temps de réponse par endpoint) via Micrometer → Prometheus → Grafana.</p>
+          <div class="code-block">
+<span class="cmt"># pom.xml</span>
+&lt;artifactId&gt;micrometer-registry-prometheus&lt;/artifactId&gt;
+
+<span class="cmt"># application.properties</span>
+<span class="ok">management.endpoints.web.exposure.include=prometheus,health,metrics</span>
+
+<span class="cmt">// Métriques métier personnalisées</span>
+meterRegistry.counter(<span class="str">"caneva.created"</span>, <span class="str">"type"</span>, creditType).increment();</div>
+          <div class="tags"><span class="tag tag-tech">Micrometer</span><span class="tag tag-tech">Prometheus</span><span class="tag tag-tech">Grafana</span></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-medium">🔵 Moyenne</span>
+          <div><div class="item-title">Tracing distribué — Zipkin ou Jaeger</div><div class="item-meta">Appels entre services sans correlation ID</div></div>
+        </div>
+        <div class="item-body">
+          <p>Ajouter un <code>traceId</code> unique à chaque requête HTTP qui se propage entre frontend → auth-server → backend-saeb → DB. Facilite le diagnostic des lenteurs inter-services.</p>
+          <div class="code-block">
+<span class="cmt"># Spring Boot 3 — Micrometer Tracing (remplace Sleuth)</span>
+&lt;artifactId&gt;micrometer-tracing-bridge-brave&lt;/artifactId&gt;
+&lt;artifactId&gt;zipkin-reporter-brave&lt;/artifactId&gt;
+
+<span class="ok">management.tracing.sampling.probability=1.0</span>
+<span class="ok">spring.zipkin.base-url=http://zipkin:9411</span></div>
+          <div class="tags"><span class="tag tag-tech">Zipkin</span><span class="tag tag-tech">Jaeger</span><span class="tag tag-tech">OpenTelemetry</span></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="item-header">
+          <span class="priority-badge p-low">🟢 Amélioration</span>
+          <div><div class="item-title">Alerting automatique sur incidents</div><div class="item-meta">Grafana Alerting ou PagerDuty</div></div>
+        </div>
+        <div class="item-body">
+          <p>Configurer des alertes automatiques sur : taux d'erreur 5xx > 1%, temps de réponse > 3s, pool de connexions > 80%, espace disque < 20%. Notification par email/SMS aux équipes BNA.</p>
+          <div class="tags"><span class="tag tag-tech">Grafana Alerting</span><span class="tag tag-tech">AlertManager</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       ROADMAP
+  ════════════════════════════════════════ -->
+  <section id="roadmap">
+    <div class="section-header">
+      <div class="section-icon">🗺️</div>
+      <h2>Roadmap d'implémentation recommandée</h2>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);">
+      <!-- Phase 1 -->
+      <div style="border-left:6px solid var(--red);padding:22px 28px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <span style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:800;letter-spacing:0.5px;">PHASE 1 — Sprint 1-2 (Semaines 1-4)</span>
+          <span style="font-size:0.8rem;color:var(--muted);font-weight:600;">Sécurité &amp; Stabilité critique</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔑 Externaliser les secrets (variables env)</div>
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:12px;font-size:0.83rem;">✅ Ajouter @Valid sur tous les controllers</div>
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:12px;font-size:0.83rem;">🌐 Configurer HTTPS (TLS)</div>
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:12px;font-size:0.83rem;">🛡️ @ControllerAdvice global</div>
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:12px;font-size:0.83rem;">📁 Flyway — migrations DB</div>
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔐 Validation des uploads fichiers</div>
+        </div>
+      </div>
+      <!-- Phase 2 -->
+      <div style="border-left:6px solid var(--orange);padding:22px 28px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <span style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border);padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:800;">PHASE 2 — Sprint 3-5 (Semaines 5-10)</span>
+          <span style="font-size:0.8rem;color:var(--muted);font-weight:600;">Qualité &amp; maintenabilité</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">🗂️ Profils Spring dev/staging/prod</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">📄 Pagination sur tous les endpoints</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔄 Remplacer ModelMapper par MapStruct</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">🐛 Rate limiting auth (Bucket4J)</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">🧪 Tests unitaires services Java (70%)</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">📊 SonarQube + SonarLint</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">🐳 Docker + Docker Compose</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:8px;padding:12px;font-size:0.83rem;">⚡ ESLint + Prettier Angular</div>
+        </div>
+      </div>
+      <!-- Phase 3 -->
+      <div style="border-left:6px solid var(--blue);padding:22px 28px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <span style="background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:800;">PHASE 3 — Sprint 6-9 (Mois 3-4)</span>
+          <span style="font-size:0.8rem;color:var(--muted);font-weight:600;">Observabilité &amp; Architecture</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">📝 Logging JSON + ELK/Loki</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">📈 Métriques Prometheus + Grafana</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔍 Tracing distribué Zipkin</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔢 API versioning /v1</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">🚀 Pipeline CI/CD GitLab</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">📋 Spring Data Auditing</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔧 Migration bnaauthentication → Java 17</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;font-size:0.83rem;">🧩 Index Oracle optimisés</div>
+        </div>
+      </div>
+      <!-- Phase 4 -->
+      <div style="border-left:6px solid var(--green);padding:22px 28px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <span style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:800;">PHASE 4 — Mois 5+</span>
+          <span style="font-size:0.8rem;color:var(--muted);font-weight:600;">Améliorations long terme</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:12px;font-size:0.83rem;">🌍 Support i18n Arabe/Français</div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:12px;font-size:0.83rem;">🧪 Tests E2E Cypress</div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:12px;font-size:0.83rem;">🌐 API Gateway centralisé</div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:12px;font-size:0.83rem;">📦 Unifier PrimeNG/Material</div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:12px;font-size:0.83rem;">🔔 Alerting Grafana automatique</div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:12px;font-size:0.83rem;">♿ Audit accessibilité (a11y)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>Canva Agricole — BNA</strong> &mdash; Rapport d'audit technique — 38 points d'amélioration identifiés — 2026-05-06
+</footer>
+
+</body>
+</html>
