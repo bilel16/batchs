@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Étude Crédit Investissement — CDC vs Code</title>
+  <style>
+    :root{
+      --ok:#1b5e20;--ok-bg:#e8f5e9;--ok-b:#a5d6a7;
+      --part:#e65100;--part-bg:#fff3e0;--part-b:#ffcc80;
+      --miss:#b71c1c;--miss-bg:#ffebee;--miss-b:#ef9a9a;
+      --plan:#1565c0;--plan-bg:#e3f2fd;--plan-b:#90caf9;
+      --dark:#0d1b2a;--text:#1c1c1c;--muted:#546e7a;
+      --border:#dce3e8;--white:#fff;--bg:#f0f4f8;
+      --shadow:0 2px 12px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,#0d1b2a 0%,#1a3055 55%,#1f4a7a 100%);color:#fff;padding:52px 48px 38px;position:relative;overflow:hidden}
+    header::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.04)}
+    .htag{display:inline-block;background:#2e7d32;color:#fff;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px}
+    header h1{font-size:2.1rem;font-weight:800;margin-bottom:8px}
+    header p.sub{font-size:.93rem;opacity:.83;max-width:750px;margin-bottom:24px}
+    .hmeta{display:flex;gap:12px;flex-wrap:wrap}
+    .hc{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 13px;border-radius:20px;font-size:.77rem;font-weight:600}
+
+    /* NAV */
+    nav{background:var(--dark);padding:0 48px;display:flex;gap:2px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+    nav a{color:rgba(255,255,255,.72);text-decoration:none;padding:12px 15px;font-size:.76rem;font-weight:700;letter-spacing:.4px;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+    nav a:hover{color:#fff;border-bottom-color:#4caf50}
+
+    main{max-width:1340px;margin:0 auto;padding:44px 32px}
+
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:44px}
+    .sc{background:var(--white);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border)}
+    .sc .n{font-size:2.2rem;font-weight:900;line-height:1}
+    .sc .l{font-size:.72rem;font-weight:700;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.6px}
+    .n.ok{color:var(--ok)}.n.pt{color:var(--part)}.n.ms{color:var(--miss)}.n.pl{color:var(--plan)}
+
+    /* SECTION */
+    section{margin-bottom:56px}
+    .sh{display:flex;align-items:center;gap:14px;margin-bottom:26px;padding-bottom:14px;border-bottom:2px solid var(--border)}
+    .si{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#0d1b2a,#1a3055);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .sh h2{font-size:1.45rem;font-weight:800;color:var(--dark)}
+    .sh .cnt{margin-left:auto;background:var(--plan-bg);color:var(--plan);border:1px solid var(--plan-b);font-size:.74rem;font-weight:700;padding:4px 12px;border-radius:20px}
+
+    /* BADGE */
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+    .b-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-b)}
+    .b-pt{background:var(--part-bg);color:var(--part);border:1px solid var(--part-b)}
+    .b-ms{background:var(--miss-bg);color:var(--miss);border:1px solid var(--miss-b)}
+    .b-pl{background:var(--plan-bg);color:var(--plan);border:1px solid var(--plan-b)}
+
+    /* CARD */
+    .card{background:var(--white);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;transition:box-shadow .2s}
+    .card:hover{box-shadow:0 6px 22px rgba(0,0,0,.11)}
+    .ch{display:flex;align-items:flex-start;gap:12px;padding:18px 22px 0}
+    .ct{font-size:.98rem;font-weight:700;color:var(--dark);margin-bottom:2px}
+    .cs{font-size:.77rem;color:var(--muted)}
+    .cb{padding:14px 22px 18px}
+    .cb p{font-size:.86rem;color:var(--muted);margin-bottom:10px}
+
+    /* 2-COL */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    @media(max-width:640px){.g2{grid-template-columns:1fr}}
+    .box{padding:13px 15px;border-radius:9px;font-size:.83rem}
+    .box strong{display:block;font-size:.68rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+    .b-cdc{background:#f8f9fa;border:1px solid #dee2e6}.b-cdc strong{color:#495057}
+    .b-code{background:var(--ok-bg);border:1px solid var(--ok-b)}.b-code strong{color:var(--ok)}
+    .b-miss{background:var(--miss-bg);border:1px solid var(--miss-b)}.b-miss strong{color:var(--miss)}
+    .b-plan{background:var(--plan-bg);border:1px solid var(--plan-b)}.b-plan strong{color:var(--plan)}
+    .b-warn{background:var(--part-bg);border:1px solid var(--part-b)}.b-warn strong{color:var(--part)}
+
+    /* CODE */
+    .code{background:#0d1117;color:#c9d1d9;border-radius:9px;padding:14px 16px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.76rem;overflow-x:auto;margin:10px 0;border:1px solid #30363d;line-height:1.7}
+    .code .ok{color:#56d364}.code .ms{color:#ff7b72}.code .nt{color:#8b949e}.code .kw{color:#ff7b72}.code .cls{color:#79c0ff}.code .str{color:#a5d6ff}.code .ann{color:#ffa657}
+
+    /* TAGS */
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .tag{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid}
+    .tf{background:#f3e5f5;color:#4a148c;border-color:#ce93d8}
+    .ts{background:#e0f2f1;color:#004d40;border-color:#80cbc4}
+    .te{background:#fff8e1;color:#6d4c00;border-color:#ffe082}
+
+    /* CALLOUT */
+    .co{border-left:4px solid;padding:13px 16px;border-radius:0 9px 9px 0;font-size:.85rem;margin-bottom:14px}
+    .co-r{border-color:var(--miss);background:var(--miss-bg);color:#7f0000}
+    .co-o{border-color:var(--part);background:var(--part-bg);color:#7a3000}
+    .co-g{border-color:var(--ok);background:var(--ok-bg);color:#1b3a1f}
+    .co-b{border-color:var(--plan);background:var(--plan-bg);color:#0d3b8c}
+
+    /* TABLE */
+    .tbl{width:100%;border-collapse:collapse;font-size:.82rem;background:var(--white);border-radius:11px;overflow:hidden;box-shadow:var(--shadow)}
+    .tbl thead{background:linear-gradient(90deg,var(--dark),#1a3055);color:#fff}
+    .tbl th{padding:12px 15px;text-align:left;font-weight:700;font-size:.77rem;letter-spacing:.4px}
+    .tbl td{padding:11px 15px;border-bottom:1px solid #e9ecef;vertical-align:top}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:nth-child(even) td{background:#f8fafb}
+    .tbl code{background:#f1f8e9;border:1px solid var(--ok-b);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:.8rem;color:var(--ok)}
+
+    /* PROPOSAL */
+    .proposal{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid var(--ok-b);border-radius:10px;padding:16px 18px;margin-top:12px}
+    .pt{font-size:.7rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--ok);margin-bottom:8px}
+
+    /* FIELD TABLE */
+    .ft{width:100%;border-collapse:collapse;font-size:.8rem;margin:10px 0}
+    .ft th{background:#e8f5e9;color:var(--ok);padding:8px 12px;text-align:left;font-size:.75rem;font-weight:700;border-bottom:2px solid var(--ok-b)}
+    .ft td{padding:7px 12px;border-bottom:1px solid #e9ecef;vertical-align:top}
+    .ft tr:last-child td{border-bottom:none}
+    .ft .ok-mark{color:var(--ok);font-weight:700}
+    .ft .ms-mark{color:var(--miss);font-weight:700}
+    .ft .pt-mark{color:var(--part);font-weight:700}
+
+    /* FORMULA */
+    .formula{background:#e8eaf6;border:1px solid #9fa8da;border-radius:8px;padding:12px 16px;font-family:monospace;font-size:.83rem;color:#1a237e;margin:8px 0}
+
+    /* GRID 2 */
+    .gg2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+
+    /* PROGRESS */
+    .pw{background:#e9ecef;border-radius:20px;height:9px;margin:6px 0 3px;overflow:hidden}
+    .pb{height:100%;border-radius:20px}
+    .pb-ok{background:var(--ok)}.pb-pt{background:var(--part)}.pb-ms{background:var(--miss)}
+    .pl{font-size:.73rem;color:var(--muted);font-weight:600}
+
+    /* ROADMAP */
+    .rmstep{border-left:6px solid;padding:20px 26px;border-bottom:1px solid var(--border)}
+    .rmstep:last-child{border-bottom:none}
+    .rmtag{display:inline-block;padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:800;margin-bottom:12px}
+    .rmgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+    .rmitem{border-radius:8px;padding:11px 13px;font-size:.82rem}
+
+    footer{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:26px;font-size:.8rem;margin-top:56px}
+    footer strong{color:#fff}
+    @media(max-width:640px){header{padding:32px 20px}main{padding:24px 14px}nav{padding:0 16px}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="htag">Étude Technique — Crédit Investissement Agricole</div>
+  <h1>Crédit Investissement — CDC vs Code Existant</h1>
+  <p class="sub">Analyse détaillée de toutes les couches (entités, services, contrôleurs, Angular) du module Crédit Investissement en regard du CDC v1.0 (Août 2024). Identification précise de ce qui est réalisé, partiel, manquant et propositions d'intégration.</p>
+  <div class="hmeta">
+    <span class="hc">CDC v1.0 — Août 2024</span>
+    <span class="hc">Annexes 49 · 50 · 57 · 63-68 · 75-77</span>
+    <span class="hc">Spring Boot 3.2 · Angular 17</span>
+    <span class="hc">Oracle DB</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#vue">📋 Vue globale</a>
+  <a href="#entites">🗄️ Entités JPA</a>
+  <a href="#api">🔌 API REST</a>
+  <a href="#angular">🅰️ Angular</a>
+  <a href="#sollicite">📝 Crédit sollicité</a>
+  <a href="#justification">🔧 Justification</a>
+  <a href="#schema-fin">💰 Schéma financement</antml>
+  <a href="#amortissement">📉 Amortissement</a>
+  <a href="#recettes">📈 Recettes & charges</a>
+  <a href="#remboursement">💳 Remboursement</a>
+  <a href="#caf">📊 CAF & TRI</a>
+  <a href="#sensibilite">🎯 Test sensibilité</a>
+  <a href="#avis">✅ Avis</a>
+  <a href="#rg">⚖️ Règles métier</a>
+  <a href="#roadmap">🗺️ Plan intégration</a>
+</nav>
+
+<main>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="sc"><div class="n ok">8</div><div class="l">Fonctionnalités réalisées</div></div>
+    <div class="sc"><div class="n pt">6</div><div class="l">Partiellement réalisées</div></div>
+    <div class="sc"><div class="n ms">11</div><div class="l">Non réalisées</div></div>
+    <div class="sc"><div class="n pl">5</div><div class="l">Endpoints manquants</div></div>
+    <div class="sc"><div class="n" style="color:#4a148c">35%</div><div class="l">Taux d'avancement</div>
+      <div class="pw" style="margin-top:8px"><div class="pb pb-pt" style="width:35%"></div></div>
+    </div>
+  </div>
+
+  <!-- ── VUE GLOBALE ── -->
+  <section id="vue">
+    <div class="sh"><div class="si">📋</div><h2>Vue globale du module</h2></div>
+
+    <div class="co co-b">
+      Le <strong>crédit investissement agricole</strong> (nature 2 dans le code, CMT/CLT) est le crédit le plus complexe du CDC. Il couvre : schéma d'investissement sollicité → justification technique → schéma de financement → amortissement → recettes/charges → remboursement → CAF + TRI → test de sensibilité → avis. Seul le début de ce pipeline est implémenté.
+    </div>
+
+    <table class="tbl">
+      <thead><tr><th>Module CDC</th><th>Annexe</th><th>Couche code</th><th>État</th><th>Avancement</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Schéma d'investissement sollicité</strong></td><td>49</td><td><code>CreditInvestissement</code> + <code>ItemInvestissement</code></td><td><span class="badge b-ok">✅ Réalisé</span></td><td><div class="pw"><div class="pb pb-ok" style="width:80%"></div></div><div class="pl">80%</div></td></tr>
+        <tr><td><strong>Conditions de financement</strong></td><td>50</td><td><code>ConditionFinancement</code> (embeddable)</td><td><span class="badge b-pt">🟠 Partiel</span></td><td><div class="pw"><div class="pb pb-pt" style="width:65%"></div></div><div class="pl">65%</div></td></tr>
+        <tr><td><strong>Justification technique (retenu)</strong></td><td>57</td><td><code>ItemInvestissement</code> + <code>ProjetCreditInvestissement</code></td><td><span class="badge b-pt">🟠 Partiel</span></td><td><div class="pw"><div class="pb pb-pt" style="width:55%"></div></div><div class="pl">55%</div></td></tr>
+        <tr><td><strong>Disponibilité / besoin fourrager</strong></td><td>63-64</td><td><code>BilanFourrager</code>, pages dédiées</td><td><span class="badge b-ok">✅ Réalisé</span></td><td><div class="pw"><div class="pb pb-ok" style="width:85%"></div></div><div class="pl">85%</div></td></tr>
+        <tr><td><strong>Disponibilité / besoin hydrique</strong></td><td>65-66</td><td><code>RessourceHydriqueInv</code>, pages dédiées</td><td><span class="badge b-ok">✅ Réalisé</span></td><td><div class="pw"><div class="pb pb-ok" style="width:80%"></div></div><div class="pl">80%</div></td></tr>
+        <tr><td><strong>Schéma d'investissement &amp; financement</strong></td><td>67</td><td><code>SchemaCreditInv</code> + <code>ComposantInv</code></td><td><span class="badge b-pt">🟠 Partiel</span></td><td><div class="pw"><div class="pb pb-pt" style="width:50%"></div></div><div class="pl">50%</div></td></tr>
+        <tr><td><strong>Tableau d'amortissement</strong></td><td>68</td><td>Absent</td><td><span class="badge b-ms">❌ Absent</span></td><td><div class="pw"><div class="pb pb-ms" style="width:0%"></div></div><div class="pl">0%</div></td></tr>
+        <tr><td><strong>Recettes et charges (7 types)</strong></td><td>69-74</td><td>Absent</td><td><span class="badge b-ms">❌ Absent</span></td><td><div class="pw"><div class="pb pb-ms" style="width:0%"></div></div><div class="pl">0%</div></td></tr>
+        <tr><td><strong>Remboursement crédits (Règle 3/6)</strong></td><td>75</td><td>Absent</td><td><span class="badge b-ms">❌ Absent</span></td><td><div class="pw"><div class="pb pb-ms" style="width:0%"></div></div><div class="pl">0%</div></td></tr>
+        <tr><td><strong>Capacité d'autofinancement (CAF + TRI)</strong></td><td>76</td><td>Absent</td><td><span class="badge b-ms">❌ Absent</span></td><td><div class="pw"><div class="pb pb-ms" style="width:0%"></div></div><div class="pl">0%</div></td></tr>
+        <tr><td><strong>Test de sensibilité ±10%</strong></td><td>77</td><td>Absent</td><td><span class="badge b-ms">❌ Absent</span></td><td><div class="pw"><div class="pb pb-ms" style="width:0%"></div></div><div class="pl">0%</div></td></tr>
+        <tr><td><strong>Avis investissement agricole</strong></td><td>—</td><td><code>AvisCreditInvestissementComponent</code></td><td><span class="badge b-pt">🟠 Partiel</span></td><td><div class="pw"><div class="pb pb-pt" style="width:50%"></div></div><div class="pl">50%</div></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── ENTITÉS JPA ── -->
+  <section id="entites">
+    <div class="sh"><div class="si">🗄️</div><h2>Entités JPA — État des champs</h2></div>
+
+    <!-- CreditInvestissement -->
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">CreditInvestissement.java</div><div class="cs">Table : credit_investissement — Entité principale du crédit</div></div></div>
+      <div class="cb">
+        <table class="ft">
+          <thead><tr><th>Champ code</th><th>Type</th><th>CDC requis</th><th>État</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>String (UUID)</td><td>Identifiant crédit</td><td><span class="ok-mark">✅</span></td></tr>
+            <tr><td><code>terme</code></td><td>String</td><td>CMT / CLT (Annexe 49)</td><td><span class="ok-mark">✅</span></td></tr>
+            <tr><td><code>montant</code></td><td>Double</td><td>Montant sollicité (Annexe 49)</td><td><span class="ok-mark">✅</span></td></tr>
+            <tr><td><code>items2</code></td><td>List&lt;ItemInvestissement&gt;</td><td>Composantes (Prod/Activité/Composante/Coût)</td><td><span class="ok-mark">✅</span></td></tr>
+            <tr><td><code>conditionFinancement</code></td><td>ConditionFinancement (@Embedded)</td><td>Conditions de financement (Annexe 50)</td><td><span class="ok-mark">✅</span></td></tr>
+            <tr><td><code>caneva</code></td><td>Caneva (@ManyToOne)</td><td>Lien au canevas</td><td><span class="ok-mark">✅</span></td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td>manquant</td><td>Nombre de crédits sollicités par nature (Annexe 45)</td><td><span class="ms-mark">❌</span></td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td>manquant</td><td>Statut du crédit (retenu / non retenu)</td><td><span class="ms-mark">❌</span></td></tr>
+          </tbody>
+        </table>
+        <div class="tags"><span class="tag ts">backend-saeb/entities/CreditInvestissement.java</span></div>
+      </div>
+    </div>
+
+    <!-- ItemInvestissement -->
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">ItemInvestissement.java</div><div class="cs">Table : item_investissement — Composantes du crédit (Annexes 49, 57)</div></div></div>
+      <div class="cb">
+        <table class="ft">
+          <thead><tr><th>Champ code</th><th>CDC (Annexe 57)</th><th>État</th><th>Remarque</th></tr></thead>
+          <tbody>
+            <tr><td><code>production</code></td><td>Production (liste déroulante)</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>activite</code></td><td>Activité (liste déroulante)</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>composante</code></td><td>Composante sollicitée</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>cout</code></td><td>Coût/montant sollicité</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>justification</code></td><td>Justification technique</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>coutRetenu</code></td><td>Coût/montant retenu</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>sites</code></td><td>Affectation à un/plusieurs sites</td><td><span class="ok-mark">✅</span></td><td>M2M avec Site</td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td><strong>Composante retenue</strong> (colonne distincte de composante sollicitée)</td><td><span class="ms-mark">❌</span></td><td>Annexe 57 : champ "Composante retenue" séparé de "Composante sollicitée"</td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td><strong>Terme</strong> par composante (CMT ou CLT modifiable)</td><td><span class="ms-mark">❌</span></td><td>CDC p.33 : "Afficher le terme de chaque composante, l'utilisateur peut le modifier"</td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td><strong>Famille</strong> (regroupement pour Annexe 67)</td><td><span class="ms-mark">❌</span></td><td>Annexe 67 regroupe par famille (Famille 1, Famille 2…)</td></tr>
+            <tr><td><code>besoinUf</code></td><td>Besoin (UF) — fourrage</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>nbTeteSollicite</code></td><td>NB de tête sollicité</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>nombreHa</code></td><td>Nombre Ha — hydrique</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>besoinHa</code></td><td>Besoin/Ha</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="tags"><span class="tag ts">backend-saeb/entities/ItemInvestissement.java</span><span class="tag te">2 champs manquants</span></div>
+      </div>
+    </div>
+
+    <!-- ConditionFinancement -->
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">ConditionFinancement.java (@Embeddable)</div><div class="cs">Conditions de financement par crédit investissement (Annexe 50)</div></div></div>
+      <div class="cb">
+        <table class="ft">
+          <thead><tr><th>Champ code</th><th>CDC (Annexe 50)</th><th>État</th><th>Règle CDC</th></tr></thead>
+          <tbody>
+            <tr><td><code>nature</code></td><td>Nature</td><td><span class="ok-mark">✅</span></td><td>Affiché automatiquement</td></tr>
+            <tr><td><code>produit</code></td><td>Produit</td><td><span class="ok-mark">✅</span></td><td>Liste déroulante prédéfinie</td></tr>
+            <tr><td><code>duree</code></td><td>Durée</td><td><span class="pt-mark">⚠️</span></td><td><strong>CMT &lt; 84 mois · CLT &gt; 84 mois — validation absente</strong></td></tr>
+            <tr><td><code>commision</code></td><td>Commission d'étude</td><td><span class="pt-mark">⚠️</span></td><td>CDC : "à partir du système C.B" — non alimenté automatiquement</td></tr>
+            <tr><td><code>typetaux</code></td><td>Type taux (Réglementaire / Préférentiel)</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>taux</code></td><td>Taux (si réglementaire)</td><td><span class="ok-mark">✅</span></td><td>Affiché si taux réglementaire</td></tr>
+            <tr><td><code>marge</code></td><td>Marge (si préférentiel)</td><td><span class="ok-mark">✅</span></td><td>Saisie si taux préférentiel</td></tr>
+            <tr><td><code>periodicite</code></td><td>Périodicité (M/T/S/A)</td><td><span class="ok-mark">✅</span></td><td>Liste déroulante</td></tr>
+            <tr><td><code>date1ereechsoll</code></td><td>Date 1ère échéance sollicitée</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>fond</code></td><td>Fond</td><td><span class="ok-mark">✅</span></td><td>Liste déroulante prédéfinie</td></tr>
+            <tr><td><code>periodegrace</code></td><td>Période de grâce (en mois)</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>typecommissionengagement</code></td><td>—</td><td><span class="ok-mark">✅</span></td><td>Extension BNA</td></tr>
+            <tr><td><code>commissionengagement</code></td><td>—</td><td><span class="ok-mark">✅</span></td><td>Extension BNA</td></tr>
+          </tbody>
+        </table>
+        <div class="tags"><span class="tag ts">backend-saeb/entities/ConditionFinancement.java</span><span class="tag te">Validation durée manquante</span></div>
+      </div>
+    </div>
+
+    <!-- SchemaCreditInv -->
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">SchemaCreditInv.java + ComposantInv.java</div><div class="cs">Table : SCHEMA_CREDIT_INV + COMPOSANT_INV — Schéma investissement &amp; financement (Annexe 67)</div></div></div>
+      <div class="cb">
+        <table class="ft">
+          <thead><tr><th>Champ</th><th>CDC (Annexe 67)</th><th>État</th><th>Remarque</th></tr></thead>
+          <tbody>
+            <tr><td><code>terme</code></td><td>CMT / CLT</td><td><span class="ok-mark">✅</span></td><td></td></tr>
+            <tr><td><code>fad</code></td><td>FAD (frais d'approche et divers)</td><td><span class="ok-mark">✅</span></td><td>Double, default 0.0</td></tr>
+            <tr><td><code>fondRoulement</code></td><td>Fond de roulement</td><td><span class="ok-mark">✅</span></td><td>Double, default 0.0</td></tr>
+            <tr><td><code>composants</code></td><td>Composantes avec montants</td><td><span class="ok-mark">✅</span></td><td>OneToMany → ComposantInv</td></tr>
+            <tr><td><code>composantRetenu</code></td><td>Composante retenue (libellé)</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr><td><code>montantRetenu</code></td><td>Montant retenu par composante</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr><td><code>dotation</code></td><td>Dotation</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr><td><code>don</code></td><td>Don</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr><td><code>autoFinancement</code></td><td>Autofinancement</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr><td><code>participationBna</code></td><td>% participation BNA</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr><td><code>montantCredPropose</code></td><td>Montant crédit proposé</td><td><span class="ok-mark">✅</span></td><td>Dans ComposantInv</td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td><strong>Famille</strong> (regroupement composantes Annexe 67)</td><td><span class="ms-mark">❌</span></td><td>CDC : "Les composantes doivent être regroupées par famille"</td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td><strong>% FAD</strong> saisi (RG : FAD ≤ 4% coût retenu)</td><td><span class="ms-mark">❌</span></td><td>CDC p.36 : saisir le % FAD, calculer automatiquement</td></tr>
+            <tr style="background:#fff8f8"><td><code>—</code></td><td><strong>% Fond de roulement</strong> saisi (RG : FR ≤ 10% coût retenu)</td><td><span class="ms-mark">❌</span></td><td>CDC p.36 : saisir le %, calculer automatiquement</td></tr>
+          </tbody>
+        </table>
+        <div class="tags"><span class="tag ts">SchemaCreditInv.java</span><span class="tag ts">ComposantInv.java</span><span class="tag te">Famille + % FAD/FR manquants</span></div>
+      </div>
+    </div>
+
+    <!-- Entités manquantes -->
+    <div class="co co-r">
+      <strong>5 entités JPA entièrement absentes</strong> — Amortissement, RecetteCharge (avec ses 7 sous-types), RemboursementCredit, CapaciteAutofinancement, TestSensibilite.
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Entité à créer</th><th>Annexe CDC</th><th>Champs principaux</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Amortissement</strong></td><td>68</td><td>idCredit, numCanva, numSeqpers, famille, montantParPeriode[], fadParPeriode[], total</td></tr>
+        <tr><td><strong>RecetteCharge</strong></td><td>69-74</td><td>typeProjet (Arbori/Avicole/PoulePond…), culture, recette, charge, anneeProduction, anneeCroisiere, tauxRendement, periods[]</td></tr>
+        <tr><td><strong>RemboursementCredit</strong></td><td>75</td><td>regle (3 ou 6), periodeGrace, termeCmt, termeClt, principal[], interet[], total[], periods[]</td></tr>
+        <tr><td><strong>CapaciteAutofinancement</strong></td><td>76</td><td>tauxImpot, recettes[], charges[], rbe[], amortissement[], fraisFinancierProjet[], caf[], tresorerieCumulee[], tri</td></tr>
+        <tr><td><strong>TestSensibilite</strong></td><td>77</td><td>type (+10%charges / -10%recettes), recettes[], charges[], rbe[], caf[], tri, modifiedTri</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── API REST ── -->
+  <section id="api">
+    <div class="sh"><div class="si">🔌</div><h2>API REST — Endpoints existants &amp; manquants</h2></div>
+
+    <div class="g2">
+      <div class="box b-code">
+        <strong>Endpoints existants</strong>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">GET  /api/credit-investissement/by-caneva/{canevaId}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">PUT  /api/credit-investissement/{id}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">GET  /api/schema-credits-inv/{numSeqpers}/{numCanva}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">GET  /api/schema-credits-inv/id/{id}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">POST /api/schema-credits-inv/</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">PUT  /api/schema-credits-inv/{id}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">POST /api/schema-credits-inv/batch</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">DELETE /api/schema-credits-inv/{id}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">GET  /api/schema-credits-inv/{ns}/{nc}/total-montant-retenu</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0">GET  /api/schema-credits-inv/{ns}/{nc}/total-credit-propose</code>
+      </div>
+      <div class="box b-miss">
+        <strong>Endpoints manquants (CDC)</strong>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">POST /api/credit-investissement ← Créer</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">DELETE /api/credit-investissement/{id}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">GET  /api/amortissement/{numSeqpers}/{numCanva}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">POST /api/amortissement/calculate</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">GET  /api/recette-charge/{creditId}</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">POST /api/recette-charge</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">POST /api/remboursement/calculate</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">POST /api/caf/calculate</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">POST /api/test-sensibilite/calculate</code>
+        <code style="display:block;font-family:monospace;font-size:.8rem;margin:4px 0;color:#b71c1c">PUT  /api/schema-credits-inv/{id}/fad-fr ← % FAD/FR</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ANGULAR ── -->
+  <section id="angular">
+    <div class="sh"><div class="si">🅰️</div><h2>Angular — Composants &amp; Services</h2></div>
+
+    <table class="tbl">
+      <thead><tr><th>Composant / Service</th><th>Rôle</th><th>État</th><th>Gap principal</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>ProjetCreditInvestissementComponent</code></td>
+          <td>Formulaire justification technique (Annexe 57)</td>
+          <td><span class="badge b-pt">🟠 Partiel</span></td>
+          <td>Regroupement par site absent. Champ "composanteRetenue" (séparé de sollicité) absent. Terme par composante non modifiable.</td>
+        </tr>
+        <tr>
+          <td><code>AvisCreditInvestissementComponent</code></td>
+          <td>Affichage avis + merge sollicité/schéma</td>
+          <td><span class="badge b-pt">🟠 Partiel</span></td>
+          <td>Merge par index (fragile). Persistance en DB non vérifiée. Modification conditions financement partiellement gérée.</td>
+        </tr>
+        <tr>
+          <td><code>SchemaCreditService</code></td>
+          <td>CRUD SchemaCreditInv via HTTP</td>
+          <td><span class="badge b-ok">✅ Réalisé</span></td>
+          <td>Endpoints % FAD/FR manquants</td>
+        </tr>
+        <tr>
+          <td><code>ExploitationProjetService</code></td>
+          <td>updateCreditInvestissement(), fourrager, hydrique</td>
+          <td><span class="badge b-ok">✅ Réalisé</span></td>
+          <td>Manque POST (création), DELETE</td>
+        </tr>
+        <tr>
+          <td><code>AmortissementComponent</code></td>
+          <td>Tableau amortissement (Annexe 68)</td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+          <td>À créer entièrement</td>
+        </tr>
+        <tr>
+          <td><code>RecetteChargeComponent</code> (×7)</td>
+          <td>Arboriculture, Avicole, Pêche, Aquaculture…</td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+          <td>7 types à créer (Annexes 69-74)</td>
+        </tr>
+        <tr>
+          <td><code>RemboursementCreditComponent</code></td>
+          <td>Tableau remboursement Règle 3 / 6 (Annexe 75)</td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+          <td>À créer entièrement</td>
+        </tr>
+        <tr>
+          <td><code>CafComponent</code></td>
+          <td>Capacité d'autofinancement + TRI (Annexe 76)</td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+          <td>À créer entièrement</td>
+        </tr>
+        <tr>
+          <td><code>TestSensibiliteComponent</code></td>
+          <td>Test ±10% recettes/charges (Annexe 77)</td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+          <td>À créer entièrement</td>
+        </tr>
+        <tr>
+          <td>Routes Angular dédiées</td>
+          <td>Navigation vers pages investissement</td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+          <td>Pas de routes déclarées pour les composants investissement dans <code>canvas.agricole-routing.module.ts</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── CRÉDIT SOLLICITÉ ── -->
+  <section id="sollicite">
+    <div class="sh"><div class="si">📝</div><h2>Crédit sollicité — Schéma d'investissement (Annexe 49)</h2></div>
+
+    <div class="card">
+      <div class="ch"><span class="badge b-ok">✅ Réalisé</span><div><div class="ct">Saisie du schéma d'investissement sollicité</div><div class="cs">Annexe 49 — Nature de crédit, terme CMT/CLT, composantes (Production / Activité / Composante / Coût)</div></div></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="box b-cdc">
+            <strong>CDC exige (Annexe 49)</strong>
+            Pour chaque crédit investissement :<br/>
+            • Terme de crédit : CMT ☐ ou CLT ☐<br/>
+            • Montant sollicité<br/>
+            • Tableau : Production | Activité | Composante | Coût<br/>
+            • Liste déroulantes prédéfinies (liste spéculations — 100+ items)<br/>
+            • Saisie manuelle si composante absente de la liste<br/>
+            • Possibilité d'ajouter / supprimer des composantes
+          </div>
+          <div class="box b-code">
+            <strong>Code — réalisé</strong>
+            Entité <code>CreditInvestissement</code> (terme, montant) + <code>ItemInvestissement</code> (production, activite, composante, cout).<br/>
+            <code>CreditInvestissementController.GET /by-caneva</code> retourne la liste.<br/>
+            Angular : formulaire dans <code>ProjetCreditInvestissementComponent</code>.
+          </div>
+        </div>
+        <div class="co co-o" style="margin-top:10px">
+          <strong>Gap identifié :</strong> La liste de spéculations prédéfinie du CDC (100+ items classés Production végétale/animale par famille/activité — pages 86-90) n'est pas chargée comme référentiel paramétrable. Les listes déroulantes Angular doivent être alimentées depuis ce référentiel.
+        </div>
+        <div class="tags"><span class="tag ts">CreditInvestissement.java</span><span class="tag ts">ItemInvestissement.java</span><span class="tag tf">ProjetCreditInvestissementComponent</span></div>
+      </div>
+    </div>
+
+    <!-- Conditions de financement -->
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">Conditions de financement par crédit (Annexe 50)</div><div class="cs">terme · nature · produit · durée · commission · type taux · marge · périodicité · date 1ère échéance · fond · période de grâce</div></div></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="box b-cdc">
+            <strong>CDC exige</strong>
+            • Durée : CMT &lt; 84 mois, CLT &gt; 84 mois (contrôle obligatoire)<br/>
+            • Commission d'étude : récupérée depuis système C.B automatiquement<br/>
+            • Type taux : Réglementaire → afficher taux+marge / Préférentiel → saisir taux sollicité<br/>
+            • Périodicité : M / T / S / A (liste déroulante)<br/>
+            • Fond : liste déroulante prédéfinie
+          </div>
+          <div class="box b-warn">
+            <strong>Gaps identifiés</strong>
+            • <strong>Validation durée non implémentée</strong> côté backend (@Valid)<br/>
+            • Commission d'étude saisie manuellement au lieu de CB automatique<br/>
+            • Validation taux préférentiel → saisie obligatoire taux non appliquée<br/>
+            • <code>duree</code> stockée en String au lieu de Integer (conversion fragile)
+          </div>
+        </div>
+        <div class="proposal">
+          <div class="pt">Proposition — Validation durée</div>
+          <div class="code">
+<span class="nt">// ConditionFinancementDto — ajouter validation</span>
+<span class="ann">@NotNull</span>
+<span class="ann">@Min(1)</span>
+<span class="kw">private</span> Integer duree;
+
+<span class="nt">// Validator personnalisé selon le terme du crédit</span>
+<span class="kw">public class</span> <span class="cls">DureeCreditValidator</span> <span class="kw">implements</span> ConstraintValidator&lt;...&gt; {
+    <span class="kw">public boolean</span> isValid(<span class="cls">ConditionFinancementDto</span> dto, ...) {
+        <span class="kw">if</span> (<span class="str">"CMT"</span>.equals(dto.getTerme())) <span class="kw">return</span> dto.getDuree() &lt; <span class="ok">84</span>;
+        <span class="kw">if</span> (<span class="str">"CLT"</span>.equals(dto.getTerme())) <span class="kw">return</span> dto.getDuree() &gt; <span class="ok">84</span>;
+        <span class="kw">return true</span>;
+    }
+}</div>
+        </div>
+        <div class="tags"><span class="tag ts">ConditionFinancement.java</span><span class="tag te">Effort : Faible</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── JUSTIFICATION TECHNIQUE ── -->
+  <section id="justification">
+    <div class="sh"><div class="si">🔧</div><h2>Justification technique — Schéma retenu (Annexe 57)</h2></div>
+
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">Schéma de justification technique — Composantes retenues</div><div class="cs">Annexe 57 : composante sollicitée → justification → composante retenue → coût retenu → terme → site</div></div></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="box b-cdc">
+            <strong>CDC exige (Annexe 57)</strong>
+            Colonnes : Composante sollicitée | Coût sollicité | Justification technique | <strong>Composante retenue</strong> | <strong>Coût/montant retenu</strong> | <strong>Terme</strong> | Site<br/><br/>
+            Total par site : Total site 1, Total site 2, …, Total général<br/><br/>
+            RG : composante retenue = 0 ou coût retenu = 0 → composante non retenue<br/>
+            RG : coût retenu ≤ coût sollicité<br/>
+            RG : Terme par composante modifiable
+          </div>
+          <div class="box b-warn">
+            <strong>Gaps identifiés</strong>
+            • <code>ItemInvestissement</code> n'a pas de champ <code>composanteRetenue</code> distinct<br/>
+            • Pas de champ <code>terme</code> par composante (terme au niveau du crédit seulement)<br/>
+            • Regroupement par site non implémenté dans le frontend<br/>
+            • Calcul total par site absent<br/>
+            • Validation <code>coutRetenu ≤ cout</code> absente côté backend
+          </div>
+        </div>
+
+        <div class="proposal">
+          <div class="pt">Proposition — Champs manquants ItemInvestissement</div>
+          <div class="code">
+<span class="nt">// Ajouter dans ItemInvestissement.java</span>
+<span class="ann">@Column</span>(name = <span class="str">"composante_retenue"</span>, length = <span class="ok">200</span>)
+<span class="kw">private</span> String composanteRetenue;
+
+<span class="ann">@Column</span>(name = <span class="str">"terme_composante"</span>, length = <span class="ok">10</span>)
+<span class="kw">private</span> String termeComposante; <span class="nt">// CMT ou CLT</span>
+
+<span class="ann">@Column</span>(name = <span class="str">"famille"</span>, length = <span class="ok">100</span>)
+<span class="kw">private</span> String famille; <span class="nt">// Pour regroupement Annexe 67</span>
+
+<span class="nt">// Validation business</span>
+<span class="ann">@AssertTrue</span>(message = <span class="str">"Le coût retenu doit être ≤ au coût sollicité"</span>)
+<span class="kw">public boolean</span> isCoutRetenuValide() {
+    <span class="kw">return</span> coutRetenu == null || cout == null || coutRetenu &lt;= cout;
+}</div>
+        </div>
+
+        <div class="proposal" style="margin-top:10px">
+          <div class="pt">Proposition — Regroupement par site (Angular)</div>
+          <div class="code">
+<span class="nt">// ProjetCreditInvestissementComponent — méthode de regroupement</span>
+<span class="kw">getItemsGroupedBySite</span>(items: ItemInvestissement[]): Map&lt;string, ItemInvestissement[]&gt; {
+  <span class="kw">return</span> items.reduce((map, item) =&gt; {
+    item.sites.forEach(site =&gt; {
+      <span class="kw">const</span> key = site.id;
+      <span class="kw">if</span> (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(item);
+    });
+    <span class="kw">return</span> map;
+  }, <span class="kw">new</span> Map());
+}
+
+<span class="nt">// Total par site</span>
+<span class="kw">getTotalBySite</span>(siteId: string): number {
+  <span class="kw">return</span> this.items
+    .filter(i =&gt; i.sites.some(s =&gt; s.id === siteId))
+    .reduce((sum, i) =&gt; sum + (i.coutRetenu || <span class="ok">0</span>), <span class="ok">0</span>);
+}</div>
+        </div>
+        <div class="tags"><span class="tag ts">ItemInvestissement.java</span><span class="tag tf">ProjetCreditInvestissementComponent</span><span class="tag te">Effort : Moyen</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SCHÉMA FINANCEMENT ── -->
+  <section id="schema-fin">
+    <div class="sh"><div class="si">💰</div><h2>Schéma d'investissement &amp; financement (Annexe 67)</h2></div>
+
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">SchemaCreditInv — Autofinancement, BNA, Dotation, Don, Crédit proposé</div><div class="cs">Annexe 67 : regroupement par famille, FAD ≤ 4%, Fond roulement ≤ 10%, arrondi multiple de 500</div></div></div>
+      <div class="cb">
+        <div class="co co-b">L'entité <code>SchemaCreditInv</code> avec <code>ComposantInv</code> couvre la structure de base. Les règles de gestion critiques du CDC ne sont pas implémentées.</div>
+
+        <table class="ft">
+          <thead><tr><th>Règle CDC</th><th>Formule</th><th>État code</th></tr></thead>
+          <tbody>
+            <tr><td>RG1 : Total CMT/CLT arrondi au multiple de 500</td><td>Math.floor(total / 500) × 500</td><td><span class="ms-mark">❌ Absent</span></td></tr>
+            <tr><td>RG2 : FAD = ∑(montants composantes) × % FAD</td><td>FAD = coûtRetenuTotal × pourcentageFAD</td><td><span class="ms-mark">❌ Absent</span> (% FAD non stocké)</td></tr>
+            <tr><td>RG3 : FAD ≤ 4% du coût retenu total</td><td>FAD ≤ coûtRetenuTotal × 0.04</td><td><span class="ms-mark">❌ Absent</span></td></tr>
+            <tr><td>RG4 : Fond de roulement = ∑montants × % FR</td><td>FR = coûtRetenuTotal × pourcentageFR</td><td><span class="ms-mark">❌ Absent</span> (% FR non stocké)</td></tr>
+            <tr><td>RG5 : Fond de roulement ≤ 10% coût retenu</td><td>FR ≤ coûtRetenuTotal × 0.10</td><td><span class="ms-mark">❌ Absent</span></td></tr>
+            <tr><td>RG6 : Autofinancement = Montant − crédit proposé − dotation − don</td><td>autoFinancement = montant − credProposé − dotation − don</td><td><span class="pt-mark">⚠️ Partiel</span> (champs présents, calcul auto absent)</td></tr>
+            <tr><td>Regroupement par famille</td><td>Affichage Famille 1, Famille 2…</td><td><span class="ms-mark">❌ Absent</span> (champ famille manquant)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="proposal" style="margin-top:14px">
+          <div class="pt">Proposition — Ajouter % FAD et % FR + calculs</div>
+          <div class="code">
+<span class="nt">// SchemaCreditInv.java — ajouter</span>
+<span class="ann">@Column</span>(name = <span class="str">"pourcentage_fad"</span>)
+<span class="kw">private</span> Double pourcentageFad = <span class="ok">0.0</span>;
+
+<span class="ann">@Column</span>(name = <span class="str">"pourcentage_fond_roulement"</span>)
+<span class="kw">private</span> Double pourcentageFondRoulement = <span class="ok">0.0</span>;
+
+<span class="nt">// SchemaCreditInvService — méthode de calcul</span>
+<span class="kw">public void</span> calculateFadAndFr(SchemaCreditInv schema) {
+    Double coutTotal = schema.getComposants().stream()
+        .mapToDouble(c -> c.getMontantRetenu()).sum();
+
+    Double fad = coutTotal * schema.getPourcentageFad() / <span class="ok">100</span>;
+    <span class="kw">if</span> (fad > coutTotal * <span class="ok">0.04</span>)
+        <span class="kw">throw new</span> <span class="cls">BusinessException</span>(<span class="str">"FAD > 4% du coût retenu"</span>);
+    schema.setFad(fad);
+
+    Double fr = coutTotal * schema.getPourcentageFondRoulement() / <span class="ok">100</span>;
+    <span class="kw">if</span> (fr > coutTotal * <span class="ok">0.10</span>)
+        <span class="kw">throw new</span> <span class="cls">BusinessException</span>(<span class="str">"Fond de roulement > 10% du coût retenu"</span>);
+    schema.setFondRoulement(fr);
+
+    <span class="nt">// Arrondir total au multiple de 500</span>
+    Double totalCredit = schema.getComposants().stream()
+        .mapToDouble(c -> c.getMontantCredPropose()).sum() + fad + fr;
+    schema.setTotalCreditArrondi(Math.floor(totalCredit / <span class="ok">500</span>) * <span class="ok">500</span>);
+}</div>
+        </div>
+        <div class="tags"><span class="tag ts">SchemaCreditInv.java</span><span class="tag ts">SchemaCreditInvService.java</span><span class="tag te">Effort : Moyen</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AMORTISSEMENT ── -->
+  <section id="amortissement">
+    <div class="sh"><div class="si">📉</div><h2>Tableau d'amortissement (Annexe 68) — Entièrement absent</h2></div>
+
+    <div class="co co-r"><strong>Complètement absent du code.</strong> Aucune entité, aucun endpoint, aucun composant Angular. Pourtant nécessaire avant le calcul de la CAF (Annexe 76).</div>
+
+    <div class="g2">
+      <div class="box b-cdc">
+        <strong>CDC exige (Annexe 68)</strong>
+        Tableau par période N, N+1, N+2 … N+durée amortissement :<br/>
+        • Famille 1 : coût retenu / durée amortissement<br/>
+        • Famille 2 : coût retenu / durée amortissement<br/>
+        • FAD : montant FAD / 5 ans (durée fixe FAD = 5 ans)<br/>
+        • Total = ∑ familles + FAD<br/>
+        Possibilité de saisir une observation.
+      </div>
+      <div class="box b-plan">
+        <strong>Proposition d'implémentation</strong>
+        1. Entité <code>Amortissement</code> avec lien au schéma crédit<br/>
+        2. Service <code>AmortissementCalculatorService</code><br/>
+        3. Endpoint <code>GET /api/amortissement/{numSeqpers}/{numCanva}</code><br/>
+        4. Composant Angular <code>amortissement/</code> avec table PrimeNG dynamique
+      </div>
+    </div>
+
+    <div class="proposal" style="margin-top:14px">
+      <div class="pt">Proposition — Entité + Service Amortissement</div>
+      <div class="code">
+<span class="nt">// Entité à créer</span>
+<span class="ann">@Entity</span> <span class="ann">@Table</span>(name = <span class="str">"AMORTISSEMENT_INV"</span>)
+<span class="kw">public class</span> <span class="cls">AmortissementInv</span> {
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(strategy = GenerationType.SEQUENCE, generator = <span class="str">"SEQ_AMORT_INV"</span>)
+    <span class="kw">private</span> Long id;
+    <span class="kw">private</span> Long numSeqpers, numCanva;
+    <span class="kw">private</span> String idCredit;
+    <span class="kw">private</span> String famille;
+    <span class="kw">private</span> Integer annee;      <span class="nt">// N, N+1, N+2…</span>
+    <span class="kw">private</span> Double montant;     <span class="nt">// coûtRetenu / durée</span>
+    <span class="kw">private</span> Double montantFad;  <span class="nt">// FAD / 5</span>
+    <span class="kw">private</span> String observation;
+}
+
+<span class="nt">// Service de calcul</span>
+<span class="kw">public</span> List&lt;AmortissementInvDto&gt; calculate(Long numSeqpers, Long numCanva) {
+    List&lt;SchemaCreditInv&gt; schemas = repo.findWithComposants(numSeqpers, numCanva);
+    List&lt;AmortissementInvDto&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
+
+    <span class="kw">for</span> (SchemaCreditInv schema : schemas) {
+        <span class="kw">for</span> (ComposantInv comp : schema.getComposants()) {
+            <span class="nt">// Montant par période = coûtRetenu / durée amortissement</span>
+            Double montantPeriode = comp.getMontantRetenu() / dureeAmortissement(comp.getFamille());
+            <span class="nt">// FAD = montant FAD / 5</span>
+            Double fadPeriode = schema.getFad() / <span class="ok">5.0</span>;
+            result.add(buildDto(comp, montantPeriode, fadPeriode));
+        }
+    }
+    <span class="kw">return</span> result;
+}</div>
+    </div>
+    <div class="tags"><span class="tag te">Effort : Moyen · Prérequis : SchemaCreditInv avec famille</span></div>
+  </section>
+
+  <!-- ── RECETTES ET CHARGES ── -->
+  <section id="recettes">
+    <div class="sh"><div class="si">📈</div><h2>Recettes et charges par type de projet (Annexes 69-74) — Absent</h2></div>
+
+    <div class="co co-r"><strong>7 types de projets définis dans le CDC, aucun implémenté.</strong> Ces calculs alimentent directement la CAF et les tests de sensibilité.</div>
+
+    <table class="tbl">
+      <thead><tr><th>Type de projet</th><th>Annexe</th><th>Formules CDC</th><th>État</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Arboriculture / Maraîchage</strong></td><td>69</td>
+          <td>
+            Recette = Superficie × Rendement × Prix<br/>
+            Charge = Recette × % charge<br/>
+            Unité : Pied / Hectare
+          </td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Avicole chair</strong></td><td>70</td>
+          <td>
+            Recette = NB rotation × NB sujet × Prix × Poids × Taux mortalité<br/>
+            Charge (GIPAC) = coût revient × NB sujet × NB rotation<br/>
+            Charge (%) = Recette × %
+          </td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Poule pondeuse</strong></td><td>71</td>
+          <td>
+            Recette = NB sujet × Prix œuf × Durée cycle × NB œuf × Taux casse<br/>
+            Charge (GIPAC) = coût revient/œuf × NB œuf × NB sujet
+          </td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Poule reproductrice chair</strong></td><td>70</td><td>Identique Avicole chair</td><td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Poule reproductrice pondeuse</strong></td><td>71</td><td>Identique Poule pondeuse</td><td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Pêche</strong></td><td>72</td>
+          <td>
+            Recette = Tonnage × Prix<br/>
+            Frais à la masse = Recette × 35%<br/>
+            Point équipage = (Recette − Frais) × 48%<br/>
+            Dépense armateur = Recette × 5%
+          </td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Aquaculture</strong></td><td>73</td>
+          <td>
+            Recette = Tonnage × Prix<br/>
+            Charge = Recette × % charge<br/>
+            Année production, année croisière, taux rendement stable
+          </td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+        <tr>
+          <td><strong>Tableau consolidé par spéculation</strong></td><td>74</td>
+          <td>
+            N+1 = N × taux rendement (si N &lt; croisière)<br/>
+            N+1 = N × taux stable (si N &gt; croisière)<br/>
+            Total recette, total charge, RBE par période
+          </td>
+          <td><span class="badge b-ms">❌ Absent</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="proposal" style="margin-top:16px">
+      <div class="pt">Proposition d'architecture — Strategy Pattern pour les 7 types</div>
+      <div class="code">
+<span class="nt">// Interface commune</span>
+<span class="kw">public interface</span> <span class="cls">RecetteChargeCalculator</span> {
+    <span class="cls">RecetteChargeResult</span> calculate(<span class="cls">RecetteChargeInput</span> input);
+    <span class="cls">TypeProjet</span> getType();
+}
+
+<span class="nt">// Implémentation Arboriculture</span>
+<span class="ann">@Service</span>
+<span class="kw">public class</span> <span class="cls">ArboricultureCalculator</span> <span class="kw">implements</span> <span class="cls">RecetteChargeCalculator</span> {
+    <span class="kw">public</span> <span class="cls">RecetteChargeResult</span> calculate(<span class="cls">RecetteChargeInput</span> in) {
+        Double recette = in.getSuperficie() * in.getRendement() * in.getPrix();
+        Double charge = recette * in.getPourcentageCharge() / <span class="ok">100</span>;
+        <span class="kw">return new</span> <span class="cls">RecetteChargeResult</span>(recette, charge, recette - charge);
+    }
+    <span class="kw">public</span> <span class="cls">TypeProjet</span> getType() { <span class="kw">return</span> TypeProjet.ARBORICULTURE; }
+}
+
+<span class="nt">// Implémentation Pêche</span>
+<span class="ann">@Service</span>
+<span class="kw">public class</span> <span class="cls">PecheCalculator</span> <span class="kw">implements</span> <span class="cls">RecetteChargeCalculator</span> {
+    <span class="kw">public</span> <span class="cls">RecetteChargeResult</span> calculate(<span class="cls">RecetteChargeInput</span> in) {
+        Double recette = in.getTonnage() * in.getPrix();
+        Double fraisMasse = recette * <span class="ok">0.35</span>;
+        Double pointEquipage = (recette - fraisMasse) * <span class="ok">0.48</span>;
+        Double depenseArmateur = recette * <span class="ok">0.05</span>;
+        <span class="kw">return new</span> <span class="cls">RecetteChargeResult</span>(recette, fraisMasse + pointEquipage + depenseArmateur, ...);
+    }
+}</div>
+    </div>
+    <div class="tags"><span class="tag te">Effort : Très élevé · Prérequis : Amortissement</span></div>
+  </section>
+
+  <!-- ── REMBOURSEMENT ── -->
+  <section id="remboursement">
+    <div class="sh"><div class="si">💳</div><h2>Remboursement des crédits — Règle 3 / Règle 6 (Annexe 75)</h2></div>
+
+    <div class="co co-r"><strong>Entièrement absent.</strong> Prérequis pour la CAF (Annexe 76).</div>
+    <div class="g2">
+      <div class="box b-cdc">
+        <strong>CDC exige</strong>
+        Règle 3 ☐ (avec période de grâce) · Règle 6 ☐ (sans période de grâce)<br/><br/>
+        Tableau par période (N, N+1, N+2…) pour CMT puis CLT :<br/>
+        Principal | Restant dû | II (intérêts intercalaires) | IC (intérêts conventionnels) | Intérêt total = IC + II<br/><br/>
+        Total principal = CMT + CLT<br/>
+        Total intérêt = CMT + CLT<br/>
+        Total = principal + intérêt
+      </div>
+      <div class="box b-plan">
+        <strong>Proposition</strong>
+        1. Entité <code>RemboursementCredit</code><br/>
+        2. <code>RemboursementCalculatorService</code> (Règle 3 / Règle 6)<br/>
+        3. Endpoint <code>POST /api/remboursement/calculate</code><br/>
+        4. Composant Angular <code>remboursement-credit/</code>
+      </div>
+    </div>
+    <div class="formula">
+      Principal(n) = Montant crédit / Nombre échéances<br/>
+      Restant dû(n) = Restant dû(n-1) − Principal(n-1)<br/>
+      IC(n) = Restant dû(n) × Taux / Périodicité<br/>
+      Règle 3 : pendant période de grâce → pas de remboursement principal, IC seulement
+    </div>
+  </section>
+
+  <!-- ── CAF ── -->
+  <section id="caf">
+    <div class="sh"><div class="si">📊</div><h2>Capacité d'autofinancement (CAF) + TRI (Annexe 76)</h2></div>
+
+    <div class="co co-r"><strong>Entièrement absent.</strong> Dépend de : Recettes/Charges (Annexe 74) + Amortissement (Annexe 68) + Remboursement (Annexe 75).</div>
+
+    <table class="tbl">
+      <thead><tr><th>Ligne CDC (Annexe 76)</th><th>Formule</th><th>Prérequis</th></tr></thead>
+      <tbody>
+        <tr><td>Recettes</td><td>Total recettes par spéculation (Annexe 74)</td><td>RecetteCharge</td></tr>
+        <tr><td>Charges</td><td>Total charges par spéculation (Annexe 74)</td><td>RecetteCharge</td></tr>
+        <tr><td>RBE</td><td>= Recettes − Charges</td><td>RecetteCharge</td></tr>
+        <tr><td>Amortissement</td><td>Total tableau amortissement (Annexe 68)</td><td>Amortissement</td></tr>
+        <tr><td>Frais financier du projet</td><td>Total intérêts (Annexe 75)</td><td>Remboursement</td></tr>
+        <tr><td>Frais financier autres crédits</td><td>Total intérêts autres crédits agricoles</td><td>SAEB</td></tr>
+        <tr><td>Résultat avant impôt</td><td>= RBE − Amort − FF projet − FF autres</td><td>—</td></tr>
+        <tr><td>Impôt</td><td>= Résultat avant impôt × Taux impôt</td><td>Taux impôt saisi</td></tr>
+        <tr><td>Résultat après impôt</td><td>= Résultat avant impôt − Impôt</td><td>—</td></tr>
+        <tr><td>CAF</td><td>= Résultat après impôt + Amortissement</td><td>—</td></tr>
+        <tr><td>Remboursement crédit principal</td><td>= Principal CMT + Principal CLT (Annexe 75)</td><td>Remboursement</td></tr>
+        <tr><td>Autres crédits en principal</td><td>Total principal autres crédits agricoles</td><td>SAEB</td></tr>
+        <tr><td>Solde de trésorerie</td><td>= CAF − Remb. principal − Autres crédits</td><td>—</td></tr>
+        <tr><td>Trésorerie cumulée</td><td>= Trésorerie cumulée(N-1) + Solde(N)</td><td>—</td></tr>
+        <tr><td><strong>TRI</strong></td><td>= (Valeur finale / Montant investi)^(1/n) − 1 · modifiable</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="co co-o" style="margin-top:14px">
+      <strong>Cas spécial Pêche (CDC p.43) :</strong> Amortissement = montant total / durée projet (règle différente des autres types). À gérer avec une condition dans le service de calcul.
+    </div>
+  </section>
+
+  <!-- ── TEST SENSIBILITÉ ── -->
+  <section id="sensibilite">
+    <div class="sh"><div class="si">🎯</div><h2>Test de sensibilité ±10% (Annexe 77)</h2></div>
+
+    <div class="co co-r"><strong>Entièrement absent.</strong> Deux scénarios : −10% recettes et +10% charges.</div>
+    <div class="g2">
+      <div class="box b-cdc">
+        <strong>Test −10% recettes</strong>
+        Recettes(test) = Recettes(CAF) × 0.90<br/>
+        Charges(test) = Charges(CAF) inchangées<br/>
+        RBE, Amort, FF identiques à CAF<br/>
+        Nouveau : Résultat avant impôt, Impôt, Résultat après impôt, CAF, <strong>TRI modifiable</strong>
+      </div>
+      <div class="box b-cdc">
+        <strong>Test +10% charges</strong>
+        Recettes(test) = Recettes(CAF) inchangées<br/>
+        Charges(test) = Charges(CAF) × 1.10<br/>
+        RBE, Amort, FF identiques à CAF<br/>
+        Nouveau : Résultat avant impôt, Impôt, Résultat après impôt, CAF, <strong>TRI modifiable</strong>
+      </div>
+    </div>
+    <div class="proposal" style="margin-top:14px">
+      <div class="pt">Proposition — Calcul dérivé depuis CAF</div>
+      <div class="code">
+<span class="nt">// TestSensibiliteService — calcul à partir des données CAF existantes</span>
+<span class="ann">@Service</span>
+<span class="kw">public class</span> <span class="cls">TestSensibiliteService</span> {
+    <span class="kw">public</span> TestSensibiliteDto calculate(CafDto caf, TypeTest type) {
+        Double recettes = type == TypeTest.MOINS_10_RECETTES
+            ? caf.getRecettes() * <span class="ok">0.90</span> : caf.getRecettes();
+        Double charges = type == TypeTest.PLUS_10_CHARGES
+            ? caf.getCharges() * <span class="ok">1.10</span> : caf.getCharges();
+
+        Double rbe = recettes - charges;
+        Double resultatAvantImpot = rbe - caf.getAmortissement() - caf.getFraisFinancier();
+        Double impot = resultatAvantImpot * caf.getTauxImpot() / <span class="ok">100</span>;
+        Double cafTest = (resultatAvantImpot - impot) + caf.getAmortissement();
+        Double tri = calculateTri(cafTest, caf.getMontantInvesti(), nbAnnees);
+
+        <span class="kw">return</span> <span class="kw">new</span> TestSensibiliteDto(recettes, charges, rbe, cafTest, tri, type);
+    }
+}</div>
+    </div>
+    <div class="tags"><span class="tag te">Effort : Moyen · Prérequis : CAF calculée</span></div>
+  </section>
+
+  <!-- ── AVIS ── -->
+  <section id="avis">
+    <div class="sh"><div class="si">✅</div><h2>Avis investissement agricole (CDC p.23)</h2></div>
+
+    <div class="card">
+      <div class="ch"><span class="badge b-pt">🟠 Partiel</span><div><div class="ct">AvisCreditInvestissementComponent</div><div class="cs">Affichage des crédits retenus + conditions de financement modifiables</div></div></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="box b-cdc">
+            <strong>CDC exige</strong>
+            Afficher crédits retenus (Composante sollicitée | Coût sollicité | Justification | Composante retenue | Montant retenu | Terme | Site)<br/>
+            Afficher conditions de financement par crédit<br/>
+            Possibilité de modifier le montant retenu<br/>
+            Possibilité de modifier les conditions<br/>
+            Saisir une proposition générale
+          </div>
+          <div class="box b-warn">
+            <strong>Gaps identifiés</strong>
+            • Merge par index (fragile) — si les deux listes ont des tailles différentes, le merge est incorrect<br/>
+            • Champ "Composante retenue" distinct non affiché (confondu avec sollicitée)<br/>
+            • Terme par composante non affiché<br/>
+            • "Proposition générale" non stockée en DB<br/>
+            • Persistance via <code>avisService</code> non clairement liée à la table Avis
+          </div>
+        </div>
+        <div class="proposal">
+          <div class="pt">Proposition — Merge robuste par ID au lieu de l'index</div>
+          <div class="code">
+<span class="nt">// AVANT — merge par index (fragile)</span>
+<span class="ms">solicitedList.map((s, index) => ({
+  ...s, montantRetenue: schemas[index]?.composants[0]?.montantCredPropose
+}))</span>
+
+<span class="nt">// APRÈS — merge par ID crédit (robuste)</span>
+<span class="ok">const schemaMap = new Map(schemas.map(s => [s.idCredit, s]));
+return solicitedList.map(credit => {
+  const schema = schemaMap.get(credit.id);
+  return {
+    ...credit,
+    items: credit.items2.map(item => ({
+      composanteSollicite: item.composante,
+      composanteRetenue: item.composanteRetenue ?? item.composante,
+      montantSollicite: item.cout,
+      montantRetenue: schema?.composants
+        .find(c => c.idComposant === item.id)?.montantCredPropose ?? 0
+    }))
+  };
+});</span></div>
+        </div>
+        <div class="tags"><span class="tag tf">AvisCreditInvestissementComponent</span><span class="tag te">Effort : Faible</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RÈGLES MÉTIER ── -->
+  <section id="rg">
+    <div class="sh"><div class="si">⚖️</div><h2>Règles de gestion CDC — État d'implémentation</h2></div>
+
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Règle de gestion CDC</th><th>Section</th><th>État</th><th>Action requise</th></tr></thead>
+      <tbody>
+        <tr><td>RG1</td><td>Total CMT/CLT arrondi par défaut au multiple de 500</td><td>p.36</td><td><span class="badge b-ms">❌</span></td><td>Ajouter Math.floor(total/500)*500 dans le service</td></tr>
+        <tr><td>RG2</td><td>FAD = ∑ montants composantes × % FAD</td><td>p.36</td><td><span class="badge b-ms">❌</span></td><td>Ajouter champ % FAD dans SchemaCreditInv</td></tr>
+        <tr><td>RG3</td><td>FAD ≤ 4% du coût retenu</td><td>p.36</td><td><span class="badge b-ms">❌</span></td><td>Validation métier dans service</td></tr>
+        <tr><td>RG4</td><td>Fond de roulement = ∑ montants × % FR</td><td>p.36</td><td><span class="badge b-ms">❌</span></td><td>Ajouter champ % FR dans SchemaCreditInv</td></tr>
+        <tr><td>RG5</td><td>Fond de roulement ≤ 10% coût retenu</td><td>p.36</td><td><span class="badge b-ms">❌</span></td><td>Validation métier dans service</td></tr>
+        <tr><td>RG6</td><td>Autofinancement = Montant − crédit proposé − dotation − don</td><td>p.36</td><td><span class="badge b-pt">⚠️</span></td><td>Calcul auto à partir des champs existants</td></tr>
+        <tr><td>RG7</td><td>Durée CMT &lt; 84 mois</td><td>Annexe 50</td><td><span class="badge b-ms">❌</span></td><td>@Valid + validator personnalisé</td></tr>
+        <tr><td>RG8</td><td>Durée CLT &gt; 84 mois</td><td>Annexe 50</td><td><span class="badge b-ms">❌</span></td><td>@Valid + validator personnalisé</td></tr>
+        <tr><td>RG9</td><td>Coût retenu ≤ coût sollicité par composante</td><td>p.33</td><td><span class="badge b-ms">❌</span></td><td>@AssertTrue sur ItemInvestissement</td></tr>
+        <tr><td>RG10</td><td>Composante retenue = 0 → composante non retenue</td><td>p.33</td><td><span class="badge b-ms">❌</span></td><td>Filtrage dans service avant calcul</td></tr>
+        <tr><td>RG11</td><td>Terme par composante modifiable (CMT/CLT)</td><td>p.33</td><td><span class="badge b-ms">❌</span></td><td>Ajouter champ termeComposante dans ItemInvestissement</td></tr>
+        <tr><td>RG12</td><td>Bilan fourrager s'affiche si élevage comme activité</td><td>p.34</td><td><span class="badge b-ok">✅</span></td><td>—</td></tr>
+        <tr><td>RG13</td><td>TRI = (valeur finale / montant investi)^(1/n) − 1, modifiable</td><td>p.42</td><td><span class="badge b-ms">❌</span></td><td>Service CAF + champ triManuel</td></tr>
+        <tr><td>RG14</td><td>Trésorerie cumulée(N) = Solde(N) + Trésorerie cumulée(N-1)</td><td>p.42</td><td><span class="badge b-ms">❌</span></td><td>Service CAF</td></tr>
+        <tr><td>RG15</td><td>Recettes et charges par spéculation calculées selon année croisière</td><td>p.41</td><td><span class="badge b-ms">❌</span></td><td>RecetteChargeService avec gestion années</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── ROADMAP ── -->
+  <section id="roadmap">
+    <div class="sh"><div class="si">🗺️</div><h2>Plan d'intégration des parties manquantes</h2></div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)">
+
+      <div class="rmstep" style="border-color:var(--miss)">
+        <div class="rmtag" style="background:var(--miss-bg);color:var(--miss);border:1px solid var(--miss-b)">SPRINT 1 — Semaines 1-2 · Corrections entités existantes (Effort faible)</div>
+        <div class="rmgrid">
+          <div class="rmitem" style="background:var(--miss-bg);border:1px solid var(--miss-b)"><strong>ItemInvestissement</strong><br/>Ajouter : composanteRetenue, termeComposante, famille</div>
+          <div class="rmitem" style="background:var(--miss-bg);border:1px solid var(--miss-b)"><strong>SchemaCreditInv</strong><br/>Ajouter : pourcentageFad, pourcentageFondRoulement, totalCreditArrondi</div>
+          <div class="rmitem" style="background:var(--miss-bg);border:1px solid var(--miss-b)"><strong>Validation @Valid</strong><br/>Durée CMT/CLT (RG7/8), coût retenu ≤ sollicité (RG9)</div>
+          <div class="rmitem" style="background:var(--miss-bg);border:1px solid var(--miss-b)"><strong>API manquants</strong><br/>POST + DELETE /api/credit-investissement</div>
+          <div class="rmitem" style="background:var(--miss-bg);border:1px solid var(--miss-b)"><strong>Règles FAD/FR</strong><br/>Calcul auto dans SchemaCreditInvService (RG2-RG5)</div>
+          <div class="rmitem" style="background:var(--miss-bg);border:1px solid var(--miss-b)"><strong>Arrondi multiple 500</strong><br/>Math.floor(total/500)*500 (RG1)</div>
+        </div>
+      </div>
+
+      <div class="rmstep" style="border-color:var(--part)">
+        <div class="rmtag" style="background:var(--part-bg);color:var(--part);border:1px solid var(--part-b)">SPRINT 2 — Semaines 3-4 · Justification &amp; Schéma financement (Effort moyen)</div>
+        <div class="rmgrid">
+          <div class="rmitem" style="background:var(--part-bg);border:1px solid var(--part-b)"><strong>Regroupement par site</strong><br/>Méthode Angular getItemsGroupedBySite()</div>
+          <div class="rmitem" style="background:var(--part-bg);border:1px solid var(--part-b)"><strong>Total par site</strong><br/>Calcul et affichage total coût retenu par site</div>
+          <div class="rmitem" style="background:var(--part-bg);border:1px solid var(--part-b)"><strong>Regroupement par famille</strong><br/>Annexe 67 : Famille 1, Famille 2…</div>
+          <div class="rmitem" style="background:var(--part-bg);border:1px solid var(--part-b)"><strong>Avis merge robuste</strong><br/>Merge par ID crédit au lieu de l'index</div>
+          <div class="rmitem" style="background:var(--part-bg);border:1px solid var(--part-b)"><strong>Référentiel spéculations</strong><br/>100+ items CDC comme table paramétrable</div>
+          <div class="rmitem" style="background:var(--part-bg);border:1px solid var(--part-b)"><strong>Routes Angular</strong><br/>Ajouter routes manquantes dans canvas.agricole-routing</div>
+        </div>
+      </div>
+
+      <div class="rmstep" style="border-color:var(--ok)">
+        <div class="rmtag" style="background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-b)">SPRINT 3 — Semaines 5-7 · Module Amortissement (Effort moyen)</div>
+        <div class="rmgrid">
+          <div class="rmitem" style="background:var(--ok-bg);border:1px solid var(--ok-b)"><strong>Entité AmortissementInv</strong><br/>Création + repository + migration Flyway</div>
+          <div class="rmitem" style="background:var(--ok-bg);border:1px solid var(--ok-b)"><strong>AmortissementCalculatorService</strong><br/>montant/famille/période + FAD/5</div>
+          <div class="rmitem" style="background:var(--ok-bg);border:1px solid var(--ok-b)"><strong>AmortissementController</strong><br/>GET /api/amortissement + POST calculate</div>
+          <div class="rmitem" style="background:var(--ok-bg);border:1px solid var(--ok-b)"><strong>Composant Angular</strong><br/>amortissement/ avec tableau PrimeNG dynamique</div>
+        </div>
+      </div>
+
+      <div class="rmstep" style="border-color:#7b1fa2">
+        <div class="rmtag" style="background:#f3e5f5;color:#4a148c;border:1px solid #ce93d8">SPRINT 4 — Semaines 8-12 · Recettes &amp; Charges (Effort très élevé)</div>
+        <div class="rmgrid">
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>Interface RecetteChargeCalculator</strong><br/>Strategy pattern + enum TypeProjet</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>ArboricultureCalculator</strong><br/>Annexe 69 — superficie × rendement × prix</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>AvicoleCalculator</strong><br/>Annexe 70 — GIPAC + pourcentage</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>PoulePondeuse/Reproductrice</strong><br/>Annexe 71 — par œuf</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>PecheCalculator</strong><br/>Annexe 72 — frais masse 35%, équipage 48%</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>AquacultureCalculator</strong><br/>Annexe 73 — rendement par croisière</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>TableauConsolide (Annexe 74)</strong><br/>Projections temporelles par spéculation</div>
+          <div class="rmitem" style="background:#f3e5f5;border:1px solid #ce93d8"><strong>Composants Angular (×7)</strong><br/>Un composant par type de projet</div>
+        </div>
+      </div>
+
+      <div class="rmstep" style="border-color:var(--plan);border-bottom:none">
+        <div class="rmtag" style="background:var(--plan-bg);color:var(--plan);border:1px solid var(--plan-b)">SPRINT 5 — Semaines 13-16 · Remboursement · CAF · Test sensibilité</div>
+        <div class="rmgrid">
+          <div class="rmitem" style="background:var(--plan-bg);border:1px solid var(--plan-b)"><strong>RemboursementCalculator</strong><br/>Règle 3 (grâce) + Règle 6 (sans)</div>
+          <div class="rmitem" style="background:var(--plan-bg);border:1px solid var(--plan-b)"><strong>CAF Service</strong><br/>Pipeline complet 15 lignes Annexe 76</div>
+          <div class="rmitem" style="background:var(--plan-bg);border:1px solid var(--plan-b)"><strong>TRI calculé + modifiable</strong><br/>(valeur finale/montant)^(1/n) − 1</div>
+          <div class="rmitem" style="background:var(--plan-bg);border:1px solid var(--plan-b)"><strong>Trésorerie cumulée</strong><br/>Solde cumulé par période</div>
+          <div class="rmitem" style="background:var(--plan-bg);border:1px solid var(--plan-b)"><strong>TestSensibilite −10% recettes</strong><br/>Recalcul CAF sur scénario dégradé</div>
+          <div class="rmitem" style="background:var(--plan-bg);border:1px solid var(--plan-b)"><strong>TestSensibilite +10% charges</strong><br/>Recalcul CAF sur scénario dégradé</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>Canva Agricole — BNA</strong> &mdash;
+  Étude Crédit Investissement Agricole — CDC v1.0 (Août 2024) vs Code — Taux d'avancement : <strong>~35%</strong> — 2026-05-06
+</footer>
+</body>
+</html>
