@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CDC vs Réalisation — Canva Agricole BNA</title>
+  <style>
+    :root {
+      --ok:       #1b5e20; --ok-bg:    #e8f5e9; --ok-border: #a5d6a7;
+      --partial:  #e65100; --partial-bg:#fff3e0; --partial-border:#ffcc80;
+      --missing:  #b71c1c; --missing-bg:#ffebee; --missing-border:#ef9a9a;
+      --todo:     #1565c0; --todo-bg:  #e3f2fd;  --todo-border:#90caf9;
+      --dark:     #0d1b2a;
+      --text:     #1c1c1c;
+      --muted:    #546e7a;
+      --border:   #dce3e8;
+      --white:    #ffffff;
+      --bg:       #f0f4f8;
+      --shadow:   0 2px 12px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,#0d1b2a,#1a3055,#1f4a7a);color:#fff;padding:52px 48px 40px;position:relative;overflow:hidden}
+    header::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.04)}
+    .htag{display:inline-block;background:#2e7d32;color:#fff;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:18px}
+    header h1{font-size:2.2rem;font-weight:800;margin-bottom:8px}
+    header p.sub{font-size:.95rem;opacity:.85;max-width:720px;margin-bottom:26px}
+    .hmeta{display:flex;gap:14px;flex-wrap:wrap}
+    .hchip{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600}
+
+    /* NAV */
+    nav{background:#0d1b2a;padding:0 48px;display:flex;gap:2px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+    nav a{color:rgba(255,255,255,.72);text-decoration:none;padding:13px 15px;font-size:.76rem;font-weight:700;letter-spacing:.4px;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+    nav a:hover{color:#fff;border-bottom-color:#4caf50}
+
+    main{max-width:1340px;margin:0 auto;padding:44px 32px}
+
+    /* LEGEND CARDS */
+    .legend-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:44px}
+    .lcard{background:var(--white);border-radius:12px;padding:18px 20px;border:1px solid var(--border);box-shadow:var(--shadow);text-align:center}
+    .lcard .lnum{font-size:2.4rem;font-weight:900;line-height:1}
+    .lcard .lnum.ok{color:var(--ok)}.lcard .lnum.part{color:var(--partial)}.lcard .lnum.miss{color:var(--missing)}.lcard .lnum.plan{color:var(--todo)}
+    .lcard .llabel{font-size:.72rem;font-weight:700;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.6px}
+
+    /* SECTION */
+    section{margin-bottom:60px}
+    .sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid var(--border)}
+    .sec-icon{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#0d1b2a,#1a3055);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .sec-hdr h2{font-size:1.5rem;font-weight:800;color:var(--dark)}
+    .sec-hdr .cnt{margin-left:auto;background:var(--todo-bg);color:var(--todo);border:1px solid var(--todo-border);font-size:.74rem;font-weight:700;padding:4px 12px;border-radius:20px}
+
+    /* STATUS BADGE */
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;flex-shrink:0;white-space:nowrap}
+    .b-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)}
+    .b-partial{background:var(--partial-bg);color:var(--partial);border:1px solid var(--partial-border)}
+    .b-missing{background:var(--missing-bg);color:var(--missing);border:1px solid var(--missing-border)}
+    .b-todo{background:var(--todo-bg);color:var(--todo);border:1px solid var(--todo-border)}
+
+    /* ITEM CARD */
+    .icard{background:var(--white);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;transition:box-shadow .2s}
+    .icard:hover{box-shadow:0 6px 22px rgba(0,0,0,.11)}
+    .icard-header{display:flex;align-items:flex-start;gap:14px;padding:18px 22px 0}
+    .icard-title{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+    .icard-sub{font-size:.78rem;color:var(--muted)}
+    .icard-body{padding:14px 22px 18px}
+
+    /* 2-col */
+    .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    @media(max-width:640px){.cols2{grid-template-columns:1fr}}
+    .col-box{padding:14px 16px;border-radius:10px;font-size:.84rem}
+    .col-cdc{background:#f8f9fa;border:1px solid #dee2e6}
+    .col-cdc strong{display:block;font-size:.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#495057;margin-bottom:6px}
+    .col-code{background:var(--ok-bg);border:1px solid var(--ok-border)}
+    .col-code strong{display:block;font-size:.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ok);margin-bottom:6px}
+    .col-miss{background:var(--missing-bg);border:1px solid var(--missing-border)}
+    .col-miss strong{display:block;font-size:.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--missing);margin-bottom:6px}
+    .col-plan{background:var(--todo-bg);border:1px solid var(--todo-border)}
+    .col-plan strong{display:block;font-size:.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--todo);margin-bottom:6px}
+
+    /* PROGRESS BAR */
+    .prog-wrap{background:#e9ecef;border-radius:20px;height:10px;margin:8px 0 4px;overflow:hidden}
+    .prog-bar{height:100%;border-radius:20px;transition:width .4s}
+    .prog-ok{background:var(--ok)}.prog-part{background:var(--partial)}.prog-miss{background:var(--missing)}
+    .prog-label{font-size:.74rem;color:var(--muted);font-weight:600}
+
+    /* CODE SNIPPET */
+    .code{background:#0d1117;color:#c9d1d9;border-radius:9px;padding:14px 16px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.77rem;overflow-x:auto;margin:10px 0;border:1px solid #30363d;line-height:1.7}
+    .code .ok{color:#56d364}.code .miss{color:#ff7b72}.code .note{color:#8b949e}.code .kw{color:#ff7b72}.code .cls{color:#79c0ff}
+
+    /* TAGS */
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .tag{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid}
+    .tag-file{background:#f3e5f5;color:#4a148c;border-color:#ce93d8}
+    .tag-src{background:#e0f2f1;color:#004d40;border-color:#80cbc4}
+    .tag-effort{background:#fff8e1;color:#6d4c00;border-color:#ffe082}
+
+    /* CALLOUT */
+    .callout{border-left:4px solid;padding:13px 17px;border-radius:0 9px 9px 0;font-size:.86rem;margin-bottom:14px}
+    .co-red{border-color:var(--missing);background:var(--missing-bg);color:#7f0000}
+    .co-orange{border-color:var(--partial);background:var(--partial-bg);color:#7a3000}
+    .co-green{border-color:var(--ok);background:var(--ok-bg);color:#1b3a1f}
+    .co-blue{border-color:var(--todo);background:var(--todo-bg);color:#0d3b8c}
+
+    /* STATUT MACHINE */
+    .statut-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}
+    .sf-step{padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:700;border:2px solid}
+    .sf-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
+    .sf-miss{background:var(--missing-bg);color:var(--missing);border-color:var(--missing-border)}
+    .sf-arrow{color:#90a4ae;font-size:1.1rem;font-weight:700}
+
+    /* TABLE */
+    .tbl{width:100%;border-collapse:collapse;font-size:.83rem;background:var(--white);border-radius:11px;overflow:hidden;box-shadow:var(--shadow)}
+    .tbl thead{background:linear-gradient(90deg,#0d1b2a,#1a3055);color:#fff}
+    .tbl th{padding:13px 16px;text-align:left;font-weight:700;font-size:.78rem;letter-spacing:.4px}
+    .tbl td{padding:11px 16px;border-bottom:1px solid #e9ecef;vertical-align:top}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:nth-child(even) td{background:#f8fafb}
+
+    /* GRID 2 */
+    .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+
+    /* PROPOSAL BOX */
+    .proposal{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid var(--ok-border);border-radius:11px;padding:18px 20px;margin-top:12px}
+    .proposal-title{font-size:.72rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--ok);margin-bottom:10px}
+
+    footer{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:28px;font-size:.8rem;margin-top:60px}
+    footer strong{color:#fff}
+    @media(max-width:640px){header{padding:32px 20px}main{padding:24px 16px}nav{padding:0 16px}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="htag">Étude comparative — CDC vs Réalisation</div>
+  <h1>Canva Agricole BNA — Analyse d'avancement</h1>
+  <p class="sub">Comparaison entre le <strong>Cahier des Charges validé (V1.0 — Août 2024)</strong> et l'existant dans le code source. Identification des parties réalisées, partiellement réalisées, manquantes et propositions d'intégration.</p>
+  <div class="hmeta">
+    <span class="hchip">CDC v1.0 — 93 pages — Août 2024</span>
+    <span class="hchip">5 Opérations CDC</span>
+    <span class="hchip">12 Rubriques</span>
+    <span class="hchip">43 Annexes analysées</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#synthese">📊 Synthèse</a>
+  <a href="#op1-realise">✅ Réalisé</a>
+  <a href="#op1-partiel">🟠 Partiel</a>
+  <a href="#manquant">❌ Manquant</a>
+  <a href="#integrations">🔗 Intégrations SI</a>
+  <a href="#statut">🔄 Statuts</a>
+  <a href="#notifications">🔔 Notifications</a>
+  <a href="#stats">📈 Statistiques</a>
+  <a href="#roadmap">🗺️ Plan d'intégration</a>
+</nav>
+
+<main>
+
+  <!-- ══ LEGEND ══ -->
+  <div class="legend-row">
+    <div class="lcard"><div class="lnum ok">17</div><div class="llabel">Fonctionnalités réalisées</div></div>
+    <div class="lcard"><div class="lnum part">9</div><div class="llabel">Partiellement réalisées</div></div>
+    <div class="lcard"><div class="lnum miss">16</div><div class="llabel">Non réalisées</div></div>
+    <div class="lcard"><div class="lnum plan">5</div><div class="llabel">Intégrations SI manquantes</div></div>
+    <div class="lcard" style="background:linear-gradient(135deg,var(--ok-bg),var(--todo-bg))">
+      <div style="font-size:1.9rem;font-weight:900;color:#1565c0">40%</div>
+      <div class="llabel">Taux d'avancement estimé</div>
+      <div class="prog-wrap" style="margin-top:10px"><div class="prog-bar prog-ok" style="width:40%"></div></div>
+    </div>
+  </div>
+
+  <!-- ══ SYNTHÈSE GÉNÉRALE ══ -->
+  <section id="synthese">
+    <div class="sec-hdr"><div class="sec-icon">📊</div><h2>Synthèse par opération CDC</h2></div>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Opération CDC</th><th>Tâches CDC</th><th>État global</th><th>Taux estimé</th><th>Points critiques</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Op. 1 — PEC Données Canevas</strong></td>
+          <td>T1: PEC données<br/>T2: Validation données<br/>T3: PEC Réexamen</td>
+          <td><span class="badge b-partial">🟠 Partiel</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-part" style="width:60%"></div></div>
+            <div class="prog-label">60%</div>
+          </td>
+          <td>Calculs rentabilité (Pêche/Aquaculture), CAF, Test sensibilité, Réexamen</td>
+        </tr>
+        <tr>
+          <td><strong>Op. 2 — PEC Avis/Décision</strong></td>
+          <td>T1: PEC Avis/décision<br/>T2: Validation Avis/décision</td>
+          <td><span class="badge b-partial">🟠 Partiel</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-part" style="width:45%"></div></div>
+            <div class="prog-label">45%</div>
+          </td>
+          <td>Circuit de validation multi-structures, pré-validation, réorientation, délégation de pouvoir</td>
+        </tr>
+        <tr>
+          <td><strong>Op. 3 — Affectation</strong></td>
+          <td>T1: PEC Affectation</td>
+          <td><span class="badge b-ok">✅ Réalisé</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-ok" style="width:80%"></div></div>
+            <div class="prog-label">80%</div>
+          </td>
+          <td>Notification par mail/système manquante</td>
+        </tr>
+        <tr>
+          <td><strong>Op. 4 — Refoulement</strong></td>
+          <td>T1: PEC Refoulement</td>
+          <td><span class="badge b-missing">❌ Absent</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-miss" style="width:0%"></div></div>
+            <div class="prog-label">0%</div>
+          </td>
+          <td>Aucune trace dans le code</td>
+        </tr>
+        <tr>
+          <td><strong>Op. 5 — Annulation Canevas</strong></td>
+          <td>T1: PEC Annulation<br/>T2: Validation Annulation</td>
+          <td><span class="badge b-missing">❌ Absent</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-miss" style="width:0%"></div></div>
+            <div class="prog-label">0%</div>
+          </td>
+          <td>Workflow complet absent, états "En attente d'annulation"/"Annulé" absents</td>
+        </tr>
+        <tr>
+          <td><strong>Consultation</strong></td>
+          <td>Consultation multi-critères</td>
+          <td><span class="badge b-partial">🟠 Partiel</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-part" style="width:50%"></div></div>
+            <div class="prog-label">50%</div>
+          </td>
+          <td>Filtre par DR/Agence/Spéculation/Activité/Nature crédit absent</td>
+        </tr>
+        <tr>
+          <td><strong>Statistiques &amp; Édition</strong></td>
+          <td>Fiche d'étude, Statistiques, Diagrammes</td>
+          <td><span class="badge b-missing">❌ Absent</span></td>
+          <td>
+            <div class="prog-wrap"><div class="prog-bar prog-miss" style="width:10%"></div></div>
+            <div class="prog-label">10%</div>
+          </td>
+          <td>Module statistiques, diagrammes, sélection de rubriques à imprimer absents</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══ PARTIES RÉALISÉES ══ -->
+  <section id="op1-realise">
+    <div class="sec-hdr"><div class="sec-icon">✅</div><h2>Parties réalisées</h2><span class="cnt">17 fonctionnalités</span></div>
+
+    <div class="callout co-green">
+      Les fonctionnalités ci-dessous sont implémentées dans le code et couvrent les rubriques de base du CDC. Le frontend dispose des pages correspondantes et le backend expose les endpoints REST nécessaires.
+    </div>
+
+    <!-- R1 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Fiche signalétique client (Rubrique I — CDC p.7-8)</div>
+          <div class="icard-sub">Présentation client — personne physique &amp; morale</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Relation, CIN/RNE, comptes, secteur, segment, téléphone, mail, date naissance, activité principale, CA, forme juridique, capital social, dossier juridique, structure du capital, détail 1er responsable.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong>Pages <code>fiche-signalitique/</code> et <code>fiche-signalitique-2/</code>. DTOs : <code>PersonneDTO</code>, <code>ClientDTO</code>, <code>ResponsableDTO</code>. Backend : <code>ClientController</code>, <code>CanevaController</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">fiche-signalitique/</span><span class="tag tag-file">PersonneDTO.java</span><span class="tag tag-file">ClientDTO.java</span><span class="tag tag-src">ClientController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R2 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Engagement de la relation — BNA &amp; BCT (Rubrique II — CDC p.10-11)</div>
+          <div class="icard-sub">Classe BCT/BNA/SNI, engagements, comptes, solde algébrique, effort de remboursement</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Classe BCT/BNA/SNI 3 dernières années, engagement BCT, engagements&amp;comptes (Annexe 6), solde algébrique (Annexe 7), effort de remboursement (Annexe 8), récap CCMLT (Annexe 9), placement (Annexe 10), mouvement local/export (Annexe 11).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>EngagementsController</code>, <code>EngagementBNADTO</code>, <code>EngagementBCTDTO</code>, <code>DetailsEngagementBNADTO</code>, <code>SommeAlgebriqueDTO</code>. Pages : <code>engagement-bct-bna/</code>, <code>engagements/</code>, <code>historical-bct-class/</code>. Cache Caffeine pour les données.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">engagement-bct-bna/</span><span class="tag tag-src">EngagementsController.java</span><span class="tag tag-src">EngagementBNADTO.java</span></div>
+      </div>
+    </div>
+
+    <!-- R3 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Garanties détenues (Rubrique III — CDC p.13)</div>
+          <div class="icard-sub">Garanties existantes du client chez la BNA</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Afficher garanties détenues du client (source SAGA), regroupement par nature de garantie (Annexe 22).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>GarantieController</code>, <code>GarantieDTO</code>, <code>NatureGarantieDTO</code>, <code>TypeGarantieDTO</code>, pages <code>garanties/</code>. <em>Réserve : source SAGA non intégrée (saisie manuelle)</em>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">garanties/</span><span class="tag tag-src">GarantieController.java</span><span class="tag tag-src">GarantieDTO.java</span></div>
+      </div>
+    </div>
+
+    <!-- R4 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Conditions de banque (Rubrique V — CDC p.16)</div>
+          <div class="icard-sub">Conditions préférentielles accordées à la relation</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Afficher conditions de banque préférentielles de la relation (source : système conditions de banque — Annexe 26).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>ConditionBanqueController</code>, <code>ConditionFinancement</code> (entité JPA), page <code>condition-banque/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">condition-banque/</span><span class="tag tag-src">ConditionBanqueController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R5 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Gestion des Sites (CDC p.16, p.19)</div>
+          <div class="icard-sub">Sites existants et nouveaux sites du projet</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Afficher tous les sites du client. Ajouter/supprimer des sites. Saisir le lieu (gouvernorat, délégation, imada). Carte géographique. Affectation des sites aux crédits.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>SiteController</code>, <code>SitesController</code>, entité <code>Site</code>, hiérarchie complète REF_* (Zone→Région→Gouvernorat→Délégation→Imada), page <code>map-picker/</code> (Leaflet).</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">map-picker/</span><span class="tag tag-src">SiteController.java</span><span class="tag tag-src">RefGouvernorat.java</span></div>
+      </div>
+    </div>
+
+    <!-- R6 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Crédit sollicité — Nature des crédits (CDC p.19-20)</div>
+          <div class="icard-sub">Court terme, investissement, achat terrain</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Choisir nature(s) de crédit, nombre par nature, saisir liste des vendeurs (si achat terrain), afficher engagements vendeurs BNA (Annexe 47).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong>Entités : <code>CreditCourtTerme</code>, <code>CreditInvestissement</code>, <code>CreditAchatTerrain</code>, <code>Vendeur</code>. DTOs : <code>CreditSolliciteDTO</code>. Controllers dédiés. Pages <code>credit-sollicite/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">credit-sollicite/</span><span class="tag tag-src">CreditAchatTerrainController.java</span><span class="tag tag-src">Vendeur.java</span></div>
+      </div>
+    </div>
+
+    <!-- R7 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Garanties proposées (CDC p.20, p.26-27)</div>
+          <div class="icard-sub">Garanties détenues + nouvelles garanties + affectation aux crédits</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Afficher garanties détenues, ajouter nouvelles garanties (Annexe 51), affecter chaque garantie à un ou plusieurs crédits avec montant (Annexe 52). Contrôle : montant total garanties ≥ total crédits.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>GarantiePropose</code>, <code>GarantieProposeeDTO</code>, <code>GarantieProposeFichier</code>. Pages <code>garanties-proposees/</code>, <code>avis-garantie/</code>. <code>AvisGarantiesDTO</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">garanties-proposees/</span><span class="tag tag-src">GarantiePropose.java</span></div>
+      </div>
+    </div>
+
+    <!-- R8 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Exploitation — Cheptel / Élevage (CDC p.28, Annexe 29)</div>
+          <div class="icard-sub">Production animale — types d'élevage, races, nombres</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Tableau cheptels (Annexe 61), choisir type d'élevage (liste prédéfinie), saisir race et nombre, affecter à un ou plusieurs sites.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong>Entité <code>Elevage</code>, <code>ElevageCheptelController</code>, <code>ElevageDto</code>, page <code>cheptel-projet/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">cheptel-projet/</span><span class="tag tag-src">ElevageCheptelController.java</span><span class="tag tag-src">Elevage.java</span></div>
+      </div>
+    </div>
+
+    <!-- R9 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Exploitation — Matériels (CDC p.32, Annexe 60)</div>
+          <div class="icard-sub">Équipements agricoles avec âge et état</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Tableau matériels, choisir type (liste 1), saisir âge et état, affecter à site(s).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong>Entité <code>Materiel</code>, <code>MaterielController</code>, <code>MaterielDto</code>, page <code>materiel-projet/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">materiel-projet/</span><span class="tag tag-src">MaterielController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R10 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Bilan fourrager (CDC p.34-35, Annexes 63-64)</div>
+          <div class="icard-sub">Disponibilité fourragère, besoin fourrager, calcul bilan</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Disponibilité fourragère = ∑(Nombre Ha × UF/Ha). Besoin fourrager = ∑(tête × Besoin UF). Bilan = disponibilité − besoin. Message si bilan &lt; 0 avec nombre de têtes à retenir.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>BilanFourragereService</code>, pages <code>besoin-fourrager/</code>, <code>disponibilite-fourragere/</code>, <code>bilan-fourrager-inv/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">besoin-fourrager/</span><span class="tag tag-file">disponibilite-fourragere/</span></div>
+      </div>
+    </div>
+
+    <!-- R11 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Ressources hydriques (CDC p.32, p.35-36, Annexes 59, 65-66)</div>
+          <div class="icard-sub">Disponibilité hydrique, besoin hydrique, bilan hydrique</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Point d'eau (liste 3), débit, salinité, profondeur, heures de pompage. Débit M³ = Débit × heures × 3,6. Besoin hydrique par spéculation. Bilan = disponibilité − besoin. Message si bilan &lt; 0.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>RessourceHydriqueController</code>, <code>RessourceHydriqueInvController</code>, entités dédiées, pages <code>besoin-hydrique/</code>, <code>disponibilite-hydrique/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">besoin-hydrique/</span><span class="tag tag-file">disponibilite-hydrique/</span><span class="tag tag-src">RessourceHydriqueController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R12 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Schéma d'investissement &amp; financement (CDC p.36-37, Annexe 67)</div>
+          <div class="icard-sub">Schéma par terme de crédit, FAD, fond de roulement, autofinancement</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Schéma par terme (CCT/CMT/CLT). RG : Total arrondi au multiple de 500. FAD ≤ 4% coût retenu. Fond de roulement ≤ 10% coût retenu. Autofinancement = Montant − crédit − dotation − don.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>SchemaCredit</code>, <code>SchemaCreditInv</code>, <code>SchemaFinanAvisDTO</code>, <code>SchemaInvestAvisDTO</code>, pages <code>credit-retenu[1-4]/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">credit-retenu1/</span><span class="tag tag-src">SchemaCreditController.java</span><span class="tag tag-src">SchemaCredit.java</span></div>
+      </div>
+    </div>
+
+    <!-- R13 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Avis bancaires (CDC p.23, Opération 2)</div>
+          <div class="icard-sub">Avis crédit court terme, achat terrain, investissement</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Avis pour chaque type de crédit. Conditions de financement pour chaque crédit. Proposition. Avis favorable/défavorable.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>AvisController</code>, <code>AvisDTO</code>, <code>AvisCanevasDTO</code>. Pages <code>avis/</code>, <code>avis-credit-court-terme/</code>, <code>avis-credit-investissement/</code>, <code>avis-achat-terrrain/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">avis/</span><span class="tag tag-file">avis-credit-court-terme/</span><span class="tag tag-src">AvisController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R14 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Affectation des canevas (Opération 3 — CDC p.56-57)</div>
+          <div class="icard-sub">Affecter canevas à des utilisateurs dans les structures centrales</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Liste canevas affectés/non affectés avec état (traité/non traité). Sélectionner canevas, saisir matricule, observation, affecter. Notification par mail.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>AffectationController</code>, <code>AffectationService</code>, entité <code>Affectation</code>, page <code>affectation/</code>, <code>agent-canevas/</code>. <em>Réserve : notification mail absente.</em></div>
+        </div>
+        <div class="tags"><span class="tag tag-file">affectation/</span><span class="tag tag-src">AffectationController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R15 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Demande de client (CDC p.19, Annexe 44)</div>
+          <div class="icard-sub">Saisie et scan de la demande de crédit</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Saisir tableau demande client (Annexe 44). Scanner et enregistrer documents (demande de crédit, etc.).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>ClientRequestController</code>, <code>ClientRequestDTO</code>, <code>DocumentClientCanva</code>, page <code>document-upload/</code>.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">document-upload/</span><span class="tag tag-src">ClientRequestController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R16 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Analyse financière — Bilan comptable &amp; Ratios (CDC p.13-15)</div>
+          <div class="icard-sub">États financiers, ratios, état des résultats pour 3 dernières années</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>État financier, ratios financiers et état des résultats de la relation sur 3 ans (source : Centrale des états financiers — Annexes 23-25). Idem pour actionnaires et cautions.</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong><code>AnalyseFinanciereController</code>, <code>BilanDTO</code>, <code>GlobalBilanDTO</code>, pages <code>bilan/</code>, <code>ratio-financier/</code>, <code>activite-rentabilite/</code>. <em>Réserve : intégration Centrale des états financiers absente (saisie manuelle).</em></div>
+        </div>
+        <div class="tags"><span class="tag tag-file">analyse-financier/bilan/</span><span class="tag tag-src">AnalyseFinanciereController.java</span></div>
+      </div>
+    </div>
+
+    <!-- R17 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-ok">✅ Réalisé</span>
+        <div>
+          <div class="icard-title">Bâtiments existants (CDC p.28, Annexe 62)</div>
+          <div class="icard-sub">Nature de bâtiment, superficie, état</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Tableau bâtiments, nature (liste 4), superficie, état, affecter à site(s).</div>
+          <div class="col-box col-code"><strong>Code — réalisé</strong>Entité <code>Batiment</code>, <code>BatimentDto</code>. Intégré dans le module exploitation.</div>
+        </div>
+        <div class="tags"><span class="tag tag-src">Batiment.java</span><span class="tag tag-src">BatimentDto.java</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PARTIES PARTIELLES ══ -->
+  <section id="op1-partiel">
+    <div class="sec-hdr"><div class="sec-icon">🟠</div><h2>Parties partiellement réalisées</h2><span class="cnt">9 fonctionnalités</span></div>
+
+    <div class="callout co-orange">
+      Ces fonctionnalités existent dans le code mais ne couvrent pas tous les cas définis dans le CDC. Des développements complémentaires sont nécessaires.
+    </div>
+
+    <!-- P1 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Groupe — Présentation &amp; Mouvements (CDC p.9, Annexes 3-4)</div>
+          <div class="icard-sub">Sociétés du groupe, engagements du groupe, mouvements</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Présentation groupe (forme juridique, capital, activité, gérant — Annexe 3). Mouvements CA des sociétés du groupe sur 3 ans (Annexe 4). Engagements groupe BNA/BCT (Annexes 18-21).</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong>Page dédiée "Groupe" avec les tableaux des mouvements des sociétés et les engagements BCT/BNA du groupe. <code>GroupeDTO</code> existe mais aucun contrôleur ni page groupe identifiés.</div>
+        </div>
+        <div class="proposal"><div class="proposal-title">Proposition d'intégration</div>Créer un composant <code>groupe-presentation/</code>, un endpoint <code>GET /api/v1/canevas/{id}/groupe</code> et un <code>GroupeController</code> utilisant le <code>GroupeDTO</code> existant.</div>
+        <div class="tags"><span class="tag tag-src">GroupeDTO.java</span><span class="tag tag-effort">Effort : Moyen</span></div>
+      </div>
+    </div>
+
+    <!-- P2 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Crédit court terme — Barème, CA réalisé, CA prévisionnel, 3 mois comptant (CDC p.29-31)</div>
+          <div class="icard-sub">4 types de calcul du crédit possible avec règles métier</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>4 méthodes de calcul : Barème (Crédit = superficie × barème), CA réalisé (= CA N-1 × % − total CT accordé SED), CA prévisionnel (= CA prév × % − SED), 3 mois comptant (= 3×achats/12 − crédit fournisseur). Choix du tableau à retenir.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong><code>BaremeAgricole</code> et <code>BaremeCourtTerme</code> existent. Mais les 4 méthodes de calcul avec les formules CDC ne sont probablement pas toutes implémentées. L'intégration avec les données SED (total CT accordé) est manquante.</div>
+        </div>
+        <div class="proposal"><div class="proposal-title">Proposition</div>Implémenter un <code>CreditPossibleCalculatorService</code> avec 4 stratégies (Strategy pattern). Ajouter l'appel SED pour récupérer le total CT accordé.</div>
+        <div class="tags"><span class="tag tag-src">BaremeAgricoleController.java</span><span class="tag tag-effort">Effort : Moyen-Élevé</span></div>
+      </div>
+    </div>
+
+    <!-- P3 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Rendement végétal (CDC p.17, Annexes 29-30)</div>
+          <div class="icard-sub">Production animale et végétale par site</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Rendement production animale (Annexe 29) et végétale (Annexe 30) par site et par nature de projet. Affichage conditionnel selon la nature choisie.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong><code>RendementVegitalController</code> et entité existent. Mais la logique conditionnelle (affichage selon nature production animale vs végétale) et l'affectation par site manquent probablement.</div>
+        </div>
+        <div class="tags"><span class="tag tag-src">RendementVegital.java</span><span class="tag tag-effort">Effort : Faible</span></div>
+      </div>
+    </div>
+
+    <!-- P4 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Recettes et charges — Arboriculture &amp; Aviculture (CDC p.38-40, Annexes 69-71)</div>
+          <div class="icard-sub">Calcul des recettes et charges par type de projet</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige (7 types)</strong>Arboriculture (Recette = superficie × rendement × prix). Avicole chair (GIPAC ou %). Poule pondeuse. Poule reproductrice chair. Poule reproductrice pondeuse. Pêche (Annexe 72). Aquaculture (Annexe 73). Tableau consolidé recettes/charges par spéculation.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong>La page <code>activite-rentabilite/</code> couvre partiellement. Les calculs spécifiques par type (avicole GIPAC, pêche, aquaculture) avec leurs formules exactes ne sont probablement pas implémentés. Aucune entité Pêche/Aquaculture visible.</div>
+        </div>
+        <div class="proposal"><div class="proposal-title">Proposition</div>Créer des composants dédiés par type de projet (<code>recette-charge-arbo/</code>, <code>recette-charge-avicole/</code>, <code>recette-charge-peche/</code>, <code>recette-charge-aquaculture/</code>) avec les formules du CDC.</div>
+        <div class="tags"><span class="tag tag-file">activite-rentabilite/</span><span class="tag tag-effort">Effort : Élevé</span></div>
+      </div>
+    </div>
+
+    <!-- P5 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Capacité d'autofinancement (CAF) avec TRI (CDC p.42-43, Annexe 76)</div>
+          <div class="icard-sub">CAF, trésorerie cumulée, TRI modifiable</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>CAF = Résultat après impôt + amortissement. Solde de trésorerie = CAF − remboursement − autres crédits. Trésorerie cumulée = cumul des soldes. TRI = (valeur finale/montant investi)^(1/n) − 1, modifiable manuellement. Cas spécial pêche.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong>Le tableau CAF complet avec calcul du TRI, la trésorerie cumulée par période, et la gestion du cas spécial pêche (amortissement = montant total / durée projet).</div>
+        </div>
+        <div class="proposal"><div class="proposal-title">Proposition</div>Ajouter un endpoint <code>POST /api/v1/canevas/{id}/caf</code> retournant le tableau CAF calculé. Exposer un champ <code>triManuel</code> modifiable par l'utilisateur.</div>
+        <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+      </div>
+    </div>
+
+    <!-- P6 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Circuit de validation des données — Tâche 2 (CDC p.48-49)</div>
+          <div class="icard-sub">Validation par le chef d'agence avec Corriger/Valider + notification</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>RG : seul le chef d'agence peut valider. Boutons Corriger (observation) / Valider (avis favorable/défavorable). Transition état : Enregistré → En cours d'étude. Notification automatique à la structure réceptrice (mail + système).</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong>La gestion du rôle "chef d'agence" pour cette action spécifique. La transition automatique de statut. La notification mail à la structure réceptrice.</div>
+        </div>
+        <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+      </div>
+    </div>
+
+    <!-- P7 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Export PDF sélectif — Fiche d'étude (CDC p.62-63)</div>
+          <div class="icard-sub">Sélection des rubriques à imprimer parmi 20+ sections</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Sélectionner chaque rubrique à imprimer (fiche signalétique, groupe, garanties, analyse financière, conditions de banque, engagement, situation avant-projet, situation projet, analyse rentabilité, avis). Ordre chronologique de sélection. Bouton Générer.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong><code>pdf-export.service.ts</code> existe (jsPDF + html2canvas) mais l'interface de sélection de rubriques avec impression sélective et ordre paramétrable définis dans le CDC est absente.</div>
+        </div>
+        <div class="proposal"><div class="proposal-title">Proposition</div>Créer un composant <code>fiche-etude-generator/</code> avec une checklist ordonnée des sections. Utiliser jsPDF pour générer le PDF multi-sections dans l'ordre choisi.</div>
+        <div class="tags"><span class="tag tag-src">pdf-export.service.ts</span><span class="tag tag-effort">Effort : Moyen</span></div>
+      </div>
+    </div>
+
+    <!-- P8 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Consultation multi-critères (CDC p.61)</div>
+          <div class="icard-sub">Recherche par DR, agence, spéculation, activité, nature crédit, état</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Recherche par : Direction régionale, Agence, CIN, RCS, N° compte, N° contrat, N° permanent, N° canevas, Spéculation, Activité, Nature de crédit, État.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong>La page <code>list/</code> existe avec filtres basiques. Les filtres par Direction régionale, Agence, Spéculation, Activité et Nature de crédit définis dans le CDC manquent.</div>
+        </div>
+        <div class="tags"><span class="tag tag-file">list/</span><span class="tag tag-effort">Effort : Faible-Moyen</span></div>
+      </div>
+    </div>
+
+    <!-- P9 -->
+    <div class="icard">
+      <div class="icard-header">
+        <span class="badge b-partial">🟠 Partiel</span>
+        <div>
+          <div class="icard-title">Placement &amp; Mouvements confiés (CDC p.10-11, Annexes 10-11)</div>
+          <div class="icard-sub">Dépôts confiés, mouvements locaux et export sur 3 ans</div>
+        </div>
+      </div>
+      <div class="icard-body">
+        <div class="cols2">
+          <div class="col-box col-cdc"><strong>CDC exige</strong>Placement/dépôts confiés sur 3 ans (source SMILE — Annexe 10). Mouvements local/export sur 3 ans (Annexe 11). Source : SMILE.</div>
+          <div class="col-box col-miss"><strong>Ce qui manque</strong><code>PlacementDTO</code> et <code>MouvementConfieDTO</code> existent. Mais l'intégration avec SMILE pour alimenter automatiquement ces données est absente (saisie manuelle).</div>
+        </div>
+        <div class="tags"><span class="tag tag-src">PlacementDTO.java</span><span class="tag tag-src">MouvementConfieDTO.java</span><span class="tag tag-effort">Effort : Élevé (dépend SMILE)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PARTIES MANQUANTES ══ -->
+  <section id="manquant">
+    <div class="sec-hdr"><div class="sec-icon">❌</div><h2>Parties non réalisées</h2><span class="cnt">16 fonctionnalités</span></div>
+
+    <div class="callout co-red">
+      Ces fonctionnalités sont explicitement définies dans le CDC mais aucune trace n'est trouvée dans le code source (ni entités JPA, ni contrôleurs, ni composants Angular).
+    </div>
+
+    <div class="g2">
+
+      <!-- M1 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Opération 4 — Refoulement (CDC p.58)</div><div class="icard-sub">Renvoi du canevas à la structure précédente</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Liste canevas "En cours d'étude". Saisir motif de refoulement (obligatoire). Cliquer "Refouler". Notifier structure via mail + système. Transmettre à la structure précédente.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Ajouter état <code>REFOULÉ</code> dans le workflow. Créer <code>RefoulementController</code> avec <code>POST /api/v1/canevas/{id}/refoulement</code>. Composant Angular <code>refoulement/</code> avec formulaire de motif.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M2 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Opération 5 — Annulation avec validation (CDC p.59-60)</div><div class="icard-sub">PEC annulation + validation par chef d'agence</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>PEC annulation (statuts "PEC enregistrée" ou "En cours de création"). Motif obligatoire. Import demande d'annulation. État → "En attente d'annulation". Validation : Valider → "Annulé" (notification SMS client + mail structures) ou Rejeter → statut précédent.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Ajouter états <code>EN_ATTENTE_ANNULATION</code> et <code>ANNULE</code> dans l'enum statut. Créer <code>AnnulationController</code> avec deux endpoints : <code>POST /canevas/{id}/annulation</code> et <code>POST /canevas/{id}/annulation/validation</code>. Ajouter service SMS.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen-Élevé</span></div>
+        </div>
+      </div>
+
+      <!-- M3 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">PEC Réexamen (CDC p.50)</div><div class="icard-sub">Recréer une PEC sur un canevas déjà validé</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>RG : Seulement sur canevas validés. Charger toutes les données du canevas. Cliquer "Réexamen". Saisir nouvelle PEC en conservant les règles. Générer nouveau N° canevas. État → "En cours d'enregistrement".</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Endpoint <code>POST /api/v1/canevas/{id}/reexamen</code> qui clone le canevas avec nouveau numéro et statut ENREGISTRE. Bouton "Réexamen" sur la page consultation du canevas validé.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M4 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Module Pêche (CDC p.18, Annexes 37-41, 72)</div><div class="icard-sub">Barques, matériel, campagnes, revenus annuels, recettes/charges pêche</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Barque (Annexe 37), matériel et outillage (Annexe 38), diverses informations (Annexe 39), campagne de pêche (Annexe 40), revenu annuel par campagne (Annexe 41). Recettes et charges pêche : Frais à la masse = Recette × 35%, Point équipage = (Recette − frais) × 48%, Dépense armateur = Recette × 5%.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Créer entités <code>Barque</code>, <code>CampagnePeche</code>, <code>RevenAnnuelPeche</code>. Composants Angular <code>peche-projet/</code>. Ajouter les formules de calcul recettes/charges dans <code>RecetteChargeService</code>.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Élevé</span></div>
+        </div>
+      </div>
+
+      <!-- M5 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Module Aquaculture (CDC p.18, Annexes 42-43, 73)</div><div class="icard-sub">Élevage aquacole, infrastructure, recettes/charges aquaculture</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Élevage aquacole (Annexe 42), infrastructure aquacole (Annexe 43). Recettes : Tonnage × Prix. Charges = Recette × %charge. Taux de rendement par spéculation, année production/croisière.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Créer entités <code>ElevageAquacole</code>, <code>InfrastructureAquacole</code>. Composant <code>aquaculture-projet/</code>. Intégrer dans le calculateur de recettes/charges.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Élevé</span></div>
+        </div>
+      </div>
+
+      <!-- M6 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Tableau d'amortissement (CDC p.37, Annexe 68)</div><div class="icard-sub">Amortissement par famille sur la durée du projet</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>N = année en cours. Durée FAD = 5 ans. Pour chaque période, montant/famille = coût retenu / durée amortissement. FAD/période = montant FAD / 5.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Service <code>AmortissementCalculatorService</code> avec endpoint <code>GET /api/v1/canevas/{id}/amortissement</code>. Composant Angular <code>amortissement/</code> avec tableau généré automatiquement.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M7 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Test de sensibilité (CDC p.44-45, Annexe 77)</div><div class="icard-sub">-10% recettes et +10% charges</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Test −10% recettes : Recettes réduites de 10%, charges inchangées → nouveau RBE, CAF, TRI. Test +10% charges : charges augmentées de 10%, recettes inchangées → nouveau RBE, CAF, TRI. TRI modifiable.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Endpoint <code>GET /api/v1/canevas/{id}/test-sensibilite?type=RECETTES|CHARGES</code>. Composant <code>test-sensibilite/</code> affichant les deux scénarios côte à côte.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M8 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Tableau remboursement des crédits — Règle 3 / Règle 6 (CDC p.41, Annexe 75)</div><div class="icard-sub">Avec ou sans période de grâce</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Choix Règle 3 (avec période de grâce) ou Règle 6 (sans). Saisir période de grâce si Règle 3. Tableau = Total principal CMT + CLT. Total intérêt CMT + CLT. Total = principal + intérêt.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Service <code>RemboursementCalculatorService</code>. Endpoint <code>POST /api/v1/canevas/{id}/remboursement</code> avec paramètre <code>regle</code> (3 ou 6) et <code>periodeGrace</code>. Composant Angular dédié.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M9 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Validation Avis/Décision multi-structures (CDC p.53-55)</div><div class="icard-sub">Accord/Rejet, Pré-validation, Réorientation, Délégation de pouvoir</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Boutons : Valider (si pouvoir décision) → Accord/Rejet. Pré-valider (si pas pouvoir) → Avis favorable/défavorable. Réorientation vers autre structure avec alerte. Notification SMS+mail au client et structures. Mise à jour état → Validé.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Créer un moteur de workflow (<code>WorkflowEngine</code>) avec la gestion de la délégation de pouvoir. Endpoints <code>POST /canevas/{id}/validation</code>, <code>/pre-validation</code>, <code>/reorientation</code>. Intégrer le service de notification.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Très élevé</span></div>
+        </div>
+      </div>
+
+      <!-- M10 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Module Statistiques &amp; Diagrammes (CDC p.64)</div><div class="icard-sub">Filtres multi-critères, graphiques, export</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Filtres : structure (Agence/DR/Centrale), état, production, spéculation, activité, matricule. Générer statistiques avec diagrammes. Télécharger le résultat.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Module Angular <code>statistiques/</code> avec PrimeNG Charts (graphiques barre/camembert). Endpoint <code>GET /api/v1/canevas/statistiques</code> avec paramètres de filtre. Export Excel/PDF.
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Élevé</span></div>
+        </div>
+      </div>
+
+      <!-- M11 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Stock aliments (CDC p.17, Annexe 32)</div><div class="icard-sub">Stock d'aliments pour l'élevage</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Afficher le dernier enregistrement du stock d'aliments (Annexe 32). Affiché dans la situation avant-projet.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>Créer entité <code>StockAliment</code> et l'intégrer dans le module exploitation, section situation avant-projet.</div>
+          <div class="tags"><span class="tag tag-effort">Effort : Faible</span></div>
+        </div>
+      </div>
+
+      <!-- M12 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Moyen humain (CDC p.17, Annexe 36)</div><div class="icard-sub">Ressources humaines du projet agricole</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Afficher le dernier enregistrement des moyens humains (Annexe 36). Intégré dans la situation avant-projet.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>Créer entité <code>MoyenHumain</code> avec champs (nombre d'employés, type, qualification). Intégrer dans le module exploitation.</div>
+          <div class="tags"><span class="tag tag-effort">Effort : Faible</span></div>
+        </div>
+      </div>
+
+      <!-- M13 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Engagement actionnaire, 1er responsable, caution (CDC p.11-12)</div><div class="icard-sub">Classes BNA/BCT et engagements pour chaque entité liée</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Pour chaque actionnaire, 1er responsable et caution : classe BNA/BCT sur 3 ans, engagements BCT (source BI), engagements BNA (source SAEB). Conformément aux Annexes 12-17.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Ajouter endpoints <code>/api/v1/canevas/{id}/actionnaires/engagements</code> et <code>/cautions/engagements</code>. Utiliser <code>AssocieRepository</code> existant et enrichir avec données d'engagement.
+          </div>
+          <div class="tags"><span class="tag tag-src">Associe.java</span><span class="tag tag-effort">Effort : Élevé</span></div>
+        </div>
+      </div>
+
+      <!-- M14 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Récap accords CCMLT &amp; Effort de remboursement (CDC p.10, Annexes 8-9)</div><div class="icard-sub">Historique des crédits CMT/CLT accordés et effort de remboursement</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Récap CCMLT : détails de tous crédits CMT/CLT débloqués (source SAEB — Annexe 9). Effort de remboursement = part des revenus dédiée aux échéances sur 3 ans (source SAEB — Annexe 8).</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>Ajouter section dédiée dans la rubrique Engagement. Endpoint <code>GET /api/v1/canevas/{id}/ccmlt</code> qui interroge SAEB pour récupérer les données historiques.</div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M15 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Occupation sol — Achat terrain (CDC p.31, Annexe 58)</div><div class="icard-sub">Superficie, irrigué/sec, rendement, âge plantation</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige</strong>Tableau occupation sol : culture, superficie, en irrigué, en sec (contrôle : superficie = irrigué + sec), rendement, âge plantation, NB pied/écartement. Affecter à un ou plusieurs sites.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>Créer entité <code>OccupationSol</code> et composant Angular <code>occupation-sol/</code> avec contrôle de cohérence superficie = irrigué + sec côté backend (@Valid).</div>
+          <div class="tags"><span class="tag tag-effort">Effort : Moyen</span></div>
+        </div>
+      </div>
+
+      <!-- M16 -->
+      <div class="icard">
+        <div class="icard-header">
+          <span class="badge b-missing">❌ Absent</span>
+          <div><div class="icard-title">Numéro de canevas automatique &amp; Machine d'états complète (CDC p.47-55)</div><div class="icard-sub">Génération automatique du numéro + 7 états distincts</div></div>
+        </div>
+        <div class="icard-body">
+          <div class="col-box col-miss" style="margin-bottom:10px"><strong>CDC exige 7 états</strong>En cours de création → Enregistré → En cours d'étude → Pré-validé → Validé → En attente d'annulation → Annulé. Génération auto du N° canevas à l'enregistrement.</div>
+          <div class="proposal"><div class="proposal-title">Proposition</div>
+            Créer un enum <code>StatutCanevas</code> avec les 7 états. Implémenter une machine d'états dans <code>CanevaWorkflowService</code> avec transitions contrôlées. Générateur de numéro séquentiel sécurisé (Oracle SEQUENCE).
+          </div>
+          <div class="tags"><span class="tag tag-effort">Effort : Élevé — Critique</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ INTÉGRATIONS SI ══ -->
+  <section id="integrations">
+    <div class="sec-hdr"><div class="sec-icon">🔗</div><h2>Intégrations Systèmes d'Information manquantes</h2><span class="cnt">5 sources de données CDC</span></div>
+
+    <div class="callout co-red">
+      Le CDC définit 5 systèmes externes comme sources de données. Aucune intégration automatique n'est visible dans le code — toutes les données sont saisies manuellement.
+    </div>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Système source</th><th>Données fournies (CDC)</th><th>Annexes CDC</th><th>État intégration</th><th>Proposition d'intégration</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>SAEB</strong><br/><small>(Système interne BNA)</small></td>
+          <td>Engagements BNA relation/actionnaires, effort remboursement, récap CCMLT, engagements vendeurs</td>
+          <td>Annexes 6, 8, 9, 13, 15, 17, 19, 47</td>
+          <td><span class="badge b-partial">🟠 Partiel</span><br/><small>Données BNA en partie disponibles via datasource secondaire</small></td>
+          <td>Ajouter des Feign clients ou des requêtes JPA sur la datasource SAEB pour chaque type de données manquant.</td>
+        </tr>
+        <tr>
+          <td><strong>SMILE</strong><br/><small>(Gestion des opérations)</small></td>
+          <td>Placements/dépôts confiés, mouvements locaux &amp; export des sociétés du groupe</td>
+          <td>Annexes 10, 11, 20, 21</td>
+          <td><span class="badge b-missing">❌ Absent</span></td>
+          <td>Implémenter un client REST (<code>SmileApiClient</code> via OpenFeign) ou une procédure stockée Oracle cross-schéma (SMILE → SAEB) pour rapatrier les données de mouvements.</td>
+        </tr>
+        <tr>
+          <td><strong>BI (Business Intelligence)</strong></td>
+          <td>Engagements BCT de la relation, actionnaires, cautions, groupe</td>
+          <td>Annexes 5, 12, 14, 16, 18 (source SED)</td>
+          <td><span class="badge b-partial">🟠 Partiel</span><br/><small>Données BCT présentes via cache Caffeine mais source non clairement définie</small></td>
+          <td>Documenter et sécuriser l'intégration BI existante. Ajouter les engagements BCT des actionnaires/cautions manquants.</td>
+        </tr>
+        <tr>
+          <td><strong>Centrale des États Financiers</strong></td>
+          <td>Bilans, comptes de résultat, ratios financiers de la relation, actionnaires et cautions</td>
+          <td>Annexes 23, 24, 25</td>
+          <td><span class="badge b-missing">❌ Absent</span></td>
+          <td>Intégration via API REST ou fichier FTP. Service <code>CentraleFinanciereClient</code> injectant automatiquement les états financiers sur 3 ans lors de l'ouverture d'un canevas.</td>
+        </tr>
+        <tr>
+          <td><strong>SAGA</strong><br/><small>(Gestion des garanties)</small></td>
+          <td>Garanties détenues du client chez la BNA</td>
+          <td>Annexe 22</td>
+          <td><span class="badge b-missing">❌ Absent</span></td>
+          <td>Service <code>SagaGarantieClient</code> appelé à l'ouverture du canevas pour charger automatiquement les garanties détenues. Mettre en cache (Caffeine) pour éviter les appels répétés.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══ MACHINE D'ÉTATS ══ -->
+  <section id="statut">
+    <div class="sec-hdr"><div class="sec-icon">🔄</div><h2>Machine d'états — Statuts du canevas</h2></div>
+
+    <div class="callout co-orange">
+      Le CDC définit 7 états distincts avec des transitions contrôlées par rôle. La machine d'états n'est pas formellement implémentée dans le code actuel.
+    </div>
+
+    <div class="icard">
+      <div class="icard-body">
+        <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase">Flux des statuts définis dans le CDC</div>
+        <div class="statut-flow">
+          <div class="sf-step sf-ok">En cours de création</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-step sf-ok">Enregistré</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-step sf-ok">En cours d'étude</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-step sf-miss">Pré-validé</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-step sf-miss">Validé</div>
+        </div>
+        <div class="statut-flow" style="margin-top:8px">
+          <div class="sf-step sf-ok">Enregistré</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-step sf-miss">En attente d'annulation</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-step sf-miss">Annulé</div>
+          <div class="sf-arrow"> ou </div>
+          <div class="sf-step sf-miss">Rejeté (retour état précédent)</div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:.78rem">
+          <div style="display:flex;align-items:center;gap:6px"><div class="sf-step sf-ok" style="font-size:.7rem;padding:4px 8px">Vert</div> = Présent dans le code</div>
+          <div style="display:flex;align-items:center;gap:6px"><div class="sf-step sf-miss" style="font-size:.7rem;padding:4px 8px">Rouge</div> = Absent du code</div>
+        </div>
+
+        <div class="proposal" style="margin-top:18px">
+          <div class="proposal-title">Implémentation recommandée</div>
+          <div class="code">
+<span class="note">// Enum StatutCanevas — à créer</span>
+<span class="kw">public enum</span> <span class="cls">StatutCanevas</span> {
+    <span class="ok">EN_COURS_CREATION</span>,    <span class="note">// Créé par agent, non encore validé chef</span>
+    <span class="ok">ENREGISTRE</span>,           <span class="note">// Validé par chef d'agence</span>
+    <span class="ok">EN_COURS_ETUDE</span>,       <span class="note">// Transmis à structure réceptrice</span>
+    <span class="miss">PRE_VALIDE</span>,           <span class="note">// Avis favorable sans pouvoir décision</span>
+    <span class="miss">VALIDE</span>,               <span class="note">// Décision finale accordée</span>
+    <span class="miss">EN_ATTENTE_ANNULATION</span>,<span class="note">// Demande annulation soumise</span>
+    <span class="miss">ANNULE</span>               <span class="note">// Annulation validée</span>
+}
+
+<span class="note">// Service de transition — CanevaWorkflowService</span>
+<span class="kw">public void</span> transitionnerVers(Long canevasId, <span class="cls">StatutCanevas</span> nouvelEtat) {
+    validerTransitionAutorisee(etatActuel, nouvelEtat, utilisateurCourant);
+    canevas.setStatut(nouvelEtat);
+    <span class="note">// Déclencher notification si requis</span>
+    notificationService.notifier(canevas, nouvelEtat);
+}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ NOTIFICATIONS ══ -->
+  <section id="notifications">
+    <div class="sec-hdr"><div class="sec-icon">🔔</div><h2>Système de notifications — Entièrement absent</h2></div>
+
+    <div class="callout co-red">
+      Le CDC spécifie des notifications automatiques à 6 étapes clés du workflow. Aucun service de notification (mail ou SMS) n'est présent dans le code actuel.
+    </div>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Événement CDC</th><th>Destinataires</th><th>Canal</th><th>État</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Validation des données par chef d'agence</td><td>Structure réceptrice</td><td>Mail + Système</td><td><span class="badge b-missing">❌</span></td></tr>
+        <tr><td>Affectation d'un canevas</td><td>Agent affecté</td><td>Mail + Système</td><td><span class="badge b-missing">❌</span></td></tr>
+        <tr><td>Refoulement du canevas</td><td>Structure concernée</td><td>Mail + Système</td><td><span class="badge b-missing">❌</span></td></tr>
+        <tr><td>Décision finale (validation)</td><td>Client + Agence + Direction centrale</td><td>SMS + Mail</td><td><span class="badge b-missing">❌</span></td></tr>
+        <tr><td>Pré-validation → transmis à structure sup.</td><td>Structure réceptrice</td><td>Mail + Système</td><td><span class="badge b-missing">❌</span></td></tr>
+        <tr><td>Validation d'annulation</td><td>Client + Toutes structures</td><td>SMS + Mail</td><td><span class="badge b-missing">❌</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="icard" style="margin-top:18px">
+      <div class="icard-body">
+        <div class="proposal">
+          <div class="proposal-title">Proposition d'architecture notification</div>
+          <div class="code">
+<span class="note">// NotificationService — à créer dans backend-saeb</span>
+<span class="kw">public interface</span> <span class="cls">NotificationService</span> {
+    <span class="kw">void</span> notifierParMail(String destinataire, String sujet, String contenu);
+    <span class="kw">void</span> notifierParSms(String telephone, String message);
+    <span class="kw">void</span> notifierParSysteme(Long canevasId, String message, List&lt;String&gt; destinataires);
+}
+
+<span class="note">// Implémentation — Spring Mail + SMS Gateway BNA</span>
+<span class="kw">public class</span> <span class="cls">NotificationServiceImpl</span> {
+    <span class="note">// Email via JavaMailSender (spring-boot-starter-mail)</span>
+    <span class="note">// SMS via API Gateway BNA (à définir)</span>
+    <span class="note">// Notification système via WebSocket (STOMP) ou polling</span>
+}</div>
+          <div style="margin-top:10px;font-size:.83rem">Dépendances à ajouter : <code>spring-boot-starter-mail</code>, client SMS BNA (API interne), WebSocket pour notifications temps réel dans le système.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STATISTIQUES ══ -->
+  <section id="stats">
+    <div class="sec-hdr"><div class="sec-icon">📈</div><h2>Module Statistiques &amp; Édition — Absent</h2></div>
+
+    <div class="callout co-red">
+      Le module statistiques défini à la page 64 du CDC n'a aucun équivalent dans le code. C'est une fonctionnalité de pilotage importante pour la direction BNA.
+    </div>
+
+    <div class="cols2">
+      <div class="col-box col-cdc">
+        <strong>CDC exige</strong>
+        Filtres : Structure (Agence / Direction régionale / Centrale), État (Enregistré / Annulé / Pré-validé / Validé), Production, Spéculation, Activité, Matricule.<br/><br/>
+        Résultat : statistiques + diagrammes visuels.<br/>
+        Export du résultat (PDF / Excel).
+      </div>
+      <div class="col-box col-plan">
+        <strong>Proposition d'implémentation</strong>
+        1. Endpoint <code>GET /api/v1/statistiques/canevas</code> avec paramètres de filtre.<br/>
+        2. Module Angular <code>statistiques/</code> avec PrimeNG Chart.js.<br/>
+        3. Graphiques : camembert (états), barres (spéculations), courbe temporelle.<br/>
+        4. Export via jsPDF (déjà installé).
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ROADMAP ══ -->
+  <section id="roadmap">
+    <div class="sec-hdr"><div class="sec-icon">🗺️</div><h2>Plan d'intégration des parties manquantes</h2></div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)">
+
+      <!-- Sprint 1 -->
+      <div style="border-left:6px solid var(--missing);padding:22px 28px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <span style="background:var(--missing-bg);color:var(--missing);border:1px solid var(--missing-border);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:800">SPRINT 1 — Semaines 1-3 · Workflow &amp; Statuts</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+          <div style="background:var(--missing-bg);border:1px solid var(--missing-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Machine d'états</strong><br/>Enum <code>StatutCanevas</code> (7 états) + <code>CanevaWorkflowService</code></div>
+          <div style="background:var(--missing-bg);border:1px solid var(--missing-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Opération Refoulement</strong><br/><code>RefoulementController</code> + page Angular</div>
+          <div style="background:var(--missing-bg);border:1px solid var(--missing-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Opération Annulation</strong><br/>PEC + Validation (2 tâches)</div>
+          <div style="background:var(--missing-bg);border:1px solid var(--missing-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>PEC Réexamen</strong><br/>Clone canevas validé</div>
+          <div style="background:var(--missing-bg);border:1px solid var(--missing-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Numéro canevas auto</strong><br/>Oracle SEQUENCE</div>
+        </div>
+      </div>
+
+      <!-- Sprint 2 -->
+      <div style="border-left:6px solid var(--partial);padding:22px 28px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <span style="background:var(--partial-bg);color:var(--partial);border:1px solid var(--partial-border);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:800">SPRINT 2 — Semaines 4-6 · Calculs rentabilité manquants</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+          <div style="background:var(--partial-bg);border:1px solid var(--partial-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Tableau amortissement</strong><br/>Service calcul + composant</div>
+          <div style="background:var(--partial-bg);border:1px solid var(--partial-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Remboursement crédits</strong><br/>Règle 3 / Règle 6</div>
+          <div style="background:var(--partial-bg);border:1px solid var(--partial-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>CAF complète + TRI</strong><br/>Trésorerie cumulée</div>
+          <div style="background:var(--partial-bg);border:1px solid var(--partial-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Test de sensibilité</strong><br/>±10% recettes/charges</div>
+          <div style="background:var(--partial-bg);border:1px solid var(--partial-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Occupation sol</strong><br/>Entité + composant achat terrain</div>
+        </div>
+      </div>
+
+      <!-- Sprint 3 -->
+      <div style="border-left:6px solid var(--ok);padding:22px 28px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <span style="background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:800">SPRINT 3 — Semaines 7-9 · Modules Pêche &amp; Aquaculture</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+          <div style="background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Module Pêche complet</strong><br/>Barques, campagnes, recettes/charges</div>
+          <div style="background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Module Aquaculture</strong><br/>Élevage, infrastructure, calculs</div>
+          <div style="background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Stock aliments</strong><br/>Entité + exploitation</div>
+          <div style="background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Moyen humain</strong><br/>Ressources RH projet</div>
+          <div style="background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Groupe complet</strong><br/>Page groupe + mouvements</div>
+        </div>
+      </div>
+
+      <!-- Sprint 4 -->
+      <div style="border-left:6px solid var(--todo);padding:22px 28px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <span style="background:var(--todo-bg);color:var(--todo);border:1px solid var(--todo-border);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:800">SPRINT 4 — Semaines 10-12 · Notifications &amp; Workflow décision</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+          <div style="background:var(--todo-bg);border:1px solid var(--todo-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Service notifications</strong><br/>Mail (Spring Mail) + SMS Gateway</div>
+          <div style="background:var(--todo-bg);border:1px solid var(--todo-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Validation multi-structures</strong><br/>Accord/Rejet/Pré-validation</div>
+          <div style="background:var(--todo-bg);border:1px solid var(--todo-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Réorientation</strong><br/>Délégation de pouvoir</div>
+          <div style="background:var(--todo-bg);border:1px solid var(--todo-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Engagements actionnaires</strong><br/>+ 1er responsable + caution</div>
+          <div style="background:var(--todo-bg);border:1px solid var(--todo-border);border-radius:8px;padding:12px;font-size:.83rem"><strong>Export PDF sélectif</strong><br/>Fiche d'étude par rubriques</div>
+        </div>
+      </div>
+
+      <!-- Sprint 5 -->
+      <div style="border-left:6px solid #6a1b9a;padding:22px 28px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <span style="background:#f3e5f5;color:#4a148c;border:1px solid #ce93d8;padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:800">SPRINT 5 — Semaines 13-16 · Intégrations SI &amp; Statistiques</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+          <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;padding:12px;font-size:.83rem"><strong>Intégration SAGA</strong><br/>Garanties détenues automatiques</div>
+          <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;padding:12px;font-size:.83rem"><strong>Intégration SMILE</strong><br/>Placements &amp; mouvements</div>
+          <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;padding:12px;font-size:.83rem"><strong>Intégration Centrale EF</strong><br/>États financiers automatiques</div>
+          <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;padding:12px;font-size:.83rem"><strong>Module Statistiques</strong><br/>Filtres + Graphiques + Export</div>
+          <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;padding:12px;font-size:.83rem"><strong>Consultation avancée</strong><br/>Filtres DR/Agence/Spéculation</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>Canva Agricole — BNA</strong> &mdash;
+  Étude comparative CDC v1.0 (Août 2024) vs Code existant &mdash;
+  Taux d'avancement estimé : <strong>~40%</strong> &mdash; 2026-05-06
+</footer>
+</body>
+</html>
