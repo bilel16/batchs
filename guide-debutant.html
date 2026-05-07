@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guide Débutant — Canva Agricole BNA</title>
+  <style>
+    :root {
+      --blue:#1565c0;--blue-bg:#e3f2fd;--blue-b:#90caf9;
+      --green:#1b5e20;--green-bg:#e8f5e9;--green-b:#a5d6a7;
+      --orange:#e65100;--orange-bg:#fff3e0;--orange-b:#ffcc80;
+      --purple:#4a148c;--purple-bg:#f3e5f5;--purple-b:#ce93d8;
+      --red:#b71c1c;--red-bg:#ffebee;--red-b:#ef9a9a;
+      --teal:#004d40;--teal-bg:#e0f2f1;--teal-b:#80cbc4;
+      --dark:#0d1b2a;--text:#1c1c1c;--muted:#546e7a;
+      --border:#dce3e8;--white:#fff;--bg:#f0f4f8;
+      --shadow:0 2px 12px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,#0d1b2a,#1a3055,#1f4a7a);color:#fff;padding:52px 48px 40px;position:relative;overflow:hidden}
+    header::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.04)}
+    .htag{display:inline-block;background:#2e7d32;color:#fff;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px}
+    header h1{font-size:2.2rem;font-weight:800;margin-bottom:8px}
+    header p.sub{font-size:.95rem;opacity:.85;max-width:720px;margin-bottom:24px}
+    .hmeta{display:flex;gap:12px;flex-wrap:wrap}
+    .hc{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600}
+
+    /* NAV */
+    nav{background:var(--dark);padding:0 48px;display:flex;gap:2px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+    nav a{color:rgba(255,255,255,.72);text-decoration:none;padding:12px 14px;font-size:.75rem;font-weight:700;letter-spacing:.4px;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+    nav a:hover{color:#fff;border-bottom-color:#4caf50}
+
+    main{max-width:1300px;margin:0 auto;padding:44px 32px}
+
+    /* SECTION */
+    section{margin-bottom:60px}
+    .sh{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:14px;border-bottom:3px solid var(--border)}
+    .si{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--dark),#1a3055);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+    .sh h2{font-size:1.5rem;font-weight:800;color:var(--dark)}
+
+    /* CARDS */
+    .card{background:var(--white);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+    .card h3{font-size:1.05rem;font-weight:700;color:var(--dark);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+
+    /* GRID */
+    .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+
+    /* CALLOUT */
+    .co{border-left:5px solid;padding:14px 18px;border-radius:0 10px 10px 0;font-size:.88rem;margin-bottom:14px}
+    .co-b{border-color:var(--blue);background:var(--blue-bg);color:#0d3b8c}
+    .co-g{border-color:var(--green);background:var(--green-bg);color:#1b3a1f}
+    .co-o{border-color:var(--orange);background:var(--orange-bg);color:#7a3000}
+    .co-r{border-color:var(--red);background:var(--red-bg);color:#7f0000}
+
+    /* CODE */
+    .code{background:#0d1117;color:#c9d1d9;border-radius:10px;padding:16px 18px;font-family:'Cascadia Code','Fira Code','Courier New',monospace;font-size:.78rem;overflow-x:auto;margin:10px 0;border:1px solid #30363d;line-height:1.8}
+    .code .g{color:#56d364}.code .r{color:#ff7b72}.code .b{color:#79c0ff}.code .y{color:#e3b341}.code .p{color:#d2a8ff}.code .nt{color:#8b949e}.code .str{color:#a5d6ff}
+
+    /* STEP BOX */
+    .steps{counter-reset:step}
+    .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+    .step-num{counter-increment:step;background:var(--blue);color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;flex-shrink:0;margin-top:2px}
+    .step-content{flex:1}
+    .step-content h4{font-size:.95rem;font-weight:700;color:var(--dark);margin-bottom:6px}
+    .step-content p{font-size:.86rem;color:var(--muted)}
+
+    /* FILE PATH */
+    .path{display:inline-block;background:#f1f8e9;border:1px solid var(--green-b);color:var(--green);border-radius:6px;padding:2px 8px;font-family:monospace;font-size:.8rem;font-weight:600;word-break:break-all}
+    .path-block{background:#f1f8e9;border:1px solid var(--green-b);border-radius:8px;padding:12px 14px;font-family:monospace;font-size:.8rem;color:var(--green);margin:8px 0;line-height:2}
+
+    /* FEATURE CARD */
+    .fc{background:var(--white);border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+    .fc-header{padding:16px 20px;font-weight:700;font-size:1rem;display:flex;align-items:center;gap:10px}
+    .fc-body{padding:16px 20px}
+
+    /* LABEL */
+    .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin:3px 2px}
+    .l-fe{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b)}
+    .l-be{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+    .l-db{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)}
+    .l-api{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-b)}
+
+    /* ARROW FLOW */
+    .flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0}
+    .flow-box{padding:10px 16px;border-radius:8px;font-size:.82rem;font-weight:600;text-align:center}
+    .flow-arrow{color:#90a4ae;font-size:1.4rem;font-weight:700}
+    .fb-ang{background:var(--blue-bg);color:var(--blue);border:2px solid var(--blue-b)}
+    .fb-srv{background:var(--purple-bg);color:var(--purple);border:2px solid var(--purple-b)}
+    .fb-http{background:var(--teal-bg);color:var(--teal);border:2px solid var(--teal-b)}
+    .fb-ctrl{background:var(--green-bg);color:var(--green);border:2px solid var(--green-b)}
+    .fb-svc{background:var(--orange-bg);color:var(--orange);border:2px solid var(--orange-b)}
+    .fb-repo{background:var(--red-bg);color:var(--red);border:2px solid var(--red-b)}
+    .fb-db{background:#263238;color:#fff;border:2px solid #455a64}
+
+    /* TABLE */
+    .tbl{width:100%;border-collapse:collapse;font-size:.83rem;background:var(--white);border-radius:11px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px}
+    .tbl thead{background:linear-gradient(90deg,var(--dark),#1a3055);color:#fff}
+    .tbl th{padding:12px 15px;text-align:left;font-weight:700;font-size:.78rem;letter-spacing:.4px}
+    .tbl td{padding:11px 15px;border-bottom:1px solid #e9ecef;vertical-align:top}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:nth-child(even) td{background:#f8fafb}
+
+    /* SIDEBAR LAYOUT */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:700px){.two-col{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr}}
+
+    /* TIP */
+    .tip{background:linear-gradient(135deg,#fff8e1,#fffde7);border:1px solid #ffe082;border-radius:10px;padding:14px 18px;font-size:.86rem;margin:12px 0}
+    .tip strong{color:#6d4c00}
+
+    /* BADGE */
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+    .b-ang{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b)}
+    .b-be{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+
+    footer{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:26px;font-size:.8rem;margin-top:56px}
+    footer strong{color:#fff}
+
+    /* MINI TREE */
+    .tree{font-family:'Courier New',monospace;font-size:.82rem;background:#f8fafb;border:1px solid var(--border);border-radius:10px;padding:16px;line-height:2;margin:10px 0}
+    .tree .dir{color:var(--blue);font-weight:700}
+    .tree .file{color:var(--text)}
+    .tree .note{color:var(--muted);font-style:italic}
+
+    @media(max-width:640px){header{padding:32px 20px}main{padding:24px 14px}nav{padding:0 16px}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="htag">Guide Débutant — Comprendre le projet</div>
+  <h1>🌾 Canva Agricole BNA — Guide Complet</h1>
+  <p class="sub">Tu es nouveau sur ce projet ? Ce guide explique <strong>où se trouve chaque fichier</strong>, <strong>comment les différentes parties se connectent</strong>, et <strong>comment modifier ou ajouter une fonctionnalité</strong>, même si tu débutes en Angular et Spring Boot.</p>
+  <div class="hmeta">
+    <span class="hc">Angular 17 — Frontend</span>
+    <span class="hc">Spring Boot 3.2 — Backend</span>
+    <span class="hc">Oracle DB</span>
+    <span class="hc">Port 4200 + Port 8081</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#comprendre">🧠 Comprendre</a>
+  <a href="#lancer">🚀 Lancer</a>
+  <a href="#structure">📁 Structure</a>
+  <a href="#flux">🔄 Flux de données</a>
+  <a href="#frontend">🅰️ Frontend</a>
+  <a href="#backend">☕ Backend</a>
+  <a href="#menus">📋 Menus & pages</a>
+  <a href="#services">⚡ Services Angular</a>
+  <a href="#api">🔌 API REST</a>
+  <a href="#modifier">✏️ Modifier une feature</a>
+  <a href="#ajouter">➕ Ajouter une feature</a>
+  <a href="#erreurs">🐛 Erreurs fréquentes</a>
+</nav>
+
+<main>
+
+  <!-- ══════════ COMPRENDRE ══════════ -->
+  <section id="comprendre">
+    <div class="sh"><div class="si">🧠</div><h2>C'est quoi ce projet ?</h2></div>
+
+    <div class="co co-b">
+      <strong>Canva Agricole</strong> est une application web faite pour la <strong>Banque Nationale Agricole (BNA)</strong>. Les agents de la banque l'utilisent pour gérer les dossiers de crédit agricole : ils créent un "canevas" pour chaque client, saisissent les données du projet (crédits, garanties, élevage, irrigation…), puis analysent si le projet est rentable.
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <h3>🅰️ Le Frontend (ce que voit l'utilisateur)</h3>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:12px">Construit avec <strong>Angular 17</strong>. C'est la partie visuelle : les formulaires, les tableaux, les boutons. Elle tourne dans le navigateur.</p>
+        <div class="path-block">📂 frontend-app1/</div>
+        <ul style="font-size:.85rem;color:var(--muted);padding-left:18px;margin-top:8px">
+          <li>Lance sur : <strong>http://localhost:4200</strong></li>
+          <li>Parle au backend via des <strong>requêtes HTTP</strong> (fetch)</li>
+          <li>Les pages sont des <strong>Composants Angular</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>☕ Le Backend (la logique &amp; les données)</h3>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:12px">Construit avec <strong>Spring Boot 3</strong>. C'est le serveur : il reçoit les requêtes, traite les données et parle à la base de données Oracle.</p>
+        <div class="path-block">📂 backend-saeb/</div>
+        <ul style="font-size:.85rem;color:var(--muted);padding-left:18px;margin-top:8px">
+          <li>Lance sur : <strong>http://localhost:8081</strong></li>
+          <li>Expose des <strong>API REST</strong> (GET, POST, PUT, DELETE)</li>
+          <li>Stocke les données dans <strong>Oracle Database</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Le flux de communication -->
+    <div class="card" style="margin-top:0">
+      <h3>🔄 Comment le Frontend et le Backend se parlent</h3>
+      <div class="flow">
+        <div class="flow-box fb-ang">👤 Utilisateur<br/><small>clique sur bouton</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-ang">Angular Component<br/><small>gère l'événement</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-srv">Angular Service<br/><small>prépare la requête</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-http">HTTP<br/><small>localhost:8081</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-ctrl">Controller Java<br/><small>reçoit la requête</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-svc">Service Java<br/><small>traite les données</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-repo">Repository<br/><small>requête SQL</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-db">Oracle DB<br/><small>stocke/lit</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ LANCER ══════════ -->
+  <section id="lancer">
+    <div class="sh"><div class="si">🚀</div><h2>Comment lancer l'application</h2></div>
+
+    <div class="g2">
+      <div class="card">
+        <h3>🅰️ Lancer le Frontend Angular</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Ouvrir un terminal dans le dossier frontend</h4>
+              <div class="code"><span class="b">cd</span> C:\Users\Bilel Jandoubi\Desktop\canva_agricole\<span class="y">frontend-app1</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Installer les dépendances (seulement la 1ère fois)</h4>
+              <div class="code"><span class="b">npm install</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Lancer le serveur de développement</h4>
+              <div class="code"><span class="b">npm start</span>
+<span class="nt"># ou</span>
+<span class="b">ng serve</span></div>
+              <p>Ouvre <strong>http://localhost:4200</strong> dans le navigateur.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tip"><strong>Fichier config important :</strong> <span class="path">frontend-app1/src/environments/environment.development.ts</span><br/>C'est là que tu changes l'URL du backend et le mode d'authentification.</div>
+      </div>
+
+      <div class="card">
+        <h3>☕ Lancer le Backend Spring Boot</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Ouvrir un terminal dans le dossier backend</h4>
+              <div class="code"><span class="b">cd</span> C:\Users\Bilel Jandoubi\Desktop\canva_agricole\<span class="y">backend-saeb</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Compiler et lancer avec Maven</h4>
+              <div class="code"><span class="b">mvn spring-boot:run</span>
+<span class="nt"># ou depuis IntelliJ : bouton ▶ sur Application.java</span></div>
+              <p>L'API tourne sur <strong>http://localhost:8081</strong>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Vérifier que ça marche</h4>
+              <div class="code"><span class="nt"># Ouvre dans le navigateur :</span>
+http://localhost:8081/swagger-ui.html</div>
+              <p>Tu verras toutes les APIs disponibles.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tip"><strong>Fichier config important :</strong> <span class="path">backend-saeb/src/main/resources/application.properties</span><br/>Port, URL de la base Oracle, JWT secret…</div>
+      </div>
+    </div>
+
+    <!-- Config files -->
+    <div class="card">
+      <h3>⚙️ Les 2 fichiers de configuration essentiels</h3>
+      <div class="two-col">
+        <div>
+          <p style="font-weight:700;margin-bottom:8px"><span class="badge b-ang">Angular</span> environment.development.ts</p>
+          <div class="path-block">📄 frontend-app1/src/environments/environment.development.ts</div>
+          <div class="code"><span class="nt">// Ce qui est configuré ici :</span>
+<span class="b">apiURL</span>: <span class="str">'http://localhost:8081/'</span>,     <span class="nt">// URL du backend</span>
+<span class="b">AUTH_MODE</span>: <span class="str">'custom'</span>,                   <span class="nt">// Mode auth (custom ou keycloak)</span>
+<span class="b">authServerUrl</span>: <span class="str">'http://localhost:7070'</span>,  <span class="nt">// Serveur d'auth</span>
+<span class="b">appId</span>: <span class="str">'BNAHABIL'</span>,                     <span class="nt">// ID de l'application</span>
+<span class="b">callbackUrl</span>: <span class="str">'http://localhost:4333/auth/callback'</span></div>
+        </div>
+        <div>
+          <p style="font-weight:700;margin-bottom:8px"><span class="badge b-be">Spring Boot</span> application.properties</p>
+          <div class="path-block">📄 backend-saeb/src/main/resources/application.properties</div>
+          <div class="code"><span class="nt"># Ce qui est configuré ici :</span>
+<span class="b">server.port</span>=<span class="y">8081</span>           <span class="nt"># Port du serveur</span>
+<span class="b">spring.datasource.url</span>=...  <span class="nt"># URL Oracle</span>
+<span class="b">spring.datasource.username</span>=<span class="str">saeb</span>
+<span class="b">spring.datasource.password</span>=...
+<span class="b">server.servlet.context-path</span>=<span class="str">/</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ STRUCTURE ══════════ -->
+  <section id="structure">
+    <div class="sh"><div class="si">📁</div><h2>Structure des dossiers — Vue complète</h2></div>
+
+    <div class="co co-o">
+      <strong>Règle d'or :</strong> Quand tu cherches un fichier, la structure est toujours la même — le nom du dossier correspond à la fonctionnalité. Ex: pour modifier les "Garanties", cherche dans <code>garanties/</code>.
+    </div>
+
+    <div class="two-col">
+      <!-- Frontend tree -->
+      <div class="card">
+        <h3>🅰️ Arbre Frontend — Angular</h3>
+        <div class="tree">
+<span class="dir">frontend-app1/src/app/</span>
+├── <span class="dir">_components/</span>
+│   ├── <span class="dir">layout/</span>            <span class="note">← Menu, barre du haut</span>
+│   └── <span class="dir">pages/canvas.agricole/</span>
+│       ├── <span class="dir">add-canevas/</span>       <span class="note">← Créer un canevas</span>
+│       ├── <span class="dir">list/</span>              <span class="note">← Liste canevas</span>
+│       ├── <span class="dir">fiche-signalitique/</span><span class="note">← Fiche client</span>
+│       ├── <span class="dir">engagements/</span>       <span class="note">← Engagements</span>
+│       ├── <span class="dir">garanties/</span>         <span class="note">← Garanties</span>
+│       ├── <span class="dir">credit-sollicite/</span>  <span class="note">← Crédits</span>
+│       ├── <span class="dir">affectation/</span>       <span class="note">← Affectation</span>
+│       ├── <span class="dir">exploitation/</span>      <span class="note">← Exploitation</span>
+│       ├── <span class="dir">avis/</span>              <span class="note">← Circuit avis</span>
+│       └── <span class="dir">analyse-financier/</span> <span class="note">← Analyse financière</span>
+├── <span class="dir">_services/</span>            <span class="note">← Communication HTTP</span>
+│   ├── canevas.service.ts
+│   ├── garantie.service.ts
+│   ├── engagement.service.ts
+│   └── ... (28 services)
+├── <span class="dir">_models/</span>              <span class="note">← Types TypeScript</span>
+├── <span class="dir">guards/</span>               <span class="note">← Protection des routes</span>
+├── app-routing.module.ts  <span class="note">← Routes principales</span>
+└── app.module.ts          <span class="note">← Configuration app</span>
+        </div>
+      </div>
+
+      <!-- Backend tree -->
+      <div class="card">
+        <h3>☕ Arbre Backend — Spring Boot</h3>
+        <div class="tree">
+<span class="dir">backend-saeb/src/main/java/net/kachout/saeb/</span>
+├── <span class="dir">web/</span>          <span class="note">← Contrôleurs REST (point d'entrée)</span>
+│   ├── CanevaController.java
+│   ├── GarantieController.java
+│   ├── EngagementsController.java
+│   └── ... (33 contrôleurs)
+├── <span class="dir">service/</span>      <span class="note">← Logique métier</span>
+│   ├── CanevaService.java
+│   ├── GarantieServiceImpl.java
+│   └── ... (56 services)
+├── <span class="dir">repository/</span>   <span class="note">← Accès à la base Oracle</span>
+│   ├── CanevaRepository.java
+│   ├── GarantieProposeRepository.java
+│   └── ... (47 repositories)
+├── <span class="dir">entities/</span>     <span class="note">← Tables Oracle en Java</span>
+│   ├── Caneva.java
+│   ├── GarantiePropose.java
+│   └── ... (40 entités)
+├── <span class="dir">dtos/</span>         <span class="note">← Données échangées avec Angular</span>
+└── <span class="dir">dtos_/</span>        <span class="note">← DTOs récents (nouveaux)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FLUX ══════════ -->
+  <section id="flux">
+    <div class="sh"><div class="si">🔄</div><h2>Comment ça marche — Le flux complet expliqué</h2></div>
+
+    <div class="co co-b">
+      Pour chaque fonctionnalité, il y a <strong>toujours 7 couches</strong>. Comprendre cette chaîne est la clé pour tout modifier ou ajouter.
+    </div>
+
+    <div class="card">
+      <h3>Exemple concret : Afficher la liste des canevas</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4><span class="label l-fe">Angular</span> Component — Affiche la page</h4>
+            <div class="path-block">📄 frontend-app1/src/app/_components/pages/canvas.agricole/list/list.component.ts</div>
+            <div class="code"><span class="nt">// Le composant appelle le service dans ngOnInit()</span>
+<span class="b">ngOnInit</span>() {
+  this.canevasService.<span class="g">getAllCanevas</span>()
+    .subscribe(data => this.canevas = data);
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4><span class="label l-fe">Angular</span> Service — Fait la requête HTTP</h4>
+            <div class="path-block">📄 frontend-app1/src/app/_services/canevas.service.ts</div>
+            <div class="code"><span class="b">getAllCanevas</span>(): Observable&lt;Caneva[]&gt; {
+  <span class="nt">// Envoie GET à http://localhost:8081/api/canevas</span>
+  <span class="r">return</span> this.http.<span class="g">get</span>&lt;Caneva[]&gt;(<span class="str">`${this.apiUrl}api/canevas`</span>);
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4><span class="label l-api">API</span> HTTP — Le navigateur envoie une requête</h4>
+            <div class="code"><span class="y">GET</span> http://localhost:<span class="b">8081</span>/api/canevas
+<span class="nt">Headers: Authorization: Bearer [token JWT]</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4><span class="label l-be">Spring Boot</span> Controller — Reçoit la requête</h4>
+            <div class="path-block">📄 backend-saeb/src/main/java/net/kachout/saeb/web/CanevaController.java</div>
+            <div class="code"><span class="p">@RestController</span>
+<span class="p">@RequestMapping</span>(<span class="str">"/api/canevas"</span>)
+<span class="r">public class</span> <span class="b">CanevaController</span> {
+    <span class="p">@GetMapping</span>
+    <span class="r">public</span> ResponseEntity&lt;List&lt;<span class="b">CanevaDto</span>&gt;&gt; <span class="g">getAll</span>() {
+        <span class="r">return</span> ResponseEntity.<span class="g">ok</span>(canevaService.<span class="g">findAll</span>());
+    }
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4><span class="label l-be">Spring Boot</span> Service — Traite la logique</h4>
+            <div class="path-block">📄 backend-saeb/src/main/java/net/kachout/saeb/service/CanevaServiceImpl.java</div>
+            <div class="code"><span class="r">public</span> List&lt;<span class="b">CanevaDto</span>&gt; <span class="g">findAll</span>() {
+    <span class="nt">// Récupère depuis la BDD et convertit en DTO</span>
+    <span class="r">return</span> canevaRepository.<span class="g">findAll</span>()
+        .stream()
+        .map(<span class="r">this</span>::<span class="g">convertToDto</span>)
+        .collect(Collectors.<span class="g">toList</span>());
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4><span class="label l-db">Database</span> Repository — Parle à Oracle</h4>
+            <div class="path-block">📄 backend-saeb/src/main/java/net/kachout/saeb/repository/CanevaRepository.java</div>
+            <div class="code"><span class="nt">// Spring Data JPA génère automatiquement le SQL</span>
+<span class="r">public interface</span> <span class="b">CanevaRepository</span>
+    <span class="r">extends</span> JpaRepository&lt;<span class="b">Caneva</span>, Long&gt; {
+    <span class="nt">// findAll() est déjà là automatiquement !</span>
+    List&lt;<span class="b">Caneva</span>&gt; <span class="g">findByNumSeqPers</span>(Long numSeqPers);
+}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FRONTEND ══════════ -->
+  <section id="frontend">
+    <div class="sh"><div class="si">🅰️</div><h2>Le Frontend Angular — Comment ça fonctionne</h2></div>
+
+    <div class="card">
+      <h3>🧩 Anatomie d'un Composant Angular</h3>
+      <p style="color:var(--muted);margin-bottom:14px;font-size:.88rem">Chaque page / fonctionnalité est un dossier avec <strong>3 fichiers obligatoires</strong> :</p>
+      <div class="g3">
+        <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--blue);margin-bottom:8px">📄 fichier.component.ts</div>
+          <p style="font-size:.83rem;color:var(--muted)">La logique TypeScript : données, méthodes, appels aux services.</p>
+        </div>
+        <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--green);margin-bottom:8px">📄 fichier.component.html</div>
+          <p style="font-size:.83rem;color:var(--muted)">Le template HTML : ce qui s'affiche à l'écran. Formulaires, tableaux, boutons.</p>
+        </div>
+        <div style="background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--orange);margin-bottom:8px">📄 fichier.component.css</div>
+          <p style="font-size:.83rem;color:var(--muted)">Les styles CSS spécifiques à ce composant.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Exemple : composant add-canevas</h3>
+      <div class="path-block">📂 frontend-app1/src/app/_components/pages/canvas.agricole/add-canevas/
+├── add-canevas.component.ts    ← logique
+├── add-canevas.component.html  ← affichage
+└── add-canevas.component.css   ← styles</div>
+      <div class="two-col" style="margin-top:14px">
+        <div>
+          <p style="font-weight:700;font-size:.88rem;margin-bottom:8px">Le fichier .ts (logique)</p>
+          <div class="code"><span class="p">@Component</span>({
+  selector: <span class="str">'app-add-canevas'</span>,
+  templateUrl: <span class="str">'./add-canevas.component.html'</span>
+})
+<span class="r">export class</span> <span class="b">AddCanevasComponent</span>
+                        <span class="r">implements</span> OnInit {
+
+  <span class="nt">// Variables pour le template</span>
+  canevas: Caneva = {};
+  loading = <span class="r">false</span>;
+
+  constructor(
+    <span class="r">private</span> canevasService: <span class="b">CanevasService</span>
+  ) {}
+
+  <span class="nt">// Appelé au chargement de la page</span>
+  <span class="g">ngOnInit</span>() { }
+
+  <span class="nt">// Appelé quand on clique "Sauvegarder"</span>
+  <span class="g">save</span>() {
+    this.canevasService.<span class="g">create</span>(this.canevas)
+      .subscribe(result => { <span class="nt">/* succès */</span> });
+  }
+}</div>
+        </div>
+        <div>
+          <p style="font-weight:700;font-size:.88rem;margin-bottom:8px">Le fichier .html (affichage)</p>
+          <div class="code"><span class="nt">&lt;!-- Formulaire avec liaison bidirectionnelle --&gt;</span>
+&lt;<span class="g">form</span>&gt;
+  &lt;<span class="g">input</span>
+    [(ngModel)]="<span class="y">canevas.titre</span>"
+    placeholder="Titre du canevas"
+  /&gt;
+
+  &lt;<span class="nt">&lt;!-- Bouton qui appelle la méthode save() --&gt;</span>
+  &lt;<span class="g">button</span> (click)="<span class="y">save()</span>"&gt;
+    Sauvegarder
+  &lt;/<span class="g">button</span>&gt;
+&lt;/<span class="g">form</span>&gt;
+
+<span class="nt">&lt;!-- Afficher les données --&gt;</span>
+&lt;<span class="g">p-table</span> [value]="<span class="y">canevas</span>"&gt;
+  &lt;<span class="g">ng-template</span> pTemplate="body" let-c&gt;
+    &lt;<span class="g">tr</span>&gt;&lt;<span class="g">td</span>&gt;{{c.titre}}&lt;/<span class="g">td</span>&gt;&lt;/<span class="g">tr</span>&gt;
+  &lt;/<span class="g">ng-template</span>&gt;
+&lt;/<span class="g">p-table</span>&gt;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🗺️ Comment le routage fonctionne (navigation entre pages)</h3>
+      <div class="path-block">📄 frontend-app1/src/app/_components/pages/canvas.agricole/canvas.agricole-routing.module.ts</div>
+      <div class="code"><span class="r">const</span> routes: Routes = [
+  { path: <span class="str">''</span>, redirectTo: <span class="str">'listCanevas'</span> },
+
+  <span class="nt">// Chaque route = un composant qui s'affiche</span>
+  { path: <span class="str">'listCanevas'</span>,  component: <span class="b">ListComponent</span> },
+  { path: <span class="str">'add'</span>,          component: <span class="b">AddCanevasComponent</span> },
+  { path: <span class="str">'engagement'</span>,   component: <span class="b">EngagementsComponent</span> },
+  { path: <span class="str">'garantie'</span>,    component: <span class="b">GarantiesComponent</span> },
+  { path: <span class="str">'avis'</span>,        component: <span class="b">AvisComponent</span> },
+  { path: <span class="str">'affectation'</span>, component: <span class="b">AffectationComponent</span> },
+  <span class="nt">// ... d'autres routes</span>
+];</div>
+      <div class="tip"><strong>Pour naviguer vers une route depuis le code :</strong> <code>this.router.navigate(['/pages/canvas-agricole/listCanevas'])</code></div>
+    </div>
+  </section>
+
+  <!-- ══════════ BACKEND ══════════ -->
+  <section id="backend">
+    <div class="sh"><div class="si">☕</div><h2>Le Backend Spring Boot — Comment ça fonctionne</h2></div>
+
+    <div class="card">
+      <h3>🏗️ Les 4 couches du backend</h3>
+      <div class="g2" style="margin-bottom:0">
+        <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--green);margin-bottom:6px">1. Controller (web/)</div>
+          <p style="font-size:.83rem;color:var(--muted)">Reçoit les requêtes HTTP du frontend. Définit les URLs (<code>/api/canevas</code>, etc.).</p>
+          <div class="code" style="margin-top:8px"><span class="p">@RestController</span>
+<span class="p">@RequestMapping</span>(<span class="str">"/api/canevas"</span>)
+<span class="r">public class</span> <span class="b">CanevaController</span> {
+  <span class="p">@GetMapping</span>       <span class="nt">← GET /api/canevas</span>
+  <span class="p">@PostMapping</span>      <span class="nt">← POST /api/canevas</span>
+  <span class="p">@PutMapping</span>("/{id}") <span class="nt">← PUT /api/canevas/1</span>
+  <span class="p">@DeleteMapping</span>    <span class="nt">← DELETE</span>
+}</div>
+        </div>
+        <div style="background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--orange);margin-bottom:6px">2. Service (service/)</div>
+          <p style="font-size:.83rem;color:var(--muted)">Contient la logique métier. Calcule, valide, transforme les données.</p>
+          <div class="code" style="margin-top:8px"><span class="p">@Service</span>
+<span class="r">public class</span> <span class="b">CanevaServiceImpl</span> {
+  <span class="nt">// Logique métier ici</span>
+  <span class="r">public</span> CanevaDto <span class="g">save</span>(CanevaDto dto) {
+    <span class="nt">// Vérifications, calculs...</span>
+    Caneva entity = convertToEntity(dto);
+    <span class="r">return</span> convertToDto(repo.<span class="g">save</span>(entity));
+  }
+}</div>
+        </div>
+        <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--blue);margin-bottom:6px">3. Repository (repository/)</div>
+          <p style="font-size:.83rem;color:var(--muted)">Parle à Oracle. Spring génère le SQL automatiquement à partir des noms de méthodes.</p>
+          <div class="code" style="margin-top:8px"><span class="r">public interface</span> <span class="b">CanevaRepository</span>
+    <span class="r">extends</span> JpaRepository&lt;<span class="b">Caneva</span>, Long&gt; {
+  <span class="nt">// Spring génère SELECT * WHERE numSeqPers=?</span>
+  List&lt;Caneva&gt; <span class="g">findByNumSeqPers</span>(Long num);
+  <span class="nt">// SELECT * WHERE statut=?</span>
+  List&lt;Caneva&gt; <span class="g">findByStatut</span>(String statut);
+}</div>
+        </div>
+        <div style="background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:10px;padding:16px">
+          <div style="font-weight:800;color:var(--purple);margin-bottom:6px">4. Entity (entities/)</div>
+          <p style="font-size:.83rem;color:var(--muted)">Représente une table Oracle en Java. Chaque champ = une colonne.</p>
+          <div class="code" style="margin-top:8px"><span class="p">@Entity</span>
+<span class="p">@Table</span>(name = <span class="str">"CANEVAS_AGRICOLE"</span>)
+<span class="r">public class</span> <span class="b">Caneva</span> {
+  <span class="p">@Id</span>
+  <span class="r">private</span> Long id;
+  <span class="r">private</span> String titre;
+  <span class="r">private</span> String statut;
+  <span class="nt">// 1 champ Java = 1 colonne Oracle</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📦 C'est quoi un DTO ?</h3>
+      <div class="co co-b">Un <strong>DTO (Data Transfer Object)</strong> est un objet simple qui transporte les données entre le frontend Angular et le backend Spring Boot. C'est la "traduction" entre le monde Angular et le monde Java.</div>
+      <div class="two-col">
+        <div>
+          <p style="font-weight:700;font-size:.88rem;margin-bottom:8px">Entity = Table Oracle</p>
+          <div class="code"><span class="nt">// Caneva.java — table en base</span>
+<span class="p">@Entity</span>
+<span class="r">class</span> <span class="b">Caneva</span> {
+  Long id;
+  Long numSeqPers;
+  String statut;
+  <span class="nt">// Relations complexes...</span>
+  <span class="p">@OneToMany</span> List&lt;Credit&gt; credits;
+}</div>
+        </div>
+        <div>
+          <p style="font-weight:700;font-size:.88rem;margin-bottom:8px">DTO = Ce qu'Angular reçoit</p>
+          <div class="code"><span class="nt">// CanevaDto.java — simple à utiliser</span>
+<span class="r">class</span> <span class="b">CanevaDto</span> {
+  Long id;
+  Long numSeqPers;
+  String statut;
+  <span class="nt">// Seulement ce dont Angular a besoin</span>
+  String clientNom;
+  Integer nbCredits;
+}</div>
+        </div>
+      </div>
+      <p style="font-size:.85rem;color:var(--muted);margin-top:12px">Les DTOs sont dans 2 dossiers : <span class="path">dtos/</span> (anciens) et <span class="path">dtos_/</span> (récents — utiliser ceux-là en priorité).</p>
+    </div>
+  </section>
+
+  <!-- ══════════ MENUS & PAGES ══════════ -->
+  <section id="menus">
+    <div class="sh"><div class="si">📋</div><h2>Menus &amp; Pages — Où est chaque fichier</h2></div>
+
+    <div class="co co-g">Pour chaque fonctionnalité visible dans l'interface, tu trouveras ici : le dossier Angular, le contrôleur Java, et le service Angular qui les relie.</div>
+
+    <!-- CANEVAS -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--blue-bg);border-bottom:2px solid var(--blue-b)">
+        <span style="font-size:1.3rem">📋</span> <span style="color:var(--blue)">Gestion des Canevas — Créer &amp; Lister</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 _components/pages/canvas.agricole/
+├── <strong>list/</strong>        ← Liste des canevas
+├── <strong>add-canevas/</strong> ← Créer nouveau
+└── <strong>canevas/</strong>     ← Détail canevas</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>canevas.service.ts</strong>
+📄 _services/<strong>canevas.agr.service.ts</strong>
+<span style="color:var(--muted)">• getAllCanevas()
+• getCanevasByNumSeqPers()
+• create(), update(), delete()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Controller</p>
+            <div class="path-block">📄 web/<strong>CanevaController.java</strong>
+<span style="color:var(--muted)">GET  /api/canevas
+POST /api/canevas/canevas
+PUT  /api/canevas/{id}
+DELETE /api/canevas/{id}</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Service</p>
+            <div class="path-block">📄 service/<strong>CanevaServiceImpl.java</strong>
+📄 service/<strong>CanevaServiceImpl2.java</strong></div>
+          </div>
+          <div>
+            <p class="label l-db">Base de données</p>
+            <div class="path-block">📄 entities/<strong>Caneva.java</strong>
+Table: <strong>CANEVAS_AGRICOLE</strong>
+📄 repository/<strong>CanevaRepository.java</strong></div>
+          </div>
+          <div>
+            <p class="label l-api">DTO échangé</p>
+            <div class="path-block">📄 dtos_/<strong>CanevaDto.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FICHE SIGNALETIQUE -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--green-bg);border-bottom:2px solid var(--green-b)">
+        <span style="font-size:1.3rem">👤</span> <span style="color:var(--green)">Fiche Signalétique Client</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>fiche-signalitique/</strong>
+└── <strong>fiche-signalitique-2/</strong>
+📂 <strong>client-and-canevas/</strong>
+📂 <strong>search-client/</strong></div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>client.service.ts</strong>
+<span style="color:var(--muted)">• getClientByNumSeqPers()
+• searchClient()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Controller</p>
+            <div class="path-block">📄 web/<strong>ClientController.java</strong>
+📄 web/<strong>ClientCanvasController.java</strong>
+<span style="color:var(--muted)">GET /api/clients/{numSeqPers}
+GET /api/client-canvas</span></div>
+          </div>
+          <div>
+            <p class="label l-db">Base de données</p>
+            <div class="path-block">📄 entities/<strong>ClientCanvas.java</strong>
+📄 repository/<strong>ClientCanvasRepository.java</strong></div>
+          </div>
+          <div>
+            <p class="label l-api">DTOs</p>
+            <div class="path-block">📄 dtos/<strong>ClientDTO.java</strong>
+📄 dtos/<strong>PersonneDTO.java</strong>
+📄 dtos_/<strong>ClientCanvasDTO.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENGAGEMENTS -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--orange-bg);border-bottom:2px solid var(--orange-b)">
+        <span style="font-size:1.3rem">🏦</span> <span style="color:var(--orange)">Engagements BNA &amp; BCT</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>engagements/</strong>
+├── <strong>engagement-bct-bna/</strong>
+└── <strong>historical-bct-class/</strong></div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>engagement.service.ts</strong>
+<span style="color:var(--muted)">• getEngagementsBNA()
+• getEngagementsBCT()
+• getHistoriqueClasse()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Controller</p>
+            <div class="path-block">📄 web/<strong>EngagementsController.java</strong>
+<span style="color:var(--muted)">GET /api/engagements/bna/{numSeqPers}
+GET /api/engagements/bct/{numSeqPers}
+GET /api/engagements/historique</span></div>
+          </div>
+          <div>
+            <p class="label l-db">Base de données</p>
+            <div class="path-block">💾 Cache Caffeine (24h)
+📄 dtos/<strong>EngagementBNADTO.java</strong>
+📄 dtos/<strong>EngagementBCTDTO.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GARANTIES -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--purple-bg);border-bottom:2px solid var(--purple-b)">
+        <span style="font-size:1.3rem">🔐</span> <span style="color:var(--purple)">Garanties</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>garanties/</strong>         ← Garanties détenues
+└── <strong>garanties-proposees/</strong> ← Nouvelles garanties
+📂 <strong>avis-garantie/</strong>       ← Avis garanties</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>garantie.service.ts</strong>
+<span style="color:var(--muted)">• getGaranties()
+• createGarantie()
+• updateGarantie()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Controller</p>
+            <div class="path-block">📄 web/<strong>GarantieController.java</strong>
+<span style="color:var(--muted)">GET  /api/garanties/caneva/{id}
+POST /api/garanties
+PUT  /api/garanties/{id}</span></div>
+          </div>
+          <div>
+            <p class="label l-db">Base de données</p>
+            <div class="path-block">📄 entities/<strong>GarantiePropose.java</strong>
+Table: GARANTIE_PROPOSEE
+📄 repository/<strong>GarantieProposeRepository.java</strong></div>
+          </div>
+          <div>
+            <p class="label l-api">DTOs</p>
+            <div class="path-block">📄 dtos/<strong>GarantieDTO.java</strong>
+📄 dtos/<strong>GarantieProposeeDTO.java</strong>
+📄 dtos_/<strong>GarantiesProposeDto.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRÉDITS -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--teal-bg);border-bottom:2px solid var(--teal-b)">
+        <span style="font-size:1.3rem">💳</span> <span style="color:var(--teal)">Crédits Sollicités (Court Terme, Investissement, Achat Terrain)</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>credit-sollicite/</strong>      ← Saisie crédits
+├── <strong>credit-retenu1/</strong>        ← Court terme retenu
+├── <strong>credit-retenu2/</strong>        ← Investissement retenu
+├── <strong>credit-retenu3/</strong>        ← Achat terrain retenu
+├── <strong>credit-retenu4/</strong>        ← Variante
+├── <strong>naturecredit/</strong>          ← Nature crédit 1
+├── <strong>naturecredit-2/</strong>        ← Nature crédit 2
+└── <strong>naturecredit-3/</strong>        ← Nature crédit 3</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>credit-sollicite.service.ts</strong>
+📄 _services/<strong>schema-credit.service.ts</strong>
+<span style="color:var(--muted)">• getCreditsSollicites()
+• getSchemaCredits()
+• getSchemaCreditsInv() ← investissement</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Controllers</p>
+            <div class="path-block">📄 web/<strong>CreditInvestissementController.java</strong>
+GET  /api/credit-investissement/by-caneva/{id}
+PUT  /api/credit-investissement/{id}
+
+📄 web/<strong>SchemaCreditController.java</strong>
+📄 web/<strong>SchemaCreditInvController.java</strong>
+📄 web/<strong>CreditAchatTerrainController.java</strong></div>
+          </div>
+          <div>
+            <p class="label l-db">Base de données</p>
+            <div class="path-block">📄 entities/<strong>CreditInvestissement.java</strong>
+📄 entities/<strong>CreditCourtTerme.java</strong>
+📄 entities/<strong>CreditAchatTerrain.java</strong>
+📄 entities/<strong>ItemInvestissement.java</strong>
+📄 entities/<strong>SchemaCredit.java</strong>
+📄 entities/<strong>SchemaCreditInv.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPLOITATION -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--green-bg);border-bottom:2px solid var(--green-b)">
+        <span style="font-size:1.3rem">🌾</span> <span style="color:var(--green)">Exploitation — Cheptel, Matériel, Eau, Fourrages</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>exploitation/</strong>            ← Page principale
+│   ├── site-projet/             ← Sites
+│   ├── rendement-animal/        ← Élevage rendement
+│   ├── rendement-vegital/       ← Culture rendement
+│   ├── materiel/                ← Équipements
+│   ├── bilan-fourrager/         ← Fourrage
+│   ├── ressource-hydrique/      ← Eau
+│   ├── batiment/                ← Bâtiments
+│   └── moyen-humain/            ← RH
+├── <strong>cheptel-projet/</strong>          ← Cheptel
+├── <strong>materiel-projet/</strong>         ← Matériel
+├── <strong>besoin-fourrager/</strong>        ← Besoins fourrage
+├── <strong>disponibilite-fourragere/</strong>← Dispo fourrage
+├── <strong>besoin-hydrique/</strong>         ← Besoins eau
+└── <strong>disponibilite-hydrique/</strong>  ← Dispo eau</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>exploitation-projet.service.ts</strong>
+<span style="color:var(--muted)">• updateCreditInvestissement()
+• getFourrageresByCreditId()
+• getAllRessByCreditId()
+• updateElevage(), updateMateriel()
+• updateBatiment(), updateRendement()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend — Controllers</p>
+            <div class="path-block">📄 web/<strong>ElevageCheptelController.java</strong>
+📄 web/<strong>MaterielController.java</strong>
+📄 web/<strong>BilanFourragereController.java</strong>
+📄 web/<strong>RessourceHydriqueController.java</strong>
+📄 web/<strong>RessourceHydriqueInvController.java</strong>
+📄 web/<strong>BatimentController.java</strong>
+📄 web/<strong>RendementVegitalController.java</strong></div>
+          </div>
+          <div>
+            <p class="label l-db">Base de données</p>
+            <div class="path-block">📄 entities/<strong>Elevage.java</strong>
+📄 entities/<strong>Materiel.java</strong>
+📄 entities/<strong>BilanFourragere.java</strong>
+📄 entities/<strong>RessourceHydrique.java</strong>
+📄 entities/<strong>RessourceHydriqueInv.java</strong>
+📄 entities/<strong>Batiment.java</strong>
+📄 entities/<strong>RendementVegital.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYSE FINANCIÈRE -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--blue-bg);border-bottom:2px solid var(--blue-b)">
+        <span style="font-size:1.3rem">📊</span> <span style="color:var(--blue)">Analyse Financière</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+└── <strong>analyse-financier/</strong>
+    ├── <strong>bilan/</strong>               ← Bilan comptable
+    ├── <strong>etat-tresorerie/</strong>     ← Trésorerie
+    ├── <strong>ratio-financier/</strong>     ← Ratios
+    └── <strong>activite-rentabilite/</strong>← Rentabilité</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>analyseFinanciere.service.ts</strong>
+📄 _services/<strong>bilan.service.ts</strong>
+<span style="color:var(--muted)">• getBilan()
+• getEtatFinancier()
+• getRatiosFinanciers()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend</p>
+            <div class="path-block">📄 web/<strong>AnalyseFinanciereController.java</strong>
+GET /api/analyse-financiere/bilan/{id}
+GET /api/analyse-financiere/ratios/{id}
+
+📄 dtos/<strong>BilanDTO.java</strong>
+📄 dtos/<strong>GlobalBilanDTO.java</strong>
+📄 dtos_/<strong>EtatFinancierDTO.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AVIS -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--orange-bg);border-bottom:2px solid var(--orange-b)">
+        <span style="font-size:1.3rem">✅</span> <span style="color:var(--orange)">Avis Bancaires (Court terme, Investissement, Achat terrain)</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>avis/</strong>                       ← Avis général
+├── <strong>avis-credit-court-terme/</strong>    ← Avis CT
+├── <strong>avis-credit-investissement/</strong> ← Avis Inv.
+├── <strong>avis-achat-terrrain/</strong>        ← Avis AT
+└── <strong>avis-garantie/</strong>              ← Avis Garanties</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>avis.service.ts</strong>
+<span style="color:var(--muted)">• getAvis()
+• saveAvis()
+• getAvisByParamss()
+• updateAvis()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend</p>
+            <div class="path-block">📄 web/<strong>AvisController.java</strong>
+GET  /api/avis/{canevaId}
+POST /api/avis
+PUT  /api/avis/{id}
+
+📄 entities/<strong>Avis.java</strong>
+📄 dtos/<strong>AvisCanevasDTO.java</strong>
+📄 dtos_/<strong>AvisDTO.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AFFECTATION -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--purple-bg);border-bottom:2px solid var(--purple-b)">
+        <span style="font-size:1.3rem">👥</span> <span style="color:var(--purple)">Affectation des agents</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>affectation/</strong>    ← Gérer affectations
+└── <strong>agent-canevas/</strong>  ← Vue par agent</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>affectation.service.ts</strong>
+<span style="color:var(--muted)">• getAffectations()
+• createAffectation()
+• updateAffectation()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend</p>
+            <div class="path-block">📄 web/<strong>AffectationController.java</strong>
+📄 entities/<strong>Affectation.java</strong>
+📄 service/<strong>AffectationServiceImpl.java</strong>
+📄 dtos_/<strong>AffectationDto.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SITES & CARTE -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--teal-bg);border-bottom:2px solid var(--teal-b)">
+        <span style="font-size:1.3rem">🗺️</span> <span style="color:var(--teal)">Sites Géographiques &amp; Carte</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>site/</strong>         ← Gestion site unique
+├── <strong>sites/</strong>        ← Gestion multi-sites
+└── <strong>map-picker/</strong>   ← Carte Leaflet</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>site.service.ts</strong>
+<span style="color:var(--muted)">• getSitesByCaneva()
+• createSite()
+• updateSite()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend</p>
+            <div class="path-block">📄 web/<strong>SiteController.java</strong>
+📄 web/<strong>SitesController.java</strong>
+📄 web/<strong>RefController.java</strong> ← zones, gouvernorats
+📄 entities/<strong>Site.java</strong>
+📄 entities/<strong>RefGouvernorat.java</strong>
+📄 entities/<strong>RefDelegation.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENT UPLOAD -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--red-bg);border-bottom:2px solid var(--red-b)">
+        <span style="font-size:1.3rem">📁</span> <span style="color:var(--red)">Upload Documents &amp; Export PDF</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Pages</p>
+            <div class="path-block">📂 canvas.agricole/
+├── <strong>document-upload/</strong>  ← Upload fichiers
+├── <strong>pdf-export-button/</strong>← Bouton export PDF
+└── <strong>pdf-viewer/</strong>       ← Voir PDF</div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>document.client.canva.service.ts</strong>
+📄 _services/<strong>pdf-export.service.ts</strong>
+<span style="color:var(--muted)">• uploadDocument()
+• downloadDocument()
+• exportToPdf()</span></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend</p>
+            <div class="path-block">📄 web/<strong>DocumentClientCanvaController.java</strong>
+POST /api/documents/upload
+GET  /api/documents/{id}
+📄 entities/<strong>DocumentClientCanva.java</strong>
+📂 Stockage: <strong>./uploads/</strong> (sur le serveur)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONDITION BANQUE -->
+    <div class="fc">
+      <div class="fc-header" style="background:var(--green-bg);border-bottom:2px solid var(--green-b)">
+        <span style="font-size:1.3rem">🏛️</span> <span style="color:var(--green)">Conditions de Banque</span>
+      </div>
+      <div class="fc-body">
+        <div class="g3">
+          <div>
+            <p class="label l-fe">Angular — Page</p>
+            <div class="path-block">📂 canvas.agricole/
+└── <strong>condition-banque/</strong></div>
+          </div>
+          <div>
+            <p class="label l-fe">Angular — Service</p>
+            <div class="path-block">📄 _services/<strong>conditionBanque.service.ts</strong></div>
+          </div>
+          <div>
+            <p class="label l-be">Backend</p>
+            <div class="path-block">📄 web/<strong>ConditionBanqueController.java</strong>
+📄 dtos_/<strong>ConditionBanqueDTO.java</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ SERVICES ANGULAR ══════════ -->
+  <section id="services">
+    <div class="sh"><div class="si">⚡</div><h2>Les Services Angular — Répertoire complet</h2></div>
+
+    <div class="co co-b">Les services Angular sont dans <span class="path">frontend-app1/src/app/_services/</span>. Chaque service correspond à une fonctionnalité et communique avec le backend.</div>
+
+    <table class="tbl">
+      <thead><tr><th>Fichier Service</th><th>Rôle</th><th>API Backend appelée</th></tr></thead>
+      <tbody>
+        <tr><td><span class="path">canevas.service.ts</span></td><td>Gestion des canevas agricoles</td><td><code>/api/canevas/*</code></td></tr>
+        <tr><td><span class="path">canevas.agr.service.ts</span></td><td>Service agricole principal (état partagé)</td><td>Multi-endpoints</td></tr>
+        <tr><td><span class="path">client.service.ts</span></td><td>Données client / recherche client</td><td><code>/api/clients/*</code></td></tr>
+        <tr><td><span class="path">engagement.service.ts</span></td><td>Engagements BNA et BCT</td><td><code>/api/engagements/*</code></td></tr>
+        <tr><td><span class="path">garantie.service.ts</span></td><td>Garanties du client</td><td><code>/api/garanties/*</code></td></tr>
+        <tr><td><span class="path">avis.service.ts</span></td><td>Avis bancaires (état partagé entre composants)</td><td><code>/api/avis/*</code></td></tr>
+        <tr><td><span class="path">credit-sollicite.service.ts</span></td><td>Crédits sollicités</td><td><code>/api/credit-*</code></td></tr>
+        <tr><td><span class="path">schema-credit.service.ts</span></td><td>Schémas de financement CT et Investissement</td><td><code>/api/schema-credits*</code></td></tr>
+        <tr><td><span class="path">exploitation-projet.service.ts</span></td><td>Exploitation : cheptel, matériel, eau, fourrage</td><td>Multi-endpoints</td></tr>
+        <tr><td><span class="path">analyseFinanciere.service.ts</span></td><td>Analyse financière</td><td><code>/api/analyse-financiere/*</code></td></tr>
+        <tr><td><span class="path">bilan.service.ts</span></td><td>Bilan comptable</td><td><code>/api/bilan/*</code></td></tr>
+        <tr><td><span class="path">conditionBanque.service.ts</span></td><td>Conditions bancaires préférentielles</td><td><code>/api/condition-banque/*</code></td></tr>
+        <tr><td><span class="path">affectation.service.ts</span></td><td>Affectation des agents aux canevas</td><td><code>/api/affectations/*</code></td></tr>
+        <tr><td><span class="path">site.service.ts</span></td><td>Sites géographiques</td><td><code>/api/sites/*</code></td></tr>
+        <tr><td><span class="path">speculation.service.ts</span></td><td>Données de spéculations (cultures)</td><td><code>/api/speculations/*</code></td></tr>
+        <tr><td><span class="path">document.client.canva.service.ts</span></td><td>Upload et téléchargement de documents</td><td><code>/api/documents/*</code></td></tr>
+        <tr><td><span class="path">pdf-export.service.ts</span></td><td>Génération de PDF (jsPDF)</td><td>Local (jsPDF)</td></tr>
+        <tr><td><span class="path">auth.service.ts</span></td><td>Authentification (Keycloak / Custom)</td><td><code>/api/auth/*</code></td></tr>
+        <tr><td><span class="path">user.service.ts</span></td><td>Profil utilisateur connecté</td><td><code>/api/users/*</code></td></tr>
+        <tr><td><span class="path">Associe.service.ts</span></td><td>Associés / partenaires du projet</td><td><code>/api/associes/*</code></td></tr>
+        <tr><td><span class="path">effort.service.ts</span></td><td>Calcul des efforts et coûts</td><td><code>/api/effort/*</code></td></tr>
+        <tr><td><span class="path">loading.service.ts</span></td><td>Indicateur de chargement global</td><td>Local</td></tr>
+        <tr><td><span class="path">storage.service.ts</span></td><td>LocalStorage du navigateur</td><td>Local</td></tr>
+        <tr><td><span class="path">data-base-storage.service.ts</span></td><td>IndexedDB (stockage local avancé)</td><td>Local</td></tr>
+        <tr><td><span class="path">token-expiration.service.ts</span></td><td>Surveillance expiration du token JWT</td><td>Local</td></tr>
+        <tr><td><span class="path">IdleService.service.ts</span></td><td>Détection session inactive</td><td>Local</td></tr>
+        <tr><td><span class="path">api-saeb.service.ts</span></td><td>Service direct vers SAEB</td><td>Multi</td></tr>
+        <tr><td><span class="path">truc.service.ts</span></td><td>Service utilitaire divers</td><td>Divers</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════ API REST ══════════ -->
+  <section id="api">
+    <div class="sh"><div class="si">🔌</div><h2>API REST — Tous les contrôleurs</h2></div>
+
+    <div class="co co-g">Tous ces contrôleurs sont dans <span class="path">backend-saeb/src/main/java/net/kachout/saeb/web/</span>. Pour voir toutes les APIs dans une interface graphique : <strong>http://localhost:8081/swagger-ui.html</strong></div>
+
+    <table class="tbl">
+      <thead><tr><th>Fichier Controller</th><th>URL de base</th><th>Fonctionnalité</th></tr></thead>
+      <tbody>
+        <tr><td><span class="path">CanevaController.java</span></td><td><code>/api/canevas</code></td><td>CRUD des canevas agricoles</td></tr>
+        <tr><td><span class="path">ClientController.java</span></td><td><code>/api/clients</code></td><td>Données clients</td></tr>
+        <tr><td><span class="path">ClientCanvasController.java</span></td><td><code>/api/client-canvas</code></td><td>Relations client-canevas</td></tr>
+        <tr><td><span class="path">ClientRequestController.java</span></td><td><code>/api/client-requests</code></td><td>Demandes clients</td></tr>
+        <tr><td><span class="path">EngagementsController.java</span></td><td><code>/api/engagements</code></td><td>Engagements BNA/BCT</td></tr>
+        <tr><td><span class="path">GarantieController.java</span></td><td><code>/api/garanties</code></td><td>Garanties proposées</td></tr>
+        <tr><td><span class="path">AvisController.java</span></td><td><code>/api/avis</code></td><td>Avis bancaires</td></tr>
+        <tr><td><span class="path">AffectationController.java</span></td><td><code>/api/affectations</code></td><td>Affectation agents</td></tr>
+        <tr><td><span class="path">SiteController.java</span></td><td><code>/api/site</code></td><td>Gestion d'un site</td></tr>
+        <tr><td><span class="path">SitesController.java</span></td><td><code>/api/sites</code></td><td>Gestion multi-sites</td></tr>
+        <tr><td><span class="path">RefController.java</span></td><td><code>/api/ref</code></td><td>Référentiels géo (zones, gouvernorats…)</td></tr>
+        <tr><td><span class="path">CreditInvestissementController.java</span></td><td><code>/api/credit-investissement</code></td><td>Crédit investissement</td></tr>
+        <tr><td><span class="path">CreditAchatTerrainController.java</span></td><td><code>/api/credit-achat-terrain</code></td><td>Crédit achat terrain</td></tr>
+        <tr><td><span class="path">SchemaCreditController.java</span></td><td><code>/api/schema-credits</code></td><td>Schéma financement CT</td></tr>
+        <tr><td><span class="path">SchemaCreditInvController.java</span></td><td><code>/api/schema-credits-inv</code></td><td>Schéma financement investissement</td></tr>
+        <tr><td><span class="path">BaremeAgricoleController.java</span></td><td><code>/api/bareme-agricole</code></td><td>Barèmes agricoles</td></tr>
+        <tr><td><span class="path">BaremeCourtTermeController.java</span></td><td><code>/api/bareme-court-terme</code></td><td>Barèmes court terme</td></tr>
+        <tr><td><span class="path">ElevageCheptelController.java</span></td><td><code>/api/elevage</code></td><td>Élevage / cheptel</td></tr>
+        <tr><td><span class="path">MaterielController.java</span></td><td><code>/api/materiel</code></td><td>Équipements</td></tr>
+        <tr><td><span class="path">BatimentController.java</span></td><td><code>/api/batiment</code></td><td>Bâtiments</td></tr>
+        <tr><td><span class="path">BilanFourragereController.java</span></td><td><code>/api/bilan-fourragere</code></td><td>Bilan fourrager</td></tr>
+        <tr><td><span class="path">RessourceHydriqueController.java</span></td><td><code>/api/ressource-hydrique</code></td><td>Ressources hydriques</td></tr>
+        <tr><td><span class="path">RessourceHydriqueInvController.java</span></td><td><code>/api/ressource-hydrique_inv</code></td><td>Ressources hydriques investissement</td></tr>
+        <tr><td><span class="path">RendementVegitalController.java</span></td><td><code>/api/rendement-vegital</code></td><td>Rendements agricoles</td></tr>
+        <tr><td><span class="path">AnalyseFinanciereController.java</span></td><td><code>/api/analyse-financiere</code></td><td>Analyse financière</td></tr>
+        <tr><td><span class="path">ConditionBanqueController.java</span></td><td><code>/api/condition-banque</code></td><td>Conditions bancaires</td></tr>
+        <tr><td><span class="path">DocumentClientCanvaController.java</span></td><td><code>/api/documents</code></td><td>Upload documents</td></tr>
+        <tr><td><span class="path">AgricoleRestController.java</span></td><td><code>/api/agricole</code></td><td>Opérations agricoles diverses</td></tr>
+        <tr><td><span class="path">CACourtTermeController.java</span></td><td><code>/api/ca-court-terme</code></td><td>CA court terme</td></tr>
+        <tr><td><span class="path">CAPrevCourtTermeController.java</span></td><td><code>/api/ca-prev-court-terme</code></td><td>CA prévisionnel CT</td></tr>
+        <tr><td><span class="path">StructureCapitalController.java</span></td><td><code>/api/structure-capital</code></td><td>Structure du capital</td></tr>
+        <tr><td><span class="path">CanevasUserController.java</span></td><td><code>/api/canevas-user</code></td><td>Associations canevas-utilisateur</td></tr>
+        <tr><td><span class="path">ProductController.java</span></td><td><code>/api/products</code></td><td>Produits</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════ MODIFIER ══════════ -->
+  <section id="modifier">
+    <div class="sh"><div class="si">✏️</div><h2>Comment modifier une fonctionnalité existante</h2></div>
+
+    <div class="co co-o">Exemple pratique : <strong>Ajouter un nouveau champ "Description" dans la liste des canevas</strong></div>
+
+    <div class="card">
+      <h3>📝 Étapes pour modifier une feature</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Trouver l'entité Java (la table Oracle)</h4>
+            <div class="path-block">📄 backend-saeb/src/main/java/net/kachout/saeb/entities/<strong>Caneva.java</strong></div>
+            <div class="code"><span class="nt">// Ajouter le nouveau champ dans l'entité</span>
+<span class="p">@Column</span>(name = <span class="str">"description"</span>)
+<span class="r">private</span> String description;</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Ajouter le champ dans le DTO</h4>
+            <div class="path-block">📄 backend-saeb/src/main/java/net/kachout/saeb/dtos_/<strong>CanevaDto.java</strong></div>
+            <div class="code"><span class="nt">// Ajouter dans le DTO pour que Angular reçoive ce champ</span>
+<span class="r">private</span> String description;</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Mettre à jour le mapping dans le Service Java</h4>
+            <div class="path-block">📄 backend-saeb/src/main/java/net/kachout/saeb/service/<strong>CanevaServiceImpl.java</strong></div>
+            <div class="code"><span class="nt">// Dans la méthode convertToDto()</span>
+dto.<span class="g">setDescription</span>(entity.<span class="g">getDescription</span>());
+
+<span class="nt">// Dans la méthode convertToEntity()</span>
+entity.<span class="g">setDescription</span>(dto.<span class="g">getDescription</span>());</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Ajouter la colonne en base Oracle</h4>
+            <div class="code"><span class="nt">-- Exécuter dans SQL Developer ou SQL*Plus</span>
+<span class="y">ALTER TABLE</span> CANEVAS_AGRICOLE
+<span class="y">ADD</span> description <span class="b">VARCHAR2</span>(500);</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Ajouter le champ dans le modèle TypeScript</h4>
+            <div class="path-block">📄 frontend-app1/src/app/_models/<strong>caneva.ts</strong> (ou l'interface dans le service)</div>
+            <div class="code"><span class="r">export interface</span> <span class="b">Caneva</span> {
+  id?: number;
+  titre?: string;
+  <span class="g">description?: string;</span>  <span class="nt">← ajouter ici</span>
+  statut?: string;
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Afficher le champ dans le template Angular</h4>
+            <div class="path-block">📄 frontend-app1/src/app/_components/pages/canvas.agricole/list/<strong>list.component.html</strong></div>
+            <div class="code"><span class="nt">&lt;!-- Dans le tableau PrimeNG --&gt;</span>
+&lt;<span class="g">p-column</span>
+  field=<span class="str">"description"</span>
+  header=<span class="str">"Description"</span>&gt;
+&lt;/<span class="g">p-column</span>&gt;
+
+<span class="nt">&lt;!-- Dans un formulaire --&gt;</span>
+&lt;<span class="g">textarea</span>
+  [(ngModel)]="<span class="y">canevas.description</span>"
+  placeholder=<span class="str">"Description du projet"</span>&gt;
+&lt;/<span class="g">textarea</span>&gt;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ AJOUTER ══════════ -->
+  <section id="ajouter">
+    <div class="sh"><div class="si">➕</div><h2>Comment ajouter une nouvelle fonctionnalité</h2></div>
+
+    <div class="co co-g">Exemple : <strong>Créer une nouvelle page "Notes de visite"</strong></div>
+
+    <div class="card">
+      <h3>🛠️ Checklist complète pour une nouvelle feature</h3>
+
+      <p style="font-weight:700;color:var(--green);margin-bottom:12px">1. BACKEND — 4 fichiers à créer</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Créer l'Entité JPA (table Oracle)</h4>
+            <div class="path-block">📄 backend-saeb/…/entities/<strong>NoteVisite.java</strong></div>
+            <div class="code"><span class="p">@Entity</span>
+<span class="p">@Table</span>(name = <span class="str">"NOTE_VISITE"</span>)
+<span class="p">@Getter @Setter @NoArgsConstructor</span>
+<span class="r">public class</span> <span class="b">NoteVisite</span> {
+    <span class="p">@Id</span>
+    <span class="p">@GeneratedValue</span>(strategy = GenerationType.<span class="y">SEQUENCE</span>)
+    <span class="r">private</span> Long id;
+    <span class="r">private</span> String contenu;
+    <span class="r">private</span> LocalDate dateVisite;
+    <span class="p">@ManyToOne</span>
+    <span class="r">private</span> Caneva caneva;
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Créer le Repository</h4>
+            <div class="path-block">📄 backend-saeb/…/repository/<strong>NoteVisiteRepository.java</strong></div>
+            <div class="code"><span class="r">public interface</span> <span class="b">NoteVisiteRepository</span>
+        <span class="r">extends</span> JpaRepository&lt;<span class="b">NoteVisite</span>, Long&gt; {
+    List&lt;NoteVisite&gt; <span class="g">findByCanevaId</span>(Long canevaId);
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Créer le DTO</h4>
+            <div class="path-block">📄 backend-saeb/…/dtos_/<strong>NoteVisiteDto.java</strong></div>
+            <div class="code"><span class="p">@Getter @Setter</span>
+<span class="r">public class</span> <span class="b">NoteVisiteDto</span> {
+    <span class="r">private</span> Long id;
+    <span class="r">private</span> String contenu;
+    <span class="r">private</span> LocalDate dateVisite;
+    <span class="r">private</span> Long canevaId;
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Créer le Controller REST</h4>
+            <div class="path-block">📄 backend-saeb/…/web/<strong>NoteVisiteController.java</strong></div>
+            <div class="code"><span class="p">@RestController</span>
+<span class="p">@RequestMapping</span>(<span class="str">"/api/notes-visite"</span>)
+<span class="p">@CrossOrigin</span>
+<span class="r">public class</span> <span class="b">NoteVisiteController</span> {
+
+    <span class="p">@Autowired</span>
+    <span class="r">private</span> NoteVisiteRepository repo;
+
+    <span class="p">@GetMapping</span>(<span class="str">"/caneva/{canevaId}"</span>)
+    <span class="r">public</span> List&lt;<span class="b">NoteVisite</span>&gt; <span class="g">getByCaneva</span>(
+            <span class="p">@PathVariable</span> Long canevaId) {
+        <span class="r">return</span> repo.<span class="g">findByCanevaId</span>(canevaId);
+    }
+
+    <span class="p">@PostMapping</span>
+    <span class="r">public</span> NoteVisite <span class="g">create</span>(
+            <span class="p">@RequestBody</span> NoteVisite note) {
+        <span class="r">return</span> repo.<span class="g">save</span>(note);
+    }
+
+    <span class="p">@DeleteMapping</span>(<span class="str">"/{id}"</span>)
+    <span class="r">public void</span> <span class="g">delete</span>(<span class="p">@PathVariable</span> Long id) {
+        repo.<span class="g">deleteById</span>(id);
+    }
+}</div>
+          </div>
+        </div>
+      </div>
+
+      <hr style="margin:20px 0;border:1px dashed var(--border)"/>
+
+      <p style="font-weight:700;color:var(--blue);margin-bottom:12px">2. FRONTEND — 3 étapes Angular</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Créer le service Angular</h4>
+            <div class="path-block">📄 frontend-app1/src/app/_services/<strong>note-visite.service.ts</strong></div>
+            <div class="code"><span class="p">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="r">export class</span> <span class="b">NoteVisiteService</span> {
+  <span class="r">private</span> apiUrl = environment.apiURL;
+
+  constructor(<span class="r">private</span> http: <span class="b">HttpClient</span>) {}
+
+  <span class="g">getByCaneva</span>(canevaId: number) {
+    <span class="r">return</span> this.http.<span class="g">get</span>&lt;any[]&gt;(
+      <span class="str">`${this.apiUrl}api/notes-visite/caneva/${canevaId}`</span>
+    );
+  }
+
+  <span class="g">create</span>(note: any) {
+    <span class="r">return</span> this.http.<span class="g">post</span>(
+      <span class="str">`${this.apiUrl}api/notes-visite`</span>, note
+    );
+  }
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Créer le composant Angular (dossier + 3 fichiers)</h4>
+            <div class="path-block">📂 frontend-app1/src/app/_components/pages/canvas.agricole/<strong>notes-visite/</strong>
+├── notes-visite.component.ts
+├── notes-visite.component.html
+└── notes-visite.component.css</div>
+            <div class="code"><span class="nt">// notes-visite.component.ts</span>
+<span class="p">@Component</span>({
+  selector: <span class="str">'app-notes-visite'</span>,
+  templateUrl: <span class="str">'./notes-visite.component.html'</span>
+})
+<span class="r">export class</span> <span class="b">NotesVisiteComponent</span> <span class="r">implements</span> OnInit {
+  notes: any[] = [];
+  nouvNote = { contenu: <span class="str">''</span>, dateVisite: <r>null</r> };
+
+  constructor(
+    <span class="r">private</span> noteService: <span class="b">NoteVisiteService</span>
+  ) {}
+
+  <span class="g">ngOnInit</span>() {
+    this.noteService.<span class="g">getByCaneva</span>(<span class="b">1</span>) <span class="nt">// id du canevas</span>
+      .subscribe(data => this.notes = data);
+  }
+
+  <span class="g">save</span>() {
+    this.noteService.<span class="g">create</span>(this.nouvNote)
+      .subscribe(() => this.<span class="g">ngOnInit</span>());
+  }
+}</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h4>Déclarer le composant et ajouter la route</h4>
+            <div class="path-block">📄 canvas.agricole/<strong>canvas.agricole.module.ts</strong></div>
+            <div class="code"><span class="nt">// 1. Importer dans declarations[]</span>
+declarations: [
+  <span class="nt">// ... autres composants</span>
+  <span class="g">NotesVisiteComponent</span>  <span class="nt">← ajouter ici</span>
+]</div>
+            <div class="path-block">📄 canvas.agricole/<strong>canvas.agricole-routing.module.ts</strong></div>
+            <div class="code"><span class="nt">// 2. Ajouter la route</span>
+{ path: <span class="str">'notes'</span>, component: <span class="g">NotesVisiteComponent</span> }
+
+<span class="nt">// 3. Naviguer vers la page depuis un bouton</span>
+this.router.navigate([<span class="str">'/pages/canvas-agricole/notes'</span>])</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ ERREURS ══════════ -->
+  <section id="erreurs">
+    <div class="sh"><div class="si">🐛</div><h2>Erreurs fréquentes &amp; Solutions</h2></div>
+
+    <div class="g2">
+      <div class="card">
+        <h3>🔴 Erreur Angular fréquentes</h3>
+        <table class="tbl">
+          <thead><tr><th>Erreur</th><th>Cause</th><th>Solution</th></tr></thead>
+          <tbody>
+            <tr><td><code>Cannot read 'property' of undefined</code></td><td>L'objet est null avant chargement</td><td>Utiliser <code>?.</code> (optionnel chaining) ou vérifier dans ngOnInit</td></tr>
+            <tr><td><code>CORS error</code></td><td>Backend ne répond pas ou CORS non configuré</td><td>Vérifier que le backend tourne. Vérifier <code>@CrossOrigin</code> dans le controller</td></tr>
+            <tr><td><code>401 Unauthorized</code></td><td>Token JWT expiré ou manquant</td><td>Se reconnecter. Vérifier le mode auth dans <code>environment.development.ts</code></td></tr>
+            <tr><td><code>404 Not Found</code></td><td>L'URL de l'API est mauvaise</td><td>Vérifier <code>apiURL</code> dans environment et l'URL dans le service</td></tr>
+            <tr><td><code>NullInjectorError: No provider for X</code></td><td>Service non importé dans le module</td><td>Ajouter le service dans <code>canvas.agricole.module.ts</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>🟡 Erreurs Spring Boot fréquentes</h3>
+        <table class="tbl">
+          <thead><tr><th>Erreur</th><th>Cause</th><th>Solution</th></tr></thead>
+          <tbody>
+            <tr><td><code>ORA-00942: table does not exist</code></td><td>Table Oracle non créée</td><td>Exécuter le script SQL de création de table</td></tr>
+            <tr><td><code>Port 8081 already in use</code></td><td>Une autre instance tourne déjà</td><td>Tuer le process : <code>netstat -ano | findstr 8081</code> puis <code>taskkill /PID xxx /F</code></td></tr>
+            <tr><td><code>LazyInitializationException</code></td><td>Chargement lazy hors session Hibernate</td><td>Ajouter <code>@Transactional</code> sur le service ou utiliser <code>@EntityGraph</code></td></tr>
+            <tr><td><code>Failed to connect to Oracle</code></td><td>VPN BNA non connecté ou DB inaccessible</td><td>Vérifier connexion VPN. Vérifier les URLs dans <code>application.properties</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💡 Astuces pour déboguer rapidement</h3>
+      <div class="g3">
+        <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:10px;padding:14px">
+          <div style="font-weight:700;color:var(--blue);margin-bottom:8px">🅰️ Angular</div>
+          <ul style="font-size:.83rem;color:var(--muted);padding-left:16px">
+            <li>Ouvre la console navigateur (F12) → tab "Console"</li>
+            <li>Regarde l'onglet "Network" pour voir les requêtes HTTP</li>
+            <li>Utilise <code>console.log(data)</code> dans les services</li>
+            <li>Installe l'extension Chrome "Angular DevTools"</li>
+          </ul>
+        </div>
+        <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:14px">
+          <div style="font-weight:700;color:var(--green);margin-bottom:8px">☕ Spring Boot</div>
+          <ul style="font-size:.83rem;color:var(--muted);padding-left:16px">
+            <li>Regarde les logs dans la console IntelliJ/terminal</li>
+            <li>Utilise Swagger : <code>http://localhost:8081/swagger-ui.html</code></li>
+            <li>Teste l'API avec Postman ou Insomnia</li>
+            <li>Ajouter <code>spring.jpa.show-sql=true</code> pour voir le SQL</li>
+          </ul>
+        </div>
+        <div style="background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:10px;padding:14px">
+          <div style="font-weight:700;color:var(--orange);margin-bottom:8px">🔑 Authentification</div>
+          <ul style="font-size:.83rem;color:var(--muted);padding-left:16px">
+            <li>Si 401 : vérifier que le serveur auth tourne (port 7070)</li>
+            <li>Changer <code>AUTH_MODE</code> dans environment.ts</li>
+            <li>Vérifier le token dans <code>SessionStorage</code> (F12 → Application)</li>
+            <li>En dev : désactiver temporairement la sécurité backend</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>Canva Agricole BNA</strong> — Guide Débutant — Angular 17 + Spring Boot 3.2 — 2026-05-07
+</footer>
+</body>
+</html>

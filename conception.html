@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Conception — Canva Agricole BNA</title>
+  <style>
+    :root{
+      --blue:#1565c0;--blue-bg:#e3f2fd;--blue-b:#90caf9;
+      --green:#1b5e20;--green-bg:#e8f5e9;--green-b:#a5d6a7;
+      --orange:#e65100;--orange-bg:#fff3e0;--orange-b:#ffcc80;
+      --purple:#4a148c;--purple-bg:#f3e5f5;--purple-b:#ce93d8;
+      --red:#b71c1c;--red-bg:#ffebee;--red-b:#ef9a9a;
+      --teal:#004d40;--teal-bg:#e0f2f1;--teal-b:#80cbc4;
+      --gold:#f57f17;--gold-bg:#fff8e1;--gold-b:#ffe082;
+      --dark:#0d1b2a;--text:#1c1c1c;--muted:#546e7a;
+      --border:#dce3e8;--white:#fff;--bg:#f0f4f8;
+      --shadow:0 2px 12px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+
+    header{background:linear-gradient(135deg,#0d1b2a,#1a3055,#1f4a7a);color:#fff;padding:52px 48px 38px;position:relative;overflow:hidden}
+    header::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.04)}
+    .htag{display:inline-block;background:#2e7d32;color:#fff;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px}
+    header h1{font-size:2.2rem;font-weight:800;margin-bottom:8px}
+    header p.sub{font-size:.95rem;opacity:.85;max-width:750px;margin-bottom:22px}
+    .hmeta{display:flex;gap:12px;flex-wrap:wrap}
+    .hc{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600}
+
+    nav{background:var(--dark);padding:0 48px;display:flex;gap:2px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+    nav a{color:rgba(255,255,255,.72);text-decoration:none;padding:12px 13px;font-size:.74rem;font-weight:700;letter-spacing:.4px;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+    nav a:hover{color:#fff;border-bottom-color:#4caf50}
+
+    main{max-width:1320px;margin:0 auto;padding:44px 32px}
+
+    section{margin-bottom:64px}
+    .sh{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:14px;border-bottom:3px solid var(--border)}
+    .si{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--dark),#1a3055);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+    .sh h2{font-size:1.5rem;font-weight:800;color:var(--dark)}
+
+    .card{background:var(--white);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+    .card h3{font-size:1.05rem;font-weight:700;color:var(--dark);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+    .card p{font-size:.88rem;color:var(--muted);margin-bottom:10px}
+
+    .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+    .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+    .co{border-left:5px solid;padding:14px 18px;border-radius:0 10px 10px 0;font-size:.88rem;margin-bottom:14px}
+    .co-b{border-color:var(--blue);background:var(--blue-bg);color:#0d3b8c}
+    .co-g{border-color:var(--green);background:var(--green-bg);color:#1b3a1f}
+    .co-o{border-color:var(--orange);background:var(--orange-bg);color:#7a3000}
+    .co-p{border-color:var(--purple);background:var(--purple-bg);color:#4a148c}
+    .co-gold{border-color:var(--gold);background:var(--gold-bg);color:#6d4c00}
+
+    /* ─── ENTITY BOX (UML style) ─── */
+    .ent{border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:2px solid;margin-bottom:0}
+    .ent-head{padding:10px 14px;font-weight:800;font-size:.88rem;text-align:center;letter-spacing:.5px}
+    .ent-body{padding:10px 14px;font-size:.78rem;background:var(--white)}
+    .ent-field{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted var(--border);font-family:monospace}
+    .ent-field:last-child{border-bottom:none}
+    .ent-field .fname{font-weight:700;color:var(--dark)}
+    .ent-field .ftype{color:var(--muted)}
+    .ent-field .fpk{color:var(--gold);font-weight:800}
+    .ent-field .ffk{color:var(--blue);font-weight:700}
+    .ent-rel{font-size:.72rem;color:var(--muted);padding:3px 0;font-style:italic}
+
+    /* entity colors */
+    .e-blue{border-color:var(--blue-b)}.e-blue .ent-head{background:var(--blue);color:#fff}
+    .e-green{border-color:var(--green-b)}.e-green .ent-head{background:var(--green);color:#fff}
+    .e-orange{border-color:var(--orange-b)}.e-orange .ent-head{background:var(--orange);color:#fff}
+    .e-purple{border-color:var(--purple-b)}.e-purple .ent-head{background:var(--purple);color:#fff}
+    .e-teal{border-color:var(--teal-b)}.e-teal .ent-head{background:var(--teal);color:#fff}
+    .e-red{border-color:var(--red-b)}.e-red .ent-head{background:var(--red);color:#fff}
+    .e-gold{border-color:var(--gold-b)}.e-gold .ent-head{background:var(--gold);color:#fff}
+    .e-dark{border-color:#455a64}.e-dark .ent-head{background:#263238;color:#fff}
+
+    /* ─── ARCH LAYERS ─── */
+    .layer{border-radius:12px;margin-bottom:10px;overflow:hidden;border:2px solid}
+    .layer-head{padding:12px 20px;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:10px}
+    .layer-body{padding:14px 20px;font-size:.84rem;background:var(--white)}
+    .layer-body ul{padding-left:18px;color:var(--muted);line-height:2}
+    .layer-body ul li strong{color:var(--text)}
+
+    /* ─── FLOW ARROW ─── */
+    .flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:0;margin:16px 0}
+    .fbox{padding:12px 16px;border-radius:8px;font-size:.82rem;font-weight:700;text-align:center;min-width:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+    .fbox small{font-weight:400;font-size:.72rem;opacity:.85}
+    .farrow{display:flex;align-items:center;padding:0 4px;color:#90a4ae;font-size:1.6rem;font-weight:700}
+
+    /* ─── CODE ─── */
+    .code{background:#0d1117;color:#c9d1d9;border-radius:10px;padding:16px 18px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.77rem;overflow-x:auto;margin:10px 0;border:1px solid #30363d;line-height:1.8}
+    .code .g{color:#56d364}.code .r{color:#ff7b72}.code .b{color:#79c0ff}
+    .code .y{color:#e3b341}.code .p{color:#d2a8ff}.code .nt{color:#8b949e}.code .str{color:#a5d6ff}
+
+    .path{display:inline-block;background:#f1f8e9;border:1px solid var(--green-b);color:var(--green);border-radius:5px;padding:1px 7px;font-family:monospace;font-size:.79rem;font-weight:600;word-break:break-all}
+
+    .tbl{width:100%;border-collapse:collapse;font-size:.82rem;background:var(--white);border-radius:11px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px}
+    .tbl thead{background:linear-gradient(90deg,var(--dark),#1a3055);color:#fff}
+    .tbl th{padding:11px 14px;text-align:left;font-weight:700;font-size:.77rem}
+    .tbl td{padding:10px 14px;border-bottom:1px solid #e9ecef;vertical-align:top}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:nth-child(even) td{background:#f8fafb}
+    .tbl code{background:#f1f8e9;border:1px solid var(--green-b);padding:1px 6px;border-radius:4px;font-size:.79rem;color:var(--green)}
+
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid}
+    .b-g{background:var(--green-bg);color:var(--green);border-color:var(--green-b)}
+    .b-b{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-b)}
+    .b-o{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-b)}
+    .b-p{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-b)}
+    .b-r{background:var(--red-bg);color:var(--red);border-color:var(--red-b)}
+
+    /* ─── RELATION LINE ─── */
+    .rel-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+    .rel-line{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dotted var(--border);font-size:.84rem}
+    .rel-line:last-child{border-bottom:none}
+    .rel-from{font-weight:700;color:var(--dark);min-width:180px}
+    .rel-type{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b);border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:700;white-space:nowrap}
+    .rel-to{color:var(--muted);font-size:.82rem}
+
+    /* ─── PATTERN BOX ─── */
+    .pbox{background:var(--white);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+    .pbox-head{padding:14px 18px;font-weight:800;font-size:.9rem;display:flex;align-items:center;gap:8px}
+    .pbox-body{padding:14px 18px;font-size:.84rem;color:var(--muted)}
+
+    /* ─── STAT CHIPS ─── */
+    .chips{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+    .chip{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;box-shadow:var(--shadow);min-width:120px}
+    .chip .cn{font-size:2rem;font-weight:900;line-height:1}
+    .chip .cl{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+    footer{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:26px;font-size:.8rem;margin-top:56px}
+    footer strong{color:#fff}
+
+    @media(max-width:640px){header{padding:32px 20px}main{padding:24px 14px}nav{padding:0 16px}.flow{flex-direction:column}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="htag">Document de Conception — Pour Débutants</div>
+  <h1>🌾 Canva Agricole BNA — Conception Complète</h1>
+  <p class="sub">Ce document explique <strong>comment l'application est conçue</strong> : son architecture, son modèle de données, ses couches logicielles et les choix de conception. Tout est expliqué simplement pour un débutant.</p>
+  <div class="hmeta">
+    <span class="hc">Architecture 3-Tiers</span>
+    <span class="hc">40 Entités Oracle</span>
+    <span class="hc">JWT / OAuth2</span>
+    <span class="hc">Angular 17 + Spring Boot 3.2</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#intro">💡 Intro</a>
+  <a href="#archi-globale">🏗️ Architecture</a>
+  <a href="#couches">🧱 Couches</a>
+  <a href="#modele">🗄️ Modèle de données</a>
+  <a href="#relations">🔗 Relations</a>
+  <a href="#frontend-archi">🅰️ Frontend</a>
+  <a href="#backend-archi">☕ Backend</a>
+  <a href="#securite">🔒 Sécurité</a>
+  <a href="#patterns">🎯 Patterns</a>
+  <a href="#bdd">💾 Base de données</a>
+  <a href="#flux">🔄 Flux complet</a>
+</nav>
+
+<main>
+
+<!-- ══════════ INTRO ══════════ -->
+<section id="intro">
+  <div class="sh"><div class="si">💡</div><h2>C'est quoi la « conception » d'une application ?</h2></div>
+
+  <div class="co co-b">
+    <strong>La conception</strong>, c'est comme le plan d'architecte d'une maison avant de la construire. On décide : comment les pièces (modules) sont organisées, comment elles communiquent entre elles, où on stocke les données, et qui a accès à quoi. Un bon plan évite les problèmes plus tard.
+  </div>
+
+  <div class="g3">
+    <div class="card" style="border-top:4px solid var(--blue)">
+      <h3>🧩 Architecture</h3>
+      <p>Comment les grandes parties du système sont organisées et comment elles interagissent. Ex : Frontend, Backend, Base de données.</p>
+    </div>
+    <div class="card" style="border-top:4px solid var(--green)">
+      <h3>🗄️ Modèle de données</h3>
+      <p>Quelles informations on stocke, dans quelles tables, et comment les tables sont liées entre elles.</p>
+    </div>
+    <div class="card" style="border-top:4px solid var(--orange)">
+      <h3>🎯 Patterns de conception</h3>
+      <p>Des recettes éprouvées pour résoudre des problèmes courants. Ex : le pattern "Couches" sépare l'affichage de la logique métier.</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="chips">
+    <div class="chip"><div class="cn" style="color:var(--blue)">3</div><div class="cl">Services applicatifs</div></div>
+    <div class="chip"><div class="cn" style="color:var(--green)">40</div><div class="cl">Tables Oracle</div></div>
+    <div class="chip"><div class="cn" style="color:var(--orange)">33</div><div class="cl">Endpoints REST</div></div>
+    <div class="chip"><div class="cn" style="color:var(--purple)">50+</div><div class="cl">Composants Angular</div></div>
+    <div class="chip"><div class="cn" style="color:var(--teal)">4</div><div class="cl">Couches logicielles</div></div>
+    <div class="chip"><div class="cn" style="color:var(--red)">2</div><div class="cl">Sources de données</div></div>
+  </div>
+</section>
+
+<!-- ══════════ ARCHITECTURE GLOBALE ══════════ -->
+<section id="archi-globale">
+  <div class="sh"><div class="si">🏗️</div><h2>Architecture globale — Vue d'ensemble</h2></div>
+
+  <div class="co co-g">
+    L'application suit une <strong>architecture 3-tiers classique</strong> : le <em>Tier Présentation</em> (Angular), le <em>Tier Logique Métier</em> (Spring Boot) et le <em>Tier Données</em> (Oracle). À cela s'ajoutent des services d'authentification dédiés.
+  </div>
+
+  <!-- Architecture diagram -->
+  <div class="card">
+    <h3>🖼️ Diagramme de l'architecture globale</h3>
+    <div style="overflow-x:auto">
+    <div style="min-width:700px;padding:10px">
+
+      <!-- User -->
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="display:inline-block;background:#263238;color:#fff;padding:12px 28px;border-radius:30px;font-weight:700;font-size:.9rem">
+          👤 Agent BNA — Navigateur Web
+        </div>
+      </div>
+      <div style="text-align:center;color:#90a4ae;font-size:1.4rem;margin-bottom:8px">↕ HTTPS</div>
+
+      <!-- Tier 1 -->
+      <div style="background:var(--blue-bg);border:2px solid var(--blue-b);border-radius:12px;padding:16px;margin-bottom:10px">
+        <div style="font-weight:800;color:var(--blue);margin-bottom:10px;font-size:.9rem">🅰️ TIER 1 — PRÉSENTATION &nbsp;|&nbsp; Angular 17 &nbsp;|&nbsp; http://localhost:4200</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+          <div style="background:#fff;border:1px solid var(--blue-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">📋 Pages / Composants<br/><span style="color:var(--muted);font-weight:400">50+ composants</span></div>
+          <div style="background:#fff;border:1px solid var(--blue-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">⚡ Services Angular<br/><span style="color:var(--muted);font-weight:400">28 services HTTP</span></div>
+          <div style="background:#fff;border:1px solid var(--blue-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">🗺️ Routage<br/><span style="color:var(--muted);font-weight:400">Navigation pages</span></div>
+          <div style="background:#fff;border:1px solid var(--blue-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">🔐 Intercepteurs<br/><span style="color:var(--muted);font-weight:400">Injection JWT</span></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem;margin-bottom:8px">↕ API REST / JSON (port 8081)</div>
+
+      <!-- Auth lateral -->
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:10px;align-items:start">
+        <div style="background:var(--green-bg);border:2px solid var(--green-b);border-radius:12px;padding:16px">
+          <div style="font-weight:800;color:var(--green);margin-bottom:10px;font-size:.9rem">☕ TIER 2 — LOGIQUE MÉTIER &nbsp;|&nbsp; Spring Boot 3.2 &nbsp;|&nbsp; http://localhost:8081</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+            <div style="background:#fff;border:1px solid var(--green-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">🔌 Controllers REST<br/><span style="color:var(--muted);font-weight:400">33 contrôleurs</span></div>
+            <div style="background:#fff;border:1px solid var(--green-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">⚙️ Services Java<br/><span style="color:var(--muted);font-weight:400">56 services</span></div>
+            <div style="background:#fff;border:1px solid var(--green-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">📦 Repositories<br/><span style="color:var(--muted);font-weight:400">47 repos JPA</span></div>
+            <div style="background:#fff;border:1px solid var(--green-b);border-radius:8px;padding:10px;text-align:center;font-size:.78rem;font-weight:600">☁️ Cache Caffeine<br/><span style="color:var(--muted);font-weight:400">TTL 24h</span></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+          <div style="background:var(--purple-bg);border:2px solid var(--purple-b);border-radius:10px;padding:12px;text-align:center;font-size:.78rem;font-weight:700;color:var(--purple)">
+            🔐 Auth Server<br/>Spring Boot<br/>Port 7070<br/><span style="font-weight:400;font-size:.72rem">JWT / SSO</span>
+          </div>
+          <div style="background:var(--teal-bg);border:2px solid var(--teal-b);border-radius:10px;padding:12px;text-align:center;font-size:.78rem;font-weight:700;color:var(--teal)">
+            🏛️ Keycloak<br/>OAuth2 / OIDC<br/>Port 8080<br/><span style="font-weight:400;font-size:.72rem">Realm: canvaAgricole</span>
+          </div>
+          <div style="background:var(--orange-bg);border:2px solid var(--orange-b);border-radius:10px;padding:12px;text-align:center;font-size:.78rem;font-weight:700;color:var(--orange)">
+            📡 BNA Auth<br/>LDAP (legacy)<br/>Port 8082<br/><span style="font-weight:400;font-size:.72rem">ldap://10.1.6.1:389</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem;margin-bottom:8px">↕ JDBC / HikariCP</div>
+
+      <!-- Tier 3 -->
+      <div style="background:var(--orange-bg);border:2px solid var(--orange-b);border-radius:12px;padding:16px">
+        <div style="font-weight:800;color:var(--orange);margin-bottom:10px;font-size:.9rem">🗄️ TIER 3 — DONNÉES &nbsp;|&nbsp; Oracle Database</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">
+          <div style="background:#fff;border:1px solid var(--orange-b);border-radius:8px;padding:10px;font-size:.78rem;font-weight:600">
+            <div style="color:var(--orange);margin-bottom:4px">🔵 Oracle Primaire</div>
+            <div style="color:var(--muted);font-weight:400">10.1.9.214:1561<br/>SAEB.bna.tn<br/>user: saeb</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--orange-b);border-radius:8px;padding:10px;font-size:.78rem;font-weight:600">
+            <div style="color:var(--orange);margin-bottom:4px">🟡 Oracle Secondaire</div>
+            <div style="color:var(--muted);font-weight:400">10.1.224.10:1541<br/>bnaprod<br/>user: saeb</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--orange-b);border-radius:8px;padding:10px;font-size:.78rem;font-weight:600">
+            <div style="color:var(--orange);margin-bottom:4px">📁 Stockage Fichiers</div>
+            <div style="color:var(--muted);font-weight:400">./uploads/<br/>Max 10MB / fichier<br/>PDF, JPG, PNG</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--orange-b);border-radius:8px;padding:10px;font-size:.78rem;font-weight:600">
+            <div style="color:var(--orange);margin-bottom:4px">🏛️ Schémas Oracle</div>
+            <div style="color:var(--muted);font-weight:400">SAEB (principal)<br/>SMILE (mouvements)<br/>HABIL (habilitations)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ COUCHES ══════════ -->
+<section id="couches">
+  <div class="sh"><div class="si">🧱</div><h2>Architecture en couches — Principe fondamental</h2></div>
+
+  <div class="co co-gold">
+    <strong>Règle d'or :</strong> Chaque couche ne parle qu'à la couche directement en dessous ou au-dessus d'elle. Le Controller ne parle pas au Repository. Le Component Angular ne parle pas directement à la base Oracle. Cette séparation s'appelle le <strong>principe de séparation des responsabilités</strong>.
+  </div>
+
+  <div class="card">
+    <h3>Les 7 couches de l'application (de l'utilisateur à la base de données)</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">
+
+      <div class="layer e-blue" style="border-color:var(--blue-b)">
+        <div class="layer-head" style="background:var(--blue);color:#fff">
+          <span style="font-size:1.2rem">🖥️</span> Couche 1 — Component Angular <span style="margin-left:auto;font-size:.75rem;opacity:.85">frontend-app1/src/app/_components/</span>
+        </div>
+        <div class="layer-body">
+          <strong>Rôle :</strong> Afficher les données à l'utilisateur et capturer ses actions (clic, saisie de formulaire).<br/>
+          <strong>Ce qu'elle fait :</strong> Appelle le Service Angular quand l'utilisateur agit. Reçoit les données et les affiche dans le template HTML.<br/>
+          <strong>Ce qu'elle NE fait PAS :</strong> Elle ne contient pas de logique HTTP ni de traitement des données.
+          <div class="code" style="margin-top:10px"><span class="nt">// Exemple : list.component.ts</span>
+<span class="b">ngOnInit</span>() {
+  this.canevasService.<span class="g">getAllCanevas</span>()
+    .subscribe(data => this.canevas = data); <span class="nt">// ← reçoit, affiche</span>
+}</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem">↕</div>
+
+      <div class="layer" style="border-color:var(--purple-b)">
+        <div class="layer-head" style="background:var(--purple);color:#fff">
+          <span style="font-size:1.2rem">⚡</span> Couche 2 — Service Angular <span style="margin-left:auto;font-size:.75rem;opacity:.85">frontend-app1/src/app/_services/</span>
+        </div>
+        <div class="layer-body">
+          <strong>Rôle :</strong> Communiquer avec le backend via HTTP. C'est le "messager" entre Angular et Spring Boot.<br/>
+          <strong>Ce qu'elle fait :</strong> Construit les requêtes HTTP (GET, POST, PUT, DELETE). Retourne un Observable au Component.<br/>
+          <strong>Ce qu'elle NE fait PAS :</strong> Elle ne gère pas l'affichage ni la logique métier.
+          <div class="code" style="margin-top:10px"><span class="nt">// Exemple : canevas.service.ts</span>
+<span class="b">getAllCanevas</span>(): Observable&lt;Caneva[]&gt; {
+  <span class="r">return</span> this.http.<span class="g">get</span>&lt;Caneva[]&gt;(<span class="str">`${this.api}api/canevas`</span>);
+}</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem">↕ HTTP/JSON</div>
+
+      <div class="layer" style="border-color:var(--teal-b)">
+        <div class="layer-head" style="background:var(--teal);color:#fff">
+          <span style="font-size:1.2rem">🔌</span> Couche 3 — Controller Java (REST) <span style="margin-left:auto;font-size:.75rem;opacity:.85">backend-saeb/.../web/</span>
+        </div>
+        <div class="layer-body">
+          <strong>Rôle :</strong> Point d'entrée du backend. Reçoit les requêtes HTTP, les valide et délègue au Service Java.<br/>
+          <strong>Ce qu'elle fait :</strong> Définit les URLs (<code>/api/canevas</code>), les méthodes HTTP (GET, POST…). Convertit la requête et la réponse.<br/>
+          <strong>Ce qu'elle NE fait PAS :</strong> Elle ne contient pas de logique métier ni d'accès direct à la base de données.
+          <div class="code" style="margin-top:10px"><span class="p">@GetMapping</span>
+<span class="r">public</span> ResponseEntity&lt;List&lt;CanevaDto&gt;&gt; <span class="g">getAll</span>() {
+  <span class="r">return</span> ResponseEntity.<span class="g">ok</span>(service.<span class="g">findAll</span>()); <span class="nt">// délègue</span>
+}</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem">↕</div>
+
+      <div class="layer" style="border-color:var(--orange-b)">
+        <div class="layer-head" style="background:var(--orange);color:#fff">
+          <span style="font-size:1.2rem">⚙️</span> Couche 4 — Service Java (Logique métier) <span style="margin-left:auto;font-size:.75rem;opacity:.85">backend-saeb/.../service/</span>
+        </div>
+        <div class="layer-body">
+          <strong>Rôle :</strong> Contient toute la logique métier (calculs, validations, règles BNA).<br/>
+          <strong>Ce qu'elle fait :</strong> Appelle le Repository, transforme Entity ↔ DTO, applique les règles métier.<br/>
+          <strong>Ce qu'elle NE fait PAS :</strong> Elle ne gère pas les requêtes HTTP.
+          <div class="code" style="margin-top:10px"><span class="p">@Service</span>
+<span class="r">public class</span> <span class="b">CanevaServiceImpl</span> {
+  <span class="r">public</span> CanevaDto <span class="g">save</span>(CanevaDto dto) {
+    Caneva entity = <span class="g">convertToEntity</span>(dto); <span class="nt">// DTO → Entity</span>
+    Caneva saved = repo.<span class="g">save</span>(entity);    <span class="nt">// sauvegarde</span>
+    <span class="r">return</span> <span class="g">convertToDto</span>(saved);           <span class="nt">// Entity → DTO</span>
+  }
+}</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem">↕</div>
+
+      <div class="layer" style="border-color:var(--red-b)">
+        <div class="layer-head" style="background:var(--red);color:#fff">
+          <span style="font-size:1.2rem">📦</span> Couche 5 — Repository (Accès données) <span style="margin-left:auto;font-size:.75rem;opacity:.85">backend-saeb/.../repository/</span>
+        </div>
+        <div class="layer-body">
+          <strong>Rôle :</strong> Seule couche qui parle à Oracle. Génère les requêtes SQL automatiquement.<br/>
+          <strong>Ce qu'elle fait :</strong> Hérite de JpaRepository → Spring génère les SELECT, INSERT, UPDATE, DELETE.<br/>
+          <strong>Ce qu'elle NE fait PAS :</strong> Elle ne contient pas de logique métier.
+          <div class="code" style="margin-top:10px"><span class="r">public interface</span> <span class="b">CanevaRepository</span>
+    <span class="r">extends</span> JpaRepository&lt;<span class="b">Caneva</span>, Long&gt; {
+  <span class="nt">// Spring génère: SELECT * FROM CANEVAS_AGRICOLE WHERE num_seqpers = ?</span>
+  List&lt;Caneva&gt; <span class="g">findByNumSeqpers</span>(Integer num);
+}</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem">↕ SQL / JDBC</div>
+
+      <div class="layer" style="border-color:#455a64">
+        <div class="layer-head" style="background:#263238;color:#fff">
+          <span style="font-size:1.2rem">🗄️</span> Couche 6 — Entité JPA (Modèle) <span style="margin-left:auto;font-size:.75rem;opacity:.85">backend-saeb/.../entities/</span>
+        </div>
+        <div class="layer-body">
+          <strong>Rôle :</strong> Représentation Java d'une table Oracle. Chaque instance = une ligne de la table.<br/>
+          <div class="code" style="margin-top:10px"><span class="p">@Entity</span> <span class="p">@Table</span>(name=<span class="str">"CANEVAS_AGRICOLE"</span>)
+<span class="r">public class</span> <span class="b">Caneva</span> {
+  <span class="p">@Id</span> Long id;
+  <span class="p">@Column</span>(name=<span class="str">"COD_STRC_DEM"</span>) String codeStrcDem;
+  <span class="p">@OneToMany</span>(cascade=ALL) List&lt;CreditCourtTerme&gt; creditsCtTerme;
+}</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae;font-size:1.2rem">↕</div>
+
+      <div class="layer e-gold" style="border-color:var(--gold-b)">
+        <div class="layer-head" style="background:var(--gold);color:#fff">
+          <span style="font-size:1.2rem">🗄️</span> Couche 7 — Oracle Database
+        </div>
+        <div class="layer-body">
+          <strong>Tables :</strong> CANEVAS_AGRICOLE, CREDIT_COURT_TERME, GARANTIE_PROPOSE, AVIS_AGRICOLE, SITES, etc. (40 tables au total).
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MODÈLE DE DONNÉES ══════════ -->
+<section id="modele">
+  <div class="sh"><div class="si">🗄️</div><h2>Modèle de données — Les entités et leurs champs</h2></div>
+
+  <div class="co co-b">
+    Le modèle de données décrit <strong>comment les informations sont organisées</strong> dans Oracle. Chaque rectangle ci-dessous représente une table (entité). La clé 🔑 = clé primaire (identifiant unique). La flèche 🔗 = lien vers une autre table.
+  </div>
+
+  <!-- ENTITÉ PRINCIPALE -->
+  <div class="card" style="border-top:4px solid var(--blue)">
+    <h3>🏛️ Entité centrale — CANEVAS_AGRICOLE (Table principale)</h3>
+    <p>C'est la table pivot. Tout le reste gravitent autour du canevas. Un canevas = un dossier de financement agricole pour un client.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:12px">
+      <div class="ent e-blue">
+        <div class="ent-head">CANEVAS_AGRICOLE</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (IDENTITY)</span></div>
+          <div class="ent-field"><span class="fname">numSeqpers</span><span class="ftype">Integer — N° séq. client</span></div>
+          <div class="ent-field"><span class="fname">codeStrcDem</span><span class="ftype">String — Code structure demande</span></div>
+          <div class="ent-field"><span class="fname">matrAffectCnv</span><span class="ftype">String — Matricule affectation</span></div>
+          <div class="ent-field"><span class="fname">matricule</span><span class="ftype">String — Matricule agent</span></div>
+          <div class="ent-field"><span class="fname">dateDemande</span><span class="ftype">Date — DATE_DEM_CNV</span></div>
+          <div class="ent-field"><span class="fname">dateCreation</span><span class="ftype">Date — DATE_CREAT_CNV</span></div>
+          <div class="ent-field"><span class="fname">demandeText</span><span class="ftype">String — Texte demande</span></div>
+          <div class="ent-field"><span class="fname">description</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">codeStructure</span><span class="ftype">String(5) — Structure courante</span></div>
+          <div class="ent-field"><span class="fname">stade</span><span class="ftype">Enum (STADE)</span></div>
+          <div class="ent-field"><span class="fname">avis</span><span class="ftype">Enum (AVIS)</span></div>
+          <div style="margin-top:8px;padding-top:6px;border-top:1px dashed var(--border)">
+            <div class="ent-rel">🔗 → [Sites] ManyToMany via caneva_site_projet</div>
+            <div class="ent-rel">🔗 → [CreditCourtTerme] OneToMany</div>
+            <div class="ent-rel">🔗 → [CreditInvestissement] OneToMany</div>
+            <div class="ent-rel">🔗 → [CreditAchatTerrain] OneToMany</div>
+            <div class="ent-rel">🔗 → [DocumentCanevaFile] OneToMany</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="co co-gold">
+          <strong>Comment lire ce tableau ?</strong><br/>
+          🔑 = Clé primaire (identifiant unique de la ligne)<br/>
+          🔗 = Relation vers une autre table<br/>
+          Chaque ligne = une colonne Oracle<br/>
+          Enum = valeur choisie parmi une liste fixe
+        </div>
+        <div class="co co-b">
+          <strong>Enum Stade :</strong> EN_COURS_CREATION, ENREGISTRE, EN_COURS_ETUDE, PRE_VALIDE, VALIDE, EN_ATTENTE_ANNULATION, ANNULE<br/><br/>
+          <strong>Enum Avis :</strong> FAVORABLE, DEFAVORABLE, EN_ATTENTE
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRÉDITS -->
+  <div class="card" style="border-top:4px solid var(--green)">
+    <h3>💳 Entités Crédits — 3 types de crédit</h3>
+    <p>Un canevas peut avoir plusieurs crédits de 3 natures différentes. Chaque type a sa propre table.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px">
+
+      <div class="ent e-green">
+        <div class="ent-head">credit_court_terme</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">String (UUID)</span></div>
+          <div class="ent-field"><span class="fname">produit</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">codeSpeculation</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">natureSpeculation</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">montant</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">echeance</span><span class="ftype">Date</span></div>
+          <div class="ent-field"><span class="fname">typetaux</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">taux</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">marge</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">commission</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">fond</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">dateDeblocage</span><span class="ftype">Date</span></div>
+          <div class="ent-field"><span class="fname ffk">🔗 caneva_id</span><span class="ftype">ManyToOne → Caneva</span></div>
+        </div>
+      </div>
+
+      <div class="ent e-teal">
+        <div class="ent-head">credit_investissement</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">String (UUID)</span></div>
+          <div class="ent-field"><span class="fname">terme</span><span class="ftype">String (CMT/CLT)</span></div>
+          <div class="ent-field"><span class="fname">montant</span><span class="ftype">Double</span></div>
+          <div style="background:#e8f5e9;border-radius:6px;padding:6px;margin:4px 0;font-size:.75rem;color:var(--green)">
+            <strong>@Embedded ConditionFinancement</strong><br/>
+            c_f_nature, c_f_produit, c_f_duree,<br/>
+            c_f_commision, c_f_typetaux, c_f_taux,<br/>
+            c_f_marge, c_f_periodicite,<br/>
+            c_f_date1ereechsoll, c_f_fond,<br/>
+            c_f_periodegrace (13 colonnes)
+          </div>
+          <div class="ent-field"><span class="fname ffk">🔗 caneva_id</span><span class="ftype">ManyToOne → Caneva</span></div>
+          <div class="ent-rel">🔗 → [ItemInvestissement] OneToMany</div>
+        </div>
+      </div>
+
+      <div class="ent e-orange">
+        <div class="ent-head">credit_achat_terrain</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">String (UUID)</span></div>
+          <div class="ent-field"><span class="fname">terme</span><span class="ftype">String (CMT/CLT)</span></div>
+          <div class="ent-field"><span class="fname">montant</span><span class="ftype">Double</span></div>
+          <div style="background:#fff3e0;border-radius:6px;padding:6px;margin:4px 0;font-size:.75rem;color:var(--orange)">
+            <strong>@Embedded ConditionFinancement</strong><br/>
+            (mêmes 13 colonnes que ci-dessus)
+          </div>
+          <div class="ent-field"><span class="fname ffk">🔗 caneva_id</span><span class="ftype">ManyToOne → Caneva</span></div>
+          <div class="ent-rel">🔗 → [ItemAchatTerrain] OneToMany</div>
+          <div class="ent-rel">🔗 → [Vendeur] OneToMany</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GARANTIES + AVIS -->
+  <div class="card" style="border-top:4px solid var(--purple)">
+    <h3>🔐 Garanties &amp; Avis</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">
+
+      <div class="ent e-purple">
+        <div class="ent-head">GARANTIE_PROPOSE</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (IDENTITY)</span></div>
+          <div class="ent-field"><span class="fname">sourceGarantieId</span><span class="ftype">Long — source SAGA</span></div>
+          <div class="ent-field"><span class="fname">numSeqPers</span><span class="ftype">Integer</span></div>
+          <div class="ent-field"><span class="fname">numCaneva</span><span class="ftype">Integer</span></div>
+          <div class="ent-field"><span class="fname">nature</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">refBien</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">description</span><span class="ftype">@Lob String</span></div>
+          <div class="ent-field"><span class="fname">marge</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">montantGarantieProposee</span><span class="ftype">BigDecimal</span></div>
+          <div class="ent-field"><span class="fname">valeur</span><span class="ftype">BigDecimal</span></div>
+          <div class="ent-field"><span class="fname">dateExpertise</span><span class="ftype">LocalDate</span></div>
+          <div class="ent-field"><span class="fname">totalMtCredit</span><span class="ftype">BigDecimal</span></div>
+          <div class="ent-rel" style="margin-top:6px">🔗 → [CreditCourtTerme] ManyToMany</div>
+          <div class="ent-rel">🔗 → [CreditInvestissement] ManyToMany</div>
+          <div class="ent-rel">🔗 → [CreditAchatTerrain] ManyToMany</div>
+          <div class="ent-rel">🔗 → [GarantieProposeFichier] OneToMany</div>
+        </div>
+      </div>
+
+      <div class="ent e-red">
+        <div class="ent-head">AVIS_AGRICOLE</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQUENCE)</span></div>
+          <div class="ent-field"><span class="fname">numCaneva</span><span class="ftype">Long (NOT NULL)</span></div>
+          <div class="ent-field"><span class="fname">numSeqpers</span><span class="ftype">Long (NOT NULL)</span></div>
+          <div class="ent-field"><span class="fname">statusAvis</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">structure</span><span class="ftype">Long</span></div>
+          <div class="ent-field"><span class="fname">matricule</span><span class="ftype">Long</span></div>
+          <div class="ent-field"><span class="fname">avisValue</span><span class="ftype">String (FAVORABLE/DEF.)</span></div>
+          <div class="ent-field"><span class="fname">commentaire</span><span class="ftype">@Lob String</span></div>
+          <div class="ent-field"><span class="fname">dataAchatTerrain</span><span class="ftype">@Lob String (JSON)</span></div>
+          <div class="ent-field"><span class="fname">dataCreditInvestissement</span><span class="ftype">@Lob String (JSON)</span></div>
+          <div class="ent-field"><span class="fname">dataCreditCourtTerme</span><span class="ftype">@Lob String (JSON)</span></div>
+          <div class="ent-field"><span class="fname">dataGaranties</span><span class="ftype">@Lob String (JSON)</span></div>
+          <div class="ent-field"><span class="fname">dateCreation</span><span class="ftype">LocalDateTime</span></div>
+          <div style="margin-top:6px;font-size:.75rem;color:var(--red)">⚠️ Les data* stockent des snapshots JSON des données au moment de l'avis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE + AFFECTATION -->
+  <div class="card" style="border-top:4px solid var(--teal)">
+    <h3>🗺️ Sites &amp; Affectation</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">
+
+      <div class="ent e-teal">
+        <div class="ent-head">sites (table)</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQUENCE)</span></div>
+          <div class="ent-field"><span class="fname">zone</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">region</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">gouvernorat</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">delegation</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">imada</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">localisation</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">latitude</span><span class="ftype">Double (GPS)</span></div>
+          <div class="ent-field"><span class="fname">longitude</span><span class="ftype">Double (GPS)</span></div>
+          <div class="ent-field"><span class="fname">description</span><span class="ftype">@Lob String</span></div>
+          <div class="ent-field"><span class="fname">status</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">createdDate</span><span class="ftype">LocalDateTime (@Audit)</span></div>
+          <div class="ent-rel" style="margin-top:6px">🔗 ← [Caneva] ManyToMany</div>
+          <div class="ent-rel">🔗 → [Elevage] OneToMany</div>
+          <div class="ent-rel">🔗 → [Materiel] OneToMany</div>
+          <div class="ent-rel">🔗 → [RessourceHydrique] OneToMany</div>
+          <div class="ent-rel">🔗 → [RendementVegital] OneToMany</div>
+          <div class="ent-rel">🔗 → [Batiment] OneToMany</div>
+        </div>
+      </div>
+
+      <div class="ent e-dark">
+        <div class="ent-head">AFFECTATION</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQUENCE)</span></div>
+          <div class="ent-field"><span class="fname">dateAffectation</span><span class="ftype">Date</span></div>
+          <div class="ent-field"><span class="fname">dateEcheance</span><span class="ftype">Date</span></div>
+          <div class="ent-field"><span class="fname">etatAffectation</span><span class="ftype">Enum</span></div>
+          <div class="ent-field"><span class="fname">observations</span><span class="ftype">String(500)</span></div>
+          <div class="ent-field"><span class="fname">matriculeRecepteur</span><span class="ftype">String(20)</span></div>
+          <div class="ent-field"><span class="fname">codeStructureRecepteur</span><span class="ftype">String(5)</span></div>
+          <div class="ent-field"><span class="fname">matriculeEmetteur</span><span class="ftype">String(20)</span></div>
+          <div class="ent-field"><span class="fname">codeStructureEmetteur</span><span class="ftype">String(5)</span></div>
+          <div class="ent-field"><span class="fname">actif</span><span class="ftype">Boolean</span></div>
+          <div class="ent-field"><span class="fname">dateCreation</span><span class="ftype">Date (TIMESTAMP)</span></div>
+          <div class="ent-rel" style="margin-top:6px">🔗 → [Caneva] ManyToOne</div>
+          <div class="ent-rel">🔗 → [CanevasUser] ManyToOne (récepteur)</div>
+          <div class="ent-rel">🔗 → [CanevasUser] ManyToOne (émetteur)</div>
+          <div style="margin-top:6px;font-size:.75rem;color:#90a4ae">Enum: EN_COURS, TERMINE, ANNULE,<br/>EN_ATTENTE, EN_COURS_ETUDE, AFFECTE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLOITATION -->
+  <div class="card" style="border-top:4px solid var(--green)">
+    <h3>🌾 Entités Exploitation Agricole</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px">
+
+      <div class="ent e-green">
+        <div class="ent-head">Elevage (Cheptel)</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQ)</span></div>
+          <div class="ent-field"><span class="fname">type</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">nombre</span><span class="ftype">Integer</span></div>
+          <div class="ent-field"><span class="fname">duree</span><span class="ftype">Integer</span></div>
+          <div class="ent-field"><span class="fname">race</span><span class="ftype">String</span></div>
+          <div class="ent-rel">🔗 → [Site] ManyToOne</div>
+        </div>
+      </div>
+
+      <div class="ent e-teal">
+        <div class="ent-head">Materiel</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQ)</span></div>
+          <div class="ent-field"><span class="fname">immatriculation</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">age</span><span class="ftype">Integer</span></div>
+          <div class="ent-field"><span class="fname">etat</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">type</span><span class="ftype">String</span></div>
+          <div class="ent-rel">🔗 → [Site] ManyToOne</div>
+        </div>
+      </div>
+
+      <div class="ent e-blue">
+        <div class="ent-head">bilan_fourragere</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQ)</span></div>
+          <div class="ent-field"><span class="fname">espece</span><span class="ftype">String(100)</span></div>
+          <div class="ent-field"><span class="fname">nombreHa</span><span class="ftype">BigDecimal</span></div>
+          <div class="ent-field"><span class="fname">ufParHa</span><span class="ftype">BigDecimal</span></div>
+          <div class="ent-field"><span class="fname">totalEspece</span><span class="ftype">BigDecimal (auto-calc)</span></div>
+          <div class="ent-field"><span class="fname">creditInvId</span><span class="ftype">String (FK)</span></div>
+          <div style="font-size:.72rem;color:var(--blue);margin-top:4px">@PrePersist: totalEspece = nombreHa × ufParHa</div>
+        </div>
+      </div>
+
+      <div class="ent e-orange">
+        <div class="ent-head">RessourceHydrique</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQ)</span></div>
+          <div class="ent-field"><span class="fname">pointEau</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">debit</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">salinite</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">profondeur</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">nbHeurePompage</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">debitDisponible</span><span class="ftype">Double (calc)</span></div>
+          <div class="ent-rel">🔗 → [Site] ManyToOne</div>
+        </div>
+      </div>
+
+      <div class="ent e-purple">
+        <div class="ent-head">SCHEMA_CREDIT_INV</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQ)</span></div>
+          <div class="ent-field"><span class="fname">numSeqpers</span><span class="ftype">Long (NOT NULL)</span></div>
+          <div class="ent-field"><span class="fname">numCanva</span><span class="ftype">Long (NOT NULL)</span></div>
+          <div class="ent-field"><span class="fname">idCredit</span><span class="ftype">String(50) (NOT NULL)</span></div>
+          <div class="ent-field"><span class="fname">terme</span><span class="ftype">String(20)</span></div>
+          <div class="ent-field"><span class="fname">fad</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">fondRoulement</span><span class="ftype">Double</span></div>
+          <div class="ent-field"><span class="fname">createdDate</span><span class="ftype">LocalDateTime</span></div>
+          <div class="ent-rel">🔗 → [ComposantInv] OneToMany</div>
+          <div style="font-size:.72rem;color:var(--purple);margin-top:4px">Contrainte unique: (numSeqpers, numCanva, idCredit)</div>
+        </div>
+      </div>
+
+      <div class="ent e-gold">
+        <div class="ent-head">DOCUMENT_CLIENT_CANEVA</div>
+        <div class="ent-body">
+          <div class="ent-field"><span class="fname fpk">🔑 id</span><span class="ftype">Long (SEQ)</span></div>
+          <div class="ent-field"><span class="fname">fileName</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">fileType</span><span class="ftype">String (MIME)</span></div>
+          <div class="ent-field"><span class="fname">fileData</span><span class="ftype">@Lob byte[] (binaire)</span></div>
+          <div class="ent-field"><span class="fname">uploadDate</span><span class="ftype">LocalDateTime (auto)</span></div>
+          <div class="ent-field"><span class="fname">description</span><span class="ftype">String</span></div>
+          <div class="ent-field"><span class="fname">rubrique</span><span class="ftype">String</span></div>
+          <div class="ent-rel">🔗 → [ClientCanvas] ManyToOne</div>
+          <div style="font-size:.72rem;color:var(--gold);margin-top:4px">@PrePersist: uploadDate = now()</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RELATIONS ══════════ -->
+<section id="relations">
+  <div class="sh"><div class="si">🔗</div><h2>Relations entre entités — Expliquées simplement</h2></div>
+
+  <div class="card">
+    <h3>📚 Les 3 types de relations (avec exemples concrets)</h3>
+    <div class="g3" style="margin-bottom:16px">
+      <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:16px">
+        <div style="font-weight:800;color:var(--green);margin-bottom:8px">OneToMany (1 → N)</div>
+        <p style="font-size:.84rem;color:var(--muted)">Un canevas peut avoir plusieurs crédits court terme. Mais chaque crédit appartient à UN seul canevas.</p>
+        <div class="code" style="margin-top:8px;font-size:.75rem"><span class="nt">// Dans Caneva.java</span>
+<span class="p">@OneToMany</span>(mappedBy=<span class="str">"caneva"</span>, cascade=ALL)
+List&lt;CreditCourtTerme&gt; creditsCtTerme;</div>
+      </div>
+      <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:10px;padding:16px">
+        <div style="font-weight:800;color:var(--blue);margin-bottom:8px">ManyToOne (N → 1)</div>
+        <p style="font-size:.84rem;color:var(--muted)">Plusieurs crédits court terme peuvent appartenir au même canevas.</p>
+        <div class="code" style="margin-top:8px;font-size:.75rem"><span class="nt">// Dans CreditCourtTerme.java</span>
+<span class="p">@ManyToOne</span>
+<span class="p">@JoinColumn</span>(name=<span class="str">"caneva_id"</span>)
+Caneva caneva; <span class="nt">// FK dans la table</span></div>
+      </div>
+      <div style="background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:10px;padding:16px">
+        <div style="font-weight:800;color:var(--purple);margin-bottom:8px">ManyToMany (N → N)</div>
+        <p style="font-size:.84rem;color:var(--muted)">Un canevas peut avoir plusieurs sites. Un site peut appartenir à plusieurs canevas.</p>
+        <div class="code" style="margin-top:8px;font-size:.75rem"><span class="nt">// Dans Caneva.java</span>
+<span class="p">@ManyToMany</span>
+<span class="p">@JoinTable</span>(name=<span class="str">"caneva_site_projet"</span>)
+List&lt;Site&gt; selectedSites; <span class="nt">// table de jointure</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:16px">🗺️ Carte des relations principales</h3>
+    <div class="rel-wrap">
+      <div class="rel-line"><span class="rel-from">Caneva</span><span class="rel-type">1 → N</span><span class="rel-to">CreditCourtTerme — Un canevas, plusieurs crédits CT</span></div>
+      <div class="rel-line"><span class="rel-from">Caneva</span><span class="rel-type">1 → N</span><span class="rel-to">CreditInvestissement — Un canevas, plusieurs crédits investissement</span></div>
+      <div class="rel-line"><span class="rel-from">Caneva</span><span class="rel-type">1 → N</span><span class="rel-to">CreditAchatTerrain — Un canevas, plusieurs crédits terrain</span></div>
+      <div class="rel-line"><span class="rel-from">Caneva</span><span class="rel-type">N ↔ N</span><span class="rel-to">Site — via table caneva_site_projet (un canevas peut couvrir plusieurs sites)</span></div>
+      <div class="rel-line"><span class="rel-from">Caneva</span><span class="rel-type">1 → N</span><span class="rel-to">DocumentCanevaFile — Documents attachés</span></div>
+      <div class="rel-line"><span class="rel-from">CreditInvestissement</span><span class="rel-type">1 → N</span><span class="rel-to">ItemInvestissement — Composantes du crédit</span></div>
+      <div class="rel-line"><span class="rel-from">CreditAchatTerrain</span><span class="rel-type">1 → N</span><span class="rel-to">ItemAchatTerrain + Vendeur</span></div>
+      <div class="rel-line"><span class="rel-from">GarantiePropose</span><span class="rel-type">N ↔ N</span><span class="rel-to">CreditCourtTerme / Investissement / Achat Terrain — via 3 tables de jonction</span></div>
+      <div class="rel-line"><span class="rel-from">Site</span><span class="rel-type">1 → N</span><span class="rel-to">Elevage, Materiel, Batiment, RessourceHydrique, RendementVegital</span></div>
+      <div class="rel-line"><span class="rel-from">ItemInvestissement</span><span class="rel-type">N ↔ N</span><span class="rel-to">Site — Composante peut couvrir plusieurs sites</span></div>
+      <div class="rel-line"><span class="rel-from">SchemaCreditInv</span><span class="rel-type">1 → N</span><span class="rel-to">ComposantInv — Contrainte unique (person, caneva, credit)</span></div>
+      <div class="rel-line"><span class="rel-from">Affectation</span><span class="rel-type">N → 1</span><span class="rel-to">Caneva + CanevasUser (récepteur et émetteur)</span></div>
+      <div class="rel-line"><span class="rel-from">ClientCanvas</span><span class="rel-type">1 → N</span><span class="rel-to">DocumentClientCanva — Documents du client</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FRONTEND ARCHI ══════════ -->
+<section id="frontend-archi">
+  <div class="sh"><div class="si">🅰️</div><h2>Architecture Frontend Angular — Conception</h2></div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>📦 Structure des modules</h3>
+      <p>Angular organise le code en <strong>modules</strong>. Chaque module regroupe des composants liés.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+        <div style="background:var(--dark);color:#fff;border-radius:8px;padding:12px;font-size:.82rem">
+          <strong>AppModule</strong> (app.module.ts) — Module racine<br/>
+          <span style="opacity:.7">Configure l'auth, les providers globaux, le routing principal</span>
+        </div>
+        <div style="text-align:center;color:#90a4ae">↓ charge</div>
+        <div style="background:var(--blue);color:#fff;border-radius:8px;padding:12px;font-size:.82rem">
+          <strong>AppLayoutModule</strong> (layout/app.layout.module.ts)<br/>
+          <span style="opacity:.7">Sidebar, Topbar, Footer — cadre visuel permanent</span>
+        </div>
+        <div style="text-align:center;color:#90a4ae">↓ lazy-load</div>
+        <div style="background:var(--green);color:#fff;border-radius:8px;padding:12px;font-size:.82rem">
+          <strong>PagesModule</strong> (pages/pages.module.ts)<br/>
+          <span style="opacity:.7">Chargé uniquement quand on accède à /pages</span>
+        </div>
+        <div style="text-align:center;color:#90a4ae">↓ lazy-load</div>
+        <div style="background:var(--teal);color:#fff;border-radius:8px;padding:12px;font-size:.82rem">
+          <strong>CanvasAgricoleModule</strong> (canvas.agricole.module.ts)<br/>
+          <span style="opacity:.7">Déclare 80+ composants, imports PrimeNG, Material</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔄 Gestion de l'état avec Signals Angular 17</h3>
+      <p>Le projet utilise les <strong>Signals</strong> (nouveauté Angular 17) pour gérer l'état partagé entre composants. C'est plus simple et plus performant que les anciens services avec BehaviorSubject.</p>
+      <div class="code"><span class="nt">// Dans canevas.service.ts</span>
+<span class="nt">// Signal = valeur réactive (comme une variable "intelligente")</span>
+canevas = signal&lt;Caneva[]&gt;([]);
+
+<span class="nt">// computed = calculé automatiquement depuis d'autres signals</span>
+totalCanevas = computed(() => this.canevas().length);
+
+<span class="nt">// Dans le composant — écoute les changements automatiquement</span>
+<span class="r">protected</span> canevas = this.canevasService.canevas;
+
+<span class="nt">// Dans le template HTML</span>
+<span class="nt">&lt;!-- S'actualise automatiquement quand canevas change --&gt;</span>
+&lt;p&gt;{{ canevas().length }} canevas &lt;/p&gt;</div>
+      <div class="co co-b" style="margin-top:10px">
+        <strong>Pourquoi les Signals ?</strong> Moins de code, meilleure performance, pas de gestion manuelle des subscriptions (plus de risque de memory leaks).
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🏗️ Pattern de communication entre composants</h3>
+    <div class="g3">
+      <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:14px">
+        <strong style="color:var(--green)">@Input — Données du parent vers l'enfant</strong>
+        <div class="code" style="margin-top:8px;font-size:.75rem"><span class="nt">// Parent envoie des données</span>
+&lt;app-enfant [donnee]="<span class="y">maVariable</span>"&gt;&lt;/app-enfant&gt;
+<span class="nt">// Enfant les reçoit</span>
+<span class="p">@Input</span>() donnee: string;</div>
+      </div>
+      <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:10px;padding:14px">
+        <strong style="color:var(--blue)">@Output — Événements de l'enfant vers le parent</strong>
+        <div class="code" style="margin-top:8px;font-size:.75rem"><span class="nt">// Enfant émet un événement</span>
+<span class="p">@Output</span>() saved = <span class="r">new</span> EventEmitter();
+<span class="nt">// Parent écoute</span>
+&lt;enfant (saved)="<span class="y">onSave($event)</span>"&gt;&lt;/enfant&gt;</div>
+      </div>
+      <div style="background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:10px;padding:14px">
+        <strong style="color:var(--orange)">Service partagé — Entre composants non liés</strong>
+        <div class="code" style="margin-top:8px;font-size:.75rem"><span class="nt">// Service avec signal partagé</span>
+<span class="nt">// Ex: canevasAgrService partage</span>
+<span class="nt">// l'état entre toutes les pages</span>
+numSeqpers = signal&lt;number&gt;(0);
+numCanva = signal&lt;number&gt;(0);</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ BACKEND ARCHI ══════════ -->
+<section id="backend-archi">
+  <div class="sh"><div class="si">☕</div><h2>Architecture Backend Spring Boot — Conception</h2></div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>🔧 Injection de dépendances (IoC)</h3>
+      <p>Spring Boot gère automatiquement la création des objets. Tu déclares ce dont tu as besoin, Spring te le fournit.</p>
+      <div class="code"><span class="nt">// Sans IoC (mauvais) — crée manuellement</span>
+<span class="r">public class</span> Controller {
+  <span class="r">private</span> Service service = <span class="r">new</span> ServiceImpl(<span class="r">new</span> Repository());
+}
+
+<span class="nt">// Avec IoC (bien) — Spring injecte automatiquement</span>
+<span class="p">@RestController</span>
+<span class="r">public class</span> <span class="b">CanevaController</span> {
+  <span class="p">@Autowired</span>  <span class="nt">// Spring fournit automatiquement</span>
+  <span class="r">private</span> CanevaService service;
+}</div>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Cache Caffeine — Optimisation performance</h3>
+      <p>Les données d'engagement BNA/BCT sont coûteuses à récupérer. Le cache évite de recharger les mêmes données pendant 24h.</p>
+      <div class="code"><span class="nt">// Configuration dans application.properties</span>
+<span class="b">spring.cache.caffeine.spec</span>=maximumSize=<span class="y">500</span>,expireAfterWrite=<span class="y">24h</span>
+
+<span class="nt">// Utilisation dans le service</span>
+<span class="p">@Cacheable</span>(<span class="str">"engagementBNA"</span>)  <span class="nt">// ← résultat mis en cache</span>
+<span class="r">public</span> List&lt;EngagementBNADTO&gt; <span class="g">getEngagements</span>(String numSeq) {
+  <span class="nt">// Appelé 1 fois, puis depuis le cache</span>
+  <span class="r">return</span> repo.<span class="g">findByNumSeqPers</span>(numSeq);
+}</div>
+      <div class="co co-b" style="margin-top:10px">
+        <strong>Caches configurés :</strong> engagementBNA, engagementBCT, historiqueClasseBNA, historiqueClasseBCT, historiqueRetourClasseBct, montantTerme
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔄 Pattern DTO — Pourquoi ne pas envoyer les entités directement ?</h3>
+    <div class="g2">
+      <div>
+        <p style="margin-bottom:10px">Les entités JPA contiennent des informations sensibles et des relations complexes. Le DTO expose seulement ce dont Angular a besoin.</p>
+        <div class="code"><span class="nt">// Entité (NE PAS envoyer au frontend)</span>
+<span class="r">class</span> <span class="b">Caneva</span> {
+  Long id;
+  <span class="nt">// Relations qui causent des boucles JSON infinis !</span>
+  <span class="p">@OneToMany</span> List&lt;Credit&gt; credits;
+  <span class="nt">// Données internes qu'on ne veut pas exposer</span>
+  String motDePasseInterne;
+}
+
+<span class="nt">// DTO (ce qu'Angular reçoit — simple et sûr)</span>
+<span class="r">class</span> <span class="b">CanevaDto</span> {
+  Long id;
+  String clientNom;      <span class="nt">// calculé</span>
+  Integer nbCredits;     <span class="nt">// calculé</span>
+  String statut;         <span class="nt">// seulement le statut</span>
+  <span class="nt">// Pas de relations complexes, pas de données sensibles</span>
+}</div>
+      </div>
+      <div>
+        <div class="co co-gold">
+          <strong>Conversion Entity ↔ DTO</strong> dans le Service Java :
+        </div>
+        <div class="code"><span class="nt">// Dans CanevaServiceImpl.java</span>
+<span class="r">private</span> CanevaDto <span class="g">convertToDto</span>(Caneva entity) {
+  CanevaDto dto = <span class="r">new</span> CanevaDto();
+  dto.<span class="g">setId</span>(entity.<span class="g">getId</span>());
+  dto.<span class="g">setStatut</span>(entity.<span class="g">getStade</span>().<span class="g">name</span>());
+  <span class="r">return</span> dto;
+}
+
+<span class="nt">// Ou avec ModelMapper (automatique) — MapperConfig.java</span>
+CanevaDto dto = modelMapper.<span class="g">map</span>(entity, CanevaDto.<span class="r">class</span>);
+<span class="nt">// stratégie STRICT + skipNull activés</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SECURITE ══════════ -->
+<section id="securite">
+  <div class="sh"><div class="si">🔒</div><h2>Conception de la sécurité</h2></div>
+
+  <div class="co co-o">L'application supporte <strong>deux modes d'authentification</strong> configurables dans <span class="path">environment.development.ts</span>. Le mode actif est <code>AUTH_MODE: 'custom'</code>.</div>
+
+  <div class="card">
+    <h3>🔑 Flux d'authentification JWT (mode Custom)</h3>
+    <div style="overflow-x:auto;padding:10px 0">
+    <div style="min-width:600px">
+      <div class="flow" style="gap:4px">
+        <div class="fbox" style="background:var(--blue-bg);border:2px solid var(--blue-b);color:var(--blue)">👤 Agent BNA<br/><small>saisit login/mdp</small></div>
+        <div class="farrow">→</div>
+        <div class="fbox" style="background:var(--purple-bg);border:2px solid var(--purple-b);color:var(--purple)">Auth Server<br/>:7070<br/><small>POST /api/auth/login</small></div>
+        <div class="farrow">→</div>
+        <div class="fbox" style="background:var(--teal-bg);border:2px solid var(--teal-b);color:var(--teal)">BNA LDAP<br/>:8082<br/><small>vérifie annuaire</small></div>
+        <div class="farrow">→</div>
+        <div class="fbox" style="background:var(--purple-bg);border:2px solid var(--purple-b);color:var(--purple)">Auth Server<br/><small>génère JWT</small></div>
+        <div class="farrow">→</div>
+        <div class="fbox" style="background:var(--blue-bg);border:2px solid var(--blue-b);color:var(--blue)">Angular<br/><small>stocke le token</small></div>
+      </div>
+      <div style="text-align:center;margin:8px 0;font-size:.85rem;color:var(--muted)">→ Pour chaque requête API suivante :</div>
+      <div class="flow" style="gap:4px">
+        <div class="fbox" style="background:var(--blue-bg);border:2px solid var(--blue-b);color:var(--blue)">Angular<br/><small>envoie JWT dans<br/>Authorization header</small></div>
+        <div class="farrow">→</div>
+        <div class="fbox" style="background:var(--green-bg);border:2px solid var(--green-b);color:var(--green)">Spring Boot<br/>:8081<br/><small>valide le JWT</small></div>
+        <div class="farrow">→</div>
+        <div class="fbox" style="background:var(--green-bg);border:2px solid var(--green-b);color:var(--green)">Accès autorisé<br/><small>ou 401 si invalide</small></div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>🔐 Token JWT — Structure</h3>
+      <p>Un JWT (JSON Web Token) contient 3 parties séparées par des points :</p>
+      <div class="code"><span class="nt">// Structure : Header.Payload.Signature</span>
+eyJhbGciOiJIUzI1NiJ9                    <span class="nt">← Header (algorithme)</span>
+.eyJ1c2VyIjoiYWdlbnQiLCJleHAiOjE3..}  <span class="nt">← Payload (données)</span>
+.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV  <span class="nt">← Signature (vérification)</span>
+
+<span class="nt">// Payload contient (décodable sur jwt.io) :</span>
+{
+  "sub": "12345",           <span class="nt">// matricule agent</span>
+  "exp": 1748000000,        <span class="nt">// expiration (1 heure)</span>
+  "iat": 1747996400,        <span class="nt">// issued at</span>
+  "roles": ["AGENT", "..."] <span class="nt">// rôles</span>
+}</div>
+    </div>
+
+    <div class="card">
+      <h3>🛡️ Interception HTTP — Injection automatique du JWT</h3>
+      <p>L'intercepteur Angular ajoute automatiquement le token JWT à chaque requête vers le backend.</p>
+      <div class="code"><span class="nt">// auth.interceptor.ts — injecte le JWT automatiquement</span>
+intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler) {
+  <span class="r">const</span> token = sessionStorage.getItem(<span class="str">'access_token'</span>);
+  <span class="r">if</span> (token) {
+    req = req.clone({
+      setHeaders: {
+        <span class="y">Authorization</span>: <span class="str">`Bearer ${token}`</span>
+      }
+    });
+  }
+  <span class="r">return</span> next.handle(req);
+}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PATTERNS ══════════ -->
+<section id="patterns">
+  <div class="sh"><div class="si">🎯</div><h2>Patterns de conception utilisés</h2></div>
+
+  <div class="co co-p">Un <strong>design pattern</strong> est une solution réutilisable à un problème récurrent. Ce projet en utilise plusieurs. Les connaître te aide à comprendre pourquoi le code est organisé comme il est.</div>
+
+  <div class="g2">
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--blue-bg)"><span style="font-size:1.2rem">🏛️</span> <span style="color:var(--blue)">Pattern Repository</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Séparer la logique d'accès aux données du reste du code.<br/>
+        <strong style="color:var(--text)">Comment :</strong> Une interface Repository par entité. Spring génère le SQL automatiquement.<br/>
+        <strong style="color:var(--text)">Exemple :</strong> <span class="path">CanevaRepository.java</span> étend <code>JpaRepository</code>. Tu appelles <code>findAll()</code> sans écrire de SQL.
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--green-bg)"><span style="font-size:1.2rem">⚙️</span> <span style="color:var(--green)">Pattern Service (Façade)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Cacher la complexité de la logique métier derrière une interface simple.<br/>
+        <strong style="color:var(--text)">Comment :</strong> Interface + Implémentation (ICanevasService → CanevaServiceImpl).<br/>
+        <strong style="color:var(--text)">Exemple :</strong> Le Controller appelle <code>service.findAll()</code> sans savoir comment c'est implémenté.
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--orange-bg)"><span style="font-size:1.2rem">📦</span> <span style="color:var(--orange)">Pattern DTO (Data Transfer Object)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Ne pas exposer les entités JPA directement à l'extérieur.<br/>
+        <strong style="color:var(--text)">Comment :</strong> Classes simples (sans annotations JPA) pour transporter les données.<br/>
+        <strong style="color:var(--text)">Exemple :</strong> <span class="path">CanevaDto.java</span> — Angular reçoit seulement les données nécessaires.
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--purple-bg)"><span style="font-size:1.2rem">💉</span> <span style="color:var(--purple)">Injection de dépendances (IoC)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Éviter de créer manuellement les objets (new).<br/>
+        <strong style="color:var(--text)">Comment :</strong> <code>@Autowired</code> en Java, injection dans le constructeur Angular.<br/>
+        <strong style="color:var(--text)">Exemple :</strong> Le Controller reçoit son Service automatiquement de Spring. Le composant reçoit son Service automatiquement d'Angular.
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--teal-bg)"><span style="font-size:1.2rem">🔍</span> <span style="color:var(--teal)">Pattern Observer (RxJS)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Réagir à des événements asynchrones (réponses HTTP).<br/>
+        <strong style="color:var(--text)">Comment :</strong> Les Services Angular retournent des <code>Observable</code>. Les composants s'abonnent (<code>subscribe()</code>).<br/>
+        <strong style="color:var(--text)">Exemple :</strong> <code>canevasService.getAll().subscribe(data => this.canevas = data)</code>
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--gold-bg)"><span style="font-size:1.2rem">🗂️</span> <span style="color:var(--gold)">Pattern Module (Angular)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Organiser une grande application en blocs indépendants.<br/>
+        <strong style="color:var(--text)">Comment :</strong> AppModule → LayoutModule → PagesModule → CanvasAgricoleModule (lazy-loaded).<br/>
+        <strong style="color:var(--text)">Exemple :</strong> Le module Canvas n'est chargé que si l'utilisateur navigue vers /pages/canvas-agricole.
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--red-bg)"><span style="font-size:1.2rem">🔒</span> <span style="color:var(--red)">Pattern Intercepteur (Angular)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Ajouter du comportement à toutes les requêtes HTTP sans modifier chaque service.<br/>
+        <strong style="color:var(--text)">Comment :</strong> L'intercepteur <span class="path">auth.interceptor.ts</span> injecte le JWT dans chaque requête.<br/>
+        <strong style="color:var(--text)">Exemple :</strong> Tu n'as pas à penser au JWT dans chaque service — l'intercepteur le gère automatiquement.
+      </div>
+    </div>
+
+    <div class="pbox">
+      <div class="pbox-head" style="background:var(--blue-bg)"><span style="font-size:1.2rem">🧩</span> <span style="color:var(--blue)">Pattern Embeddable (JPA)</span></div>
+      <div class="pbox-body">
+        <strong style="color:var(--text)">Problème résolu :</strong> Réutiliser un groupe de colonnes dans plusieurs tables sans créer une table séparée.<br/>
+        <strong style="color:var(--text)">Comment :</strong> <code>@Embeddable</code> sur <span class="path">ConditionFinancement.java</span>. Ses 13 champs sont inclus directement dans credit_investissement et credit_achat_terrain avec des préfixes de colonnes.<br/>
+        <strong style="color:var(--text)">Exemple :</strong> <code>c_f_nature, c_f_produit, c_f_duree...</code> — pas de jointure nécessaire.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ BASE DE DONNÉES ══════════ -->
+<section id="bdd">
+  <div class="sh"><div class="si">💾</div><h2>Conception de la base de données</h2></div>
+
+  <div class="card">
+    <h3>🔵 Dual DataSource — Pourquoi deux bases de données ?</h3>
+    <div class="g2">
+      <div>
+        <p>L'application est configurée avec <strong>deux connexions Oracle distinctes</strong> grâce à la classe <span class="path">DataSourceConfig.java</span>.</p>
+        <div class="code"><span class="nt">// DataSourceConfig.java</span>
+<span class="p">@Bean @Primary</span>
+<span class="p">@ConfigurationProperties</span>(<span class="str">"spring.datasource.primary"</span>)
+<span class="r">public</span> DataSource <span class="g">primaryDataSource</span>() { ... }
+
+<span class="p">@Bean</span>
+<span class="p">@ConfigurationProperties</span>(<span class="str">"spring.datasource.secondary"</span>)
+<span class="r">public</span> DataSource <span class="g">secondaryDataSource</span>() { ... }
+
+<span class="nt">// Aussi deux JdbcClient pour les requêtes natives</span>
+<span class="p">@Bean @Primary</span>
+<span class="r">public</span> JdbcClient <span class="g">primaryJdbcClient</span>(...) { ... }
+
+<span class="p">@Bean</span>
+<span class="r">public</span> JdbcClient <span class="g">secondaryJdbcClient</span>(...) { ... }</div>
+      </div>
+      <div>
+        <div class="tbl" style="margin-bottom:0">
+          <thead><tr><th>Datasource</th><th>URL</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Primaire</strong> <span class="badge b-g">@Primary</span></td><td>10.1.9.214:1561<br/>SAEB.bna.tn</td><td>Données métier principales (canevas, crédits, garanties…)</td></tr>
+            <tr><td><strong>Secondaire</strong></td><td>10.1.224.10:1541<br/>bnaprod</td><td>Données BNA existantes (engagements, clients, barèmes…)</td></tr>
+          </tbody>
+        </table>
+        <div class="co co-b" style="margin-top:10px">
+          <strong>@Primary</strong> signifie que quand Spring ne sait pas quelle datasource utiliser, il prend la primaire. La secondaire est utilisée explicitement avec <code>@Qualifier("secondaryDataSource")</code>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Les 40 tables Oracle — Vue d'ensemble</h3>
+    <div class="g3">
+      <div>
+        <p style="font-weight:700;color:var(--blue);margin-bottom:8px">Tables principales</p>
+        <ul style="font-size:.83rem;color:var(--muted);padding-left:16px;line-height:2">
+          <li><strong>CANEVAS_AGRICOLE</strong> — Table pivot</li>
+          <li><strong>credit_court_terme</strong> — Crédits CT</li>
+          <li><strong>credit_investissement</strong> — Crédits inv.</li>
+          <li><strong>credit_achat_terrain</strong> — Crédits AT</li>
+          <li><strong>GARANTIE_PROPOSE</strong> — Garanties</li>
+          <li><strong>AVIS_AGRICOLE</strong> — Avis bancaires</li>
+          <li><strong>AFFECTATION</strong> — Affectations</li>
+          <li><strong>sites</strong> — Sites géographiques</li>
+          <li><strong>CLIENT_CANVAS</strong> — Infos client/canevas</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-weight:700;color:var(--green);margin-bottom:8px">Tables exploitation agricole</p>
+        <ul style="font-size:.83rem;color:var(--muted);padding-left:16px;line-height:2">
+          <li><strong>Elevage</strong> — Cheptel</li>
+          <li><strong>Materiel</strong> — Équipements</li>
+          <li><strong>bilan_fourragere</strong> — Fourrage</li>
+          <li><strong>RessourceHydrique</strong> — Eau</li>
+          <li><strong>RessourceHydriqueInv</strong> — Eau inv.</li>
+          <li><strong>Batiment</strong> — Bâtiments</li>
+          <li><strong>RendementVegital</strong> — Rendements</li>
+          <li><strong>item_investissement</strong> — Composantes inv.</li>
+          <li><strong>item_achat_terrain</strong> — Composantes AT</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-weight:700;color:var(--orange);margin-bottom:8px">Tables financement &amp; référentiels</p>
+        <ul style="font-size:.83rem;color:var(--muted);padding-left:16px;line-height:2">
+          <li><strong>SCHEMA_CREDIT_INV</strong> — Schéma inv.</li>
+          <li><strong>SCHEMA_CREDIT</strong> — Schéma CT</li>
+          <li><strong>COMPOSANT_INV</strong> — Composants schéma</li>
+          <li><strong>BAREME_AGRICOLE</strong> — Barèmes</li>
+          <li><strong>REF_ZONE / REF_REGION</strong></li>
+          <li><strong>REF_GOUVERNORAT</strong></li>
+          <li><strong>REF_DELEGATION / REF_IMADA</strong></li>
+          <li><strong>DOCUMENT_CLIENT_CANEVA</strong></li>
+          <li><strong>CANEVAS_USER</strong> — Utilisateurs canevas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FLUX COMPLET ══════════ -->
+<section id="flux">
+  <div class="sh"><div class="si">🔄</div><h2>Flux complet — De l'interface à la base de données</h2></div>
+
+  <div class="card">
+    <h3>Exemple : Créer un nouveau canevas agricole</h3>
+    <div style="display:flex;flex-direction:column;gap:6px">
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--blue);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">1</div>
+        <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--blue)">🖥️ Composant Angular — add-canevas.component.ts</strong><br/>
+          L'agent remplit le formulaire et clique "Créer". Le composant appelle <code>this.canevasService.create(this.formData)</code>.
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--purple);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">2</div>
+        <div style="background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--purple)">⚡ Intercepteur HTTP — auth.interceptor.ts</strong><br/>
+          Avant d'envoyer la requête, l'intercepteur ajoute automatiquement le JWT : <code>Authorization: Bearer eyJhbG...</code>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--purple);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">3</div>
+        <div style="background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--purple)">⚡ Service Angular — canevas.service.ts</strong><br/>
+          Envoie <code>POST http://localhost:8081/api/canevas/canevas</code> avec les données JSON en body.
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓ réseau HTTP</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--teal);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">4</div>
+        <div style="background:var(--teal-bg);border:1px solid var(--teal-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--teal)">🔐 Spring Security — Filtre JWT</strong><br/>
+          Valide le token JWT. Si invalide → répond 401 Unauthorized. Si valide → laisse passer la requête.
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--green);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">5</div>
+        <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--green)">🔌 Controller — CanevaController.java</strong><br/>
+          Reçoit <code>@PostMapping → CanevaDto dto</code>. Valide les données. Appelle <code>canevaService.create(dto)</code>.
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--orange);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">6</div>
+        <div style="background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--orange)">⚙️ Service — CanevaServiceImpl.java</strong><br/>
+          Convertit DTO → Entity (convertToEntity). Applique les règles métier (date de création, statut initial). Appelle <code>canevaRepository.save(entity)</code>.
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--red);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">7</div>
+        <div style="background:var(--red-bg);border:1px solid var(--red-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--red)">📦 Repository — CanevaRepository.java</strong><br/>
+          Hibernate génère : <code>INSERT INTO CANEVAS_AGRICOLE (num_seqpers, cod_strc_dem, stade, ...) VALUES (?, ?, ?, ...)</code>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↓ JDBC / HikariCP</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:#263238;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">8</div>
+        <div style="background:#eceff1;border:1px solid #b0bec5;border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong>🗄️ Oracle Database — CANEVAS_AGRICOLE</strong><br/>
+          La ligne est insérée. Oracle génère l'ID (IDENTITY). La transaction est commitée.
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#90a4ae">↑ Retour dans l'autre sens</div>
+
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="background:var(--blue);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;margin-top:2px">9</div>
+        <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:8px;padding:12px;flex:1;font-size:.84rem">
+          <strong style="color:var(--blue)">🖥️ Angular reçoit la réponse</strong><br/>
+          Le service reçoit le <code>CanevaDto</code> créé (avec son nouvel ID). Le composant est notifié via <code>.subscribe()</code>. L'interface se met à jour avec <code>this.canevas.push(result)</code>. Un message de succès s'affiche (PrimeNG Toast).
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📐 Résumé — Les responsabilités de chaque couche</h3>
+    <table class="tbl">
+      <thead><tr><th>Couche</th><th>Technologie</th><th>Responsabilité unique</th><th>Ne doit PAS faire</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Component</strong></td><td>Angular .ts + .html</td><td>Afficher des données, capturer les actions utilisateur</td><td>Requêtes HTTP directes, logique métier complexe</td></tr>
+        <tr><td><strong>Service Angular</strong></td><td>Angular .service.ts</td><td>Communiquer avec le backend (HTTP)</td><td>Affichage, manipulation DOM</td></tr>
+        <tr><td><strong>Controller</strong></td><td>Spring @RestController</td><td>Recevoir requêtes HTTP, définir les URLs</td><td>Logique métier, accès BDD direct</td></tr>
+        <tr><td><strong>Service Java</strong></td><td>Spring @Service</td><td>Logique métier, transformation DTO↔Entity</td><td>Requêtes HTTP, définition d'URLs</td></tr>
+        <tr><td><strong>Repository</strong></td><td>Spring Data JPA</td><td>Accès à Oracle (lecture/écriture)</td><td>Logique métier, HTTP</td></tr>
+        <tr><td><strong>Entity</strong></td><td>JPA @Entity</td><td>Représenter une ligne Oracle en Java</td><td>Logique, HTTP, transformation</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>Canva Agricole BNA</strong> — Document de Conception — Pour Débutants — Angular 17 + Spring Boot 3.2 — 2026-05-07
+</footer>
+</body>
+</html>
