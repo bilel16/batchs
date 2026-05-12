@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snapshot Engagement — Implémentation Compatible</title>
+  <style>
+    :root{
+      --blue:#1565c0;--blue-bg:#e3f2fd;--blue-b:#90caf9;
+      --green:#1b5e20;--green-bg:#e8f5e9;--green-b:#a5d6a7;
+      --orange:#e65100;--orange-bg:#fff3e0;--orange-b:#ffcc80;
+      --purple:#4a148c;--purple-bg:#f3e5f5;--purple-b:#ce93d8;
+      --red:#b71c1c;--red-bg:#ffebee;--red-b:#ef9a9a;
+      --teal:#004d40;--teal-bg:#e0f2f1;--teal-b:#80cbc4;
+      --gold:#f57f17;--gold-bg:#fff8e1;--gold-b:#ffe082;
+      --dark:#0d1b2a;--text:#1c1c1c;--muted:#546e7a;
+      --border:#dce3e8;--white:#fff;--bg:#f0f4f8;
+      --shadow:0 2px 12px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+
+    header{background:linear-gradient(135deg,#0d1b2a,#1a3055,#1f4a7a);color:#fff;padding:50px 48px 36px;position:relative;overflow:hidden}
+    header::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.04)}
+    .htag{display:inline-block;background:#1b5e20;color:#fff;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px}
+    header h1{font-size:2.1rem;font-weight:800;margin-bottom:8px}
+    header p.sub{font-size:.93rem;opacity:.84;max-width:760px;margin-bottom:22px}
+    .hmeta{display:flex;gap:12px;flex-wrap:wrap}
+    .hc{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:.77rem;font-weight:600}
+
+    nav{background:var(--dark);padding:0 48px;display:flex;gap:2px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+    nav a{color:rgba(255,255,255,.72);text-decoration:none;padding:11px 12px;font-size:.73rem;font-weight:700;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+    nav a:hover{color:#fff;border-bottom-color:#4caf50}
+
+    main{max-width:1320px;margin:0 auto;padding:40px 32px}
+    section{margin-bottom:56px}
+    .sh{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:12px;border-bottom:3px solid var(--border)}
+    .si{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--dark),#1a3055);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .sh h2{font-size:1.4rem;font-weight:800;color:var(--dark)}
+
+    .card{background:var(--white);border-radius:13px;border:1px solid var(--border);box-shadow:var(--shadow);padding:20px;margin-bottom:13px}
+    .card h3{font-size:.95rem;font-weight:700;color:var(--dark);margin-bottom:11px;padding-bottom:9px;border-bottom:2px solid var(--border)}
+
+    .co{border-left:5px solid;padding:12px 16px;border-radius:0 9px 9px 0;font-size:.86rem;margin-bottom:12px}
+    .co-b{border-color:var(--blue);background:var(--blue-bg);color:#0d3b8c}
+    .co-g{border-color:var(--green);background:var(--green-bg);color:#1b3a1f}
+    .co-o{border-color:var(--orange);background:var(--orange-bg);color:#7a3000}
+    .co-r{border-color:var(--red);background:var(--red-bg);color:#7f0000}
+    .co-gold{border-color:var(--gold);background:var(--gold-bg);color:#6d4c00}
+
+    /* CODE */
+    .code{background:#0d1117;color:#c9d1d9;font-family:'Cascadia Code','Fira Code',monospace;font-size:.75rem;overflow-x:auto;padding:14px 16px;line-height:1.85;border:1px solid #30363d;border-radius:9px;margin:8px 0}
+    .code .g{color:#56d364}   /* green - ok */
+    .code .r{color:#ff7b72}   /* red - keyword */
+    .code .b{color:#79c0ff}   /* blue - class/type */
+    .code .y{color:#e3b341}   /* yellow - number/value */
+    .code .p{color:#ffa657}   /* annotation */
+    .code .nt{color:#8b949e}  /* comment */
+    .code .str{color:#a5d6ff} /* string */
+    .code .m{color:#d2a8ff}   /* method */
+
+    .path{background:#f1f8e9;border:1px solid var(--green-b);color:var(--green);border-radius:5px;padding:1px 7px;font-family:monospace;font-size:.78rem;font-weight:600}
+    .warn{background:#fff3e0;border:1px solid var(--orange-b);color:var(--orange);border-radius:5px;padding:2px 8px;font-size:.78rem;font-weight:600}
+
+    .tbl{width:100%;border-collapse:collapse;font-size:.8rem;background:var(--white);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px}
+    .tbl thead{background:linear-gradient(90deg,var(--dark),#1a3055);color:#fff}
+    .tbl th{padding:10px 13px;text-align:left;font-weight:700;font-size:.75rem}
+    .tbl td{padding:9px 13px;border-bottom:1px solid #e9ecef;vertical-align:top;font-size:.8rem}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:nth-child(even) td{background:#f8fafb}
+
+    .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px}
+
+    .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.71rem;font-weight:700;border:1px solid}
+    .b-g{background:var(--green-bg);color:var(--green);border-color:var(--green-b)}
+    .b-b{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-b)}
+    .b-o{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-b)}
+    .b-r{background:var(--red-bg);color:var(--red);border-color:var(--red-b)}
+    .b-p{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-b)}
+
+    /* step */
+    .steps{display:flex;flex-direction:column;gap:8px}
+    .step{display:flex;gap:12px;align-items:flex-start}
+    .sn{background:var(--blue);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0;margin-top:2px}
+    .sb h4{font-size:.9rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+    .sb p{font-size:.83rem;color:var(--muted)}
+
+    /* file tree */
+    .tree{font-family:monospace;font-size:.8rem;background:#f8fafb;border:1px solid var(--border);border-radius:9px;padding:14px;line-height:2}
+    .tree .d{color:var(--blue);font-weight:700}
+    .tree .f{color:var(--green)}
+    .tree .n{color:var(--muted);font-style:italic}
+    .tree .new{color:var(--orange);font-weight:700}
+
+    footer{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:22px;font-size:.8rem;margin-top:52px}
+    footer strong{color:#fff}
+    @media(max-width:640px){header{padding:32px 20px}main{padding:24px 14px}nav{padding:0 12px}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="htag">Implémentation compatible — Snapshot Engagement</div>
+  <h1>📸 Système Snapshot Engagement — Code Prêt à Intégrer</h1>
+  <p class="sub">Code 100% compatible avec le projet existant : package <code>net.kachout.saeb</code>, patterns <code>@RequiredArgsConstructor</code>, enum <code>Stade</code> réel, accès vendeurs via <code>getCreditAchatTerrains()</code>, premier responsable via <code>ClientCanvas</code>.</p>
+  <div class="hmeta">
+    <span class="hc">Package net.kachout.saeb</span>
+    <span class="hc">dtos_ (avec underscore)</span>
+    <span class="hc">@Qualifier("CanevaServiceImpl2")</span>
+    <span class="hc">Enum Stade réels</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#plan">📋 Plan</a>
+  <a href="#sql">🗄️ SQL Oracle</a>
+  <a href="#entity">🏗️ Entités JPA</a>
+  <a href="#repo">📦 Repositories</a>
+  <a href="#dtos">📄 DTOs</a>
+  <a href="#service">⚙️ Service</a>
+  <a href="#controller">🔌 Controller</a>
+  <a href="#caneva-modif">✏️ Caneva.java</a>
+  <a href="#angular-service">🅰️ Angular Service</a>
+  <a href="#angular-comp">🖥️ Angular Composant</a>
+  <a href="#flyway">🚀 Flyway</a>
+  <a href="#checklist">✅ Checklist</a>
+</nav>
+
+<main>
+
+<!-- ══ PLAN ══ -->
+<section id="plan">
+  <div class="sh"><div class="si">📋</div><h2>Plan d'implémentation — Vue d'ensemble</h2></div>
+
+  <div class="co co-gold">
+    <strong>Compatibilité vérifiée :</strong> Caneva.java n'a pas de champ <code>getAssocies()</code> ni <code>getNumSeqPersPremResp()</code>. Les associés sont lus via <code>AssocieRepository</code>, le premier responsable via <code>ClientCanvas</code>. Les vendeurs sont accessibles via <code>caneva.getCreditAchatTerrains().stream().flatMap(c -> c.getVendeurs().stream())</code>.
+  </div>
+
+  <div class="card">
+    <h3>Fichiers à créer (9 nouveaux) + 2 à modifier</h3>
+    <div class="tree">
+<span class="d">backend-saeb/src/main/java/net/kachout/saeb/</span>
+├── <span class="d">entities/</span>
+│   ├── <span class="new">CanevasStructureSnapshot.java</span>    <span class="n">← nouvelle entité JPA</span>
+│   └── <span class="new">CanevasWorkflowLog.java</span>           <span class="n">← nouvelle entité JPA</span>
+│   └── <span class="f">Caneva.java</span>                        <span class="n">← modifier : +3 champs</span>
+├── <span class="d">repository/</span>
+│   ├── <span class="new">CanevasSnapshotRepository.java</span>    <span class="n">← nouveau</span>
+│   └── <span class="new">CanevasWorkflowLogRepository.java</span> <span class="n">← nouveau</span>
+├── <span class="d">dtos_/</span>
+│   ├── <span class="new">SnapshotSummaryDto.java</span>           <span class="n">← nouveau (record)</span>
+│   ├── <span class="new">SnapshotDetailDto.java</span>            <span class="n">← nouveau (record)</span>
+│   ├── <span class="new">SnapshotCompareDto.java</span>           <span class="n">← nouveau (record)</span>
+│   ├── <span class="new">EngagementDetailleDto.java</span>        <span class="n">← nouveau (liste parties liées)</span>
+│   ├── <span class="new">ValidationRequestDto.java</span>         <span class="n">← nouveau</span>
+│   └── <span class="new">RefoulementRequestDto.java</span>        <span class="n">← nouveau</span>
+├── <span class="d">service/</span>
+│   ├── <span class="new">CanevasSnapshotService.java</span>       <span class="n">← nouveau service principal</span>
+│   └── <span class="new">WorkflowLogService.java</span>           <span class="n">← nouveau service log</span>
+└── <span class="d">web/</span>
+    └── <span class="new">CanevasSnapshotController.java</span>    <span class="n">← nouveau controller</span>
+
+<span class="d">backend-saeb/src/main/resources/db/migration/</span>
+├── <span class="new">V5__add_snapshot_tables.sql</span>           <span class="n">← migration Flyway</span>
+
+<span class="d">frontend-app1/src/app/</span>
+├── <span class="d">_services/</span>
+│   └── <span class="new">snapshot.service.ts</span>
+└── <span class="d">_components/pages/canvas.agricole/</span>
+    └── <span class="new">snapshot-history/</span>
+        ├── <span class="new">snapshot-history.component.ts</span>
+        ├── <span class="new">snapshot-history.component.html</span>
+        └── <span class="new">snapshot-history.component.css</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SQL ══ -->
+<section id="sql">
+  <div class="sh"><div class="si">🗄️</div><h2>SQL Oracle — Tables à créer</h2></div>
+
+  <div class="card">
+    <h3>V5__add_snapshot_tables.sql — Script complet</h3>
+    <div class="code">
+<span class="nt">-- ============================================================</span>
+<span class="nt">-- V5__add_snapshot_tables.sql</span>
+<span class="nt">-- Snapshot Engagement — Tables Oracle pour Canva Agricole BNA</span>
+<span class="nt">-- ============================================================</span>
+
+<span class="nt">-- TABLE 1 : Snapshot complet par structure</span>
+<span class="r">CREATE TABLE</span> CANEVAS_STRUCTURE_SNAPSHOT (
+  snapshot_id              NUMBER          <span class="r">GENERATED BY DEFAULT AS IDENTITY</span> <span class="r">PRIMARY KEY</span>,
+  canevas_id               NUMBER          <span class="r">NOT NULL</span>,
+  structure_code           VARCHAR2(<span class="y">20</span>)   <span class="r">NOT NULL</span>,   <span class="nt">-- 'AGC', 'DR', 'DC'</span>
+  structure_label          VARCHAR2(<span class="y">100</span>),              <span class="nt">-- 'Agence Béja Nord'</span>
+  version_number           NUMBER          <span class="r">NOT NULL</span>,
+  status_at_snapshot       VARCHAR2(<span class="y">50</span>),              <span class="nt">-- valeur de l'enum Stade</span>
+  created_by               VARCHAR2(<span class="y">100</span>),
+  matricule                VARCHAR2(<span class="y">20</span>),
+  created_at               TIMESTAMP       <span class="r">DEFAULT</span> CURRENT_TIMESTAMP,
+  observations             CLOB,
+
+  <span class="nt">-- Engagement relation (onglet 0)</span>
+  engagement_bna_json      CLOB,    <span class="nt">-- List&lt;EngagementBNADTO&gt; → Jackson JSON</span>
+  engagement_bct_json      CLOB,    <span class="nt">-- List&lt;EngagementBCTDTO&gt; → Jackson JSON</span>
+  classe_bna_json          CLOB,    <span class="nt">-- List&lt;ClasseDTO&gt; → Jackson JSON</span>
+  classe_bct_json          CLOB,    <span class="nt">-- List&lt;ClasseDTO&gt; → Jackson JSON</span>
+  classe_retour_json       CLOB,    <span class="nt">-- List&lt;ClasseBctDTO&gt; → Jackson JSON</span>
+
+  <span class="nt">-- Engagement parties liées (onglets 1-4)</span>
+  engagement_detaille_json CLOB,    <span class="nt">-- EngagementDetailleDto → Jackson JSON</span>
+
+  <span class="nt">-- Données métier</span>
+  donnees_credits_json      CLOB,
+  donnees_exploitation_json CLOB,
+  donnees_garanties_json    CLOB,
+  donnees_avis_json         CLOB,
+
+  <span class="r">CONSTRAINT</span> fk_snapshot_caneva
+    <span class="r">FOREIGN KEY</span> (canevas_id) <span class="r">REFERENCES</span> CANEVAS_AGRICOLE(id),
+  <span class="r">CONSTRAINT</span> uq_snapshot_canevas_structure_version
+    <span class="r">UNIQUE</span> (canevas_id, structure_code, version_number)
+);
+
+<span class="r">CREATE INDEX</span> idx_snapshot_canevas_id
+  <span class="r">ON</span> CANEVAS_STRUCTURE_SNAPSHOT(canevas_id);
+<span class="r">CREATE INDEX</span> idx_snapshot_structure
+  <span class="r">ON</span> CANEVAS_STRUCTURE_SNAPSHOT(canevas_id, structure_code);
+
+<span class="nt">-- TABLE 2 : Log des transitions workflow</span>
+<span class="r">CREATE TABLE</span> CANEVAS_WORKFLOW_LOG (
+  log_id           NUMBER          <span class="r">GENERATED BY DEFAULT AS IDENTITY</span> <span class="r">PRIMARY KEY</span>,
+  canevas_id       NUMBER          <span class="r">NOT NULL</span>,
+  from_structure   VARCHAR2(<span class="y">20</span>),
+  to_structure     VARCHAR2(<span class="y">20</span>),
+  action           VARCHAR2(<span class="y">30</span>)   <span class="r">NOT NULL</span>,
+  snapshot_version NUMBER,
+  snapshot_id      NUMBER,
+  comments         CLOB,
+  performed_by     VARCHAR2(<span class="y">100</span>),
+  performed_at     TIMESTAMP       <span class="r">DEFAULT</span> CURRENT_TIMESTAMP,
+
+  <span class="r">CONSTRAINT</span> fk_wflog_canevas
+    <span class="r">FOREIGN KEY</span> (canevas_id) <span class="r">REFERENCES</span> CANEVAS_AGRICOLE(id),
+  <span class="r">CONSTRAINT</span> fk_wflog_snapshot
+    <span class="r">FOREIGN KEY</span> (snapshot_id) <span class="r">REFERENCES</span> CANEVAS_STRUCTURE_SNAPSHOT(snapshot_id),
+  <span class="r">CONSTRAINT</span> chk_wflog_action
+    <span class="r">CHECK</span> (action <span class="r">IN</span> (<span class="str">'VALIDER'</span>,<span class="str">'PRE_VALIDER'</span>,<span class="str">'REFOULER'</span>,<span class="str">'ANNULER'</span>,<span class="str">'CORRIGER'</span>))
+);
+
+<span class="r">CREATE INDEX</span> idx_wflog_canevas_id
+  <span class="r">ON</span> CANEVAS_WORKFLOW_LOG(canevas_id);
+
+<span class="nt">-- Colonnes ajoutées sur CANEVAS_AGRICOLE existante</span>
+<span class="r">ALTER TABLE</span> CANEVAS_AGRICOLE <span class="r">ADD</span> (
+  current_version    NUMBER,          <span class="nt">-- version du dernier snapshot</span>
+  current_structure  VARCHAR2(<span class="y">20</span>),   <span class="nt">-- structure courante (AGC/DR/DC)</span>
+  last_snapshot_id   NUMBER           <span class="nt">-- FK dernier snapshot</span>
+);</div>
+  </div>
+</section>
+
+<!-- ══ ENTITÉS ══ -->
+<section id="entity">
+  <div class="sh"><div class="si">🏗️</div><h2>Entités JPA — Code exact</h2></div>
+
+  <div class="card">
+    <h3>CanevasStructureSnapshot.java — <span class="path">entities/</span></h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.entities;
+
+<span class="r">import</span> jakarta.persistence.*;
+<span class="r">import</span> lombok.*;
+<span class="r">import</span> org.hibernate.annotations.CreationTimestamp;
+<span class="r">import</span> java.time.LocalDateTime;
+
+<span class="p">@Entity</span>
+<span class="p">@Table</span>(name = <span class="str">"CANEVAS_STRUCTURE_SNAPSHOT"</span>)
+<span class="p">@Getter</span> <span class="p">@Setter</span> <span class="p">@NoArgsConstructor</span> <span class="p">@AllArgsConstructor</span> <span class="p">@Builder</span>
+<span class="r">public class</span> <span class="b">CanevasStructureSnapshot</span> {
+
+    <span class="p">@Id</span>
+    <span class="p">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="r">private</span> Long snapshotId;
+
+    <span class="p">@Column</span>(name = <span class="str">"canevas_id"</span>, nullable = <span class="r">false</span>)
+    <span class="r">private</span> Long canevasId;
+
+    <span class="p">@Column</span>(name = <span class="str">"structure_code"</span>, length = <span class="y">20</span>)
+    <span class="r">private</span> String structureCode;     <span class="nt">// "AGC", "DR", "DC"</span>
+
+    <span class="p">@Column</span>(name = <span class="str">"structure_label"</span>)
+    <span class="r">private</span> String structureLabel;
+
+    <span class="p">@Column</span>(name = <span class="str">"version_number"</span>)
+    <span class="r">private</span> Integer versionNumber;
+
+    <span class="p">@Column</span>(name = <span class="str">"status_at_snapshot"</span>, length = <span class="y">50</span>)
+    <span class="r">private</span> String statusAtSnapshot;   <span class="nt">// ex : "INIT_DONNEE", "VALID_DONNEE"</span>
+
+    <span class="p">@Column</span>(name = <span class="str">"created_by"</span>)
+    <span class="r">private</span> String createdBy;
+
+    <span class="p">@Column</span>(name = <span class="str">"matricule"</span>)
+    <span class="r">private</span> String matricule;
+
+    <span class="p">@CreationTimestamp</span>
+    <span class="p">@Column</span>(name = <span class="str">"created_at"</span>, updatable = <span class="r">false</span>)
+    <span class="r">private</span> LocalDateTime createdAt;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"observations"</span>)
+    <span class="r">private</span> String observations;
+
+    <span class="nt">// ─── Engagement relation (onglet 0) ───</span>
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"engagement_bna_json"</span>)
+    <span class="r">private</span> String engagementBnaJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"engagement_bct_json"</span>)
+    <span class="r">private</span> String engagementBctJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"classe_bna_json"</span>)
+    <span class="r">private</span> String classeBnaJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"classe_bct_json"</span>)
+    <span class="r">private</span> String classeBctJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"classe_retour_json"</span>)
+    <span class="r">private</span> String classeRetourJson;
+
+    <span class="nt">// ─── Engagement parties liées (onglets 1-4) ───</span>
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"engagement_detaille_json"</span>)
+    <span class="r">private</span> String engagementDetailleJson;
+
+    <span class="nt">// ─── Données métier ───</span>
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"donnees_credits_json"</span>)
+    <span class="r">private</span> String donneesCreditsJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"donnees_exploitation_json"</span>)
+    <span class="r">private</span> String donneesExploitationJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"donnees_garanties_json"</span>)
+    <span class="r">private</span> String donneesGarantiesJson;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"donnees_avis_json"</span>)
+    <span class="r">private</span> String donneesAvisJson;
+}</div>
+  </div>
+
+  <div class="card">
+    <h3>CanevasWorkflowLog.java — <span class="path">entities/</span></h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.entities;
+
+<span class="r">import</span> jakarta.persistence.*;
+<span class="r">import</span> lombok.*;
+<span class="r">import</span> org.hibernate.annotations.CreationTimestamp;
+<span class="r">import</span> java.time.LocalDateTime;
+
+<span class="p">@Entity</span>
+<span class="p">@Table</span>(name = <span class="str">"CANEVAS_WORKFLOW_LOG"</span>)
+<span class="p">@Getter</span> <span class="p">@Setter</span> <span class="p">@NoArgsConstructor</span> <span class="p">@AllArgsConstructor</span> <span class="p">@Builder</span>
+<span class="r">public class</span> <span class="b">CanevasWorkflowLog</span> {
+
+    <span class="p">@Id</span>
+    <span class="p">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="r">private</span> Long logId;
+
+    <span class="p">@Column</span>(name = <span class="str">"canevas_id"</span>, nullable = <span class="r">false</span>)
+    <span class="r">private</span> Long canevasId;
+
+    <span class="p">@Column</span>(name = <span class="str">"from_structure"</span>, length = <span class="y">20</span>)
+    <span class="r">private</span> String fromStructure;
+
+    <span class="p">@Column</span>(name = <span class="str">"to_structure"</span>, length = <span class="y">20</span>)
+    <span class="r">private</span> String toStructure;
+
+    <span class="p">@Column</span>(name = <span class="str">"action"</span>, length = <span class="y">30</span>, nullable = <span class="r">false</span>)
+    <span class="r">private</span> String action;   <span class="nt">// VALIDER/PRE_VALIDER/REFOULER/ANNULER/CORRIGER</span>
+
+    <span class="p">@Column</span>(name = <span class="str">"snapshot_version"</span>)
+    <span class="r">private</span> Integer snapshotVersion;
+
+    <span class="p">@Column</span>(name = <span class="str">"snapshot_id"</span>)
+    <span class="r">private</span> Long snapshotId;
+
+    <span class="p">@Lob</span> <span class="p">@Column</span>(name = <span class="str">"comments"</span>)
+    <span class="r">private</span> String comments;
+
+    <span class="p">@Column</span>(name = <span class="str">"performed_by"</span>)
+    <span class="r">private</span> String performedBy;
+
+    <span class="p">@CreationTimestamp</span>
+    <span class="p">@Column</span>(name = <span class="str">"performed_at"</span>, updatable = <span class="r">false</span>)
+    <span class="r">private</span> LocalDateTime performedAt;
+}</div>
+  </div>
+</section>
+
+<!-- ══ REPOSITORIES ══ -->
+<section id="repo">
+  <div class="sh"><div class="si">📦</div><h2>Repositories — <span class="path">repository/</span></h2></div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>CanevasSnapshotRepository.java</h3>
+      <div class="code">
+<span class="r">package</span> net.kachout.saeb.repository;
+
+<span class="r">import</span> net.kachout.saeb.entities.CanevasStructureSnapshot;
+<span class="r">import</span> org.springframework.data.jpa.repository.JpaRepository;
+<span class="r">import</span> org.springframework.data.jpa.repository.Query;
+<span class="r">import</span> org.springframework.data.repository.query.Param;
+<span class="r">import</span> java.util.*;
+
+<span class="r">public interface</span> <span class="b">CanevasSnapshotRepository</span>
+        <span class="r">extends</span> JpaRepository&lt;<span class="b">CanevasStructureSnapshot</span>, Long&gt; {
+
+    <span class="nt">// Historique complet trié par version</span>
+    List&lt;CanevasStructureSnapshot&gt;
+    <span class="m">findByCanevasIdOrderByVersionNumberAsc</span>(Long canevasId);
+
+    <span class="nt">// Dernier snapshot d'une structure (DESC = dernier en premier)</span>
+    List&lt;CanevasStructureSnapshot&gt;
+    <span class="m">findByCanevasIdAndStructureCodeOrderByVersionNumberDesc</span>(
+            Long canevasId, String structureCode);
+
+    <span class="nt">// Version max pour calculer la prochaine</span>
+    <span class="p">@Query</span>(<span class="str">"SELECT MAX(s.versionNumber) FROM CanevasStructureSnapshot s "</span>
+         + <span class="str">"WHERE s.canevasId = :canevasId"</span>)
+    Optional&lt;Integer&gt; <span class="m">findMaxVersionByCanevasId</span>(
+            <span class="p">@Param</span>(<span class="str">"canevasId"</span>) Long canevasId);
+}</div>
+    </div>
+    <div class="card">
+      <h3>CanevasWorkflowLogRepository.java</h3>
+      <div class="code">
+<span class="r">package</span> net.kachout.saeb.repository;
+
+<span class="r">import</span> net.kachout.saeb.entities.CanevasWorkflowLog;
+<span class="r">import</span> org.springframework.data.jpa.repository.JpaRepository;
+<span class="r">import</span> java.util.List;
+
+<span class="r">public interface</span> <span class="b">CanevasWorkflowLogRepository</span>
+        <span class="r">extends</span> JpaRepository&lt;<span class="b">CanevasWorkflowLog</span>, Long&gt; {
+
+    List&lt;CanevasWorkflowLog&gt;
+    <span class="m">findByCanevasIdOrderByPerformedAtDesc</span>(Long canevasId);
+
+    List&lt;CanevasWorkflowLog&gt;
+    <span class="m">findByCanevasIdAndAction</span>(Long canevasId, String action);
+}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DTOs ══ -->
+<section id="dtos">
+  <div class="sh"><div class="si">📄</div><h2>DTOs — Package <span class="path">dtos_/</span> (avec underscore)</h2></div>
+
+  <div class="co co-r"><strong>Attention :</strong> Dans ce projet, le package des DTOs modernes est <code>net.kachout.saeb.dtos_</code> (avec underscore). Ne pas confondre avec <code>dtos</code> (anciens DTOs).</div>
+
+  <div class="card">
+    <h3>EngagementDetailleDto.java — Structure pour onglets 1-4</h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.dtos_;
+
+<span class="r">import</span> net.kachout.saeb.dtos.EngagementBNADTO;
+<span class="r">import</span> net.kachout.saeb.dtos.EngagementBCTDTO;
+<span class="r">import</span> net.kachout.saeb.dtos.ClasseDTO;
+<span class="r">import</span> lombok.*;
+<span class="r">import</span> java.util.List;
+
+<span class="nt">// ─── Partie liée (actionnaire, groupe, vendeur) ───</span>
+<span class="p">@Getter</span> <span class="p">@Setter</span> <span class="p">@NoArgsConstructor</span> <span class="p">@AllArgsConstructor</span> <span class="p">@Builder</span>
+<span class="r">public class</span> <span class="b">EngagementPartieDto</span> {
+    <span class="r">private</span> String typePartie;        <span class="nt">// ACTIONNAIRE/PREMIER_RESPONSABLE/GROUPE/VENDEUR</span>
+    <span class="r">private</span> String nom;
+    <span class="r">private</span> String cin;
+    <span class="r">private</span> Long numSeqPers;
+    <span class="r">private</span> String partCapital;       <span class="nt">// null pour premier responsable</span>
+    <span class="r">private</span> String formeJuridique;    <span class="nt">// pour groupe</span>
+    <span class="r">private</span> List&lt;EngagementBNADTO&gt; engagementsBNA;
+    <span class="r">private</span> List&lt;EngagementBCTDTO&gt; engagementsBCT;
+    <span class="r">private</span> List&lt;ClasseDTO&gt; classeBNA;
+    <span class="r">private</span> List&lt;ClasseDTO&gt; classeBCT;
+}
+
+<span class="nt">// ─── Conteneur pour TOUTES les parties ───</span>
+<span class="p">@Getter</span> <span class="p">@Setter</span> <span class="p">@NoArgsConstructor</span> <span class="p">@AllArgsConstructor</span> <span class="p">@Builder</span>
+<span class="r">public class</span> <span class="b">EngagementDetailleDto</span> {
+    <span class="r">private</span> List&lt;EngagementPartieDto&gt; actionnaires;   <span class="nt">// onglet 1</span>
+    <span class="r">private</span> EngagementPartieDto premierResponsable;    <span class="nt">// onglet 2</span>
+    <span class="r">private</span> List&lt;EngagementPartieDto&gt; groupe;          <span class="nt">// onglet 3</span>
+    <span class="r">private</span> List&lt;EngagementPartieDto&gt; vendeurs;        <span class="nt">// onglet 4</span>
+}</div>
+  </div>
+
+  <div class="card">
+    <h3>Records Java — SnapshotSummaryDto, SnapshotDetailDto, SnapshotCompareDto</h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.dtos_;
+
+<span class="r">import</span> java.time.LocalDateTime;
+<span class="r">import</span> java.util.List;
+
+<span class="nt">// ─── Résumé pour la liste historique ───</span>
+<span class="r">public record</span> <span class="b">SnapshotSummaryDto</span>(
+    Long snapshotId,
+    String structureCode,
+    String structureLabel,
+    Integer versionNumber,
+    String statusAtSnapshot,
+    String createdBy,
+    String matricule,
+    LocalDateTime createdAt,
+    String observations
+) {}
+
+<span class="nt">// ─── Détail complet (CLOBs désérialisés) ───</span>
+<span class="r">public record</span> <span class="b">SnapshotDetailDto</span>(
+    Long snapshotId,
+    String structureCode,
+    String structureLabel,
+    Integer versionNumber,
+    String statusAtSnapshot,
+    String createdBy,
+    LocalDateTime createdAt,
+    String observations,
+    Object engagementsBNA,           <span class="nt">// List&lt;EngagementBNADTO&gt; désérialisé</span>
+    Object engagementsBCT,           <span class="nt">// List&lt;EngagementBCTDTO&gt; désérialisé</span>
+    Object classeBNA,
+    Object classeBCT,
+    Object classeRetour,
+    EngagementDetailleDto engagementDetaille,  <span class="nt">// onglets 1-4</span>
+    Object creditsData,
+    Object exploitationData,
+    Object garantiesData
+) {}
+
+<span class="nt">// ─── Résultat comparaison deux structures ───</span>
+<span class="r">public record</span> <span class="b">DifferenceItem</span>(
+    String champ,
+    Object valeurStructure1,
+    Object valeurStructure2
+) {}
+
+<span class="r">public record</span> <span class="b">SnapshotCompareDto</span>(
+    String structure1,
+    String structure2,
+    Boolean engagementIdentique,
+    Boolean creditsIdentique,
+    Boolean garantiesIdentique,
+    List&lt;DifferenceItem&gt; differences
+) {}
+
+<span class="nt">// ─── Requêtes entrantes ───</span>
+<span class="r">public record</span> <span class="b">ValidationRequestDto</span>(
+    String fromStructureCode,
+    String fromStructureLabel,
+    String toStructureCode,
+    String matricule,
+    String observations,
+    String avisValue    <span class="nt">// "FAVORABLE" | "DEFAVORABLE" | "SANS_AVIS"</span>
+) {}
+
+<span class="r">public record</span> <span class="b">RefoulementRequestDto</span>(
+    String fromStructureCode,
+    String fromStructureLabel,
+    String toStructureCode,
+    String matricule,
+    String motif    <span class="nt">// champ obligatoire</span>
+) {}
+
+<span class="r">public record</span> <span class="b">SnapshotResponseDto</span>(
+    Long snapshotId,
+    Integer versionNumber,
+    String structureCode
+) {}</div>
+  </div>
+</section>
+
+<!-- ══ SERVICE ══ -->
+<section id="service">
+  <div class="sh"><div class="si">⚙️</div><h2>Service principal — CanevasSnapshotService.java</h2></div>
+
+  <div class="co co-gold">
+    <strong>Points d'adaptation au code existant :</strong> Les associés se trouvent dans <code>AssocieRepository.findAssociesByNumSeqPers(numSeqPers)</code>. Le premier responsable est dans <code>ClientCanvas</code> (champs <code>nomResponsable</code>, <code>cinResponsable</code>). Les vendeurs s'obtiennent via <code>caneva.getCreditAchatTerrains().stream().flatMap(c → c.getVendeurs().stream())</code>.
+  </div>
+
+  <div class="card">
+    <h3>CanevasSnapshotService.java — Code complet</h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.service;
+
+<span class="r">import</span> com.fasterxml.jackson.core.JsonProcessingException;
+<span class="r">import</span> com.fasterxml.jackson.databind.ObjectMapper;
+<span class="r">import</span> lombok.RequiredArgsConstructor;
+<span class="r">import</span> lombok.extern.slf4j.Slf4j;
+<span class="r">import</span> net.kachout.saeb.dtos.*;
+<span class="r">import</span> net.kachout.saeb.dtos_.*;
+<span class="r">import</span> net.kachout.saeb.entities.*;
+<span class="r">import</span> net.kachout.saeb.repository.*;
+<span class="r">import</span> org.springframework.stereotype.Service;
+<span class="r">import</span> org.springframework.transaction.annotation.Transactional;
+<span class="r">import</span> jakarta.persistence.EntityNotFoundException;
+<span class="r">import</span> java.util.*;
+<span class="r">import</span> java.util.stream.Collectors;
+
+<span class="p">@Service</span>
+<span class="p">@RequiredArgsConstructor</span>
+<span class="p">@Slf4j</span>
+<span class="r">public class</span> <span class="b">CanevasSnapshotService</span> {
+
+    <span class="r">private final</span> CanevasSnapshotRepository snapshotRepo;
+    <span class="r">private final</span> CanevasWorkflowLogRepository workflowRepo;
+    <span class="r">private final</span> CanevaRepository canevaRepository;
+    <span class="r">private final</span> AssocieRepository associeRepository;
+    <span class="r">private final</span> ClientCanvasRepository clientCanvasRepository;
+    <span class="r">private final</span> IEngagementService engagementService;
+    <span class="r">private final</span> ObjectMapper objectMapper;
+
+    <span class="nt">/**
+     * Crée un snapshot complet lors d'une transition de workflow.
+     * Compatible avec Caneva.java existant (pas de getAssocies() direct).
+     */</span>
+    <span class="p">@Transactional</span>
+    <span class="r">public</span> CanevasStructureSnapshot <span class="m">createSnapshot</span>(
+            Long canevasId,
+            String structureCode,
+            String structureLabel,
+            String matricule,
+            String createdBy,
+            String observations,
+            String statusAtSnapshot) {
+
+        <span class="nt">// 1. Version suivante</span>
+        Integer nextVersion = snapshotRepo
+            .<span class="m">findMaxVersionByCanevasId</span>(canevasId)
+            .map(v -> v + <span class="y">1</span>)
+            .orElse(<span class="y">1</span>);
+
+        <span class="nt">// 2. Charger le canevas (avec ses relations)</span>
+        Caneva caneva = canevaRepository.<span class="m">findById</span>(canevasId)
+            .orElseThrow(() -> <span class="r">new</span> EntityNotFoundException(
+                <span class="str">"Canevas introuvable : "</span> + canevasId));
+
+        <span class="nt">// 3. numSeqPers de la relation (Integer dans Caneva.java)</span>
+        String numSeqPersStr = String.<span class="m">valueOf</span>(caneva.<span class="m">getNumSeqpers</span>());
+
+        <span class="nt">// 4. Engagement RELATION (onglet 0) depuis Oracle SAEB</span>
+        EngagementDTO engagement = <span class="m">loadEngagementSafe</span>(numSeqPersStr);
+
+        <span class="nt">// 5. Engagement PARTIES LIÉES (onglets 1-4)</span>
+        EngagementDetailleDto detaille = <span class="m">buildEngagementDetaille</span>(caneva);
+
+        <span class="nt">// 6. Données métier</span>
+        String creditsJson = <span class="m">buildCreditsJson</span>(caneva);
+        String exploitJson = <span class="m">buildExploitationJson</span>(caneva);
+        String garantiesJson = <span class="m">buildGarantiesJson</span>(caneva);
+
+        <span class="nt">// 7. Construire et persister le snapshot</span>
+        CanevasStructureSnapshot snapshot = CanevasStructureSnapshot.builder()
+            .canevasId(canevasId)
+            .structureCode(structureCode)
+            .structureLabel(structureLabel)
+            .versionNumber(nextVersion)
+            .statusAtSnapshot(statusAtSnapshot)
+            .matricule(matricule)
+            .createdBy(createdBy)
+            .observations(observations)
+            .engagementBnaJson(<span class="m">toJson</span>(engagement.getEngagementsBNA()))
+            .engagementBctJson(<span class="m">toJson</span>(engagement.getEngagementsBCT()))
+            .classeBnaJson(<span class="m">toJson</span>(engagement.getClasseBNA()))
+            .classeBctJson(<span class="m">toJson</span>(engagement.getClasseBCT()))
+            .classeRetourJson(<span class="m">toJson</span>(engagement.getClasseRetourBCT()))
+            .engagementDetailleJson(<span class="m">toJson</span>(detaille))
+            .donneesCreditsJson(creditsJson)
+            .donneesExploitationJson(exploitJson)
+            .donneesGarantiesJson(garantiesJson)
+            .build();
+
+        CanevasStructureSnapshot saved = snapshotRepo.<span class="m">save</span>(snapshot);
+        log.<span class="m">info</span>(<span class="str">"Snapshot créé : canevas={}, structure={}, v={}"</span>,
+            canevasId, structureCode, nextVersion);
+
+        <span class="nt">// 8. Mettre à jour CANEVAS_AGRICOLE</span>
+        caneva.<span class="m">setCurrentVersion</span>(nextVersion);
+        caneva.<span class="m">setCurrentStructure</span>(structureCode);
+        caneva.<span class="m">setLastSnapshotId</span>(saved.<span class="m">getSnapshotId</span>());
+        canevaRepository.<span class="m">save</span>(caneva);
+
+        <span class="r">return</span> saved;
+    }
+
+    <span class="nt">// ─── Engagement PARTIES LIÉES ───</span>
+    <span class="r">private</span> EngagementDetailleDto <span class="m">buildEngagementDetaille</span>(Caneva caneva) {
+        Long numSeqPers = caneva.<span class="m">getNumSeqpers</span>().longValue();
+
+        <span class="nt">// Actionnaires : via AssocieRepository (Caneva n'a pas getAssocies())</span>
+        List&lt;EngagementPartieDto&gt; actionnaires = associeRepository
+            .<span class="m">findAssociesByNumSeqPers</span>(numSeqPers)
+            .stream()
+            .map(<span class="r">this</span>::<span class="m">associeToEngagementPartie</span>)
+            .collect(Collectors.<span class="m">toList</span>());
+
+        <span class="nt">// Premier responsable : via ClientCanvasRepository</span>
+        EngagementPartieDto premierResponsable = clientCanvasRepository
+            .<span class="m">findByNumSeqpers</span>(numSeqPers)
+            .map(<span class="r">this</span>::<span class="m">clientCanvasToPremierResp</span>)
+            .orElse(<span class="r">null</span>);
+
+        <span class="nt">// Vendeurs : via CreditAchatTerrain.getVendeurs()</span>
+        List&lt;EngagementPartieDto&gt; vendeurs = caneva.<span class="m">getCreditAchatTerrains</span>().stream()
+            .flatMap(cat -> cat.<span class="m">getVendeurs</span>().stream())
+            .filter(v -> v.<span class="m">getNumseqpers</span>() != <span class="r">null</span>)
+            .distinct()
+            .map(<span class="r">this</span>::<span class="m">vendeurToEngagementPartie</span>)
+            .collect(Collectors.<span class="m">toList</span>());
+
+        <span class="nt">// Note : groupe non géré dans Caneva.java actuel</span>
+        <span class="nt">// → à ajouter si la relation groupe est implementée</span>
+
+        <span class="r">return</span> EngagementDetailleDto.builder()
+            .actionnaires(actionnaires)
+            .premierResponsable(premierResponsable)
+            .vendeurs(vendeurs)
+            .groupe(List.<span class="m">of</span>())
+            .build();
+    }
+
+    <span class="r">private</span> EngagementPartieDto <span class="m">associeToEngagementPartie</span>(Associe associe) {
+        String numSeqPersStr = String.<span class="m">valueOf</span>(associe.<span class="m">getNumSeqPers</span>());
+        EngagementDTO eng = <span class="m">loadEngagementSafe</span>(numSeqPersStr);
+        <span class="r">return</span> EngagementPartieDto.builder()
+            .typePartie(<span class="str">"ACTIONNAIRE"</span>)
+            .nom(associe.<span class="m">getName</span>())
+            .numSeqPers(associe.<span class="m">getNumSeqPers</span>())
+            .partCapital(associe.<span class="m">getPartPercentage</span>() != <span class="r">null</span>
+                ? associe.<span class="m">getPartPercentage</span>().<span class="m">toString</span>() : <span class="r">null</span>)
+            .engagementsBNA(eng.<span class="m">getEngagementsBNA</span>())
+            .engagementsBCT(eng.<span class="m">getEngagementsBCT</span>())
+            .classeBNA(eng.<span class="m">getClasseBNA</span>())
+            .build();
+    }
+
+    <span class="r">private</span> EngagementPartieDto <span class="m">clientCanvasToPremierResp</span>(ClientCanvas cc) {
+        <span class="nt">// Premier responsable stocké dans ClientCanvas.java :</span>
+        <span class="nt">// nomResponsable, prenomResponsable, cinResponsable, numSeqpers</span>
+        String numSeqPersStr = String.<span class="m">valueOf</span>(cc.<span class="m">getNumSeqpers</span>());
+        EngagementDTO eng = <span class="m">loadEngagementSafe</span>(numSeqPersStr);
+        <span class="r">return</span> EngagementPartieDto.builder()
+            .typePartie(<span class="str">"PREMIER_RESPONSABLE"</span>)
+            .nom(cc.<span class="m">getNomResponsable</span>() + <span class="str">" "</span> + cc.<span class="m">getPrenomResponsable</span>())
+            .cin(cc.<span class="m">getCinResponsable</span>())
+            .numSeqPers(cc.<span class="m">getNumSeqpers</span>())
+            .engagementsBNA(eng.<span class="m">getEngagementsBNA</span>())
+            .engagementsBCT(eng.<span class="m">getEngagementsBCT</span>())
+            .classeBNA(eng.<span class="m">getClasseBNA</span>())
+            .build();
+    }
+
+    <span class="r">private</span> EngagementPartieDto <span class="m">vendeurToEngagementPartie</span>(Vendeur vendeur) {
+        <span class="nt">// Vendeur.java : nomPrenom, typePiece, numPiece, numseqpers</span>
+        String numSeqPersStr = String.<span class="m">valueOf</span>(vendeur.<span class="m">getNumseqpers</span>());
+        EngagementDTO eng = <span class="m">loadEngagementSafe</span>(numSeqPersStr);
+        <span class="r">return</span> EngagementPartieDto.builder()
+            .typePartie(<span class="str">"VENDEUR"</span>)
+            .nom(vendeur.<span class="m">getNomPrenom</span>())
+            .numSeqPers(vendeur.<span class="m">getNumseqpers</span>().longValue())
+            .engagementsBNA(eng.<span class="m">getEngagementsBNA</span>())
+            .engagementsBCT(eng.<span class="m">getEngagementsBCT</span>())
+            .build();
+    }
+
+    <span class="nt">// ─── Données métier ───</span>
+    <span class="r">private</span> String <span class="m">buildCreditsJson</span>(Caneva caneva) {
+        Map&lt;String, Object&gt; credits = Map.<span class="m">of</span>(
+            <span class="str">"courtTerme"</span>, caneva.<span class="m">getCreditCourtTermes</span>().stream()
+                .map(c -> Map.<span class="m">of</span>(
+                    <span class="str">"id"</span>, c.<span class="m">getId</span>(),
+                    <span class="str">"produit"</span>, c.<span class="m">getProduit</span>(),
+                    <span class="str">"codeSpeculation"</span>, c.<span class="m">getCodeSpeculation</span>(),
+                    <span class="str">"montant"</span>, c.<span class="m">getMontant</span>()
+                )).toList(),
+            <span class="str">"investissement"</span>, caneva.<span class="m">getCreditInvestissements</span>().stream()
+                .map(c -> Map.<span class="m">of</span>(
+                    <span class="str">"id"</span>, c.<span class="m">getId</span>(),
+                    <span class="str">"terme"</span>, c.<span class="m">getTerme</span>(),
+                    <span class="str">"montant"</span>, c.<span class="m">getMontant</span>()
+                )).toList(),
+            <span class="str">"achatTerrain"</span>, caneva.<span class="m">getCreditAchatTerrains</span>().stream()
+                .map(c -> Map.<span class="m">of</span>(
+                    <span class="str">"id"</span>, c.<span class="m">getId</span>(),
+                    <span class="str">"terme"</span>, c.<span class="m">getTerme</span>(),
+                    <span class="str">"montant"</span>, c.<span class="m">getMontant</span>()
+                )).toList()
+        );
+        <span class="r">return</span> <span class="m">toJson</span>(credits);
+    }
+
+    <span class="r">private</span> String <span class="m">buildExploitationJson</span>(Caneva caneva) {
+        Map&lt;String, Object&gt; exploitation = Map.<span class="m">of</span>(
+            <span class="str">"sites"</span>, caneva.<span class="m">getSelectedSites</span>().stream()
+                .map(s -> Map.<span class="m">of</span>(
+                    <span class="str">"id"</span>, s.<span class="m">getId</span>(),
+                    <span class="str">"gouvernorat"</span>, s.<span class="m">getGouvernorat</span>(),
+                    <span class="str">"delegation"</span>, s.<span class="m">getDelegation</span>(),
+                    <span class="str">"latitude"</span>, s.<span class="m">getLatitude</span>(),
+                    <span class="str">"longitude"</span>, s.<span class="m">getLongitude</span>()
+                )).toList()
+        );
+        <span class="r">return</span> <span class="m">toJson</span>(exploitation);
+    }
+
+    <span class="r">private</span> String <span class="m">buildGarantiesJson</span>(Caneva caneva) {
+        <span class="nt">// GarantiePropose n'est pas directement lié à Caneva</span>
+        <span class="nt">// → passer numSeqPers + numCaneva via le service garanties</span>
+        Map&lt;String, Object&gt; garanties = Map.<span class="m">of</span>(
+            <span class="str">"numCaneva"</span>, caneva.<span class="m">getId</span>(),
+            <span class="str">"numSeqPers"</span>, caneva.<span class="m">getNumSeqpers</span>()
+        );
+        <span class="r">return</span> <span class="m">toJson</span>(garanties);
+    }
+
+    <span class="nt">// ─── Utilitaires ───</span>
+    <span class="r">private</span> EngagementDTO <span class="m">loadEngagementSafe</span>(String numSeqPers) {
+        <span class="r">try</span> {
+            <span class="r">return</span> engagementService.<span class="m">getListeEngagementClient</span>(numSeqPers);
+        } <span class="r">catch</span> (Exception e) {
+            log.<span class="m">warn</span>(<span class="str">"Impossible de charger engagements pour numSeqPers={}"</span>,
+                numSeqPers, e);
+            <span class="r">return new</span> EngagementDTO();  <span class="nt">// snapshot créé même en cas d'erreur</span>
+        }
+    }
+
+    <span class="r">private</span> String <span class="m">toJson</span>(Object obj) {
+        <span class="r">if</span> (obj == <span class="r">null</span>) <span class="r">return null</span>;
+        <span class="r">try</span> {
+            <span class="r">return</span> objectMapper.<span class="m">writeValueAsString</span>(obj);
+        } <span class="r">catch</span> (JsonProcessingException e) {
+            log.<span class="m">error</span>(<span class="str">"Erreur sérialisation JSON"</span>, e);
+            <span class="r">return null</span>;
+        }
+    }
+
+    <span class="r">private</span> &lt;T&gt; T <span class="m">fromJson</span>(String json, Class&lt;T&gt; type) {
+        <span class="r">if</span> (json == <span class="r">null</span>) <span class="r">return null</span>;
+        <span class="r">try</span> {
+            <span class="r">return</span> objectMapper.<span class="m">readValue</span>(json, type);
+        } <span class="r">catch</span> (Exception e) {
+            log.<span class="m">warn</span>(<span class="str">"Erreur désérialisation JSON"</span>, e);
+            <span class="r">return null</span>;
+        }
+    }
+
+    <span class="nt">// ─── Requêtes consultation ───</span>
+    <span class="r">public</span> List&lt;SnapshotSummaryDto&gt; <span class="m">getHistory</span>(Long canevasId) {
+        <span class="r">return</span> snapshotRepo
+            .<span class="m">findByCanevasIdOrderByVersionNumberAsc</span>(canevasId)
+            .stream()
+            .map(s -> <span class="r">new</span> SnapshotSummaryDto(
+                s.<span class="m">getSnapshotId</span>(), s.<span class="m">getStructureCode</span>(), s.<span class="m">getStructureLabel</span>(),
+                s.<span class="m">getVersionNumber</span>(), s.<span class="m">getStatusAtSnapshot</span>(),
+                s.<span class="m">getCreatedBy</span>(), s.<span class="m">getMatricule</span>(), s.<span class="m">getCreatedAt</span>(),
+                s.<span class="m">getObservations</span>()))
+            .toList();
+    }
+
+    <span class="r">public</span> Optional&lt;SnapshotDetailDto&gt; <span class="m">getByStructure</span>(
+            Long canevasId, String structureCode) {
+
+        <span class="r">return</span> snapshotRepo
+            .<span class="m">findByCanevasIdAndStructureCodeOrderByVersionNumberDesc</span>(
+                canevasId, structureCode)
+            .stream().<span class="m">findFirst</span>()
+            .map(s -> <span class="r">new</span> SnapshotDetailDto(
+                s.<span class="m">getSnapshotId</span>(), s.<span class="m">getStructureCode</span>(), s.<span class="m">getStructureLabel</span>(),
+                s.<span class="m">getVersionNumber</span>(), s.<span class="m">getStatusAtSnapshot</span>(),
+                s.<span class="m">getCreatedBy</span>(), s.<span class="m">getCreatedAt</span>(), s.<span class="m">getObservations</span>(),
+                <span class="m">fromJson</span>(s.<span class="m">getEngagementBnaJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getEngagementBctJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getClasseBnaJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getClasseBctJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getClasseRetourJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getEngagementDetailleJson</span>(), EngagementDetailleDto.class),
+                <span class="m">fromJson</span>(s.<span class="m">getDonneesCreditsJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getDonneesExploitationJson</span>(), Object.class),
+                <span class="m">fromJson</span>(s.<span class="m">getDonneesGarantiesJson</span>(), Object.class)));
+    }
+}</div>
+  </div>
+
+  <div class="card">
+    <h3>WorkflowLogService.java</h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.service;
+
+<span class="r">import</span> lombok.RequiredArgsConstructor;
+<span class="r">import</span> lombok.extern.slf4j.Slf4j;
+<span class="r">import</span> net.kachout.saeb.entities.CanevasWorkflowLog;
+<span class="r">import</span> net.kachout.saeb.repository.CanevasWorkflowLogRepository;
+<span class="r">import</span> org.springframework.stereotype.Service;
+<span class="r">import</span> org.springframework.transaction.annotation.Transactional;
+<span class="r">import</span> java.util.List;
+
+<span class="p">@Service</span>
+<span class="p">@RequiredArgsConstructor</span>
+<span class="p">@Slf4j</span>
+<span class="r">public class</span> <span class="b">WorkflowLogService</span> {
+
+    <span class="r">private final</span> CanevasWorkflowLogRepository workflowRepo;
+
+    <span class="p">@Transactional</span>
+    <span class="r">public</span> CanevasWorkflowLog <span class="m">log</span>(
+            Long canevasId,
+            String fromStructure, String toStructure,
+            String action,
+            Integer snapshotVersion, Long snapshotId,
+            String comments, String performedBy) {
+
+        CanevasWorkflowLog entry = CanevasWorkflowLog.builder()
+            .canevasId(canevasId)
+            .fromStructure(fromStructure)
+            .toStructure(toStructure)
+            .action(action)
+            .snapshotVersion(snapshotVersion)
+            .snapshotId(snapshotId)
+            .comments(comments)
+            .performedBy(performedBy)
+            .build();
+
+        CanevasWorkflowLog saved = workflowRepo.<span class="m">save</span>(entry);
+        log.<span class="m">info</span>(<span class="str">"Workflow log : canevas={} {} -> {} action={}"</span>,
+            canevasId, fromStructure, toStructure, action);
+        <span class="r">return</span> saved;
+    }
+
+    <span class="r">public</span> List&lt;CanevasWorkflowLog&gt; <span class="m">getHistory</span>(Long canevasId) {
+        <span class="r">return</span> workflowRepo.<span class="m">findByCanevasIdOrderByPerformedAtDesc</span>(canevasId);
+    }
+}</div>
+  </div>
+</section>
+
+<!-- ══ CONTROLLER ══ -->
+<section id="controller">
+  <div class="sh"><div class="si">🔌</div><h2>Controller REST — CanevasSnapshotController.java</h2></div>
+
+  <div class="co co-b">Suit le même pattern que <code>CanevaController.java</code> existant : <code>@RestController</code>, <code>@RequestMapping("/api/canevas")</code>, injection par constructeur avec <code>@RequiredArgsConstructor</code>.</div>
+
+  <div class="card">
+    <h3>CanevasSnapshotController.java — <span class="path">web/</span></h3>
+    <div class="code">
+<span class="r">package</span> net.kachout.saeb.web;
+
+<span class="r">import</span> lombok.RequiredArgsConstructor;
+<span class="r">import</span> lombok.extern.slf4j.Slf4j;
+<span class="r">import</span> net.kachout.saeb.dtos_.*;
+<span class="r">import</span> net.kachout.saeb.entities.CanevasStructureSnapshot;
+<span class="r">import</span> net.kachout.saeb.service.CanevasSnapshotService;
+<span class="r">import</span> net.kachout.saeb.service.WorkflowLogService;
+<span class="r">import</span> org.springframework.http.ResponseEntity;
+<span class="r">import</span> org.springframework.web.bind.annotation.*;
+<span class="r">import</span> java.util.List;
+<span class="r">import</span> java.util.Map;
+
+<span class="p">@RestController</span>
+<span class="p">@RequestMapping</span>(<span class="str">"/api/canevas"</span>)
+<span class="p">@CrossOrigin</span>
+<span class="p">@RequiredArgsConstructor</span>
+<span class="p">@Slf4j</span>
+<span class="r">public class</span> <span class="b">CanevasSnapshotController</span> {
+
+    <span class="r">private final</span> CanevasSnapshotService snapshotService;
+    <span class="r">private final</span> WorkflowLogService workflowLogService;
+
+    <span class="nt">// POST /api/canevas/{id}/valider</span>
+    <span class="p">@PostMapping</span>(<span class="str">"/{id}/valider"</span>)
+    <span class="r">public</span> ResponseEntity&lt;SnapshotResponseDto&gt; <span class="m">valider</span>(
+            <span class="p">@PathVariable</span> Long id,
+            <span class="p">@RequestBody</span> ValidationRequestDto request) {
+
+        CanevasStructureSnapshot snapshot = snapshotService.<span class="m">createSnapshot</span>(
+            id,
+            request.fromStructureCode(),
+            request.fromStructureLabel(),
+            request.matricule(),
+            request.matricule(),    <span class="nt">// createdBy = matricule si pas d'auth injectée</span>
+            request.observations(),
+            <span class="str">"VALID_DONNEE"</span>          <span class="nt">// valeur exacte de l'enum Stade</span>
+        );
+
+        workflowLogService.<span class="m">log</span>(
+            id,
+            request.fromStructureCode(),
+            request.toStructureCode(),
+            <span class="str">"VALIDER"</span>,
+            snapshot.<span class="m">getVersionNumber</span>(),
+            snapshot.<span class="m">getSnapshotId</span>(),
+            request.observations(),
+            request.matricule()
+        );
+
+        <span class="r">return</span> ResponseEntity.<span class="m">ok</span>(<span class="r">new</span> SnapshotResponseDto(
+            snapshot.<span class="m">getSnapshotId</span>(),
+            snapshot.<span class="m">getVersionNumber</span>(),
+            request.fromStructureCode()));
+    }
+
+    <span class="nt">// POST /api/canevas/{id}/refouler</span>
+    <span class="p">@PostMapping</span>(<span class="str">"/{id}/refouler"</span>)
+    <span class="r">public</span> ResponseEntity&lt;SnapshotResponseDto&gt; <span class="m">refouler</span>(
+            <span class="p">@PathVariable</span> Long id,
+            <span class="p">@RequestBody</span> RefoulementRequestDto request) {
+
+        CanevasStructureSnapshot snapshot = snapshotService.<span class="m">createSnapshot</span>(
+            id,
+            request.fromStructureCode(),
+            request.fromStructureLabel(),
+            request.matricule(),
+            request.matricule(),
+            request.motif(),
+            <span class="str">"CORRIGE_DONNEE"</span>   <span class="nt">// valeur Stade pour refoulement</span>
+        );
+
+        workflowLogService.<span class="m">log</span>(
+            id,
+            request.fromStructureCode(),
+            request.toStructureCode(),
+            <span class="str">"REFOULER"</span>,
+            snapshot.<span class="m">getVersionNumber</span>(),
+            snapshot.<span class="m">getSnapshotId</span>(),
+            request.motif(),
+            request.matricule()
+        );
+
+        <span class="r">return</span> ResponseEntity.<span class="m">ok</span>(<span class="r">new</span> SnapshotResponseDto(
+            snapshot.<span class="m">getSnapshotId</span>(),
+            snapshot.<span class="m">getVersionNumber</span>(),
+            request.fromStructureCode()));
+    }
+
+    <span class="nt">// GET /api/canevas/{id}/snapshots</span>
+    <span class="p">@GetMapping</span>(<span class="str">"/{id}/snapshots"</span>)
+    <span class="r">public</span> ResponseEntity&lt;List&lt;SnapshotSummaryDto&gt;&gt; <span class="m">getHistory</span>(
+            <span class="p">@PathVariable</span> Long id) {
+        <span class="r">return</span> ResponseEntity.<span class="m">ok</span>(snapshotService.<span class="m">getHistory</span>(id));
+    }
+
+    <span class="nt">// GET /api/canevas/{id}/snapshots/structure/{structureCode}</span>
+    <span class="p">@GetMapping</span>(<span class="str">"/{id}/snapshots/structure/{structureCode}"</span>)
+    <span class="r">public</span> ResponseEntity&lt;SnapshotDetailDto&gt; <span class="m">getByStructure</span>(
+            <span class="p">@PathVariable</span> Long id,
+            <span class="p">@PathVariable</span> String structureCode) {
+        <span class="r">return</span> snapshotService
+            .<span class="m">getByStructure</span>(id, structureCode)
+            .map(ResponseEntity::<span class="m">ok</span>)
+            .orElse(ResponseEntity.<span class="m">notFound</span>().<span class="m">build</span>());
+    }
+
+    <span class="nt">// GET /api/canevas/{id}/snapshots/workflow-log</span>
+    <span class="p">@GetMapping</span>(<span class="str">"/{id}/snapshots/workflow-log"</span>)
+    <span class="r">public</span> ResponseEntity&lt;List&lt;?&gt;&gt; <span class="m">getWorkflowLog</span>(
+            <span class="p">@PathVariable</span> Long id) {
+        <span class="r">return</span> ResponseEntity.<span class="m">ok</span>(workflowLogService.<span class="m">getHistory</span>(id));
+    }
+}</div>
+  </div>
+</section>
+
+<!-- ══ CANEVA MODIF ══ -->
+<section id="caneva-modif">
+  <div class="sh"><div class="si">✏️</div><h2>Caneva.java — 3 champs à ajouter</h2></div>
+
+  <div class="co co-o">Ajouter exactement ces 3 champs à la fin de <span class="path">entities/Caneva.java</span>, avant le commentaire <code>// Getters and Setters</code>.</div>
+
+  <div class="card">
+    <h3>Modification minimale de Caneva.java</h3>
+    <div class="code">
+<span class="nt">// Dans Caneva.java — ajouter ces 3 champs</span>
+<span class="nt">// Correspondance avec ALTER TABLE CANEVAS_AGRICOLE ADD (...</span>
+
+<span class="p">@Column</span>(name = <span class="str">"current_version"</span>)
+<span class="r">private</span> Integer currentVersion;
+
+<span class="p">@Column</span>(name = <span class="str">"current_structure"</span>, length = <span class="y">20</span>)
+<span class="r">private</span> String currentStructure;   <span class="nt">// "AGC", "DR", "DC"</span>
+
+<span class="p">@Column</span>(name = <span class="str">"last_snapshot_id"</span>)
+<span class="r">private</span> Long lastSnapshotId;
+
+<span class="nt">// Getters and Setters (générés par Lombok @Getter @Setter déjà en place)</span></div>
+
+    <div class="co co-g" style="margin-top:10px">
+      <strong>Lombok déjà configuré :</strong> <code>@Getter</code> et <code>@Setter</code> sont déjà sur la classe Caneva. Les nouveaux champs héritent automatiquement de <code>getCurrentVersion()</code>, <code>setCurrentVersion()</code>, etc.
+    </div>
+  </div>
+</section>
+
+<!-- ══ ANGULAR SERVICE ══ -->
+<section id="angular-service">
+  <div class="sh"><div class="si">🅰️</div><h2>Angular — snapshot.service.ts</h2></div>
+
+  <div class="card">
+    <h3>snapshot.service.ts — <span class="path">_services/</span></h3>
+    <div class="code">
+<span class="nt">// frontend-app1/src/app/_services/snapshot.service.ts</span>
+<span class="r">import</span> { Injectable, inject } <span class="r">from</span> <span class="str">'@angular/core'</span>;
+<span class="r">import</span> { HttpClient } <span class="r">from</span> <span class="str">'@angular/common/http'</span>;
+<span class="r">import</span> { Observable } <span class="r">from</span> <span class="str">'rxjs'</span>;
+<span class="r">import</span> { environment } <span class="r">from</span> <span class="str">'../../environments/environment'</span>;
+
+<span class="nt">// ─── Interfaces TypeScript ───</span>
+<span class="r">export interface</span> <span class="b">SnapshotSummary</span> {
+  snapshotId: number;
+  structureCode: string;
+  structureLabel: string;
+  versionNumber: number;
+  statusAtSnapshot: string;
+  createdBy: string;
+  matricule: string;
+  createdAt: string;
+  observations: string;
+}
+
+<span class="r">export interface</span> <span class="b">EngagementPartie</span> {
+  typePartie: string;
+  nom: string;
+  cin?: string;
+  numSeqPers: number;
+  partCapital?: string;
+  engagementsBNA: <span class="b">any</span>[];
+  engagementsBCT: <span class="b">any</span>[];
+  classeBNA: <span class="b">any</span>[];
+}
+
+<span class="r">export interface</span> <span class="b">EngagementDetaille</span> {
+  actionnaires: EngagementPartie[];
+  premierResponsable: EngagementPartie | null;
+  groupe: EngagementPartie[];
+  vendeurs: EngagementPartie[];
+}
+
+<span class="r">export interface</span> <span class="b">SnapshotDetail</span> <span class="r">extends</span> SnapshotSummary {
+  engagementsBNA: <span class="b">any</span>[];
+  engagementsBCT: <span class="b">any</span>[];
+  classeBNA: <span class="b">any</span>[];
+  classeRetour: <span class="b">any</span>[];
+  engagementDetaille: EngagementDetaille;
+  creditsData: <span class="b">any</span>;
+  exploitationData: <span class="b">any</span>;
+  garantiesData: <span class="b">any</span>;
+}
+
+<span class="r">export interface</span> <span class="b">ValidationRequest</span> {
+  fromStructureCode: string;
+  fromStructureLabel: string;
+  toStructureCode: string;
+  matricule: string;
+  observations: string;
+  avisValue: <span class="str">'FAVORABLE'</span> | <span class="str">'DEFAVORABLE'</span> | <span class="str">'SANS_AVIS'</span>;
+}
+
+<span class="r">export interface</span> <span class="b">RefoulementRequest</span> {
+  fromStructureCode: string;
+  fromStructureLabel: string;
+  toStructureCode: string;
+  matricule: string;
+  motif: string;
+}
+
+<span class="r">export interface</span> <span class="b">SnapshotResponse</span> {
+  snapshotId: number;
+  versionNumber: number;
+  structureCode: string;
+}
+
+<span class="nt">// ─── Service ───</span>
+<span class="p">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="r">export class</span> <span class="b">SnapshotService</span> {
+  <span class="r">private</span> http = inject(HttpClient);
+  <span class="r">private</span> api = environment.apiURL + <span class="str">'api/canevas'</span>;
+
+  <span class="m">validerEtTransmettre</span>(
+    canevasId: number,
+    request: ValidationRequest
+  ): Observable&lt;SnapshotResponse&gt; {
+    <span class="r">return</span> <span class="r">this</span>.http.post&lt;SnapshotResponse&gt;(
+      <span class="str">`${this.api}/${canevasId}/valider`</span>, request
+    );
+  }
+
+  <span class="m">refouler</span>(
+    canevasId: number,
+    request: RefoulementRequest
+  ): Observable&lt;SnapshotResponse&gt; {
+    <span class="r">return</span> <span class="r">this</span>.http.post&lt;SnapshotResponse&gt;(
+      <span class="str">`${this.api}/${canevasId}/refouler`</span>, request
+    );
+  }
+
+  <span class="m">getHistory</span>(canevasId: number): Observable&lt;SnapshotSummary[]&gt; {
+    <span class="r">return</span> <span class="r">this</span>.http.get&lt;SnapshotSummary[]&gt;(
+      <span class="str">`${this.api}/${canevasId}/snapshots`</span>
+    );
+  }
+
+  <span class="m">getByStructure</span>(
+    canevasId: number,
+    structureCode: string
+  ): Observable&lt;SnapshotDetail&gt; {
+    <span class="r">return</span> <span class="r">this</span>.http.get&lt;SnapshotDetail&gt;(
+      <span class="str">`${this.api}/${canevasId}/snapshots/structure/${structureCode}`</span>
+    );
+  }
+
+  <span class="m">getWorkflowLog</span>(canevasId: number): Observable&lt;<span class="b">any</span>[]&gt; {
+    <span class="r">return</span> <span class="r">this</span>.http.get&lt;<span class="b">any</span>[]&gt;(
+      <span class="str">`${this.api}/${canevasId}/snapshots/workflow-log`</span>
+    );
+  }
+}</div>
+  </div>
+</section>
+
+<!-- ══ ANGULAR COMPOSANT ══ -->
+<section id="angular-comp">
+  <div class="sh"><div class="si">🖥️</div><h2>Angular — Composant historique snapshot</h2></div>
+
+  <div class="card">
+    <h3>snapshot-history.component.ts — Signals Angular 17 (compatible avec le projet)</h3>
+    <div class="code">
+<span class="nt">// frontend-app1/src/app/_components/pages/canvas.agricole/</span>
+<span class="nt">//   snapshot-history/snapshot-history.component.ts</span>
+<span class="r">import</span> {
+  Component, OnInit, signal, computed,
+  inject, DestroyRef
+} <span class="r">from</span> <span class="str">'@angular/core'</span>;
+<span class="r">import</span> { takeUntilDestroyed } <span class="r">from</span> <span class="str">'@angular/core/rxjs-interop'</span>;
+<span class="r">import</span> { MessageService } <span class="r">from</span> <span class="str">'primeng/api'</span>;
+<span class="r">import</span> {
+  SnapshotService, SnapshotSummary, SnapshotDetail, ValidationRequest
+} <span class="r">from</span> <span class="str">'../../../../_services/snapshot.service'</span>;
+<span class="r">import</span> { CanevasAgrService } <span class="r">from</span> <span class="str">'../../../../_services/canevas.agr.service'</span>;
+
+<span class="p">@Component</span>({
+  selector: <span class="str">'app-snapshot-history'</span>,
+  templateUrl: <span class="str">'./snapshot-history.component.html'</span>,
+  styleUrl: <span class="str">'./snapshot-history.component.css'</span>
+})
+<span class="r">export class</span> <span class="b">SnapshotHistoryComponent</span> <span class="r">implements</span> OnInit {
+
+  <span class="r">private</span> destroyRef = inject(DestroyRef);
+  <span class="r">private</span> snapshotService = inject(SnapshotService);
+  <span class="r">private</span> canevasAgrService = inject(CanevasAgrService);
+  <span class="r">private</span> messageService = inject(MessageService);
+
+  <span class="nt">// ─── Signals (style du projet existant) ───</span>
+  history = signal&lt;SnapshotSummary[]&gt;([]);
+  selectedSnapshot = signal&lt;SnapshotDetail | null&gt;(null);
+  loading = signal&lt;<span class="b">boolean</span>&gt;(<span class="r">false</span>);
+  activeDetailTab = signal&lt;<span class="b">number</span>&gt;(<span class="y">0</span>);  <span class="nt">// 0=Relation,1=Actionnaire...</span>
+  showValidDialog = signal&lt;<span class="b">boolean</span>&gt;(<span class="r">false</span>);
+  showRefoulDialog = signal&lt;<span class="b">boolean</span>&gt;(<span class="r">false</span>);
+
+  <span class="nt">// Compteur versions par structure (pour badge dans la liste)</span>
+  totalVersions = computed(() => <span class="r">this</span>.history().length);
+
+  <span class="nt">// Formulaires inline</span>
+  validForm = {
+    fromStructureCode: <span class="str">''</span>,
+    fromStructureLabel: <span class="str">''</span>,
+    toStructureCode: <span class="str">''</span>,
+    matricule: <span class="str">''</span>,
+    observations: <span class="str">''</span>,
+    avisValue: <span class="str">'FAVORABLE'</span> <span class="r">as const</span>
+  };
+
+  refoulForm = {
+    fromStructureCode: <span class="str">''</span>,
+    fromStructureLabel: <span class="str">''</span>,
+    toStructureCode: <span class="str">''</span>,
+    matricule: <span class="str">''</span>,
+    motif: <span class="str">''</span>
+  };
+
+  <span class="m">ngOnInit</span>() {
+    <span class="r">const</span> canevasId = <span class="r">this</span>.canevasAgrService.numCanva();
+    <span class="r">this</span>.<span class="m">loadHistory</span>(canevasId);
+  }
+
+  <span class="m">loadHistory</span>(canevasId: number) {
+    <span class="r">this</span>.loading.set(<span class="r">true</span>);
+    <span class="r">this</span>.snapshotService.<span class="m">getHistory</span>(canevasId)
+      .pipe(takeUntilDestroyed(<span class="r">this</span>.destroyRef))
+      .subscribe({
+        next: data => {
+          <span class="r">this</span>.history.set(data);
+          <span class="r">this</span>.loading.set(<span class="r">false</span>);
+        },
+        error: () => <span class="r">this</span>.loading.set(<span class="r">false</span>)
+      });
+  }
+
+  <span class="m">loadSnapshot</span>(structureCode: string) {
+    <span class="r">const</span> canevasId = <span class="r">this</span>.canevasAgrService.numCanva();
+    <span class="r">this</span>.loading.set(<span class="r">true</span>);
+    <span class="r">this</span>.snapshotService.<span class="m">getByStructure</span>(canevasId, structureCode)
+      .pipe(takeUntilDestroyed(<span class="r">this</span>.destroyRef))
+      .subscribe({
+        next: snap => {
+          <span class="r">this</span>.selectedSnapshot.set(snap);
+          <span class="r">this</span>.loading.set(<span class="r">false</span>);
+        },
+        error: () => {
+          <span class="r">this</span>.loading.set(<span class="r">false</span>);
+          <span class="r">this</span>.messageService.add({
+            severity: <span class="str">'error'</span>,
+            summary: <span class="str">'Erreur'</span>,
+            detail: <span class="str">'Snapshot introuvable'</span>
+          });
+        }
+      });
+  }
+
+  <span class="m">valider</span>() {
+    <span class="r">const</span> canevasId = <span class="r">this</span>.canevasAgrService.numCanva();
+    <span class="r">this</span>.snapshotService
+      .<span class="m">validerEtTransmettre</span>(canevasId, <span class="r">this</span>.validForm)
+      .pipe(takeUntilDestroyed(<span class="r">this</span>.destroyRef))
+      .subscribe({
+        next: res => {
+          <span class="r">this</span>.messageService.add({
+            severity: <span class="str">'success'</span>,
+            summary: <span class="str">'Succès'</span>,
+            detail: <span class="str">`Snapshot v${res.versionNumber} créé`</span>
+          });
+          <span class="r">this</span>.showValidDialog.set(<span class="r">false</span>);
+          <span class="r">this</span>.<span class="m">loadHistory</span>(canevasId);
+        }
+      });
+  }
+
+  <span class="m">refouler</span>() {
+    <span class="r">const</span> canevasId = <span class="r">this</span>.canevasAgrService.numCanva();
+    <span class="r">this</span>.snapshotService
+      .<span class="m">refouler</span>(canevasId, <span class="r">this</span>.refoulForm)
+      .pipe(takeUntilDestroyed(<span class="r">this</span>.destroyRef))
+      .subscribe({
+        next: res => {
+          <span class="r">this</span>.messageService.add({
+            severity: <span class="str">'warn'</span>,
+            summary: <span class="str">'Refoulé'</span>,
+            detail: <span class="str">`Dossier refoulé — Snapshot v${res.versionNumber}`</span>
+          });
+          <span class="r">this</span>.showRefoulDialog.set(<span class="r">false</span>);
+          <span class="r">this</span>.<span class="m">loadHistory</span>(canevasId);
+        }
+      });
+  }
+}</div>
+
+    <h3 style="margin-top:16px">snapshot-history.component.html — Template PrimeNG</h3>
+    <div class="code">
+<span class="nt">&lt;!-- snapshot-history.component.html --&gt;</span>
+&lt;<span class="g">p-toast</span>&gt;&lt;/<span class="g">p-toast</span>&gt;
+
+<span class="nt">&lt;!-- Historique des snapshots --&gt;</span>
+&lt;<span class="g">p-fieldset</span> legend="Historique des snapshots" [toggleable]="true"&gt;
+  &lt;<span class="g">p-table</span> [value]="history()" [loading]="loading()"&gt;
+    &lt;<span class="g">ng-template</span> pTemplate="header"&gt;
+      &lt;<span class="g">tr</span>&gt;
+        &lt;<span class="g">th</span>&gt;Structure&lt;/<span class="g">th</span>&gt;
+        &lt;<span class="g">th</span>&gt;Version&lt;/<span class="g">th</span>&gt;
+        &lt;<span class="g">th</span>&gt;Statut&lt;/<span class="g">th</span>&gt;
+        &lt;<span class="g">th</span>&gt;Créé par&lt;/<span class="g">th</span>&gt;
+        &lt;<span class="g">th</span>&gt;Date&lt;/<span class="g">th</span>&gt;
+        &lt;<span class="g">th</span>&gt;Actions&lt;/<span class="g">th</span>&gt;
+      &lt;/<span class="g">tr</span>&gt;
+    &lt;/<span class="g">ng-template</span>&gt;
+    &lt;<span class="g">ng-template</span> pTemplate="body" let-snap&gt;
+      &lt;<span class="g">tr</span>&gt;
+        &lt;<span class="g">td</span>&gt;
+          &lt;<span class="g">p-tag</span> [value]="snap.structureCode"
+                 [severity]="snap.structureCode === 'AGC' ? 'info'
+                            : snap.structureCode === 'DR'  ? 'success'
+                            : 'warning'"&gt;
+          &lt;/<span class="g">p-tag</span>&gt;
+          {{ snap.structureLabel }}
+        &lt;/<span class="g">td</span>&gt;
+        &lt;<span class="g">td</span>&gt;&lt;<span class="g">p-badge</span> [value]="'v' + snap.versionNumber"&gt;&lt;/<span class="g">p-badge</span>&gt;&lt;/<span class="g">td</span>&gt;
+        &lt;<span class="g">td</span>&gt;{{ snap.statusAtSnapshot }}&lt;/<span class="g">td</span>&gt;
+        &lt;<span class="g">td</span>&gt;{{ snap.createdBy }} ({{ snap.matricule }})&lt;/<span class="g">td</span>&gt;
+        &lt;<span class="g">td</span>&gt;{{ snap.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/<span class="g">td</span>&gt;
+        &lt;<span class="g">td</span>&gt;
+          &lt;<span class="g">p-button</span> icon="pi pi-eye" [rounded]="true" [text]="true"
+                    (onClick)="loadSnapshot(snap.structureCode)"
+                    pTooltip="Consulter ce snapshot"&gt;
+          &lt;/<span class="g">p-button</span>&gt;
+        &lt;/<span class="g">td</span>&gt;
+      &lt;/<span class="g">tr</span>&gt;
+    &lt;/<span class="g">ng-template</span>&gt;
+  &lt;/<span class="g">p-table</span>&gt;
+
+  <span class="nt">&lt;!-- Boutons d'action --&gt;</span>
+  &lt;<span class="g">div</span> class="flex gap-2 mt-3"&gt;
+    &lt;<span class="g">p-button</span> label="Valider &amp; Transmettre" icon="pi pi-check"
+              severity="success"
+              (onClick)="showValidDialog.set(true)"&gt;
+    &lt;/<span class="g">p-button</span>&gt;
+    &lt;<span class="g">p-button</span> label="Refouler" icon="pi pi-times"
+              severity="danger"
+              (onClick)="showRefoulDialog.set(true)"&gt;
+    &lt;/<span class="g">p-button</span>&gt;
+  &lt;/<span class="g">div</span>&gt;
+&lt;/<span class="g">p-fieldset</span>&gt;
+
+<span class="nt">&lt;!-- Détail snapshot sélectionné --&gt;</span>
+@if (selectedSnapshot()) {
+  &lt;<span class="g">p-fieldset</span> [legend]="'Snapshot — ' + selectedSnapshot()!.structureLabel
+                         + ' v' + selectedSnapshot()!.versionNumber"&gt;
+    &lt;<span class="g">p-tabView</span>&gt;
+      &lt;<span class="g">p-tabPanel</span> header="Relation (Onglet 0)"&gt;
+        <span class="nt">&lt;!-- Réutiliser le composant existant engagement-bct-bna --&gt;</span>
+        &lt;<span class="g">app-engagement-bct-bna</span>
+          [engagements]="selectedSnapshot()!.engagementsBNA"&gt;
+        &lt;/<span class="g">app-engagement-bct-bna</span>&gt;
+      &lt;/<span class="g">p-tabPanel</span>&gt;
+
+      &lt;<span class="g">p-tabPanel</span> header="Actionnaires (Onglet 1)"&gt;
+        @for (act of selectedSnapshot()!.engagementDetaille.actionnaires;
+              track act.numSeqPers) {
+          &lt;<span class="g">p-panel</span> [header]="act.nom"&gt;
+            &lt;<span class="g">app-engagement-bct-bna</span>
+              [engagements]="act.engagementsBNA"&gt;
+            &lt;/<span class="g">app-engagement-bct-bna</span>&gt;
+          &lt;/<span class="g">p-panel</span>&gt;
+        }
+      &lt;/<span class="g">p-tabPanel</span>&gt;
+
+      &lt;<span class="g">p-tabPanel</span> header="1er Responsable (Onglet 2)"&gt;
+        @if (selectedSnapshot()!.engagementDetaille.premierResponsable) {
+          &lt;<span class="g">app-engagement-bct-bna</span>
+            [engagements]="selectedSnapshot()!.engagementDetaille.premierResponsable!.engagementsBNA"&gt;
+          &lt;/<span class="g">app-engagement-bct-bna</span>&gt;
+        }
+      &lt;/<span class="g">p-tabPanel</span>&gt;
+
+      &lt;<span class="g">p-tabPanel</span> header="Vendeurs (Onglet 4)"&gt;
+        @for (v of selectedSnapshot()!.engagementDetaille.vendeurs;
+              track v.numSeqPers) {
+          &lt;<span class="g">p-panel</span> [header]="v.nom"&gt;
+            &lt;<span class="g">app-engagement-bct-bna</span>
+              [engagements]="v.engagementsBNA"&gt;
+            &lt;/<span class="g">app-engagement-bct-bna</span>&gt;
+          &lt;/<span class="g">p-panel</span>&gt;
+        }
+      &lt;/<span class="g">p-tabPanel</span>&gt;
+    &lt;/<span class="g">p-tabView</span>&gt;
+  &lt;/<span class="g">p-fieldset</span>&gt;
+}</div>
+  </div>
+</section>
+
+<!-- ══ FLYWAY ══ -->
+<section id="flyway">
+  <div class="sh"><div class="si">🚀</div><h2>Intégration Flyway + Configuration Spring</h2></div>
+
+  <div class="card">
+    <h3>Activer Flyway dans application.properties</h3>
+    <div class="code">
+<span class="nt"># backend-saeb/src/main/resources/application.properties</span>
+<span class="nt"># Ajouter ces lignes :</span>
+
+spring.flyway.enabled=<span class="g">true</span>
+spring.flyway.locations=classpath:<span class="str">db/migration</span>
+spring.flyway.baseline-on-migrate=<span class="g">true</span>
+spring.flyway.baseline-version=<span class="y">4</span>   <span class="nt"># si V1-V4 existent déjà (sqlSchema, V1_gpt, V1_kimik2, SQLSITES)</span></div>
+
+    <div class="co co-o" style="margin-top:10px">
+      <strong>Si Flyway n'est pas encore utilisé :</strong> Simplement copier V5__add_snapshot_tables.sql dans <span class="path">src/main/resources/db/migration/</span> et activer Flyway. Spring Boot le détecte automatiquement au démarrage.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Déclarer le composant Angular dans canvas.agricole.module.ts</h3>
+    <div class="code">
+<span class="nt">// canvas.agricole.module.ts — ajouter dans declarations[]</span>
+<span class="r">import</span> { SnapshotHistoryComponent }
+  <span class="r">from</span> <span class="str">'./snapshot-history/snapshot-history.component'</span>;
+
+declarations: [
+  <span class="nt">// ... composants existants ...</span>
+  SnapshotHistoryComponent,  <span class="nt">// ← ajouter</span>
+]
+
+<span class="nt">// canvas.agricole-routing.module.ts — ajouter la route</span>
+{ path: <span class="str">'snapshots'</span>, component: SnapshotHistoryComponent }</div>
+  </div>
+</section>
+
+<!-- ══ CHECKLIST ══ -->
+<section id="checklist">
+  <div class="sh"><div class="si">✅</div><h2>Checklist d'implémentation — Ordre d'exécution</h2></div>
+
+  <div class="card">
+    <h3>Ordre recommandé</h3>
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Action</th><th>Fichier</th><th>Durée</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Créer le script SQL et le placer dans db/migration/</td><td><span class="path">V5__add_snapshot_tables.sql</span></td><td>10 min</td></tr>
+        <tr><td>2</td><td>Activer Flyway dans application.properties</td><td><span class="path">application.properties</span></td><td>5 min</td></tr>
+        <tr><td>3</td><td>Ajouter les 3 champs dans Caneva.java</td><td><span class="path">entities/Caneva.java</span></td><td>5 min</td></tr>
+        <tr><td>4</td><td>Créer CanevasStructureSnapshot.java</td><td><span class="path">entities/</span></td><td>10 min</td></tr>
+        <tr><td>5</td><td>Créer CanevasWorkflowLog.java</td><td><span class="path">entities/</span></td><td>5 min</td></tr>
+        <tr><td>6</td><td>Créer les 2 repositories</td><td><span class="path">repository/</span></td><td>5 min</td></tr>
+        <tr><td>7</td><td>Créer les DTOs (records Java)</td><td><span class="path">dtos_/</span></td><td>15 min</td></tr>
+        <tr><td>8</td><td>Créer EngagementDetailleDto + EngagementPartieDto</td><td><span class="path">dtos_/</span></td><td>10 min</td></tr>
+        <tr><td>9</td><td>Créer WorkflowLogService.java</td><td><span class="path">service/</span></td><td>10 min</td></tr>
+        <tr><td>10</td><td>Créer CanevasSnapshotService.java</td><td><span class="path">service/</span></td><td>30 min</td></tr>
+        <tr><td>11</td><td>Vérifier que ClientCanvasRepository a findByNumSeqpers()</td><td><span class="path">repository/ClientCanvasRepository.java</span></td><td>5 min</td></tr>
+        <tr><td>12</td><td>Créer CanevasSnapshotController.java</td><td><span class="path">web/</span></td><td>15 min</td></tr>
+        <tr><td>13</td><td>Démarrer le backend — vérifier que Flyway crée les tables</td><td>Console IntelliJ/Maven</td><td>5 min</td></tr>
+        <tr><td>14</td><td>Tester dans Swagger : POST /api/canevas/{id}/valider</td><td>http://localhost:8081/swagger-ui.html</td><td>10 min</td></tr>
+        <tr><td>15</td><td>Créer snapshot.service.ts Angular</td><td><span class="path">_services/</span></td><td>15 min</td></tr>
+        <tr><td>16</td><td>Créer le composant Angular + HTML</td><td><span class="path">snapshot-history/</span></td><td>30 min</td></tr>
+        <tr><td>17</td><td>Déclarer dans le module + ajouter la route</td><td><span class="path">canvas.agricole.module.ts</span></td><td>5 min</td></tr>
+        <tr><td>18</td><td>Test complet : valider AGC → vérifier snapshot en base</td><td>Browser DevTools + SQL Developer</td><td>15 min</td></tr>
+      </tbody>
+    </table>
+
+    <div class="co co-r" style="margin-top:12px">
+      <strong>Point d'attention critique :</strong> À l'étape 11, vérifier que <code>ClientCanvasRepository</code> a bien une méthode <code>findByNumSeqpers(Long numSeqpers)</code>. Si le champ dans <code>ClientCanvas.java</code> s'appelle <code>numSeqpers</code> (Integer), la méthode Spring Data sera <code>findByNumSeqpers(Long)</code> avec auto-conversion, ou adapter le type.
+    </div>
+    <div class="co co-g">
+      <strong>Durée totale estimée :</strong> ~2h30 pour un développeur qui connaît le projet.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>Canva Agricole BNA</strong> — Snapshot Engagement — Implémentation Compatible — 2026-05-13
+</footer>
+</body>
+</html>
