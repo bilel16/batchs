@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Guide Snapshot par Avis — Canvas Agricole</title>
+  <style>
+    :root{
+      --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+      --blue:#1565c0;--blue-lt:#e3f2fd;
+      --amber:#e65100;--amber-lt:#fff3e0;
+      --red:#c62828;--red-lt:#ffebee;
+      --purple:#6a1b9a;--purple-lt:#f3e5f5;
+      --gray:#455a64;--gray-lt:#eceff1;
+      --bg:#f4f6f8;--card:#fff;--border:#cfd8dc;
+      --text:#263238;--muted:#78909c;
+      --radius:10px;--shadow:0 2px 12px rgba(0,0,0,.09);
+      --code-bg:#1a2332;--code-text:#e2e8f0;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+
+    /* NAV */
+    nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:13px 32px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+    nav .brand{font-size:16px;font-weight:800}
+    nav .nav-links{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+    nav .nav-links a{color:rgba(255,255,255,.85);text-decoration:none;font-size:12px;padding:5px 12px;border-radius:20px;transition:background .2s}
+    nav .nav-links a:hover{background:rgba(255,255,255,.2)}
+
+    /* LAYOUT */
+    .page{max-width:1220px;margin:0 auto;padding:28px 20px}
+
+    /* HERO */
+    .hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:14px;padding:36px 44px;margin-bottom:32px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.06)}
+    .hero h1{font-size:24px;font-weight:800;margin-bottom:8px}
+    .hero p{opacity:.85;max-width:680px;font-size:14px}
+    .hero .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600}
+
+    /* SECTION */
+    section{margin-bottom:44px}
+    .section-header{display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--green);padding-bottom:9px;margin-bottom:20px}
+    .section-num{width:34px;height:34px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
+    .section-header h2{font-size:18px;font-weight:700}
+
+    /* CARDS */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-bottom:14px}
+    .card h3{font-size:14px;font-weight:700;margin-bottom:10px}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+
+    /* ALERTS */
+    .alert{border-radius:8px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6}
+    .alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+    .alert-info{background:var(--blue-lt);border-left:4px solid var(--blue)}
+    .alert-warning{background:var(--amber-lt);border-left:4px solid var(--amber)}
+    .alert-success{background:var(--green-lt);border-left:4px solid var(--green)}
+    .alert-danger{background:var(--red-lt);border-left:4px solid var(--red)}
+    .alert-idea{background:var(--purple-lt);border-left:4px solid var(--purple)}
+
+    /* CODE BLOCKS */
+    .code-block{background:var(--code-bg);color:var(--code-text);border-radius:8px;font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:12.5px;line-height:1.75;overflow-x:auto;position:relative}
+    .code-header{background:#0f1923;padding:8px 16px;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#90a4ae}
+    .code-lang{background:var(--green);color:#fff;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+    .code-file{color:#64b5f6;font-style:italic}
+    .code-body{padding:16px 18px}
+    /* Syntax highlighting classes */
+    .k{color:#c792ea}   /* keyword */
+    .s{color:#c3e88d}   /* string */
+    .c{color:#546e7a;font-style:italic}  /* comment */
+    .t{color:#80cbc4}   /* type/class */
+    .m{color:#f78c6c}   /* method */
+    .a{color:#ffcb6b}   /* annotation */
+    .n{color:#82aaff}   /* number */
+    .p{color:#89ddff}   /* punctuation */
+    .h{background:#2d4a6d;display:inline-block;width:100%;border-radius:2px;margin:1px 0} /* highlight */
+    .add{background:#1b3d1e;display:inline-block;width:100%;border-radius:2px}  /* added line */
+    .del{background:#3d1b1b;display:inline-block;width:100%;border-radius:2px}  /* deleted line */
+    .ln{color:#37474f;user-select:none;min-width:32px;display:inline-block;text-align:right;padding-right:12px}
+
+    /* TABLES */
+    table.t1{width:100%;border-collapse:collapse;font-size:13px;box-shadow:var(--shadow);border-radius:var(--radius);overflow:hidden}
+    table.t1 th{background:var(--green-dk);color:#fff;padding:10px 14px;text-align:left;font-size:12px}
+    table.t1 td{padding:9px 14px;border-bottom:1px solid var(--border)}
+    table.t1 tr:last-child td{border-bottom:none}
+    table.t1 tr:nth-child(even) td{background:var(--gray-lt)}
+
+    /* BADGES */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+    .badge::before{content:'●';font-size:7px}
+    .b-green{background:var(--green-lt);color:var(--green)}
+    .b-blue{background:var(--blue-lt);color:var(--blue)}
+    .b-amber{background:var(--amber-lt);color:var(--amber)}
+    .b-red{background:var(--red-lt);color:var(--red)}
+    .b-purple{background:var(--purple-lt);color:var(--purple)}
+    .b-gray{background:var(--gray-lt);color:var(--gray)}
+
+    /* STEPS */
+    .step-list{counter-reset:steps;list-style:none}
+    .step-list>li{counter-increment:steps;display:flex;gap:14px;margin-bottom:28px;align-items:flex-start}
+    .step-list>li::before{content:counter(steps);min-width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;margin-top:2px}
+    .step-content{flex:1}
+    .step-content h4{font-size:14px;font-weight:700;margin-bottom:6px}
+    .step-content p{font-size:13px;color:var(--gray);margin-bottom:8px}
+
+    /* FLOW */
+    .flow-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0}
+    .flow-box{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;text-align:center;min-width:100px}
+    .flow-box.active{border-color:var(--green);background:var(--green-lt)}
+    .flow-box.warn{border-color:var(--amber);background:var(--amber-lt)}
+    .flow-arrow{font-size:18px;color:var(--muted)}
+    .flow-arrow.back{color:var(--red)}
+
+    /* INLINE CODE */
+    code{background:var(--gray-lt);padding:1px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--purple)}
+
+    /* TOC */
+    .toc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:32px;box-shadow:var(--shadow)}
+    .toc h3{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px}
+    .toc ol{padding-left:18px;display:grid;grid-template-columns:1fr 1fr;gap:3px 24px}
+    .toc li a{color:var(--green);text-decoration:none;font-size:13px}
+    .toc li a:hover{text-decoration:underline}
+
+    hr{border:none;border-top:1px solid var(--border);margin:28px 0}
+    .mono{font-family:'Cascadia Code','Consolas',monospace;font-size:12px;background:var(--gray-lt);padding:1px 6px;border-radius:4px}
+    .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+    .tag-java{background:#fff9c4;color:#f57f17}
+    .tag-ts{background:#e3f2fd;color:#1565c0}
+    .tag-new{background:#e8f5e9;color:#1a7f37}
+    .tag-fix{background:#ffebee;color:#c62828}
+    .tag-move{background:#f3e5f5;color:#6a1b9a}
+
+    @media(max-width:768px){.toc ol{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}nav .nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">🌿 Canvas Agricole — Guide Snapshot par Avis</div>
+  <div class="nav-links">
+    <a href="#s0">Diagnostic</a>
+    <a href="#s1">Mapping</a>
+    <a href="#s2">Backend DTO</a>
+    <a href="#s3">AvisController</a>
+    <a href="#s4">SnapshotService</a>
+    <a href="#s5">Frontend</a>
+    <a href="#s6">Checklist</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Snapshot automatique à chaque envoi d'Avis</h1>
+    <p>
+      Guide technique complet avec le <strong>code exact à ajouter</strong> dans le projet pour que
+      chaque action sur l'avis (du chargé en agence jusqu'à la décision finale) génère
+      automatiquement un snapshot horodaté + un log de workflow.
+    </p>
+    <div class="pills">
+      <span class="pill">AvisController.java</span>
+      <span class="pill">AvisDTO.java</span>
+      <span class="pill">CanevasSnapshotService.java</span>
+      <span class="pill">avis.component.ts</span>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>Plan du document</h3>
+    <ol>
+      <li><a href="#s0">Diagnostic — ce qui ne va pas aujourd'hui</a></li>
+      <li><a href="#s1">Mapping statusAvis → snapshot + log</a></li>
+      <li><a href="#s2">Étape 1 — Ajouter 2 champs à AvisDTO</a></li>
+      <li><a href="#s3">Étape 2 — Corriger AvisController</a></li>
+      <li><a href="#s4">Étape 3 — Enrichir CanevasSnapshotService (donneesAvisJson)</a></li>
+      <li><a href="#s5">Étape 4 — Frontend : passer structureLabel depuis avis.component.ts</a></li>
+      <li><a href="#s6">Checklist de validation finale</a></li>
+    </ol>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S0 — DIAGNOSTIC -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s0">
+    <div class="section-header">
+      <div class="section-num">0</div>
+      <h2>Diagnostic — ce qui ne va pas aujourd'hui dans AvisController.java</h2>
+    </div>
+
+    <div class="alert alert-danger">
+      <span class="alert-icon">🚨</span>
+      <div>
+        Le snapshot est créé <strong>AVANT</strong> que l'avis ne soit sauvegardé, avec des valeurs
+        <strong>complètement hardcodées</strong> (<code>"test label str"</code>, <code>"test Observation"</code>).
+        De plus, aucun <strong>WorkflowLog</strong> n'est créé. Résultat : les snapshots n'ont ni label ni
+        commentaire réel, et l'historique de workflow est vide.
+      </div>
+    </div>
+
+    <!-- Code actuel buggé -->
+    <div class="code-block">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">AvisController.java — ÉTAT ACTUEL (à corriger)</span></span>
+      </div>
+      <div class="code-body"><span class="del"><span class="c">// ❌ PROBLÈME 1 : snapshot créé AVANT la sauvegarde de l'avis</span>
+</span><span class="del"><span class="k">try</span> <span class="p">{</span>
+    snapshotService.createSnapshot(
+        avisDTO.getNumCaneva(),
+        String.valueOf(avisDTO.getStructure()),
+<span class="c">        "test label str",       // ❌ HARDCODÉ</span>
+        String.valueOf(avisDTO.getMatricule()),
+        String.valueOf(avisDTO.getMatricule()),
+<span class="c">        "test Observation",     // ❌ HARDCODÉ (devrait être avisDTO.getCommentaire())</span>
+        avisDTO.getStatusAvis()
+    );
+<span class="p">}</span>
+</span>
+<span class="c">// ❌ PROBLÈME 2 : saveAvis() est appelé APRÈS le snapshot</span>
+<span class="t">AvisDTO</span> saved <span class="p">=</span> avisService.saveAvis(avisDTO);
+
+<span class="c">// ❌ PROBLÈME 3 : aucun WorkflowLog n'est créé
+// ❌ PROBLÈME 4 : l'avisDTO n'a pas de champ structureLabel ni toStructureCode</span></div>
+    </div>
+
+    <!-- 4 problèmes résumés -->
+    <div class="card-grid" style="margin-top:16px">
+      <div class="card" style="border-left:4px solid var(--red)">
+        <h3>🔴 Problème 1 — Ordre inversé</h3>
+        <p style="font-size:13px;color:var(--gray)">Le snapshot est pris <strong>avant</strong> que l'avis soit sauvegardé en base. Si <code>saveAvis()</code> échoue, le snapshot existe mais pointe sur une donnée non enregistrée.</p>
+        <p style="font-size:12px;margin-top:6px"><strong>Fix :</strong> Créer le snapshot <em>après</em> <code>avisService.saveAvis(avisDTO)</code>.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--red)">
+        <h3>🔴 Problème 2 — Valeurs hardcodées</h3>
+        <p style="font-size:13px;color:var(--gray)"><code>structureLabel = "test label str"</code> et <code>observations = "test Observation"</code> sont des valeurs de test jamais remplacées par les vraies données.</p>
+        <p style="font-size:12px;margin-top:6px"><strong>Fix :</strong> Passer <code>avisDTO.getStructureLabel()</code> et <code>avisDTO.getCommentaire()</code>.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--amber)">
+        <h3>🟠 Problème 3 — Pas de WorkflowLog</h3>
+        <p style="font-size:13px;color:var(--gray)">Aucune entrée dans <code>CanevasWorkflowLog</code> n'est créée lors de l'envoi d'un avis. L'historique "History" est donc incomplet.</p>
+        <p style="font-size:12px;margin-top:6px"><strong>Fix :</strong> Appeler <code>workflowLogService.log()</code> après chaque snapshot réussi.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--amber)">
+        <h3>🟠 Problème 4 — AvisDTO incomplet</h3>
+        <p style="font-size:13px;color:var(--gray)"><code>AvisDTO</code> n'a pas de champ <code>structureLabel</code> ni <code>toStructureCode</code>. Le backend ne peut donc pas savoir vers quelle structure l'avis est transmis.</p>
+        <p style="font-size:12px;margin-top:6px"><strong>Fix :</strong> Ajouter 2 champs à <code>AvisDTO</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S1 — MAPPING -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Mapping statusAvis → Action snapshot + Log workflow</h2>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ️</span>
+      <div>
+        Chaque valeur de <code>statusAvis</code> envoyée par le frontend correspond à une action métier,
+        un profil utilisateur, et un changement de structure. Ce tableau est la <strong>référence centrale</strong>
+        pour savoir quand et comment créer le snapshot + log.
+      </div>
+    </div>
+
+    <table class="t1">
+      <thead>
+        <tr>
+          <th>statusAvis (frontend)</th>
+          <th>Qui envoie</th>
+          <th>Page</th>
+          <th>fromStructure</th>
+          <th>toStructure</th>
+          <th>action (WorkflowLog)</th>
+          <th>Stade Caneva résultant</th>
+          <th>Snapshot ?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>PEC_CCA</code></td>
+          <td>CCA / Chargé</td>
+          <td>page1</td>
+          <td>user.codeStructure</td>
+          <td>user.codeStructure</td>
+          <td><span class="badge b-blue">PRENDRE_EN_CHARGE</span></td>
+          <td><span class="badge b-blue">PEC_DONNEE</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>Envoyer</code> (Chargé/Division)</td>
+          <td>Chargé / Division</td>
+          <td>page1</td>
+          <td>user.codeStructure</td>
+          <td>supervisor.codeStructure</td>
+          <td><span class="badge b-blue">ENVOYER_SUPERVISEUR</span></td>
+          <td><span class="badge b-amber">EN_COURS_ETUDE</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>Envoyer</code> (normal)</td>
+          <td>Chef Agence / DR</td>
+          <td>page1/2</td>
+          <td>user.codeStructure</td>
+          <td>avisDTO.codeStructureReceptrice</td>
+          <td><span class="badge b-blue">ENVOYER</span></td>
+          <td><span class="badge b-amber">EN_COURS_ETUDE</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>PRES_VALIDER</code></td>
+          <td>Chef Agence (CHAGCE)</td>
+          <td>page2</td>
+          <td>user.codeStructure</td>
+          <td>user.structureMere (DR)</td>
+          <td><span class="badge b-green">PRE_VALIDER</span></td>
+          <td><span class="badge b-green">VALID_DONNEE</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>CORRIGER</code></td>
+          <td>Chef Agence (CHAGCE)</td>
+          <td>page2</td>
+          <td>user.codeStructure</td>
+          <td>avisDTO.codeStructureReceptrice</td>
+          <td><span class="badge b-red">REFOULER</span></td>
+          <td><span class="badge b-red">CORRIGE_DONNEE</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>PEC_AVIS_DEC</code></td>
+          <td>Analyste DR (PROFILE3)</td>
+          <td>page3</td>
+          <td>user.codeStructure</td>
+          <td>user.codeStructure</td>
+          <td><span class="badge b-blue">PRENDRE_EN_CHARGE</span></td>
+          <td><span class="badge b-purple">PEC_AVIS_DEC</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>VALIDER</code></td>
+          <td>Directeur DR (PROFILE4)</td>
+          <td>page4</td>
+          <td>user.codeStructure</td>
+          <td>avisDTO.codeStructureReceptrice (DC)</td>
+          <td><span class="badge b-green">VALIDER</span></td>
+          <td><span class="badge b-purple">VALIDER_DR</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>CORRIGER2</code></td>
+          <td>Directeur DR (PROFILE4)</td>
+          <td>page4</td>
+          <td>user.codeStructure</td>
+          <td>avisDTO.codeStructureReceptrice</td>
+          <td><span class="badge b-red">REFOULER</span></td>
+          <td><span class="badge b-red">CORRIGE_AVIS_DEC</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+        <tr>
+          <td><code>Décision Finale</code></td>
+          <td>DC (PROFILE5)</td>
+          <td>page5</td>
+          <td>user.codeStructure</td>
+          <td>—</td>
+          <td><span class="badge b-purple">DECISION_FINALE</span></td>
+          <td><span class="badge b-green">DEC_FINAL_PRISE_ACCORD</span> / <span class="badge b-red">DEC_FINAL_PRISE_REJET</span></td>
+          <td class="badge b-green">✔ OUI</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S2 — AvisDTO -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Étape 1 — Ajouter 2 champs à AvisDTO <span class="tag tag-java">Java</span> <span class="tag tag-new">+2 champs</span></h2>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📄</span>
+      <div>
+        Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/dtos_/AvisDTO.java</code><br/>
+        Ajouter 2 champs Lombok. Aucun autre changement dans ce fichier.
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">AvisDTO.java — ajouter ces 2 champs à la fin de la liste des champs existants</span></span>
+      </div>
+      <div class="code-body"><span class="c">// ── Champs EXISTANTS (ne pas toucher) ──</span>
+<span class="k">private</span> <span class="t">Long</span> id;
+<span class="k">private</span> <span class="t">Long</span> numCaneva;
+<span class="k">private</span> <span class="t">Long</span> numSeqpers;
+<span class="k">private</span> <span class="t">String</span> statusAvis;
+<span class="k">private</span> <span class="t">Long</span> structure;
+<span class="k">private</span> <span class="t">Long</span> matricule;
+<span class="k">private</span> <span class="t">String</span> avisValue;
+<span class="k">private</span> <span class="t">String</span> codeStructureReceptrice;
+<span class="k">private</span> <span class="t">String</span> typeStructure;
+<span class="k">private</span> <span class="t">String</span> structureMere;
+<span class="k">private</span> <span class="k">boolean</span> isChargedOrDivision;
+<span class="k">private</span> <span class="t">String</span> commentaire;
+<span class="c">// ... autres champs data ...</span>
+
+<span class="c">// ══════════════════════════════════════════════════════════</span>
+<span class="add"><span class="c">// ✅ AJOUTER CES 2 CHAMPS (nécessaires pour snapshot + log)</span>
+<span class="k">private</span> <span class="t">String</span> structureLabel;       <span class="c">// ex: "Agence Tunis Centre"</span>
+<span class="k">private</span> <span class="t">String</span> toStructureCode;      <span class="c">// code structure destinataire (pour log)</span>
+</span><span class="c">// ══════════════════════════════════════════════════════════</span></div>
+    </div>
+
+    <div class="alert alert-warning" style="margin-top:10px">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        La classe utilise <strong>Lombok @Data</strong> (ou @Getter/@Setter). Les getters/setters
+        <code>getStructureLabel()</code> et <code>getToStructureCode()</code> seront générés automatiquement.
+        Si la classe n'utilise pas Lombok, ajouter les getters/setters manuellement.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S3 — AvisController -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Étape 2 — Réécrire AvisController.saveAvis() <span class="tag tag-java">Java</span> <span class="tag tag-fix">FIX</span></h2>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📄</span>
+      <div>
+        Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/web/AvisController.java</code><br/>
+        Remplacer <strong>entièrement</strong> la méthode <code>saveAvis()</code> (lignes 31–67) par le code ci-dessous.
+        Ajouter aussi l'injection de <code>WorkflowLogService</code>.
+      </div>
+    </div>
+
+    <!-- Injection WorkflowLogService -->
+    <div class="code-block">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">AvisController.java — Étape 3a : ajouter l'injection WorkflowLogService</span></span>
+      </div>
+      <div class="code-body"><span class="c">// ── Imports à ajouter en haut du fichier ──────────────────</span>
+<span class="add"><span class="k">import</span> net.kachout.saeb.service.WorkflowLogService;
+</span>
+<span class="c">// ── Constructor — remplacer l'actuel par celui-ci ──────────</span>
+<span class="k">private final</span> <span class="t">AvisService</span> avisService;
+<span class="k">private final</span> <span class="t">CanevasSnapshotService</span> snapshotService;
+<span class="add"><span class="k">private final</span> <span class="t">WorkflowLogService</span> workflowLogService;
+</span>
+<span class="k">public</span> <span class="m">AvisController</span>(<span class="t">AvisService</span> avisService,
+                       <span class="t">CanevasSnapshotService</span> snapshotService<span class="add">,
+                       <span class="t">WorkflowLogService</span> workflowLogService</span>) {
+    <span class="k">this</span>.avisService        = avisService;
+    <span class="k">this</span>.snapshotService    = snapshotService;
+<span class="add">    <span class="k">this</span>.workflowLogService = workflowLogService;
+</span>}</div>
+    </div>
+
+    <!-- Méthode saveAvis complète -->
+    <div class="code-block" style="margin-top:14px">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">AvisController.java — Étape 3b : remplacer TOUTE la méthode saveAvis() (lignes 31–67)</span></span>
+      </div>
+      <div class="code-body"><span class="a">@PostMapping</span>
+<span class="k">public</span> <span class="t">ResponseEntity</span>&lt;<span class="t">AvisDTO</span>&gt; <span class="m">saveAvis</span>(<span class="a">@RequestBody</span> <span class="t">AvisDTO</span> avisDTO) {
+    log.info(<span class="s">"saveAvis → canevas={}, statusAvis={}, structure={}"</span>,
+            avisDTO.getNumCaneva(), avisDTO.getStatusAvis(), avisDTO.getStructure());
+
+    <span class="c">// ── ÉTAPE 1 : Sauvegarder l'avis EN PREMIER ───────────────────────────────</span>
+    <span class="t">AvisDTO</span> saved;
+    <span class="k">try</span> {
+        saved = avisService.saveAvis(avisDTO);
+    } <span class="k">catch</span> (<span class="t">JsonProcessingException</span> e) {
+        log.error(<span class="s">"Erreur sauvegarde avis"</span>, e);
+        <span class="k">return</span> <span class="t">ResponseEntity</span>.badRequest().build();
+    }
+
+    <span class="c">// ── ÉTAPE 2 : Résoudre les valeurs snapshot (plus de hardcoded) ───────────</span>
+    <span class="t">String</span> structureCode  = <span class="t">String</span>.valueOf(avisDTO.getStructure());
+    <span class="t">String</span> structureLabel = avisDTO.getStructureLabel() != <span class="k">null</span>
+                            ? avisDTO.getStructureLabel() : structureCode;
+    <span class="t">String</span> matricule      = avisDTO.getMatricule() != <span class="k">null</span>
+                            ? <span class="t">String</span>.valueOf(avisDTO.getMatricule()) : <span class="s">"INCONNU"</span>;
+    <span class="t">String</span> observations   = avisDTO.getCommentaire() != <span class="k">null</span>
+                            ? avisDTO.getCommentaire() : <span class="s">""</span>;
+    <span class="t">String</span> statusAtSnap   = resolveStatusAtSnapshot(avisDTO.getStatusAvis(),
+                                                      avisDTO.getAvisValue());
+
+    <span class="c">// ── ÉTAPE 3 : Créer le snapshot APRÈS sauvegarde ──────────────────────────</span>
+    <span class="t">Long</span> snapshotId      = <span class="k">null</span>;
+    <span class="t">Integer</span> snapshotVer  = <span class="k">null</span>;
+    <span class="k">try</span> {
+        var snapshot = snapshotService.createSnapshot(
+                avisDTO.getNumCaneva(),   <span class="c">// canevasId</span>
+                structureCode,            <span class="c">// structureCode réel</span>
+                structureLabel,           <span class="c">// ✅ libellé réel (plus "test label str")</span>
+                matricule,                <span class="c">// matricule agent</span>
+                matricule,                <span class="c">// createdBy</span>
+                observations,             <span class="c">// ✅ commentaire réel (plus "test Observation")</span>
+                statusAtSnap              <span class="c">// statut du canvas au moment du snapshot</span>
+        );
+        snapshotId  = snapshot.getSnapshotId();
+        snapshotVer = snapshot.getVersionNumber();
+        log.info(<span class="s">"✅ Snapshot v{} créé pour canevas={}"</span>, snapshotVer, avisDTO.getNumCaneva());
+    } <span class="k">catch</span> (<span class="t">Exception</span> e) {
+        <span class="c">// Le snapshot ne bloque pas la réponse</span>
+        log.warn(<span class="s">"⚠️ Échec snapshot pour canevas={}"</span>, avisDTO.getNumCaneva(), e);
+    }
+
+    <span class="c">// ── ÉTAPE 4 : Créer le WorkflowLog ────────────────────────────────────────</span>
+    <span class="k">try</span> {
+        <span class="t">String</span> toStructure = avisDTO.getToStructureCode() != <span class="k">null</span>
+                             ? avisDTO.getToStructureCode()
+                             : avisDTO.getCodeStructureReceptrice();
+        <span class="t">String</span> action = resolveWorkflowAction(avisDTO.getStatusAvis());
+
+        workflowLogService.log(
+                avisDTO.getNumCaneva(),   <span class="c">// canevasId</span>
+                structureCode,            <span class="c">// fromStructure</span>
+                toStructure,              <span class="c">// toStructure</span>
+                action,                   <span class="c">// action</span>
+                snapshotVer,              <span class="c">// snapshotVersion (peut être null)</span>
+                snapshotId,               <span class="c">// snapshotId (peut être null)</span>
+                observations,             <span class="c">// comments</span>
+                matricule                 <span class="c">// performedBy</span>
+        );
+        log.info(<span class="s">"✅ WorkflowLog créé : action={}, canevas={}"</span>, action, avisDTO.getNumCaneva());
+    } <span class="k">catch</span> (<span class="t">Exception</span> e) {
+        log.warn(<span class="s">"⚠️ Échec WorkflowLog pour canevas={}"</span>, avisDTO.getNumCaneva(), e);
+    }
+
+    <span class="k">return</span> <span class="t">ResponseEntity</span>.ok(saved);
+}</div>
+    </div>
+
+    <!-- Méthodes privées -->
+    <div class="code-block" style="margin-top:14px">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">AvisController.java — Étape 3c : ajouter ces 2 méthodes privées à la fin de la classe</span></span>
+      </div>
+      <div class="code-body"><span class="c">/**
+ * Mappe le statusAvis frontend vers le statut du canvas à enregistrer dans le snapshot.
+ * Reflète exactement la logique de AvisService.saveAvis().
+ */</span>
+<span class="k">private</span> <span class="t">String</span> <span class="m">resolveStatusAtSnapshot</span>(<span class="t">String</span> statusAvis, <span class="t">String</span> avisValue) {
+    <span class="k">if</span> (statusAvis == <span class="k">null</span>) <span class="k">return</span> <span class="s">"INCONNU"</span>;
+    <span class="k">return switch</span> (statusAvis) {
+        <span class="k">case</span> <span class="s">"PEC_CCA"</span>           -> <span class="s">"PEC_DONNEE"</span>;
+        <span class="k">case</span> <span class="s">"PRES_VALIDER"</span>       -> <span class="s">"VALID_DONNEE"</span>;
+        <span class="k">case</span> <span class="s">"CORRIGER"</span>           -> <span class="s">"CORRIGE_DONNEE"</span>;
+        <span class="k">case</span> <span class="s">"PEC_AVIS_DEC"</span>       -> <span class="s">"PEC_AVIS_DEC"</span>;
+        <span class="k">case</span> <span class="s">"CORRIGER2"</span>          -> <span class="s">"CORRIGE_AVIS_DEC"</span>;
+        <span class="k">case</span> <span class="s">"VALIDER"</span>            -> <span class="s">"VALIDER_DR"</span>;
+        <span class="k">case</span> <span class="s">"Envoyer"</span>            -> <span class="s">"EN_COURS_ETUDE"</span>;
+        <span class="k">case</span> <span class="s">"Décision Finale"</span>    -> (<span class="s">"1"</span>.equals(avisValue))
+                                        ? <span class="s">"DEC_FINAL_PRISE_ACCORD"</span>
+                                        : <span class="s">"DEC_FINAL_PRISE_REJET"</span>;
+        <span class="k">default</span>                  -> statusAvis;
+    };
+}
+
+<span class="c">/**
+ * Mappe le statusAvis frontend vers l'action à enregistrer dans CanevasWorkflowLog.
+ */</span>
+<span class="k">private</span> <span class="t">String</span> <span class="m">resolveWorkflowAction</span>(<span class="t">String</span> statusAvis) {
+    <span class="k">if</span> (statusAvis == <span class="k">null</span>) <span class="k">return</span> <span class="s">"ACTION_INCONNUE"</span>;
+    <span class="k">return switch</span> (statusAvis) {
+        <span class="k">case</span> <span class="s">"PEC_CCA"</span>           -> <span class="s">"PRENDRE_EN_CHARGE"</span>;
+        <span class="k">case</span> <span class="s">"Envoyer"</span>            -> <span class="s">"ENVOYER"</span>;
+        <span class="k">case</span> <span class="s">"PRES_VALIDER"</span>       -> <span class="s">"PRE_VALIDER"</span>;
+        <span class="k">case</span> <span class="s">"CORRIGER"</span>           -> <span class="s">"REFOULER"</span>;
+        <span class="k">case</span> <span class="s">"PEC_AVIS_DEC"</span>       -> <span class="s">"PRENDRE_EN_CHARGE"</span>;
+        <span class="k">case</span> <span class="s">"VALIDER"</span>            -> <span class="s">"VALIDER"</span>;
+        <span class="k">case</span> <span class="s">"CORRIGER2"</span>          -> <span class="s">"REFOULER"</span>;
+        <span class="k">case</span> <span class="s">"Décision Finale"</span>    -> <span class="s">"DECISION_FINALE"</span>;
+        <span class="k">default</span>                  -> statusAvis.toUpperCase();
+    };
+}</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S4 — CanevasSnapshotService -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Étape 3 — Enrichir CanevasSnapshotService : sauvegarder les données Avis <span class="tag tag-java">Java</span></h2>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📄</span>
+      <div>
+        Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java</code><br/>
+        Actuellement, le champ <code>donneesAvisJson</code> de <code>CanevasStructureSnapshot</code>
+        n'est <strong>jamais rempli</strong> dans <code>createSnapshot()</code>. Ajouter le paramètre
+        <code>avisJson</code> et le stocker.
+      </div>
+    </div>
+
+    <!-- Signature changée -->
+    <div class="code-block">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">CanevasSnapshotService.java — Étape 4a : modifier la signature de createSnapshot()</span></span>
+      </div>
+      <div class="code-body"><span class="c">// ── Ancienne signature (ligne 35) ─────────────────────────</span>
+<span class="del"><span class="k">public</span> <span class="t">CanevasStructureSnapshot</span> <span class="m">createSnapshot</span>(
+    <span class="t">Long</span> canevasId, <span class="t">String</span> structureCode, <span class="t">String</span> structureLabel,
+    <span class="t">String</span> matricule, <span class="t">String</span> createdBy, <span class="t">String</span> observations,
+    <span class="t">String</span> statusAtSnapshot) {
+</span>
+<span class="c">// ── Nouvelle signature : ajouter le paramètre avisJson ────</span>
+<span class="add"><span class="k">public</span> <span class="t">CanevasStructureSnapshot</span> <span class="m">createSnapshot</span>(
+    <span class="t">Long</span> canevasId, <span class="t">String</span> structureCode, <span class="t">String</span> structureLabel,
+    <span class="t">String</span> matricule, <span class="t">String</span> createdBy, <span class="t">String</span> observations,
+    <span class="t">String</span> statusAtSnapshot,
+    <span class="t">String</span> avisJson) {          <span class="c">// ✅ nouveau paramètre (peut être null)</span>
+</span></div>
+    </div>
+
+    <!-- Builder enrichi -->
+    <div class="code-block" style="margin-top:14px">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">CanevasSnapshotService.java — Étape 4b : ajouter donneesAvisJson dans le builder (ligne ~96)</span></span>
+      </div>
+      <div class="code-body"><span class="t">CanevasStructureSnapshot</span> snapshot = <span class="t">CanevasStructureSnapshot</span>.builder()
+    .canevasId(canevasId)
+    .structureCode(structureCode)
+    .structureLabel(structureLabel)
+    .versionNumber(nextVersion)
+    .statusAtSnapshot(statusAtSnapshot)
+    .matricule(matricule)
+    .createdBy(createdBy)
+    .observations(observations)
+    .engagementBnaJson(toJson(engagement.getListeEngagementBNA()))
+    .engagementBctJson(toJson(engagement.getListeEngagementBCT()))
+    .classeBnaJson(toJson(classeBNA))
+    .classeBctJson(toJson(classeBCT))
+    .classeRetourJson(toJson(classeRetour))
+    .engagementDetailleJson(toJson(detaille))
+    .donneesCreditsJson(creditsJson)
+    .donneesExploitationJson(exploitJson)
+    .donneesGarantiesJson(garantiesJson)
+<span class="add">    .donneesAvisJson(avisJson)      <span class="c">// ✅ AJOUTER CETTE LIGNE</span>
+</span>    .build();</div>
+    </div>
+
+    <!-- Appel depuis AvisController -->
+    <div class="code-block" style="margin-top:14px">
+      <div class="code-header">
+        <span><span class="code-lang">Java</span> <span class="code-file">AvisController.java — Étape 4c : adapter l'appel createSnapshot() pour passer l'avisJson</span></span>
+      </div>
+      <div class="code-body"><span class="c">// ── Dans saveAvis() : préparer le JSON de l'avis avant createSnapshot() ──</span>
+<span class="add"><span class="t">String</span> avisJson = <span class="k">null</span>;
+<span class="k">try</span> {
+    <span class="c">// Sérialiser l'avisDTO en JSON pour le snapshot</span>
+    <span class="t">ObjectMapper</span> mapper = <span class="k">new</span> <span class="t">ObjectMapper</span>();
+    mapper.registerModule(<span class="k">new</span> <span class="t">JavaTimeModule</span>());
+    avisJson = mapper.writeValueAsString(<span class="k">new</span> <span class="t">java.util.LinkedHashMap</span>&lt;&gt;() {{
+        put(<span class="s">"statusAvis"</span>,    avisDTO.getStatusAvis());
+        put(<span class="s">"avisValue"</span>,     avisDTO.getAvisValue());
+        put(<span class="s">"commentaire"</span>,   avisDTO.getCommentaire());
+        put(<span class="s">"structure"</span>,     avisDTO.getStructure());
+        put(<span class="s">"matricule"</span>,     avisDTO.getMatricule());
+        put(<span class="s">"avisId"</span>,        saved.getId());
+    }});
+} <span class="k">catch</span> (<span class="t">Exception</span> e) {
+    log.warn(<span class="s">"Impossible de sérialiser l'avis en JSON"</span>, e);
+}
+</span>
+<span class="c">// ── Appel createSnapshot() avec le 8e paramètre ────────────</span>
+<span class="k">var</span> snapshot = snapshotService.createSnapshot(
+    avisDTO.getNumCaneva(),
+    structureCode,
+    structureLabel,
+    matricule,
+    matricule,
+    observations,
+    statusAtSnap<span class="add">,
+    avisJson           <span class="c">// ✅ 8e paramètre ajouté</span>
+</span>);</div>
+    </div>
+
+    <div class="alert alert-warning" style="margin-top:12px">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>Tous les autres appels à createSnapshot()</strong> (dans <code>CanevasSnapshotController</code>)
+        doivent aussi être mis à jour pour passer <code>null</code> comme 8e paramètre :
+        <br/><code>snapshotService.createSnapshot(..., null);</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S5 — FRONTEND -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Étape 4 — Frontend : passer structureLabel et toStructureCode <span class="tag tag-ts">TypeScript</span></h2>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📄</span>
+      <div>
+        Fichier : <code>frontend-app1/src/app/_components/pages/canvas.agricole/avis/avis.component.ts</code><br/>
+        Dans la méthode <code>saveAvis()</code> (ligne 375), enrichir l'objet <code>avisDTO</code>
+        avec les 2 nouveaux champs.
+      </div>
+    </div>
+
+    <!-- Modèle AvisDTO TypeScript -->
+    <div class="code-block">
+      <div class="code-header">
+        <span><span class="code-lang">TypeScript</span> <span class="code-file">_models/Avis.ts — Étape 5a : ajouter 2 champs à l'interface AvisDTO</span></span>
+      </div>
+      <div class="code-body"><span class="k">export interface</span> <span class="t">AvisDTO</span> {
+  id<span class="p">?:</span> <span class="t">number</span>;
+  numCaneva<span class="p">?:</span> <span class="t">number</span>;
+  numSeqpers<span class="p">?:</span> <span class="t">number</span>;
+  statusAvis<span class="p">?:</span> <span class="t">string</span>;
+  structure<span class="p">?:</span> <span class="t">number</span>;
+  matricule<span class="p">?:</span> <span class="t">number</span>;
+  avisValue<span class="p">?:</span> <span class="t">string</span>;
+  codeStructureReceptrice<span class="p">?:</span> <span class="t">string</span>;
+  typeStructure<span class="p">?:</span> <span class="t">string</span>;
+  structureMere<span class="p">?:</span> <span class="t">string</span>;
+  isChargedOrDivision<span class="p">:</span> <span class="t">boolean</span>;
+  commentaire<span class="p">?:</span> <span class="t">string</span>;
+  <span class="c">// ... autres champs data ...</span>
+<span class="add">  structureLabel<span class="p">?:</span> <span class="t">string</span>;       <span class="c">// ✅ AJOUTER — libellé de la structure</span>
+  toStructureCode<span class="p">?:</span> <span class="t">string</span>;     <span class="c">// ✅ AJOUTER — code structure destinataire</span>
+</span>}</div>
+    </div>
+
+    <!-- avis.component.ts saveAvis() -->
+    <div class="code-block" style="margin-top:14px">
+      <div class="code-header">
+        <span><span class="code-lang">TypeScript</span> <span class="code-file">avis.component.ts — Étape 5b : enrichir l'objet avisDTO dans saveAvis() (ligne ~391)</span></span>
+      </div>
+      <div class="code-body"><span class="m">saveAvis</span>(): <span class="k">void</span> {
+  <span class="k">if</span> (<span class="k">this</span>.avisForm.invalid) { ... }
+
+  <span class="k">this</span>.isSaving.set(<span class="k">true</span>);
+  <span class="k">const</span> currentUser = <span class="k">this</span>.userService.user();
+  <span class="k">const</span> statusValue = <span class="k">this</span>.avisForm.get(<span class="s">'statusAvis'</span>)<span class="p">?.</span>value ?? <span class="s">''</span>;
+
+<span class="add">  <span class="c">// ✅ Calculer toStructureCode selon le statut sélectionné</span>
+  <span class="k">const</span> toStructureCode = <span class="k">this</span>.<span class="m">resolveToStructureCode</span>(statusValue, currentUser);
+</span>
+  <span class="k">const</span> avisDTO: <span class="t">AvisDTO</span> = {
+    id:                    <span class="k">this</span>.currentAvisId() ?? <span class="k">undefined</span>,
+    numCaneva:             <span class="k">this</span>.numCanva,
+    numSeqpers:            <span class="k">this</span>.numSeqpers,
+    statusAvis:            (statusValue === <span class="s">''</span>) ? <span class="s">'PEC_CCA'</span> : statusValue,
+    structure:             <span class="k">this</span>.structure,
+    matricule:             <span class="k">this</span>.matricule,
+    avisValue:             <span class="k">this</span>.avisForm.get(<span class="s">'avisValue'</span>)<span class="p">!.</span>value ?? <span class="s">''</span>,
+    codeStructureReceptrice: <span class="k">this</span>.avisForm.get(<span class="s">'codeStructureReceptrice'</span>)<span class="p">!.</span>value ?? <span class="s">''</span>,
+    commentaire:           <span class="k">this</span>.avisForm.get(<span class="s">'commentaire'</span>)<span class="p">!.</span>value ?? <span class="s">''</span>,
+    dataAchatTerrain:      <span class="k">this</span>.dataAchatTerrain,
+    dataCreditInvestissement: <span class="k">this</span>.dataInvestisssment,
+    dataCreditCourtTerme:  <span class="k">this</span>.dataCreditCourtTerme,
+    dataGaranties:         <span class="k">this</span>.dataGaranties,
+    typeStructure:         currentUser.typeStructure,
+    structureMere:         currentUser.structureMere,
+    isChargedOrDivision:   <span class="k">this</span>.isChargedOrDivision,
+<span class="add">    <span class="c">// ✅ AJOUTER CES 2 CHAMPS</span>
+    structureLabel:        currentUser.libStructure ?? currentUser.codeStructure ?? <span class="s">''</span>,
+    toStructureCode:       toStructureCode,
+</span>  };
+
+  <span class="k">this</span>.avisService.saveAvis(avisDTO).subscribe({ ... });
+}</div>
+    </div>
+
+    <!-- resolveToStructureCode -->
+    <div class="code-block" style="margin-top:14px">
+      <div class="code-header">
+        <span><span class="code-lang">TypeScript</span> <span class="code-file">avis.component.ts — Étape 5c : ajouter la méthode privée resolveToStructureCode()</span></span>
+      </div>
+      <div class="code-body"><span class="c">/**
+ * Détermine le code structure destinataire selon le statut de l'avis.
+ * Reprend exactement la logique de onStatusChange() et createAffectationRecords().
+ */</span>
+<span class="k">private</span> <span class="m">resolveToStructureCode</span>(statusValue: <span class="t">string</span>, user: <span class="k">any</span>): <span class="t">string</span> {
+  <span class="k">switch</span> (statusValue) {
+
+    <span class="k">case</span> <span class="s">'PRES_VALIDER'</span>:
+      <span class="c">// Chef agence pré-valide → envoie vers la DR mère</span>
+      <span class="k">return</span> user?.structureMere ?? <span class="s">''</span>;
+
+    <span class="k">case</span> <span class="s">'CORRIGER'</span>:
+    <span class="k">case</span> <span class="s">'CORRIGER2'</span>:
+      <span class="c">// Refoulement → code structure réceptrice du formulaire</span>
+      <span class="k">return</span> <span class="k">this</span>.avisForm.get(<span class="s">'codeStructureReceptrice'</span>)<span class="p">?.</span>value ?? <span class="s">''</span>;
+
+    <span class="k">case</span> <span class="s">'VALIDER'</span>: {
+      <span class="c">// DR valide → selon le type de structure</span>
+      <span class="k">if</span> (user?.typeStructure === <span class="s">'1'</span>) <span class="k">return</span> user?.structureMere ?? <span class="s">''</span>;
+      <span class="k">if</span> (user?.typeStructure === <span class="s">'2'</span>) <span class="k">return</span> <span class="s">'330'</span>;  <span class="c">// DC Pôle Risque</span>
+      <span class="k">if</span> (user?.typeStructure === <span class="s">'5'</span>) <span class="k">return</span> <span class="s">'381'</span>;
+      <span class="k">return</span> <span class="k">this</span>.avisForm.get(<span class="s">'codeStructureReceptrice'</span>)<span class="p">?.</span>value ?? <span class="s">''</span>;
+    }
+
+    <span class="k">case</span> <span class="s">'Envoyer'</span>:
+      <span class="c">// Normal : codeStructureReceptrice ; Chargé/Division : superviseur (résolu côté backend)</span>
+      <span class="k">return</span> <span class="k">this</span>.isChargedOrDivision
+        ? <span class="s">''</span>   <span class="c">// résolu côté backend via supervisor lookup</span>
+        : <span class="k">this</span>.avisForm.get(<span class="s">'codeStructureReceptrice'</span>)<span class="p">?.</span>value ?? <span class="s">''</span>;
+
+    <span class="k">case</span> <span class="s">'PEC_CCA'</span>:
+    <span class="k">case</span> <span class="s">'PEC_AVIS_DEC'</span>:
+      <span class="c">// Prise en charge → même structure</span>
+      <span class="k">return</span> user?.codeStructure ?? <span class="s">''</span>;
+
+    <span class="k">default</span>:
+      <span class="k">return</span> <span class="k">this</span>.avisForm.get(<span class="s">'codeStructureReceptrice'</span>)<span class="p">?.</span>value ?? <span class="s">''</span>;
+  }
+}</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- S6 — CHECKLIST -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Checklist de validation finale</h2>
+    </div>
+
+    <div class="alert alert-success">
+      <span class="alert-icon">✅</span>
+      <div>
+        Après avoir appliqué toutes les étapes, voici les points à vérifier pour s'assurer que le système fonctionne correctement de bout en bout.
+      </div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- Vérifs Backend -->
+      <div class="card" style="border-top:3px solid var(--green)">
+        <h3>🔧 Backend — Compilation</h3>
+        <ul style="font-size:13px;padding-left:18px;line-height:2.1;color:var(--gray)">
+          <li>✅ <code>AvisDTO</code> compile avec les 2 nouveaux champs</li>
+          <li>✅ <code>AvisController</code> compile avec injection <code>WorkflowLogService</code></li>
+          <li>✅ <code>createSnapshot()</code> accepte 8 paramètres</li>
+          <li>✅ Appels dans <code>CanevasSnapshotController</code> passent <code>null</code> en 8e param</li>
+          <li>✅ <code>mvn clean package -DskipTests</code> sans erreur</li>
+        </ul>
+      </div>
+
+      <!-- Vérifs BDD -->
+      <div class="card" style="border-top:3px solid var(--blue)">
+        <h3>🗄️ Base de données — Traces</h3>
+        <ul style="font-size:13px;padding-left:18px;line-height:2.1;color:var(--gray)">
+          <li>✅ Après chaque clic "Enregistrer" dans l'avis :<br>&nbsp;&nbsp;&nbsp;<code>SELECT * FROM CANEVAS_STRUCTURE_SNAPSHOT</code><br>&nbsp;&nbsp;&nbsp;→ 1 nouvelle ligne avec <code>STRUCTURE_LABEL</code> non null</li>
+          <li>✅ <code>SELECT * FROM CANEVAS_WORKFLOW_LOG</code><br>&nbsp;&nbsp;&nbsp;→ 1 nouvelle ligne avec <code>ACTION</code> non null</li>
+          <li>✅ <code>DONNEES_AVIS_JSON</code> contient le JSON de l'avis</li>
+          <li>✅ <code>OBSERVATIONS</code> contient le vrai commentaire (pas "test Observation")</li>
+        </ul>
+      </div>
+
+      <!-- Vérifs Frontend -->
+      <div class="card" style="border-top:3px solid var(--purple)">
+        <h3>🖥️ Frontend — Tests scénarios</h3>
+        <ul style="font-size:13px;padding-left:18px;line-height:2.1;color:var(--gray)">
+          <li>✅ CCA (page1) : clic "Enregistrer" → snapshot créé</li>
+          <li>✅ Chef Agence (page2) : PRES_VALIDER → snapshot <code>VALID_DONNEE</code></li>
+          <li>✅ Chef Agence (page2) : CORRIGER → snapshot <code>CORRIGE_DONNEE</code></li>
+          <li>✅ Analyste DR (page3) : PEC_AVIS_DEC → snapshot <code>PEC_AVIS_DEC</code></li>
+          <li>✅ Directeur DR (page4) : VALIDER → snapshot <code>VALIDER_DR</code></li>
+          <li>✅ DC (page5) : Décision Finale → snapshot <code>DEC_FINAL_PRISE_ACCORD</code></li>
+        </ul>
+      </div>
+
+      <!-- Vérifs History -->
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <h3>📋 History — Affichage</h3>
+        <ul style="font-size:13px;padding-left:18px;line-height:2.1;color:var(--gray)">
+          <li>✅ Clic "History" → onglet Workflow Log affiche toutes les actions</li>
+          <li>✅ Onglet Snapshots affiche une ligne par envoi d'avis</li>
+          <li>✅ Icône 👁 ouvre le détail avec le vrai commentaire</li>
+          <li>✅ L'onglet "Avis" dans le détail snapshot affiche les données crédit/garantie</li>
+          <li>✅ <code>structureLabel</code> est le libellé réel (pas le code brut)</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Résumé des fichiers modifiés -->
+    <div class="card" style="margin-top:16px">
+      <h3>📁 Récapitulatif des fichiers modifiés</h3>
+      <table class="t1">
+        <thead>
+          <tr><th>Fichier</th><th>Type</th><th>Nature de la modification</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>dtos_/AvisDTO.java</code></td>
+            <td><span class="tag tag-java">Java</span></td>
+            <td><span class="tag tag-new">+2 champs</span> <code>structureLabel</code>, <code>toStructureCode</code></td>
+          </tr>
+          <tr>
+            <td><code>web/AvisController.java</code></td>
+            <td><span class="tag tag-java">Java</span></td>
+            <td><span class="tag tag-fix">FIX</span> ordre snapshot/avis + vraies valeurs + WorkflowLog + 2 méthodes privées</td>
+          </tr>
+          <tr>
+            <td><code>service/CanevasSnapshotService.java</code></td>
+            <td><span class="tag tag-java">Java</span></td>
+            <td><span class="tag tag-new">+1 param</span> <code>avisJson</code> dans signature + builder</td>
+          </tr>
+          <tr>
+            <td><code>web/CanevasSnapshotController.java</code></td>
+            <td><span class="tag tag-java">Java</span></td>
+            <td><span class="tag tag-fix">FIX</span> ajouter <code>null</code> en 8e paramètre sur tous les appels <code>createSnapshot()</code></td>
+          </tr>
+          <tr>
+            <td><code>_models/Avis.ts</code></td>
+            <td><span class="tag tag-ts">TypeScript</span></td>
+            <td><span class="tag tag-new">+2 champs</span> interface <code>AvisDTO</code></td>
+          </tr>
+          <tr>
+            <td><code>avis/avis.component.ts</code></td>
+            <td><span class="tag tag-ts">TypeScript</span></td>
+            <td><span class="tag tag-new">+2 champs</span> dans l'objet avisDTO + méthode <code>resolveToStructureCode()</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vérification rapide SQL -->
+    <div class="code-block" style="margin-top:16px">
+      <div class="code-header">
+        <span><span class="code-lang">SQL</span> <span class="code-file">Requêtes Oracle pour vérifier que tout fonctionne</span></span>
+      </div>
+      <div class="code-body"><span class="c">-- Vérifier les snapshots créés par les avis</span>
+<span class="k">SELECT</span> SNAPSHOT_ID, CANEVAS_ID, STRUCTURE_CODE, STRUCTURE_LABEL,
+       VERSION_NUMBER, STATUS_AT_SNAPSHOT, CREATED_BY, CREATED_AT,
+       SUBSTR(OBSERVATIONS, 1, 60) AS OBS,
+       CASE WHEN DONNEES_AVIS_JSON IS NOT NULL THEN <span class="s">'OUI'</span> ELSE <span class="s">'NON'</span> END AS HAS_AVIS
+<span class="k">FROM</span> CANEVAS_STRUCTURE_SNAPSHOT
+<span class="k">WHERE</span> CANEVAS_ID = <span class="n">:votre_id_canevas</span>
+<span class="k">ORDER BY</span> VERSION_NUMBER;
+
+<span class="c">-- Vérifier que STRUCTURE_LABEL n'est plus "test label str"</span>
+<span class="k">SELECT</span> <span class="p">*</span> <span class="k">FROM</span> CANEVAS_STRUCTURE_SNAPSHOT
+<span class="k">WHERE</span> STRUCTURE_LABEL = <span class="s">'test label str'</span>; <span class="c">-- doit retourner 0 lignes après le fix</span>
+
+<span class="c">-- Vérifier les logs workflow créés par les avis</span>
+<span class="k">SELECT</span> LOG_ID, CANEVAS_ID, FROM_STRUCTURE, TO_STRUCTURE,
+       ACTION, PERFORMED_BY, PERFORMED_AT,
+       SUBSTR(COMMENTS, 1, 60) AS COMMENTS
+<span class="k">FROM</span> CANEVAS_WORKFLOW_LOG
+<span class="k">WHERE</span> CANEVAS_ID = <span class="n">:votre_id_canevas</span>
+<span class="k">ORDER BY</span> PERFORMED_AT;</div>
+    </div>
+  </section>
+
+  <hr/>
+  <div style="text-align:center;color:var(--muted);font-size:11px;padding-bottom:36px">
+    Guide technique — Canvas Agricole BNA &nbsp;|&nbsp;
+    6 fichiers à modifier · 0 nouvelle entité · 0 nouvelle table &nbsp;|&nbsp;
+    Généré le 14/05/2026
+  </div>
+
+</div>
+</body>
+</html>

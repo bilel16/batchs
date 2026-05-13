@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Implémentation Snapshot History — Canvas Agricole</title>
+<style>
+:root{
+  --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+  --blue:#1565c0;--blue-lt:#e3f2fd;
+  --amber:#e65100;--amber-lt:#fff3e0;
+  --red:#c62828;--red-lt:#ffebee;
+  --purple:#6a1b9a;--purple-lt:#f3e5f5;
+  --gray:#455a64;--gray-lt:#eceff1;
+  --bg:#f0f4f8;--card:#fff;--border:#cfd8dc;
+  --text:#263238;--muted:#78909c;
+  --radius:8px;--shadow:0 2px 10px rgba(0,0,0,.08);
+  --code-bg:#0d1117;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:12px 28px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+nav .brand{font-size:15px;font-weight:800}
+nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:12px;padding:4px 11px;border-radius:20px;transition:background .2s}
+nav a:hover{background:rgba(255,255,255,.2)}
+.page{max-width:1200px;margin:0 auto;padding:24px 18px}
+.hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:12px;padding:32px 40px;margin-bottom:28px}
+.hero h1{font-size:22px;font-weight:800;margin-bottom:8px}
+.hero p{opacity:.85;font-size:13px;max-width:700px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600}
+section{margin-bottom:40px}
+.sh{display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--green);padding-bottom:8px;margin-bottom:18px}
+.sn{width:32px;height:32px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.sh h2{font-size:17px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);margin-bottom:12px}
+.card h3{font-size:13px;font-weight:700;margin-bottom:10px}
+.alert{border-radius:7px;padding:11px 14px;margin-bottom:12px;display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.6}
+.ai{background:var(--blue-lt);border-left:4px solid var(--blue)}
+.aw{background:var(--amber-lt);border-left:4px solid var(--amber)}
+.as{background:var(--green-lt);border-left:4px solid var(--green)}
+.ad{background:var(--red-lt);border-left:4px solid var(--red)}
+/* CODE */
+.cb{background:var(--code-bg);border-radius:7px;overflow:hidden;margin-bottom:14px}
+.ch{background:#161b22;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#8b949e;border-bottom:1px solid #30363d}
+.cl{background:var(--green);color:#fff;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.cf{color:#58a6ff;font-style:italic}
+.cd{padding:14px 16px;font-family:'Cascadia Code','Consolas',monospace;font-size:12.5px;line-height:1.8;color:#e6edf3;overflow-x:auto;white-space:pre}
+/* Syntax */
+.k{color:#ff7b72}.t{color:#79c0ff}.s{color:#a5d6ff}.m{color:#d2a8ff}
+.c{color:#8b949e;font-style:italic}.a{color:#ffa657}.n{color:#79c0ff}
+.add{background:#0d4429;display:block}.del{background:#67060c;display:block}
+table.t1{width:100%;border-collapse:collapse;font-size:13px;overflow:hidden;border-radius:var(--radius);box-shadow:var(--shadow)}
+table.t1 th{background:var(--green-dk);color:#fff;padding:9px 13px;text-align:left;font-size:12px}
+table.t1 td{padding:8px 13px;border-bottom:1px solid var(--border)}
+table.t1 tr:last-child td{border-bottom:none}
+table.t1 tr:nth-child(even) td{background:var(--gray-lt)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+code{background:var(--gray-lt);padding:1px 5px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--purple)}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+.tj{background:#fff9c4;color:#f57f17}.tts{background:#e3f2fd;color:#1565c0}
+.tn{background:#e8f5e9;color:#1a7f37}.tf{background:#ffebee;color:#c62828}
+hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}nav a{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌿 Implémentation Snapshot History</div>
+  <a href="#s1">1·Backend Entity</a>
+  <a href="#s2">2·Repository</a>
+  <a href="#s3">3·Service</a>
+  <a href="#s4">4·Controller</a>
+  <a href="#s5">5·TS Service</a>
+  <a href="#s6">6·Component TS</a>
+  <a href="#s7">7·Template HTML</a>
+  <a href="#s8">8·CSS</a>
+</nav>
+<div class="page">
+
+<div class="hero">
+  <h1>Code complet — Implémentation Snapshot History</h1>
+  <p>Tous les fichiers à modifier ou créer pour implémenter le scénario complet : bouton History, timeline workflow, visibilité par rôle (AGC/DR/DC), détail snapshot au clic de l'œil.</p>
+  <div class="pills">
+    <span class="pill">6 fichiers backend</span>
+    <span class="pill">3 fichiers frontend</span>
+    <span class="pill">Zéro nouvelle table</span>
+    <span class="pill">Angular Signals</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S1 — CanevasWorkflowLog.java                       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s1">
+<div class="sh"><div class="sn">1</div><h2>CanevasWorkflowLog.java — ajouter <code>structureMere</code> <span class="tag tj">Java</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/entities/CanevasWorkflowLog.java</code><br/>Ajouter un seul champ. Ce champ permet à la DR de filtrer les logs des agences sous sa tutelle.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">Java</span> <span class="cf">CanevasWorkflowLog.java — ajouter après le champ performedAt (ligne 43)</span></span></div>
+<div class="cd"><span class="c">// ── Champs EXISTANTS (ne pas toucher) ──────────────────────</span>
+@Column(name = <span class="s">"performed_by"</span>)
+<span class="k">private</span> <span class="t">String</span> performedBy;
+
+@CreationTimestamp
+@Column(name = <span class="s">"performed_at"</span>, updatable = <span class="k">false</span>)
+<span class="k">private</span> <span class="t">LocalDateTime</span> performedAt;
+
+<span class="add">// ✅ AJOUTER CE CHAMP — hiérarchie DR→AGC pour le filtrage par rôle
+@Column(name = <span class="s">"structure_mere"</span>, length = <span class="n">20</span>)
+<span class="k">private</span> <span class="t">String</span> structureMere;  <span class="c">// ex: "DR-05" quand fromStructure = "AGC-001"</span>
+</span></div></div>
+
+<div class="alert aw"><span>⚠️</span><div>La colonne <code>STRUCTURE_MERE</code> doit exister dans la table Oracle. Ajouter ce script Flyway si elle n'existe pas encore :</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">SQL</span> <span class="cf">V9__add_structure_mere_to_workflow_log.sql — créer dans db/migration/</span></span></div>
+<div class="cd">ALTER TABLE CANEVAS_WORKFLOW_LOG
+  ADD structure_mere VARCHAR2(20 CHAR);
+
+COMMENT ON COLUMN CANEVAS_WORKFLOW_LOG.structure_mere
+  IS 'Structure mère de fromStructure (ex: DR-05 pour AGC-001). Sert au filtrage DR.';</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S2 — CanevasWorkflowLogRepository.java             -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s2">
+<div class="sh"><div class="sn">2</div><h2>CanevasWorkflowLogRepository.java — ajouter 3 méthodes <span class="tag tj">Java</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/repository/CanevasWorkflowLogRepository.java</code><br/>Remplacer tout le contenu du fichier par ce code.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">Java</span> <span class="cf">CanevasWorkflowLogRepository.java — fichier complet</span></span></div>
+<div class="cd"><span class="k">package</span> net.kachout.saeb.repository;
+
+<span class="k">import</span> net.kachout.saeb.entities.CanevasWorkflowLog;
+<span class="k">import</span> org.springframework.data.jpa.repository.JpaRepository;
+<span class="k">import</span> java.util.List;
+
+<span class="k">public interface</span> <span class="t">CanevasWorkflowLogRepository</span>
+        <span class="k">extends</span> <span class="t">JpaRepository</span>&lt;<span class="t">CanevasWorkflowLog</span>, Long&gt; {
+
+    <span class="c">// ── Existant ──────────────────────────────────────────────</span>
+    List&lt;<span class="t">CanevasWorkflowLog</span>&gt;
+    findByCanevasIdOrderByPerformedAtDesc(Long canevasId);
+
+    List&lt;<span class="t">CanevasWorkflowLog</span>&gt;
+    findByCanevasIdAndAction(Long canevasId, String action);
+
+<span class="add">    // ✅ AJOUTER — filtre AGC : logs où fromStructure = codeStructure de l'agence
+    List&lt;<span class="t">CanevasWorkflowLog</span>&gt;
+    findByCanevasIdAndFromStructureOrderByPerformedAtDesc(
+            Long canevasId, String fromStructure);
+
+    // ✅ AJOUTER — filtre DR : logs de ses agences (via structureMere)
+    List&lt;<span class="t">CanevasWorkflowLog</span>&gt;
+    findByCanevasIdAndStructureMereOrderByPerformedAtDesc(
+            Long canevasId, String structureMere);
+
+    // ✅ AJOUTER — logs DR propres (fromStructure = code DR)
+    List&lt;<span class="t">CanevasWorkflowLog</span>&gt;
+    findByCanevasIdAndFromStructureOrCanevasIdAndToStructureOrderByPerformedAtDesc(
+            Long canevasId1, String fromStructure,
+            Long canevasId2, String toStructure);
+</span>}</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S3 — WorkflowLogService.java                       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s3">
+<div class="sh"><div class="sn">3</div><h2>WorkflowLogService.java — mise à jour complète <span class="tag tj">Java</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/service/WorkflowLogService.java</code><br/>Remplacer tout le contenu.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">Java</span> <span class="cf">WorkflowLogService.java — fichier complet</span></span></div>
+<div class="cd"><span class="k">package</span> net.kachout.saeb.service;
+
+<span class="k">import</span> lombok.RequiredArgsConstructor;
+<span class="k">import</span> lombok.extern.slf4j.Slf4j;
+<span class="k">import</span> net.kachout.saeb.entities.CanevasWorkflowLog;
+<span class="k">import</span> net.kachout.saeb.repository.CanevasWorkflowLogRepository;
+<span class="k">import</span> org.springframework.stereotype.Service;
+<span class="k">import</span> java.util.*;
+<span class="k">import</span> java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+<span class="k">public class</span> <span class="t">WorkflowLogService</span> {
+
+    <span class="k">private final</span> <span class="t">CanevasWorkflowLogRepository</span> repo;
+
+    <span class="c">/**
+     * Crée un log de transition workflow.
+     * @param structureMere  la DR parente de fromStructure (null si fromStructure est une DR ou DC)
+     */</span>
+    <span class="k">public</span> <span class="t">CanevasWorkflowLog</span> <span class="m">log</span>(
+            Long canevasId,
+            String fromStructure,
+            String toStructure,
+            String action,
+            Integer snapshotVersion,
+            Long snapshotId,
+            String comments,
+            String performedBy<span class="add">,
+            String structureMere      <span class="c">// ✅ nouveau paramètre</span>
+</span>    ) {
+        <span class="t">CanevasWorkflowLog</span> entry = <span class="t">CanevasWorkflowLog</span>.builder()
+                .canevasId(canevasId)
+                .fromStructure(fromStructure)
+                .toStructure(toStructure)
+                .action(action)
+                .snapshotVersion(snapshotVersion)
+                .snapshotId(snapshotId)
+                .comments(comments)
+                .performedBy(performedBy)
+<span class="add">                .structureMere(structureMere)  <span class="c">// ✅</span>
+</span>                .build();
+        <span class="t">CanevasWorkflowLog</span> saved = repo.save(entry);
+        log.info(<span class="s">"WorkflowLog créé: canevas={} action={} from={} to={}"</span>,
+                canevasId, action, fromStructure, toStructure);
+        <span class="k">return</span> saved;
+    }
+
+    <span class="c">/** Surcharge rétrocompatible sans structureMere (pour CanevasSnapshotController) */</span>
+    <span class="k">public</span> <span class="t">CanevasWorkflowLog</span> <span class="m">log</span>(
+            Long canevasId, String fromStructure, String toStructure,
+            String action, Integer snapshotVersion, Long snapshotId,
+            String comments, String performedBy) {
+        <span class="k">return</span> log(canevasId, fromStructure, toStructure, action,
+                   snapshotVersion, snapshotId, comments, performedBy, <span class="k">null</span>);
+    }
+
+    <span class="c">/** Tous les logs — pour DC (aucun filtre) */</span>
+    <span class="k">public</span> List&lt;<span class="t">CanevasWorkflowLog</span>&gt; <span class="m">getHistory</span>(Long canevasId) {
+        <span class="k">return</span> repo.findByCanevasIdOrderByPerformedAtDesc(canevasId);
+    }
+
+    <span class="c">/**
+     * Logs filtrés selon le rôle :
+     *   typeStructure="1" (AGC) → uniquement les logs de codeStructure
+     *   typeStructure="2" (DR)  → ses propres logs + logs de ses agences (structureMere)
+     *   null / autre (DC)       → tous les logs
+     */</span>
+    <span class="k">public</span> List&lt;<span class="t">CanevasWorkflowLog</span>&gt; <span class="m">getHistoryFiltered</span>(
+            Long canevasId,
+            String typeStructure,
+            String codeStructure) {
+
+        <span class="k">if</span> (<span class="s">"1"</span>.equals(typeStructure) &amp;&amp; codeStructure != <span class="k">null</span>) {
+            <span class="c">// AGC : uniquement ses propres logs</span>
+            <span class="k">return</span> repo.findByCanevasIdAndFromStructureOrderByPerformedAtDesc(
+                    canevasId, codeStructure);
+        }
+        <span class="k">if</span> (<span class="s">"2"</span>.equals(typeStructure) &amp;&amp; codeStructure != <span class="k">null</span>) {
+            <span class="c">// DR : ses propres logs + logs de ses agences filles</span>
+            List&lt;<span class="t">CanevasWorkflowLog</span>&gt; propres =
+                repo.findByCanevasIdAndFromStructureOrderByPerformedAtDesc(
+                        canevasId, codeStructure);
+            List&lt;<span class="t">CanevasWorkflowLog</span>&gt; agences =
+                repo.findByCanevasIdAndStructureMereOrderByPerformedAtDesc(
+                        canevasId, codeStructure);
+            List&lt;<span class="t">CanevasWorkflowLog</span>&gt; merged = <span class="k">new</span> ArrayList&lt;&gt;();
+            merged.addAll(propres);
+            merged.addAll(agences);
+            merged.sort(<span class="t">Comparator</span>.comparing(
+                    <span class="t">CanevasWorkflowLog</span>::getPerformedAt).reversed());
+            <span class="k">return</span> merged;
+        }
+        <span class="c">// DC ou non spécifié : tout</span>
+        <span class="k">return</span> repo.findByCanevasIdOrderByPerformedAtDesc(canevasId);
+    }
+}</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S4 — CanevasSnapshotController.java                -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s4">
+<div class="sh"><div class="sn">4</div><h2>CanevasSnapshotController.java — endpoint workflow-log filtré <span class="tag tj">Java</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/web/CanevasSnapshotController.java</code><br/>Remplacer uniquement la méthode <code>getWorkflowLog()</code> (lignes 108–113). Le reste du fichier ne change pas.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">Java</span> <span class="cf">CanevasSnapshotController.java — remplacer getWorkflowLog() (lignes 108–113)</span></span></div>
+<div class="cd"><span class="del">// ❌ ANCIENNE VERSION — aucun filtre
+@GetMapping(<span class="s">"/{id}/snapshots/workflow-log"</span>)
+<span class="k">public</span> <span class="t">ResponseEntity</span>&lt;List&lt;?&gt;&gt; getWorkflowLog(@PathVariable Long id) {
+    <span class="k">return</span> <span class="t">ResponseEntity</span>.ok(workflowLogService.getHistory(id));
+}
+</span>
+<span class="add">// ✅ NOUVELLE VERSION — filtre par rôle (typeStructure + codeStructure)
+@GetMapping(<span class="s">"/{id}/snapshots/workflow-log"</span>)
+<span class="k">public</span> <span class="t">ResponseEntity</span>&lt;List&lt;<span class="t">CanevasWorkflowLog</span>&gt;&gt; getWorkflowLog(
+        @PathVariable Long id,
+        @RequestParam(required = <span class="k">false</span>) String typeStructure,
+        @RequestParam(required = <span class="k">false</span>) String codeStructure) {
+
+    List&lt;<span class="t">CanevasWorkflowLog</span>&gt; logs =
+        workflowLogService.getHistoryFiltered(id, typeStructure, codeStructure);
+    <span class="k">return</span> <span class="t">ResponseEntity</span>.ok(logs);
+}
+
+<span class="c">// ✅ AJOUTER — consulter un snapshot par son ID (pour l'icône œil)</span>
+@GetMapping(<span class="s">"/{id}/snapshots/{snapshotId}/detail"</span>)
+<span class="k">public</span> <span class="t">ResponseEntity</span>&lt;<span class="t">SnapshotDetailDto</span>&gt; getSnapshotById(
+        @PathVariable Long id,
+        @PathVariable Long snapshotId) {
+    <span class="k">return</span> snapshotService
+            .getBySnapshotId(snapshotId)
+            .map(<span class="t">ResponseEntity</span>::ok)
+            .orElse(<span class="t">ResponseEntity</span>.notFound().build());
+}
+</span></div></div>
+
+<div class="alert aw"><span>⚠️</span><div>Ajouter aussi la méthode <code>getBySnapshotId()</code> dans <code>CanevasSnapshotService.java</code> :</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">Java</span> <span class="cf">CanevasSnapshotService.java — ajouter après getByStructure() (ligne ~344)</span></span></div>
+<div class="cd"><span class="add"><span class="c">// ✅ AJOUTER — récupérer un snapshot par son snapshotId exact</span>
+<span class="k">public</span> Optional&lt;<span class="t">SnapshotDetailDto</span>&gt; <span class="m">getBySnapshotId</span>(Long snapshotId) {
+    <span class="k">return</span> snapshotRepo.findById(snapshotId)
+            .map(s -> <span class="k">new</span> <span class="t">SnapshotDetailDto</span>(
+                    s.getSnapshotId(), s.getStructureCode(), s.getStructureLabel(),
+                    s.getVersionNumber(), s.getStatusAtSnapshot(),
+                    s.getCreatedBy(), s.getCreatedAt(), s.getObservations(),
+                    fromJson(s.getEngagementBnaJson(), Object.class),
+                    fromJson(s.getEngagementBctJson(), Object.class),
+                    fromJson(s.getClasseBnaJson(), Object.class),
+                    fromJson(s.getClasseBctJson(), Object.class),
+                    fromJson(s.getClasseRetourJson(), Object.class),
+                    fromJson(s.getEngagementDetailleJson(), <span class="t">EngagementDetailleDto</span>.class),
+                    fromJson(s.getDonneesCreditsJson(), Object.class),
+                    fromJson(s.getDonneesExploitationJson(), Object.class),
+                    fromJson(s.getDonneesGarantiesJson(), Object.class)));
+}
+</span></div></div>
+
+<div class="alert aw"><span>⚠️</span><div>Mettre à jour les 2 appels à <code>createSnapshot()</code> dans <code>valider()</code> et <code>refouler()</code> pour passer <code>null</code> en 8e paramètre (si tu as appliqué le guide précédent) :</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">Java</span> <span class="cf">CanevasSnapshotController.java — dans valider() et refouler(), ajouter , null</span></span></div>
+<div class="cd"><span class="c">// Dans valider() :</span>
+<span class="t">CanevasStructureSnapshot</span> snapshot = snapshotService.createSnapshot(
+    id, request.fromStructureCode(), request.fromStructureLabel(),
+    request.matricule(), request.matricule(),
+    request.observations(), <span class="s">"VALID_DONNEE"</span><span class="add">, <span class="k">null</span>   <span class="c">// ✅ 8e param avisJson</span>
+</span>);
+<span class="c">// Dans refouler() :</span>
+<span class="t">CanevasStructureSnapshot</span> snapshot = snapshotService.createSnapshot(
+    id, request.fromStructureCode(), request.fromStructureLabel(),
+    request.matricule(), request.matricule(),
+    request.motif(), <span class="s">"CORRIGE_DONNEE"</span><span class="add">, <span class="k">null</span>    <span class="c">// ✅ 8e param avisJson</span>
+</span>);</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S5 — snapshot.service.ts                           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s5">
+<div class="sh"><div class="sn">5</div><h2>snapshot.service.ts — mise à jour complète <span class="tag tts">TypeScript</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>frontend-app1/src/app/_services/snapshot.service.ts</code><br/>Remplacer tout le contenu.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">TypeScript</span> <span class="cf">snapshot.service.ts — fichier complet</span></span></div>
+<div class="cd"><span class="k">import</span> { Injectable } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { HttpClient, HttpParams } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { Observable } <span class="k">from</span> <span class="s">'rxjs'</span>;
+<span class="k">import</span> { environment } <span class="k">from</span> <span class="s">'../../environments/environment.development'</span>;
+
+<span class="c">// ─── Interfaces ────────────────────────────────────────────</span>
+
+<span class="k">export interface</span> <span class="t">SnapshotSummary</span> {
+  snapshotId: <span class="t">number</span>;
+  structureCode: <span class="t">string</span>;
+  structureLabel: <span class="t">string</span>;
+  versionNumber: <span class="t">number</span>;
+  statusAtSnapshot: <span class="t">string</span>;
+  createdBy: <span class="t">string</span>;
+  matricule: <span class="t">string</span>;
+  createdAt: <span class="t">string</span>;
+  observations: <span class="t">string</span>;
+}
+
+<span class="k">export interface</span> <span class="t">EngagementPartie</span> {
+  typePartie: <span class="t">string</span>; nom: <span class="t">string</span>; cin?: <span class="t">string</span>;
+  numSeqPers: <span class="t">number</span>; partCapital?: <span class="t">string</span>;
+  engagementsBNA: <span class="t">any</span>[]; engagementsBCT: <span class="t">any</span>[]; classeBNA: <span class="t">any</span>[];
+}
+
+<span class="k">export interface</span> <span class="t">EngagementDetaille</span> {
+  actionnaires: <span class="t">EngagementPartie</span>[];
+  premierResponsable: <span class="t">EngagementPartie</span> | <span class="k">null</span>;
+  groupe: <span class="t">EngagementPartie</span>[]; vendeurs: <span class="t">EngagementPartie</span>[];
+}
+
+<span class="k">export interface</span> <span class="t">SnapshotDetail</span> <span class="k">extends</span> <span class="t">SnapshotSummary</span> {
+  engagementsBNA: <span class="t">any</span>[]; engagementsBCT: <span class="t">any</span>[];
+  classeBNA: <span class="t">any</span>[]; classeBCT: <span class="t">any</span>[]; classeRetour: <span class="t">any</span>[];
+  engagementDetaille: <span class="t">EngagementDetaille</span>;
+  creditsData: <span class="t">any</span>; exploitationData: <span class="t">any</span>; garantiesData: <span class="t">any</span>;
+}
+
+<span class="k">export interface</span> <span class="t">ValidationRequest</span> {
+  fromStructureCode: <span class="t">string</span>; fromStructureLabel: <span class="t">string</span>;
+  toStructureCode: <span class="t">string</span>; matricule: <span class="t">string</span>;
+  observations: <span class="t">string</span>; avisValue: <span class="s">'FAVORABLE'</span> | <span class="s">'DEFAVORABLE'</span> | <span class="s">'SANS_AVIS'</span>;
+}
+
+<span class="k">export interface</span> <span class="t">RefoulementRequest</span> {
+  fromStructureCode: <span class="t">string</span>; fromStructureLabel: <span class="t">string</span>;
+  toStructureCode: <span class="t">string</span>; matricule: <span class="t">string</span>; motif: <span class="t">string</span>;
+}
+
+<span class="k">export interface</span> <span class="t">SnapshotResponse</span> {
+  snapshotId: <span class="t">number</span>; versionNumber: <span class="t">number</span>; structureCode: <span class="t">string</span>;
+}
+
+<span class="k">export interface</span> <span class="t">WorkflowLogEntry</span> {
+  logId: <span class="t">number</span>; canevasId: <span class="t">number</span>;
+  fromStructure: <span class="t">string</span>; toStructure: <span class="t">string</span>;
+  action: <span class="t">string</span>; snapshotVersion: <span class="t">number</span>; snapshotId: <span class="t">number</span>;
+  comments: <span class="t">string</span>; performedBy: <span class="t">string</span>; performedAt: <span class="t">string</span>;
+<span class="add">  structureMere?: <span class="t">string</span>;  <span class="c">// ✅ nouveau champ ajouté</span>
+</span>}
+
+<span class="c">// ─── Service ────────────────────────────────────────────────</span>
+
+@Injectable({ providedIn: <span class="s">'root'</span> })
+<span class="k">export class</span> <span class="t">SnapshotService</span> {
+
+  <span class="k">private</span> api = <span class="s">`${environment.apiURL}api/canevas`</span>;
+
+  <span class="k">constructor</span>(<span class="k">private</span> http: <span class="t">HttpClient</span>) {}
+
+  validerEtTransmettre(id: <span class="t">number</span>, req: <span class="t">ValidationRequest</span>): Observable&lt;<span class="t">SnapshotResponse</span>&gt; {
+    <span class="k">return</span> <span class="k">this</span>.http.post&lt;<span class="t">SnapshotResponse</span>&gt;(<span class="s">`${this.api}/${id}/valider`</span>, req);
+  }
+
+  refouler(id: <span class="t">number</span>, req: <span class="t">RefoulementRequest</span>): Observable&lt;<span class="t">SnapshotResponse</span>&gt; {
+    <span class="k">return</span> <span class="k">this</span>.http.post&lt;<span class="t">SnapshotResponse</span>&gt;(<span class="s">`${this.api}/${id}/refouler`</span>, req);
+  }
+
+  getHistory(id: <span class="t">number</span>): Observable&lt;<span class="t">SnapshotSummary</span>[]&gt; {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;<span class="t">SnapshotSummary</span>[]&gt;(<span class="s">`${this.api}/${id}/snapshots`</span>);
+  }
+
+  getByStructure(id: <span class="t">number</span>, code: <span class="t">string</span>): Observable&lt;<span class="t">SnapshotDetail</span>&gt; {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;<span class="t">SnapshotDetail</span>&gt;(<span class="s">`${this.api}/${id}/snapshots/structure/${code}`</span>);
+  }
+
+<span class="add">  <span class="c">// ✅ AJOUTER — récupérer un snapshot par son ID exact</span>
+  getBySnapshotId(canevasId: <span class="t">number</span>, snapshotId: <span class="t">number</span>): Observable&lt;<span class="t">SnapshotDetail</span>&gt; {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;<span class="t">SnapshotDetail</span>&gt;(
+      <span class="s">`${this.api}/${canevasId}/snapshots/${snapshotId}/detail`</span>
+    );
+  }
+
+  <span class="c">// ✅ MODIFIER — accepte typeStructure et codeStructure pour filtrage côté serveur</span>
+  getWorkflowLog(
+    id: <span class="t">number</span>,
+    typeStructure?: <span class="t">string</span>,
+    codeStructure?: <span class="t">string</span>
+  ): Observable&lt;<span class="t">WorkflowLogEntry</span>[]&gt; {
+    <span class="k">let</span> params = <span class="k">new</span> <span class="t">HttpParams</span>();
+    <span class="k">if</span> (typeStructure) params = params.set(<span class="s">'typeStructure'</span>, typeStructure);
+    <span class="k">if</span> (codeStructure) params = params.set(<span class="s">'codeStructure'</span>, codeStructure);
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;<span class="t">WorkflowLogEntry</span>[]&gt;(
+      <span class="s">`${this.api}/${id}/snapshots/workflow-log`</span>, { params }
+    );
+  }
+</span>}</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S6 — snapshot-history.component.ts                 -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s6">
+<div class="sh"><div class="sn">6</div><h2>snapshot-history.component.ts — réécriture complète <span class="tag tts">TypeScript</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>frontend-app1/src/app/_components/pages/canvas.agricole/snapshot-history/snapshot-history.component.ts</code><br/>Remplacer tout le contenu.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">TypeScript</span> <span class="cf">snapshot-history.component.ts — fichier complet</span></span></div>
+<div class="cd"><span class="k">import</span> { Component, OnInit, signal, computed, inject } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { MessageService } <span class="k">from</span> <span class="s">'primeng/api'</span>;
+<span class="k">import</span> {
+  SnapshotService, SnapshotSummary, SnapshotDetail,
+  SnapshotResponse, WorkflowLogEntry
+} <span class="k">from</span> <span class="s">'../../../../_services/snapshot.service'</span>;
+<span class="k">import</span> { CanevasAgrService } <span class="k">from</span> <span class="s">'../../../../_services/canevas.agr.service'</span>;
+<span class="k">import</span> { UserService } <span class="k">from</span> <span class="s">'../../../../_services/user.service'</span>;
+
+@Component({
+  selector: <span class="s">'app-snapshot-history'</span>,
+  templateUrl: <span class="s">'./snapshot-history.component.html'</span>,
+  styleUrls: [<span class="s">'./snapshot-history.component.css'</span>],
+  providers: [MessageService]
+})
+<span class="k">export class</span> <span class="t">SnapshotHistoryComponent</span> <span class="k">implements</span> <span class="t">OnInit</span> {
+
+  <span class="k">private</span> snapshotService = inject(<span class="t">SnapshotService</span>);
+  <span class="k">private</span> canevasAgrService = inject(<span class="t">CanevasAgrService</span>);
+  <span class="k">private</span> messageService = inject(<span class="t">MessageService</span>);
+  userService = inject(<span class="t">UserService</span>);
+
+  <span class="c">// ─── State ────────────────────────────────────────────────</span>
+  history        = signal&lt;<span class="t">SnapshotSummary</span>[]&gt;([]);
+  workflowLog    = signal&lt;<span class="t">WorkflowLogEntry</span>[]&gt;([]);
+  selectedSnap   = signal&lt;<span class="t">SnapshotDetail</span> | <span class="k">null</span>&gt;(<span class="k">null</span>);
+  loading        = signal(<span class="k">false</span>);
+  activeTab      = signal&lt;<span class="s">'log'</span> | <span class="s">'snapshots'</span>&gt;(<span class="s">'log'</span>);
+  showValidDlg   = signal(<span class="k">false</span>);
+  showRefoulDlg  = signal(<span class="k">false</span>);
+
+  <span class="c">// ─── Computed — rôle utilisateur ──────────────────────────</span>
+  <span class="k">private</span> userTypeStructure = computed(() => <span class="k">this</span>.userService.user()?.typeStructure ?? <span class="s">''</span>);
+  <span class="k">private</span> userCodeStructure = computed(() => <span class="k">this</span>.userService.user()?.codeStructure ?? <span class="s">''</span>);
+
+  <span class="c">// ─── Computed — filtrage visibilité par rôle ──────────────</span>
+  <span class="c">/**
+   * AGC(typeStructure=1) : uniquement ses propres logs
+   * DR (typeStructure=2) : ses logs + logs des agences (structureMere = son code)
+   * DC / autre           : tous les logs (pas de filtre client)
+   * NB: le filtre principal est appliqué côté serveur via query params.
+   *     Ce computed est un filtre défensif côté client.
+   */</span>
+  filteredLogs = computed(() => {
+    <span class="k">const</span> logs = <span class="k">this</span>.workflowLog();
+    <span class="k">const</span> type = <span class="k">this</span>.userTypeStructure();
+    <span class="k">const</span> code = <span class="k">this</span>.userCodeStructure();
+    <span class="k">if</span> (type === <span class="s">'1'</span> &amp;&amp; code) {
+      <span class="k">return</span> logs.filter(l => l.fromStructure === code || l.toStructure === code);
+    }
+    <span class="k">if</span> (type === <span class="s">'2'</span> &amp;&amp; code) {
+      <span class="k">return</span> logs.filter(l =>
+        l.fromStructure === code ||
+        l.toStructure   === code ||
+        l.structureMere === code
+      );
+    }
+    <span class="k">return</span> logs; <span class="c">// DC : tout</span>
+  });
+
+  <span class="c">// Snapshots : pour AGC, on cache les snapshots DC/DR internes</span>
+  filteredHistory = computed(() => {
+    <span class="k">const</span> snaps = <span class="k">this</span>.history();
+    <span class="k">return</span> snaps; <span class="c">// filtrage déjà fait côté serveur si nécessaire</span>
+  });
+
+  totalVersions = computed(() => <span class="k">this</span>.history().length);
+  totalLogs     = computed(() => <span class="k">this</span>.filteredLogs().length);
+
+  <span class="c">// ─── Formulaires ─────────────────────────────────────────</span>
+  validForm = {
+    fromStructureCode: <span class="s">''</span>, fromStructureLabel: <span class="s">''</span>,
+    toStructureCode: <span class="s">''</span>, matricule: <span class="s">''</span>,
+    observations: <span class="s">''</span>, avisValue: <span class="s">'FAVORABLE'</span> <span class="k">as const</span>
+  };
+  refoulForm = {
+    fromStructureCode: <span class="s">''</span>, fromStructureLabel: <span class="s">''</span>,
+    toStructureCode: <span class="s">''</span>, matricule: <span class="s">''</span>, motif: <span class="s">''</span>
+  };
+  avisOptions = [
+    { label: <span class="s">'Favorable'</span>,   value: <span class="s">'FAVORABLE'</span>  },
+    { label: <span class="s">'Défavorable'</span>, value: <span class="s">'DEFAVORABLE'</span> },
+    { label: <span class="s">'Sans avis'</span>,   value: <span class="s">'SANS_AVIS'</span>   }
+  ];
+
+  <span class="c">// ─── Init ─────────────────────────────────────────────────</span>
+  ngOnInit(): <span class="k">void</span> {
+    <span class="k">const</span> id = <span class="k">this</span>.canevasAgrService.currentIdCaneva();
+    <span class="k">if</span> (id) { <span class="k">this</span>.loadAll(id); }
+    <span class="c">// Pré-remplir le formulaire depuis l'utilisateur connecté</span>
+    <span class="k">const</span> u = <span class="k">this</span>.userService.user();
+    <span class="k">this</span>.validForm.fromStructureCode  = u?.codeStructure  ?? <span class="s">''</span>;
+    <span class="k">this</span>.validForm.fromStructureLabel = u?.libStructure   ?? <span class="s">''</span>;
+    <span class="k">this</span>.validForm.matricule          = u?.matricule      ?? <span class="s">''</span>;
+    <span class="k">this</span>.refoulForm.fromStructureCode  = u?.codeStructure ?? <span class="s">''</span>;
+    <span class="k">this</span>.refoulForm.fromStructureLabel = u?.libStructure  ?? <span class="s">''</span>;
+    <span class="k">this</span>.refoulForm.matricule          = u?.matricule     ?? <span class="s">''</span>;
+  }
+
+  <span class="k">private</span> loadAll(id: <span class="t">number</span>): <span class="k">void</span> {
+    <span class="k">this</span>.loading.set(<span class="k">true</span>);
+    <span class="k">const</span> u = <span class="k">this</span>.userService.user();
+    <span class="c">// History snapshots</span>
+    <span class="k">this</span>.snapshotService.getHistory(id).subscribe({
+      next: d => { <span class="k">this</span>.history.set(d); <span class="k">this</span>.loading.set(<span class="k">false</span>); },
+      error: () => <span class="k">this</span>.loading.set(<span class="k">false</span>)
+    });
+    <span class="c">// Workflow log — filtré selon le rôle</span>
+    <span class="k">this</span>.snapshotService.getWorkflowLog(id, u?.typeStructure, u?.codeStructure).subscribe({
+      next: d => <span class="k">this</span>.workflowLog.set(d),
+      error: e => console.error(<span class="s">'WorkflowLog error'</span>, e)
+    });
+  }
+
+  <span class="c">// ─── Ouvrir snapshot par snapshotId ───────────────────────</span>
+  openSnapshot(snap: <span class="t">SnapshotSummary</span>): <span class="k">void</span> {
+    <span class="k">const</span> id = <span class="k">this</span>.canevasAgrService.currentIdCaneva();
+    <span class="k">if</span> (!id) <span class="k">return</span>;
+    <span class="k">this</span>.loading.set(<span class="k">true</span>);
+    <span class="k">this</span>.snapshotService.getBySnapshotId(id, snap.snapshotId).subscribe({
+      next:  d => { <span class="k">this</span>.selectedSnap.set(d); <span class="k">this</span>.loading.set(<span class="k">false</span>); },
+      error: () => {
+        <span class="k">this</span>.loading.set(<span class="k">false</span>);
+        <span class="k">this</span>.messageService.add({ severity: <span class="s">'error'</span>, summary: <span class="s">'Erreur'</span>, detail: <span class="s">'Snapshot introuvable'</span> });
+      }
+    });
+  }
+
+  closeSnapshot(): <span class="k">void</span> { <span class="k">this</span>.selectedSnap.set(<span class="k">null</span>); }
+
+  <span class="c">// ─── Valider ─────────────────────────────────────────────</span>
+  valider(): <span class="k">void</span> {
+    <span class="k">const</span> id = <span class="k">this</span>.canevasAgrService.currentIdCaneva();
+    <span class="k">if</span> (!id) <span class="k">return</span>;
+    <span class="k">this</span>.snapshotService.validerEtTransmettre(id, <span class="k">this</span>.validForm).subscribe({
+      next: (res: <span class="t">SnapshotResponse</span>) => {
+        <span class="k">this</span>.messageService.add({ severity: <span class="s">'success'</span>, summary: <span class="s">'Validé'</span>,
+          detail: <span class="s">`Snapshot v${res.versionNumber} créé`</span> });
+        <span class="k">this</span>.showValidDlg.set(<span class="k">false</span>); <span class="k">this</span>.loadAll(id);
+      },
+      error: () => <span class="k">this</span>.messageService.add({ severity: <span class="s">'error'</span>, summary: <span class="s">'Erreur'</span>, detail: <span class="s">'Échec validation'</span> })
+    });
+  }
+
+  <span class="c">// ─── Refouler ────────────────────────────────────────────</span>
+  refouler(): <span class="k">void</span> {
+    <span class="k">const</span> id = <span class="k">this</span>.canevasAgrService.currentIdCaneva();
+    <span class="k">if</span> (!id || !<span class="k">this</span>.refoulForm.motif?.trim()) {
+      <span class="k">this</span>.messageService.add({ severity: <span class="s">'warn'</span>, summary: <span class="s">'Attention'</span>, detail: <span class="s">'Motif obligatoire'</span> });
+      <span class="k">return</span>;
+    }
+    <span class="k">this</span>.snapshotService.refouler(id, <span class="k">this</span>.refoulForm).subscribe({
+      next: (res: <span class="t">SnapshotResponse</span>) => {
+        <span class="k">this</span>.messageService.add({ severity: <span class="s">'warn'</span>, summary: <span class="s">'Refoulé'</span>,
+          detail: <span class="s">`Snapshot v${res.versionNumber}`</span> });
+        <span class="k">this</span>.showRefoulDlg.set(<span class="k">false</span>); <span class="k">this</span>.loadAll(id);
+      },
+      error: () => <span class="k">this</span>.messageService.add({ severity: <span class="s">'error'</span>, summary: <span class="s">'Erreur'</span>, detail: <span class="s">'Échec refoulement'</span> })
+    });
+  }
+
+  <span class="c">// ─── Helpers visuels ──────────────────────────────────────</span>
+  actionSeverity(a: <span class="t">string</span>): <span class="t">string</span> {
+    <span class="k">const</span> map: Record&lt;<span class="t">string</span>,<span class="t">string</span>&gt; = {
+      VALIDER:<span class="s">'success'</span>, PRE_VALIDER:<span class="s">'info'</span>, REFOULER:<span class="s">'danger'</span>,
+      CORRIGER:<span class="s">'warning'</span>, ANNULER:<span class="s">'danger'</span>, PRENDRE_EN_CHARGE:<span class="s">'secondary'</span>,
+      ENVOYER:<span class="s">'info'</span>, DECISION_FINALE:<span class="s">'success'</span>, ENVOYER_SUPERVISEUR:<span class="s">'info'</span>
+    };
+    <span class="k">return</span> map[a] ?? <span class="s">'secondary'</span>;
+  }
+
+  statusSeverity(s: <span class="t">string</span>): <span class="t">string</span> {
+    <span class="k">const</span> map: Record&lt;<span class="t">string</span>,<span class="t">string</span>&gt; = {
+      VALID_DONNEE:<span class="s">'success'</span>, CORRIGE_DONNEE:<span class="s">'danger'</span>,
+      PEC_DONNEE:<span class="s">'info'</span>, PEC_AVIS_DEC:<span class="s">'warning'</span>,
+      VALIDER_DR:<span class="s">'success'</span>, CORRIGE_AVIS_DEC:<span class="s">'danger'</span>,
+      DEC_FINAL_PRISE_ACCORD:<span class="s">'success'</span>, DEC_FINAL_PRISE_REJET:<span class="s">'danger'</span>
+    };
+    <span class="k">return</span> map[s] ?? <span class="s">'secondary'</span>;
+  }
+
+  actionLabel(a: <span class="t">string</span>): <span class="t">string</span> {
+    <span class="k">const</span> map: Record&lt;<span class="t">string</span>,<span class="t">string</span>&gt; = {
+      VALIDER:<span class="s">'Valider'</span>, PRE_VALIDER:<span class="s">'Pré-Valider'</span>, REFOULER:<span class="s">'Refouler'</span>,
+      CORRIGER:<span class="s">'Corriger'</span>, ANNULER:<span class="s">'Annuler'</span>,
+      PRENDRE_EN_CHARGE:<span class="s">'Prise en charge'</span>, ENVOYER:<span class="s">'Envoyer'</span>,
+      ENVOYER_SUPERVISEUR:<span class="s">'→ Superviseur'</span>, DECISION_FINALE:<span class="s">'Décision Finale'</span>
+    };
+    <span class="k">return</span> map[a] ?? a;
+  }
+
+  <span class="c">// Vrai si l'utilisateur peut valider/refouler (DR ou DC seulement)</span>
+  canAct = computed(() => {
+    <span class="k">const</span> t = <span class="k">this</span>.userTypeStructure();
+    <span class="k">return</span> t === <span class="s">'2'</span> || t === <span class="s">'5'</span>;
+  });
+}</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S7 — snapshot-history.component.html               -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s7">
+<div class="sh"><div class="sn">7</div><h2>snapshot-history.component.html — réécriture complète <span class="tag tts">HTML/Angular</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>frontend-app1/src/app/_components/pages/canvas.agricole/snapshot-history/snapshot-history.component.html</code><br/>Remplacer tout le contenu. Utilise PrimeNG 17, @if/@for (Angular 17).</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">HTML</span> <span class="cf">snapshot-history.component.html — fichier complet</span></span></div>
+<div class="cd">&lt;p-toast&gt;&lt;/p-toast&gt;
+
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;!-- BARRE D'ONGLETS : Journal / Snapshots                  --&gt;
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;div class="hist-header"&gt;
+  &lt;div class="hist-tabs"&gt;
+    &lt;button class="hist-tab" [class.active]="activeTab()==='log'"
+            (click)="activeTab.set('log')"&gt;
+      &lt;i class="pi pi-list"&gt;&lt;/i&gt; Journal workflow
+      &lt;span class="hist-count"&gt;{{ totalLogs() }}&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="hist-tab" [class.active]="activeTab()==='snapshots'"
+            (click)="activeTab.set('snapshots')"&gt;
+      &lt;i class="pi pi-camera"&gt;&lt;/i&gt; Snapshots
+      &lt;span class="hist-count"&gt;{{ totalVersions() }}&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+  &lt;!-- Boutons d'action (DR/DC seulement) --&gt;
+  @if (canAct()) {
+    &lt;div class="hist-actions"&gt;
+      &lt;button pButton label="Valider &amp; Transmettre" icon="pi pi-check"
+              class="p-button-success p-button-sm"
+              (click)="showValidDlg.set(true)"&gt;&lt;/button&gt;
+      &lt;button pButton label="Refouler" icon="pi pi-reply"
+              class="p-button-danger p-button-sm"
+              (click)="showRefoulDlg.set(true)"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+  }
+&lt;/div&gt;
+
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;!-- ONGLET 1 : TIMELINE WORKFLOW LOG                       --&gt;
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+@if (activeTab() === 'log') {
+  @if (loading()) {
+    &lt;div class="flex justify-content-center p-4"&gt;
+      &lt;p-progressSpinner strokeWidth="4" [style]="{width:'40px',height:'40px'}"&gt;&lt;/p-progressSpinner&gt;
+    &lt;/div&gt;
+  } @else if (filteredLogs().length === 0) {
+    &lt;div class="hist-empty"&gt;
+      &lt;i class="pi pi-inbox"&gt;&lt;/i&gt;
+      &lt;p&gt;Aucun log workflow pour ce canvas.&lt;/p&gt;
+    &lt;/div&gt;
+  } @else {
+    &lt;!-- TIMELINE PrimeNG --&gt;
+    &lt;p-timeline [value]="filteredLogs()" align="left" styleClass="hist-timeline"&gt;
+
+      &lt;ng-template pTemplate="marker" let-log&gt;
+        &lt;span class="tl-marker"
+              [class.tl-valider]="log.action==='VALIDER'||log.action==='PRE_VALIDER'||log.action==='DECISION_FINALE'"
+              [class.tl-refouler]="log.action==='REFOULER'||log.action==='CORRIGER'"
+              [class.tl-pec]="log.action==='PRENDRE_EN_CHARGE'"
+              [class.tl-envoyer]="log.action==='ENVOYER'||log.action==='ENVOYER_SUPERVISEUR'"&gt;
+          &lt;i [class]="
+            log.action==='VALIDER'||log.action==='PRE_VALIDER' ? 'pi pi-check' :
+            log.action==='REFOULER'||log.action==='CORRIGER'   ? 'pi pi-times' :
+            log.action==='DECISION_FINALE'                     ? 'pi pi-star'  :
+            log.action==='PRENDRE_EN_CHARGE'                   ? 'pi pi-inbox' :
+            'pi pi-send'"&gt;
+          &lt;/i&gt;
+        &lt;/span&gt;
+      &lt;/ng-template&gt;
+
+      &lt;ng-template pTemplate="content" let-log&gt;
+        &lt;div class="tl-card"&gt;
+          &lt;div class="tl-card-header"&gt;
+            &lt;p-tag [value]="actionLabel(log.action)"
+                   [severity]="actionSeverity(log.action)" class="mr-2"&gt;&lt;/p-tag&gt;
+            &lt;span class="tl-structures"&gt;
+              &lt;strong&gt;{{ log.fromStructure }}&lt;/strong&gt;
+              @if (log.toStructure &amp;&amp; log.toStructure !== log.fromStructure) {
+                &lt;i class="pi pi-arrow-right mx-1" style="font-size:11px"&gt;&lt;/i&gt;
+                &lt;strong&gt;{{ log.toStructure }}&lt;/strong&gt;
+              }
+            &lt;/span&gt;
+            &lt;span class="tl-date"&gt;{{ log.performedAt | date:'dd/MM/yyyy HH:mm' }}&lt;/span&gt;
+            @if (log.snapshotVersion) {
+              &lt;p-badge [value]="'v'+log.snapshotVersion" severity="info" styleClass="ml-2"&gt;&lt;/p-badge&gt;
+            }
+          &lt;/div&gt;
+          &lt;div class="tl-card-body"&gt;
+            &lt;span class="tl-by"&gt;Par : &lt;strong&gt;{{ log.performedBy }}&lt;/strong&gt;&lt;/span&gt;
+            @if (log.comments) {
+              &lt;span class="tl-comment"&gt;"{{ log.comments }}"&lt;/span&gt;
+            }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/ng-template&gt;
+
+    &lt;/p-timeline&gt;
+  }
+}
+
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;!-- ONGLET 2 : TABLE SNAPSHOTS                             --&gt;
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+@if (activeTab() === 'snapshots') {
+  &lt;p-table [value]="filteredHistory()" [loading]="loading()"
+           [paginator]="true" [rows]="10" [rowHover]="true"
+           styleClass="p-datatable-sm p-datatable-striped"&gt;
+    &lt;ng-template pTemplate="header"&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Version&lt;/th&gt;&lt;th&gt;Structure&lt;/th&gt;&lt;th&gt;Statut&lt;/th&gt;
+        &lt;th&gt;Créé par&lt;/th&gt;&lt;th&gt;Date&lt;/th&gt;&lt;th&gt;Observations&lt;/th&gt;
+        &lt;th style="width:90px"&gt;Actions&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/ng-template&gt;
+    &lt;ng-template pTemplate="body" let-snap&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;p-badge [value]="'v'+snap.versionNumber" severity="info"&gt;&lt;/p-badge&gt;&lt;/td&gt;
+        &lt;td&gt;
+          &lt;p-tag [value]="snap.structureCode" severity="info"&gt;&lt;/p-tag&gt;
+          &lt;span class="ml-1 text-sm"&gt;{{ snap.structureLabel }}&lt;/span&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;p-tag [value]="snap.statusAtSnapshot"
+                 [severity]="statusSeverity(snap.statusAtSnapshot)"&gt;
+          &lt;/p-tag&gt;
+        &lt;/td&gt;
+        &lt;td&gt;{{ snap.createdBy }}&lt;/td&gt;
+        &lt;td&gt;{{ snap.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/td&gt;
+        &lt;td&gt;
+          &lt;span class="text-truncate" style="max-width:180px;display:inline-block"&gt;
+            {{ snap.observations || '—' }}
+          &lt;/span&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;button pButton icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  (click)="openSnapshot(snap)"
+                  pTooltip="Voir le canvas sauvegardé" tooltipPosition="left"&gt;
+          &lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/ng-template&gt;
+    &lt;ng-template pTemplate="emptymessage"&gt;
+      &lt;tr&gt;&lt;td colspan="7" class="text-center p-4 text-muted"&gt;
+        &lt;i class="pi pi-camera mr-2"&gt;&lt;/i&gt; Aucun snapshot disponible.
+      &lt;/td&gt;&lt;/tr&gt;
+    &lt;/ng-template&gt;
+  &lt;/p-table&gt;
+}
+
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;!-- PANNEAU DÉTAIL SNAPSHOT (œil)                          --&gt;
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+@if (selectedSnap()) {
+  &lt;p-fieldset class="mt-3 snap-detail"&gt;
+    &lt;ng-template pTemplate="legend"&gt;
+      &lt;div class="flex align-items-center gap-2"&gt;
+        &lt;i class="pi pi-camera"&gt;&lt;/i&gt;
+        &lt;span&gt;Snapshot v{{ selectedSnap()!.versionNumber }}
+              — {{ selectedSnap()!.structureLabel }}&lt;/span&gt;
+        &lt;p-tag [value]="selectedSnap()!.statusAtSnapshot"
+               [severity]="statusSeverity(selectedSnap()!.statusAtSnapshot)"&gt;&lt;/p-tag&gt;
+      &lt;/div&gt;
+    &lt;/ng-template&gt;
+
+    &lt;!-- Métadonnées --&gt;
+    &lt;div class="snap-meta"&gt;
+      &lt;div&gt;&lt;span class="meta-label"&gt;Créé par&lt;/span&gt; {{ selectedSnap()!.createdBy }}&lt;/div&gt;
+      &lt;div&gt;&lt;span class="meta-label"&gt;Date&lt;/span&gt;
+           {{ selectedSnap()!.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/div&gt;
+      @if (selectedSnap()!.observations) {
+        &lt;div class="snap-obs"&gt;
+          &lt;i class="pi pi-comment mr-1"&gt;&lt;/i&gt;{{ selectedSnap()!.observations }}
+        &lt;/div&gt;
+      }
+      &lt;button pButton icon="pi pi-times" label="Fermer"
+              class="p-button-text p-button-sm ml-auto"
+              (click)="closeSnapshot()"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Onglets du détail --&gt;
+    &lt;p-tabView&gt;
+
+      &lt;!-- Engagements BNA/BCT --&gt;
+      &lt;p-tabPanel header="Engagements BNA/BCT"&gt;
+        &lt;div class="grid"&gt;
+          &lt;div class="col-12 md:col-6"&gt;
+            &lt;h5 class="snap-sub"&gt;🏦 Engagements BNA&lt;/h5&gt;
+            @if (selectedSnap()!.engagementsBNA?.length) {
+              &lt;p-table [value]="selectedSnap()!.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                &lt;ng-template pTemplate="header"&gt;
+                  &lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;th&gt;Impayé&lt;/th&gt;&lt;/tr&gt;
+                &lt;/ng-template&gt;
+                &lt;ng-template pTemplate="body" let-e&gt;
+                  &lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;
+                      &lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;td&gt;{{e.impaye}}&lt;/td&gt;&lt;/tr&gt;
+                &lt;/ng-template&gt;
+              &lt;/p-table&gt;
+            } @else { &lt;p class="text-muted"&gt;Aucun engagement BNA.&lt;/p&gt; }
+          &lt;/div&gt;
+          &lt;div class="col-12 md:col-6"&gt;
+            &lt;h5 class="snap-sub"&gt;🏛 Engagements BCT&lt;/h5&gt;
+            @if (selectedSnap()!.engagementsBCT?.length) {
+              &lt;p-table [value]="selectedSnap()!.engagementsBCT" styleClass="p-datatable-sm"&gt;
+                &lt;ng-template pTemplate="header"&gt;
+                  &lt;tr&gt;&lt;th&gt;Banque&lt;/th&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Utilisé&lt;/th&gt;&lt;/tr&gt;
+                &lt;/ng-template&gt;
+                &lt;ng-template pTemplate="body" let-e&gt;
+                  &lt;tr&gt;&lt;td&gt;{{e.banque}}&lt;/td&gt;&lt;td&gt;{{e.typeCredit}}&lt;/td&gt;
+                      &lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.utilise}}&lt;/td&gt;&lt;/tr&gt;
+                &lt;/ng-template&gt;
+              &lt;/p-table&gt;
+            } @else { &lt;p class="text-muted"&gt;Aucun engagement BCT.&lt;/p&gt; }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Actionnaires --&gt;
+      &lt;p-tabPanel header="Actionnaires"&gt;
+        @if (selectedSnap()!.engagementDetaille?.actionnaires?.length) {
+          @for (a of selectedSnap()!.engagementDetaille.actionnaires; track a.numSeqPers) {
+            &lt;p-panel [header]="a.nom + (a.partCapital ? ' ('+a.partCapital+'%)' : '')"
+                     [toggleable]="true" [collapsed]="true" class="mb-2"&gt;
+              @if (a.engagementsBNA?.length) {
+                &lt;p-table [value]="a.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                  &lt;ng-template pTemplate="header"&gt;
+                    &lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;th&gt;Impayé&lt;/th&gt;&lt;/tr&gt;
+                  &lt;/ng-template&gt;
+                  &lt;ng-template pTemplate="body" let-e&gt;
+                    &lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;
+                        &lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;td&gt;{{e.impaye}}&lt;/td&gt;&lt;/tr&gt;
+                  &lt;/ng-template&gt;
+                &lt;/p-table&gt;
+              }
+            &lt;/p-panel&gt;
+          }
+        } @else { &lt;p class="text-muted"&gt;Aucun actionnaire.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- 1er Responsable --&gt;
+      &lt;p-tabPanel header="1er Responsable"&gt;
+        @if (selectedSnap()!.engagementDetaille?.premierResponsable) {
+          &lt;p&gt;&lt;strong&gt;Nom :&lt;/strong&gt; {{selectedSnap()!.engagementDetaille.premierResponsable!.nom}}
+             &amp;nbsp; &lt;strong&gt;CIN :&lt;/strong&gt; {{selectedSnap()!.engagementDetaille.premierResponsable!.cin}}&lt;/p&gt;
+          @if (selectedSnap()!.engagementDetaille.premierResponsable!.engagementsBNA?.length) {
+            &lt;p-table [value]="selectedSnap()!.engagementDetaille.premierResponsable!.engagementsBNA"
+                     styleClass="p-datatable-sm mt-2"&gt;
+              &lt;ng-template pTemplate="header"&gt;
+                &lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;th&gt;Impayé&lt;/th&gt;&lt;/tr&gt;
+              &lt;/ng-template&gt;
+              &lt;ng-template pTemplate="body" let-e&gt;
+                &lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;
+                    &lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;td&gt;{{e.impaye}}&lt;/td&gt;&lt;/tr&gt;
+              &lt;/ng-template&gt;
+            &lt;/p-table&gt;
+          }
+        } @else { &lt;p class="text-muted"&gt;Aucun 1er responsable.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Vendeurs --&gt;
+      &lt;p-tabPanel header="Vendeurs"&gt;
+        @if (selectedSnap()!.engagementDetaille?.vendeurs?.length) {
+          @for (v of selectedSnap()!.engagementDetaille.vendeurs; track v.numSeqPers) {
+            &lt;p-panel [header]="v.nom" [toggleable]="true" [collapsed]="true" class="mb-2"&gt;
+              @if (v.engagementsBNA?.length) {
+                &lt;p-table [value]="v.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                  &lt;ng-template pTemplate="header"&gt;
+                    &lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;th&gt;Impayé&lt;/th&gt;&lt;/tr&gt;
+                  &lt;/ng-template&gt;
+                  &lt;ng-template pTemplate="body" let-e&gt;
+                    &lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;
+                        &lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;td&gt;{{e.impaye}}&lt;/td&gt;&lt;/tr&gt;
+                  &lt;/ng-template&gt;
+                &lt;/p-table&gt;
+              }
+            &lt;/p-panel&gt;
+          }
+        } @else { &lt;p class="text-muted"&gt;Aucun vendeur.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Crédits --&gt;
+      &lt;p-tabPanel header="Crédits"&gt;
+        @if (selectedSnap()!.creditsData) {
+          &lt;pre style="font-size:12px;white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px"&gt;
+            {{selectedSnap()!.creditsData | json}}
+          &lt;/pre&gt;
+        } @else { &lt;p class="text-muted"&gt;Aucune donnée crédit.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Exploitation --&gt;
+      &lt;p-tabPanel header="Exploitation"&gt;
+        @if (selectedSnap()!.exploitationData) {
+          &lt;pre style="font-size:12px;white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px"&gt;
+            {{selectedSnap()!.exploitationData | json}}
+          &lt;/pre&gt;
+        } @else { &lt;p class="text-muted"&gt;Aucune donnée exploitation.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+    &lt;/p-tabView&gt;
+  &lt;/p-fieldset&gt;
+}
+
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;!-- DIALOG VALIDER                                         --&gt;
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;p-dialog header="Valider &amp; Transmettre" [(visible)]="showValidDlg"
+          [modal]="true" [style]="{width:'500px'}"&gt;
+  &lt;div class="grid p-fluid"&gt;
+    &lt;div class="col-6"&gt;
+      &lt;label&gt;Structure source&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="validForm.fromStructureCode" [readonly]="true"/&gt;
+    &lt;/div&gt;
+    &lt;div class="col-6"&gt;
+      &lt;label&gt;Structure destination *&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="validForm.toStructureCode" placeholder="ex: DR-05"/&gt;
+    &lt;/div&gt;
+    &lt;div class="col-12"&gt;
+      &lt;label&gt;Avis&lt;/label&gt;
+      &lt;p-dropdown [options]="avisOptions" [(ngModel)]="validForm.avisValue"
+                  optionLabel="label" optionValue="value"&gt;&lt;/p-dropdown&gt;
+    &lt;/div&gt;
+    &lt;div class="col-12"&gt;
+      &lt;label&gt;Observations&lt;/label&gt;
+      &lt;textarea pInputTextarea [(ngModel)]="validForm.observations" rows="3"&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;ng-template pTemplate="footer"&gt;
+    &lt;button pButton label="Annuler" class="p-button-text" (click)="showValidDlg.set(false)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Valider" icon="pi pi-check" class="p-button-success" (click)="valider()"&gt;&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/p-dialog&gt;
+
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;!-- DIALOG REFOULER                                        --&gt;
+&lt;!-- ═══════════════════════════════════════════════════════ --&gt;
+&lt;p-dialog header="Refouler le dossier" [(visible)]="showRefoulDlg"
+          [modal]="true" [style]="{width:'500px'}"&gt;
+  &lt;div class="grid p-fluid"&gt;
+    &lt;div class="col-6"&gt;
+      &lt;label&gt;Structure source&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="refoulForm.fromStructureCode" [readonly]="true"/&gt;
+    &lt;/div&gt;
+    &lt;div class="col-6"&gt;
+      &lt;label&gt;Retourner vers *&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="refoulForm.toStructureCode" placeholder="ex: AGC-001"/&gt;
+    &lt;/div&gt;
+    &lt;div class="col-12"&gt;
+      &lt;label&gt;Motif &lt;span class="text-danger"&gt;*&lt;/span&gt;&lt;/label&gt;
+      &lt;textarea pInputTextarea [(ngModel)]="refoulForm.motif" rows="4"
+                placeholder="Motif obligatoire..."&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;ng-template pTemplate="footer"&gt;
+    &lt;button pButton label="Annuler" class="p-button-text" (click)="showRefoulDlg.set(false)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Refouler" icon="pi pi-reply" class="p-button-danger"
+            [disabled]="!refoulForm.motif?.trim()" (click)="refouler()"&gt;&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/p-dialog&gt;</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S8 — snapshot-history.component.css                -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s8">
+<div class="sh"><div class="sn">8</div><h2>snapshot-history.component.css — styles complets <span class="tag tts">CSS</span></h2></div>
+<div class="alert ai"><span>ℹ️</span><div>Fichier : <code>snapshot-history.component.css</code> — remplacer tout le contenu.</div></div>
+<div class="cb">
+<div class="ch"><span><span class="cl">CSS</span> <span class="cf">snapshot-history.component.css — fichier complet</span></span></div>
+<div class="cd"><span class="c">/* ── BARRE D'ONGLETS ─────────────────────────────────────── */</span>
+.hist-header {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 8px 0 12px 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 16px;
+}
+.hist-tabs { display: flex; gap: 4px; }
+.hist-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 6px 6px 0 0; border: 1px solid transparent;
+  background: #eceff1; color: #455a64; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.hist-tab:hover { background: #dce8f0; }
+.hist-tab.active {
+  background: #fff; border-color: #cfd8dc; border-bottom-color: #fff;
+  color: #1a7f37; margin-bottom: -2px; z-index: 1;
+}
+.hist-tab i { font-size: 13px; }
+.hist-count {
+  background: #1a7f37; color: #fff; border-radius: 20px;
+  padding: 1px 7px; font-size: 11px; font-weight: 700;
+}
+.hist-tab.active .hist-count { background: #1565c0; }
+.hist-actions { display: flex; gap: 6px; margin-left: auto; }
+.hist-empty {
+  text-align: center; padding: 40px; color: #78909c;
+}
+.hist-empty i { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+<span class="c">/* ── TIMELINE ────────────────────────────────────────────── */</span>
+.hist-timeline { padding: 8px 0; }
+.tl-marker {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #78909c; color: #fff; font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.tl-valider  { background: #1a7f37; }
+.tl-refouler { background: #c62828; }
+.tl-pec      { background: #1565c0; }
+.tl-envoyer  { background: #6a1b9a; }
+
+.tl-card {
+  background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.07); transition: box-shadow .2s;
+}
+.tl-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+.tl-card-header {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+}
+.tl-structures { font-size: 13px; font-weight: 600; color: #263238; }
+.tl-date { font-size: 11px; color: #78909c; margin-left: auto; }
+.tl-card-body { font-size: 12px; color: #546e7a; display: flex; gap: 12px; flex-wrap: wrap; }
+.tl-by { color: #455a64; }
+.tl-comment {
+  font-style: italic; color: #78909c;
+  max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+<span class="c">/* ── PANNEAU DÉTAIL SNAPSHOT ─────────────────────────────── */</span>
+.snap-detail { border: 2px solid #1a7f37 !important; }
+.snap-meta {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  background: #e8f5e9; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px;
+  font-size: 13px;
+}
+.meta-label { color: #78909c; font-size: 11px; display: block; }
+.snap-obs {
+  color: #455a64; font-style: italic; font-size: 12px;
+  flex: 1; min-width: 200px;
+}
+.snap-sub {
+  font-size: 13px; font-weight: 700; color: #1565c0; margin-bottom: 8px;
+}</div></div>
+
+<hr/>
+<div class="card" style="border-top:3px solid var(--green)">
+  <h3>📋 Récapitulatif des 9 fichiers à modifier</h3>
+  <table class="t1">
+    <thead><tr><th>Fichier</th><th>Type</th><th>Changement</th></tr></thead>
+    <tbody>
+      <tr><td><code>db/migration/V9__add_structure_mere.sql</code></td><td><span class="tag tn">SQL</span></td><td>Nouveau — ALTER TABLE ajouter colonne structure_mere</td></tr>
+      <tr><td><code>entities/CanevasWorkflowLog.java</code></td><td><span class="tag tj">Java</span></td><td>+1 champ <code>structureMere</code></td></tr>
+      <tr><td><code>repository/CanevasWorkflowLogRepository.java</code></td><td><span class="tag tj">Java</span></td><td>+3 méthodes de requête filtrées</td></tr>
+      <tr><td><code>service/WorkflowLogService.java</code></td><td><span class="tag tj">Java</span></td><td>Réécriture — <code>log()</code> avec structureMere + <code>getHistoryFiltered()</code></td></tr>
+      <tr><td><code>web/CanevasSnapshotController.java</code></td><td><span class="tag tj">Java</span></td><td>Endpoint filtré + nouveau endpoint <code>/{snapshotId}/detail</code></td></tr>
+      <tr><td><code>service/CanevasSnapshotService.java</code></td><td><span class="tag tj">Java</span></td><td>+méthode <code>getBySnapshotId()</code></td></tr>
+      <tr><td><code>_services/snapshot.service.ts</code></td><td><span class="tag tts">TS</span></td><td>+<code>structureMere</code> interface + <code>getBySnapshotId()</code> + params sur <code>getWorkflowLog()</code></td></tr>
+      <tr><td><code>snapshot-history.component.ts</code></td><td><span class="tag tts">TS</span></td><td>Réécriture — filtrage par rôle, timeline, openSnapshot par ID</td></tr>
+      <tr><td><code>snapshot-history.component.html</code></td><td><span class="tag tts">HTML</span></td><td>Réécriture — onglets, PrimeNG Timeline, détail 6 tabs</td></tr>
+      <tr><td><code>snapshot-history.component.css</code></td><td><span class="tag tts">CSS</span></td><td>Nouveau — styles timeline + onglets</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="text-align:center;color:var(--muted);font-size:11px;padding:28px 0">
+  Canvas Agricole BNA — Implémentation Snapshot History — 14/05/2026
+</div>
+</section>
+</div>
+</body>
+</html>
