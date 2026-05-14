@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Implémentation Complète — Canvas Agricole</title>
+<style>
+:root{
+  --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+  --blue:#1565c0;--blue-lt:#e3f2fd;
+  --amber:#e65100;--amber-lt:#fff3e0;
+  --red:#c62828;--red-lt:#ffebee;
+  --purple:#6a1b9a;--purple-lt:#f3e5f5;
+  --gray:#455a64;--gray-lt:#eceff1;
+  --bg:#f0f4f8;--card:#fff;--border:#cfd8dc;
+  --text:#263238;--muted:#78909c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.6}
+nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:10px 24px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-wrap:wrap}
+nav .brand{font-size:14px;font-weight:800;margin-right:8px}
+nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:11px;padding:3px 9px;border-radius:20px;transition:background .2s;white-space:nowrap}
+nav a:hover{background:rgba(255,255,255,.2)}
+.page{max-width:1180px;margin:0 auto;padding:20px 16px}
+.hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:10px;padding:28px 36px;margin-bottom:24px}
+.hero h1{font-size:20px;font-weight:800;margin-bottom:6px}
+.hero p{opacity:.85;font-size:13px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+/* FILE SECTIONS */
+.file-section{margin-bottom:32px}
+.file-header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px 8px 0 0;border:1px solid var(--border)}
+.fh-java{background:#fffde7;border-color:#f9a825}
+.fh-ts{background:#e3f2fd;border-color:#1565c0}
+.fh-html{background:#fce4ec;border-color:#c62828}
+.fh-css{background:#f3e5f5;border-color:#6a1b9a}
+.fh-sql{background:#e8f5e9;border-color:#1a7f37}
+.file-num{width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.file-path{font-family:'Cascadia Code','Consolas',monospace;font-size:12px;font-weight:700}
+.file-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.b-new{background:#c8e6c9;color:#1b5e20}
+.b-mod{background:#fff3e0;color:#e65100}
+.b-full{background:#e3f2fd;color:#0d47a1}
+/* CODE */
+.code-wrap{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden}
+.code-label{background:#161b22;padding:5px 14px;font-size:10px;color:#8b949e;font-family:monospace;display:flex;justify-content:space-between}
+pre{background:#0d1117;color:#e6edf3;padding:14px 16px;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;line-height:1.75;margin:0}
+.alert{border-radius:6px;padding:10px 14px;margin:10px 0;display:flex;gap:8px;font-size:12px;line-height:1.6}
+.ai{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.aw{background:var(--amber-lt);border-left:3px solid var(--amber)}
+.as{background:var(--green-lt);border-left:3px solid var(--green)}
+code{background:var(--gray-lt);padding:1px 5px;border-radius:3px;font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--purple)}
+table.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0;border-radius:6px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+table.tbl th{background:var(--green-dk);color:#fff;padding:8px 12px;text-align:left}
+table.tbl td{padding:7px 12px;border-bottom:1px solid var(--border)}
+table.tbl tr:last-child td{border:none}
+table.tbl tr:nth-child(even) td{background:var(--gray-lt)}
+hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌿 Implémentation Complète</div>
+  <a href="#f01">SQL</a>
+  <a href="#f02">WorkflowLog</a>
+  <a href="#f03">Repository</a>
+  <a href="#f04">LogService</a>
+  <a href="#f05">AvisDTO</a>
+  <a href="#f06">SnapshotService</a>
+  <a href="#f07">SnapshotCtrl</a>
+  <a href="#f08">AvisCtrl</a>
+  <a href="#f09">Avis.ts</a>
+  <a href="#f10">avis.component.ts</a>
+  <a href="#f11">snapshot.service.ts</a>
+  <a href="#f12">history.component.ts</a>
+  <a href="#f13">history.html</a>
+  <a href="#f14">history.css</a>
+</nav>
+<div class="page">
+
+<div class="hero">
+  <h1>Code complet — Implémentation des 2 guides</h1>
+  <p>14 fichiers prêts à copier-coller. Ordre d'application : SQL → Backend (Java) → Frontend (TypeScript/HTML/CSS).</p>
+  <div class="pills">
+    <span class="pill">1 migration SQL</span>
+    <span class="pill">7 fichiers Java</span>
+    <span class="pill">6 fichiers Angular</span>
+    <span class="pill">Zéro rupture API</span>
+  </div>
+</div>
+
+<table class="tbl">
+<thead><tr><th>#</th><th>Fichier</th><th>Action</th><th>Pourquoi</th></tr></thead>
+<tbody>
+<tr><td>01</td><td><code>V9__add_structure_mere.sql</code></td><td><span class="b-new file-badge">NOUVEAU</span></td><td>Colonne Oracle pour filtrage DR→AGC</td></tr>
+<tr><td>02</td><td><code>CanevasWorkflowLog.java</code></td><td><span class="b-mod file-badge">+1 champ</span></td><td>Champ <code>structureMere</code></td></tr>
+<tr><td>03</td><td><code>CanevasWorkflowLogRepository.java</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>+3 méthodes filtrées</td></tr>
+<tr><td>04</td><td><code>WorkflowLogService.java</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>log() + getHistoryFiltered()</td></tr>
+<tr><td>05</td><td><code>AvisDTO.java</code></td><td><span class="b-mod file-badge">+2 champs</span></td><td>structureLabel, toStructureCode</td></tr>
+<tr><td>06</td><td><code>CanevasSnapshotService.java</code></td><td><span class="b-mod file-badge">MODIF</span></td><td>+param avisJson + getBySnapshotId()</td></tr>
+<tr><td>07</td><td><code>CanevasSnapshotController.java</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>Endpoint filtré + endpoint par ID</td></tr>
+<tr><td>08</td><td><code>AvisController.java</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>saveAvis() corrigé + WorkflowLog</td></tr>
+<tr><td>09</td><td><code>_models/Avis.ts</code></td><td><span class="b-mod file-badge">+2 champs</span></td><td>Interface AvisDTO enrichie</td></tr>
+<tr><td>10</td><td><code>avis.component.ts</code></td><td><span class="b-mod file-badge">MODIF</span></td><td>resolveToStructureCode() + saveAvis()</td></tr>
+<tr><td>11</td><td><code>snapshot.service.ts</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>getBySnapshotId() + params filtrage</td></tr>
+<tr><td>12</td><td><code>snapshot-history.component.ts</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>Signals + filtrage rôle + timeline</td></tr>
+<tr><td>13</td><td><code>snapshot-history.component.html</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>Onglets + Timeline + Détail snapshot</td></tr>
+<tr><td>14</td><td><code>snapshot-history.component.css</code></td><td><span class="b-full file-badge">COMPLET</span></td><td>Styles timeline + onglets</td></tr>
+</tbody>
+</table>
+
+<hr/>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 01 — SQL MIGRATION -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f01">
+<div class="file-header fh-sql">
+  <div class="file-num">1</div>
+  <span class="file-path">backend-saeb/src/main/resources/db/migration/V9__add_structure_mere.sql</span>
+  <span class="b-new file-badge">NOUVEAU FICHIER</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>SQL — Oracle — créer ce fichier (ne pas modifier V8)</span></div>
+<pre>ALTER TABLE CANEVAS_WORKFLOW_LOG
+  ADD structure_mere VARCHAR2(20 CHAR);
+
+COMMENT ON COLUMN CANEVAS_WORKFLOW_LOG.structure_mere
+  IS 'DR parente de fromStructure. Ex: DR-05 quand fromStructure=AGC-001.';</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 02 — CanevasWorkflowLog.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f02">
+<div class="file-header fh-java">
+  <div class="file-num">2</div>
+  <span class="file-path">backend-saeb/.../entities/CanevasWorkflowLog.java</span>
+  <span class="b-mod file-badge">+1 champ</span>
+</div>
+<div class="alert ai"><span>ℹ️</span> Ajouter uniquement le champ <code>structureMere</code> après <code>performedAt</code> (ligne 43). Le reste du fichier ne change pas.</div>
+<div class="code-wrap">
+<div class="code-label"><span>Java — ajouter après private LocalDateTime performedAt;</span></div>
+<pre>    @Column(name = "structure_mere", length = 20)
+    private String structureMere;  // DR-05 quand fromStructure = AGC-001</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 03 — CanevasWorkflowLogRepository.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f03">
+<div class="file-header fh-java">
+  <div class="file-num">3</div>
+  <span class="file-path">backend-saeb/.../repository/CanevasWorkflowLogRepository.java</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>Java — fichier complet</span></div>
+<pre>package net.kachout.saeb.repository;
+
+import net.kachout.saeb.entities.CanevasWorkflowLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface CanevasWorkflowLogRepository
+        extends JpaRepository&lt;CanevasWorkflowLog, Long&gt; {
+
+    List&lt;CanevasWorkflowLog&gt;
+    findByCanevasIdOrderByPerformedAtDesc(Long canevasId);
+
+    List&lt;CanevasWorkflowLog&gt;
+    findByCanevasIdAndAction(Long canevasId, String action);
+
+    // filtre AGC : ses propres logs uniquement
+    List&lt;CanevasWorkflowLog&gt;
+    findByCanevasIdAndFromStructureOrderByPerformedAtDesc(
+            Long canevasId, String fromStructure);
+
+    // filtre DR : logs de ses agences (structureMere = code DR)
+    List&lt;CanevasWorkflowLog&gt;
+    findByCanevasIdAndStructureMereOrderByPerformedAtDesc(
+            Long canevasId, String structureMere);
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 04 — WorkflowLogService.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f04">
+<div class="file-header fh-java">
+  <div class="file-num">4</div>
+  <span class="file-path">backend-saeb/.../service/WorkflowLogService.java</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>Java — fichier complet</span></div>
+<pre>package net.kachout.saeb.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.kachout.saeb.entities.CanevasWorkflowLog;
+import net.kachout.saeb.repository.CanevasWorkflowLogRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class WorkflowLogService {
+
+    private final CanevasWorkflowLogRepository workflowRepo;
+
+    // ── Version complète avec structureMere ──────────────────────────────────
+    @Transactional
+    public CanevasWorkflowLog log(
+            Long canevasId,
+            String fromStructure, String toStructure,
+            String action,
+            Integer snapshotVersion, Long snapshotId,
+            String comments, String performedBy,
+            String structureMere) {
+
+        CanevasWorkflowLog entry = CanevasWorkflowLog.builder()
+                .canevasId(canevasId)
+                .fromStructure(fromStructure)
+                .toStructure(toStructure)
+                .action(action)
+                .snapshotVersion(snapshotVersion)
+                .snapshotId(snapshotId)
+                .comments(comments)
+                .performedBy(performedBy)
+                .structureMere(structureMere)
+                .build();
+
+        CanevasWorkflowLog saved = workflowRepo.save(entry);
+        log.info("WorkflowLog: canevas={} {} -[{}]-> {}", canevasId, fromStructure, action, toStructure);
+        return saved;
+    }
+
+    // ── Surcharge rétrocompatible (pour CanevasSnapshotController) ───────────
+    @Transactional
+    public CanevasWorkflowLog log(
+            Long canevasId,
+            String fromStructure, String toStructure,
+            String action,
+            Integer snapshotVersion, Long snapshotId,
+            String comments, String performedBy) {
+        return log(canevasId, fromStructure, toStructure, action,
+                   snapshotVersion, snapshotId, comments, performedBy, null);
+    }
+
+    // ── Tous les logs — DC (pas de filtre) ───────────────────────────────────
+    public List&lt;CanevasWorkflowLog&gt; getHistory(Long canevasId) {
+        return workflowRepo.findByCanevasIdOrderByPerformedAtDesc(canevasId);
+    }
+
+    // ── Logs filtrés selon le rôle ────────────────────────────────────────────
+    // typeStructure "1"=AGC, "2"=DR, autres=DC
+    public List&lt;CanevasWorkflowLog&gt; getHistoryFiltered(
+            Long canevasId, String typeStructure, String codeStructure) {
+
+        if ("1".equals(typeStructure) &amp;&amp; codeStructure != null) {
+            // AGC : uniquement ses propres logs
+            return workflowRepo.findByCanevasIdAndFromStructureOrderByPerformedAtDesc(
+                    canevasId, codeStructure);
+        }
+        if ("2".equals(typeStructure) &amp;&amp; codeStructure != null) {
+            // DR : ses logs + logs des agences filles
+            List&lt;CanevasWorkflowLog&gt; propres =
+                workflowRepo.findByCanevasIdAndFromStructureOrderByPerformedAtDesc(
+                        canevasId, codeStructure);
+            List&lt;CanevasWorkflowLog&gt; agences =
+                workflowRepo.findByCanevasIdAndStructureMereOrderByPerformedAtDesc(
+                        canevasId, codeStructure);
+            List&lt;CanevasWorkflowLog&gt; merged = new ArrayList&lt;&gt;(propres);
+            merged.addAll(agences);
+            merged.sort(Comparator.comparing(CanevasWorkflowLog::getPerformedAt).reversed());
+            return merged;
+        }
+        // DC ou non précisé : tout
+        return workflowRepo.findByCanevasIdOrderByPerformedAtDesc(canevasId);
+    }
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 05 — AvisDTO.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f05">
+<div class="file-header fh-java">
+  <div class="file-num">5</div>
+  <span class="file-path">backend-saeb/.../dtos_/AvisDTO.java</span>
+  <span class="b-mod file-badge">+2 champs</span>
+</div>
+<div class="alert ai"><span>ℹ️</span> Ajouter les 2 lignes surlignées à la fin de la liste des champs, avant le commentaire <code>// Getters/Setters</code>.</div>
+<div class="code-wrap">
+<div class="code-label"><span>Java — ajouter après "private boolean isChargedOrDivision;" (ligne 52)</span></div>
+<pre>    private String structureLabel;    // ex: "Agence Tunis Centre" — pour le snapshot
+    private String toStructureCode;   // code structure destinataire — pour le WorkflowLog</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 06 — CanevasSnapshotService.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f06">
+<div class="file-header fh-java">
+  <div class="file-num">6</div>
+  <span class="file-path">backend-saeb/.../service/CanevasSnapshotService.java</span>
+  <span class="b-mod file-badge">2 MODIFICATIONS</span>
+</div>
+<div class="alert aw"><span>⚠️</span> Deux modifications distinctes dans ce fichier.</div>
+
+<div class="code-wrap">
+<div class="code-label"><span>Modification 6a — changer la signature de createSnapshot() ligne 35 : ajouter le 8e paramètre</span></div>
+<pre>// AVANT (ligne 35):
+public CanevasStructureSnapshot createSnapshot(
+        Long canevasId, String structureCode, String structureLabel,
+        String matricule, String createdBy, String observations,
+        String statusAtSnapshot) {
+
+// APRÈS — ajouter le 8e paramètre :
+public CanevasStructureSnapshot createSnapshot(
+        Long canevasId, String structureCode, String structureLabel,
+        String matricule, String createdBy, String observations,
+        String statusAtSnapshot,
+        String avisJson) {         // peut être null</pre>
+</div>
+
+<div class="code-wrap" style="margin-top:8px">
+<div class="code-label"><span>Modification 6b — dans le builder (après ligne 96), ajouter .donneesAvisJson(avisJson)</span></div>
+<pre>        CanevasStructureSnapshot snapshot = CanevasStructureSnapshot.builder()
+                // ... tous les champs existants ...
+                .donneesGarantiesJson(garantiesJson)
+                .donneesAvisJson(avisJson)   // ← AJOUTER CETTE LIGNE
+                .build();</pre>
+</div>
+
+<div class="code-wrap" style="margin-top:8px">
+<div class="code-label"><span>Modification 6c — ajouter la méthode getBySnapshotId() après getByStructure() (ligne ~344)</span></div>
+<pre>    public Optional&lt;SnapshotDetailDto&gt; getBySnapshotId(Long snapshotId) {
+        return snapshotRepo.findById(snapshotId)
+                .map(s -> new SnapshotDetailDto(
+                        s.getSnapshotId(), s.getStructureCode(), s.getStructureLabel(),
+                        s.getVersionNumber(), s.getStatusAtSnapshot(),
+                        s.getCreatedBy(), s.getCreatedAt(), s.getObservations(),
+                        fromJson(s.getEngagementBnaJson(), Object.class),
+                        fromJson(s.getEngagementBctJson(), Object.class),
+                        fromJson(s.getClasseBnaJson(), Object.class),
+                        fromJson(s.getClasseBctJson(), Object.class),
+                        fromJson(s.getClasseRetourJson(), Object.class),
+                        fromJson(s.getEngagementDetailleJson(), EngagementDetailleDto.class),
+                        fromJson(s.getDonneesCreditsJson(), Object.class),
+                        fromJson(s.getDonneesExploitationJson(), Object.class),
+                        fromJson(s.getDonneesGarantiesJson(), Object.class)));
+    }</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 07 — CanevasSnapshotController.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f07">
+<div class="file-header fh-java">
+  <div class="file-num">7</div>
+  <span class="file-path">backend-saeb/.../web/CanevasSnapshotController.java</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>Java — fichier complet</span></div>
+<pre>package net.kachout.saeb.web;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.kachout.saeb.dtos_.*;
+import net.kachout.saeb.entities.CanevasStructureSnapshot;
+import net.kachout.saeb.entities.CanevasWorkflowLog;
+import net.kachout.saeb.service.CanevasSnapshotService;
+import net.kachout.saeb.service.WorkflowLogService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/canevas")
+@CrossOrigin
+@RequiredArgsConstructor
+@Slf4j
+public class CanevasSnapshotController {
+
+    private final CanevasSnapshotService snapshotService;
+    private final WorkflowLogService workflowLogService;
+
+    @PostMapping("/{id}/valider")
+    public ResponseEntity&lt;SnapshotResponseDto&gt; valider(
+            @PathVariable Long id,
+            @RequestBody ValidationRequestDto request) {
+
+        CanevasStructureSnapshot snapshot = snapshotService.createSnapshot(
+                id, request.fromStructureCode(), request.fromStructureLabel(),
+                request.matricule(), request.matricule(),
+                request.observations(), "VALID_DONNEE", null);
+
+        workflowLogService.log(id,
+                request.fromStructureCode(), request.toStructureCode(),
+                "VALIDER", snapshot.getVersionNumber(), snapshot.getSnapshotId(),
+                request.observations(), request.matricule());
+
+        return ResponseEntity.ok(new SnapshotResponseDto(
+                snapshot.getSnapshotId(), snapshot.getVersionNumber(),
+                request.fromStructureCode()));
+    }
+
+    @PostMapping("/{id}/refouler")
+    public ResponseEntity&lt;SnapshotResponseDto&gt; refouler(
+            @PathVariable Long id,
+            @RequestBody RefoulementRequestDto request) {
+
+        CanevasStructureSnapshot snapshot = snapshotService.createSnapshot(
+                id, request.fromStructureCode(), request.fromStructureLabel(),
+                request.matricule(), request.matricule(),
+                request.motif(), "CORRIGE_DONNEE", null);
+
+        workflowLogService.log(id,
+                request.fromStructureCode(), request.toStructureCode(),
+                "REFOULER", snapshot.getVersionNumber(), snapshot.getSnapshotId(),
+                request.motif(), request.matricule());
+
+        return ResponseEntity.ok(new SnapshotResponseDto(
+                snapshot.getSnapshotId(), snapshot.getVersionNumber(),
+                request.fromStructureCode()));
+    }
+
+    @GetMapping("/{id}/snapshots")
+    public ResponseEntity&lt;List&lt;SnapshotSummaryDto&gt;&gt; getHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(snapshotService.getHistory(id));
+    }
+
+    @GetMapping("/{id}/snapshots/structure/{structureCode}")
+    public ResponseEntity&lt;SnapshotDetailDto&gt; getByStructure(
+            @PathVariable Long id, @PathVariable String structureCode) {
+        return snapshotService.getByStructure(id, structureCode)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // NOUVEAU — récupérer un snapshot par son ID exact (pour l'icône œil)
+    @GetMapping("/{id}/snapshots/{snapshotId}/detail")
+    public ResponseEntity&lt;SnapshotDetailDto&gt; getSnapshotById(
+            @PathVariable Long id, @PathVariable Long snapshotId) {
+        return snapshotService.getBySnapshotId(snapshotId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // MODIFIÉ — filtre par rôle via typeStructure + codeStructure
+    @GetMapping("/{id}/snapshots/workflow-log")
+    public ResponseEntity&lt;List&lt;CanevasWorkflowLog&gt;&gt; getWorkflowLog(
+            @PathVariable Long id,
+            @RequestParam(required = false) String typeStructure,
+            @RequestParam(required = false) String codeStructure) {
+        return ResponseEntity.ok(
+                workflowLogService.getHistoryFiltered(id, typeStructure, codeStructure));
+    }
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 08 — AvisController.java -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f08">
+<div class="file-header fh-java">
+  <div class="file-num">8</div>
+  <span class="file-path">backend-saeb/.../web/AvisController.java</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>Java — fichier complet</span></div>
+<pre>package net.kachout.saeb.web;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import net.kachout.saeb.dtos_.AvisDTO;
+import net.kachout.saeb.exceptions.EntityNotFoundException;
+import net.kachout.saeb.service.AvisService;
+import net.kachout.saeb.service.CanevasSnapshotService;
+import net.kachout.saeb.service.WorkflowLogService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@Slf4j
+@RestController
+@RequestMapping("/api/avis")
+public class AvisController {
+
+    private final AvisService avisService;
+    private final CanevasSnapshotService snapshotService;
+    private final WorkflowLogService workflowLogService;
+    private final ObjectMapper objectMapper;
+
+    public AvisController(AvisService avisService,
+                          CanevasSnapshotService snapshotService,
+                          WorkflowLogService workflowLogService,
+                          ObjectMapper objectMapper) {
+        this.avisService        = avisService;
+        this.snapshotService    = snapshotService;
+        this.workflowLogService = workflowLogService;
+        this.objectMapper       = objectMapper;
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;AvisDTO&gt; saveAvis(@RequestBody AvisDTO avisDTO) {
+        log.info("saveAvis → canevas={} statusAvis={}", avisDTO.getNumCaneva(), avisDTO.getStatusAvis());
+
+        // 1. Sauvegarder l'avis EN PREMIER
+        AvisDTO saved;
+        try {
+            saved = avisService.saveAvis(avisDTO);
+        } catch (JsonProcessingException e) {
+            log.error("Erreur sauvegarde avis", e);
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 2. Préparer les valeurs (plus de hardcoded)
+        String structureCode  = String.valueOf(avisDTO.getStructure());
+        String structureLabel = avisDTO.getStructureLabel() != null
+                                ? avisDTO.getStructureLabel() : structureCode;
+        String matricule      = avisDTO.getMatricule() != null
+                                ? String.valueOf(avisDTO.getMatricule()) : "INCONNU";
+        String observations   = avisDTO.getCommentaire() != null
+                                ? avisDTO.getCommentaire() : "";
+        String statusAtSnap   = resolveStatusAtSnapshot(avisDTO.getStatusAvis(), avisDTO.getAvisValue());
+
+        // 3. Sérialiser l'avis en JSON pour le snapshot
+        String avisJson = null;
+        try {
+            Map&lt;String, Object&gt; avisMap = new LinkedHashMap&lt;&gt;();
+            avisMap.put("statusAvis",  avisDTO.getStatusAvis());
+            avisMap.put("avisValue",   avisDTO.getAvisValue());
+            avisMap.put("commentaire", avisDTO.getCommentaire());
+            avisMap.put("structure",   avisDTO.getStructure());
+            avisMap.put("matricule",   avisDTO.getMatricule());
+            avisMap.put("avisId",      saved.getId());
+            avisJson = objectMapper.writeValueAsString(avisMap);
+        } catch (Exception e) {
+            log.warn("Impossible de sérialiser l'avis", e);
+        }
+
+        // 4. Créer le snapshot APRÈS sauvegarde
+        Long snapshotId  = null;
+        Integer snapVer  = null;
+        try {
+            var snap = snapshotService.createSnapshot(
+                    avisDTO.getNumCaneva(), structureCode, structureLabel,
+                    matricule, matricule, observations, statusAtSnap, avisJson);
+            snapshotId = snap.getSnapshotId();
+            snapVer    = snap.getVersionNumber();
+            log.info("✅ Snapshot v{} créé pour canevas={}", snapVer, avisDTO.getNumCaneva());
+        } catch (Exception e) {
+            log.warn("⚠️ Échec snapshot canevas={}", avisDTO.getNumCaneva(), e);
+        }
+
+        // 5. Créer le WorkflowLog
+        try {
+            String toStructure = avisDTO.getToStructureCode() != null
+                                 ? avisDTO.getToStructureCode()
+                                 : avisDTO.getCodeStructureReceptrice();
+            String action = resolveWorkflowAction(avisDTO.getStatusAvis());
+            // structureMere = structureMere de l'AvisDTO (valeur de l'agence vers sa DR)
+            String structureMereLog = "1".equals(avisDTO.getTypeStructure())
+                                     ? avisDTO.getStructureMere() : null;
+
+            workflowLogService.log(avisDTO.getNumCaneva(),
+                    structureCode, toStructure, action,
+                    snapVer, snapshotId, observations, matricule,
+                    structureMereLog);
+            log.info("✅ WorkflowLog action={} canevas={}", action, avisDTO.getNumCaneva());
+        } catch (Exception e) {
+            log.warn("⚠️ Échec WorkflowLog canevas={}", avisDTO.getNumCaneva(), e);
+        }
+
+        return ResponseEntity.ok(saved);
+    }
+
+    // ── Méthodes privées ──────────────────────────────────────────────────────
+
+    private String resolveStatusAtSnapshot(String statusAvis, String avisValue) {
+        if (statusAvis == null) return "INCONNU";
+        return switch (statusAvis) {
+            case "PEC_CCA"        -> "PEC_DONNEE";
+            case "PRES_VALIDER"   -> "VALID_DONNEE";
+            case "CORRIGER"       -> "CORRIGE_DONNEE";
+            case "PEC_AVIS_DEC"   -> "PEC_AVIS_DEC";
+            case "CORRIGER2"      -> "CORRIGE_AVIS_DEC";
+            case "VALIDER"        -> "VALIDER_DR";
+            case "Envoyer"        -> "EN_COURS_ETUDE";
+            case "Décision Finale"-> "1".equals(avisValue) ? "DEC_FINAL_PRISE_ACCORD" : "DEC_FINAL_PRISE_REJET";
+            default               -> statusAvis;
+        };
+    }
+
+    private String resolveWorkflowAction(String statusAvis) {
+        if (statusAvis == null) return "ACTION_INCONNUE";
+        return switch (statusAvis) {
+            case "PEC_CCA"        -> "PRENDRE_EN_CHARGE";
+            case "Envoyer"        -> "ENVOYER";
+            case "PRES_VALIDER"   -> "PRE_VALIDER";
+            case "CORRIGER"       -> "REFOULER";
+            case "PEC_AVIS_DEC"   -> "PRENDRE_EN_CHARGE";
+            case "VALIDER"        -> "VALIDER";
+            case "CORRIGER2"      -> "REFOULER";
+            case "Décision Finale"-> "DECISION_FINALE";
+            default               -> statusAvis.toUpperCase();
+        };
+    }
+
+    // ── Endpoints GET existants (inchangés) ───────────────────────────────────
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;String&gt; handleAllExceptions(Exception ex) {
+        log.error("Exception: ", ex);
+        return ResponseEntity.status(500).body("Error: " + ex.getMessage());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(avisService.getAvisById(id));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/by-params")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParams(
+            @RequestParam Long numCaneva, @RequestParam Long numSeqpers) {
+        try {
+            AvisDTO a = avisService.getAvisByParams(numCaneva, numSeqpers);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/by-paramss2")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParamss2(
+            @RequestParam Long numCaneva, @RequestParam Long numSeqpers,
+            @RequestParam String status, @RequestParam Long matricule) {
+        try {
+            AvisDTO a = avisService.getAvisByParamss2(numCaneva, numSeqpers, status, matricule);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/by-paramss3")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParamss3(
+            @RequestParam Long numCaneva, @RequestParam Long numSeqpers,
+            @RequestParam Long matricule) {
+        try {
+            AvisDTO a = avisService.getAvisByParamss3(numCaneva, numSeqpers, matricule);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/by-paramss4")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParamss4(
+            @RequestParam Long numCaneva, @RequestParam Long structure) {
+        try {
+            AvisDTO a = avisService.getAvisByParamss4(numCaneva, structure);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/byNumCanevaAndStructure")
+    public ResponseEntity&lt;List&lt;AvisDTO&gt;&gt; getAvisListByNumCanevaAndStructure(
+            @RequestParam Long numCaneva, @RequestParam Long structure) {
+        List&lt;AvisDTO&gt; list = avisService.getAvisListByNumCanevaAndStructure(numCaneva, structure);
+        return (list != null &amp;&amp; !list.isEmpty()) ? ResponseEntity.ok(list) : ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/byNumCanevaAndStructureAndMatricule")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParamss7(
+            @RequestParam Long numCaneva, @RequestParam Long structure,
+            @RequestParam Long matricule) {
+        try {
+            AvisDTO a = avisService.getAvisListByNumCanevaAndStructureAndMatricule(numCaneva, structure, matricule);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/by-paramss8")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParamss8(
+            @RequestParam Long structure, @RequestParam Long numCaneva, @RequestParam String status) {
+        try {
+            AvisDTO a = avisService.findAvisByStructureAndNumCanevaAndStatusAvisAndMaxId(structure, numCaneva, status);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/by-paramss9")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByParamss9(
+            @RequestParam Long structure, @RequestParam Long numCaneva, @RequestParam String status) {
+        try {
+            AvisDTO a = avisService.findAvisByStructureRecepAndNumCanevaAndStatusAvisAndMaxId(structure, numCaneva, status);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+
+    @GetMapping("/by-caneva-mat-maxid")
+    public ResponseEntity&lt;AvisDTO&gt; getAvisByNumCanvaAndMat(
+            @RequestParam Long numCaneva, @RequestParam Long matricule) {
+        try {
+            AvisDTO a = avisService.findByNumCanevaAndMatriculeAndMaxId(numCaneva, matricule);
+            return a != null ? ResponseEntity.ok(a) : ResponseEntity.noContent().build();
+        } catch (JsonProcessingException e) { return ResponseEntity.badRequest().build(); }
+    }
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 09 — _models/Avis.ts -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f09">
+<div class="file-header fh-ts">
+  <div class="file-num">9</div>
+  <span class="file-path">frontend-app1/src/app/_models/Avis.ts</span>
+  <span class="b-mod file-badge">+2 champs</span>
+</div>
+<div class="alert ai"><span>ℹ️</span> Ajouter 2 lignes à la fin de l'interface <code>AvisDTO</code>, avant la dernière accolade fermante.</div>
+<div class="code-wrap">
+<div class="code-label"><span>TypeScript — ajouter dans l'interface AvisDTO</span></div>
+<pre>  structureLabel?: string;    // libellé de la structure — pour le snapshot
+  toStructureCode?: string;   // code structure destinataire — pour le WorkflowLog</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 10 — avis.component.ts -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f10">
+<div class="file-header fh-ts">
+  <div class="file-num">10</div>
+  <span class="file-path">frontend-app1/.../avis/avis.component.ts</span>
+  <span class="b-mod file-badge">2 MODIFICATIONS</span>
+</div>
+
+<div class="code-wrap">
+<div class="code-label"><span>Modification 10a — dans saveAvis(), enrichir l'objet avisDTO (après la ligne isChargedOrDivision)</span></div>
+<pre>  saveAvis(): void {
+    // ... code existant jusqu'à la construction de avisDTO ...
+    const statusValue = this.avisForm.get('statusAvis')?.value ?? '';
+    const currentUser = this.userService.user();
+
+    // AJOUTER CETTE LIGNE avant la construction de avisDTO:
+    const toStructureCode = this.resolveToStructureCode(statusValue, currentUser);
+
+    const avisDTO: AvisDTO = {
+      id:                      this.currentAvisId() ?? undefined,
+      numCaneva:               this.numCanva,
+      numSeqpers:              this.numSeqpers,
+      statusAvis:              (statusValue === '') ? 'PEC_CCA' : statusValue,
+      structure:               this.structure,
+      matricule:               this.matricule,
+      avisValue:               this.avisForm.get('avisValue')!.value ?? '',
+      codeStructureReceptrice: this.avisForm.get('codeStructureReceptrice')!.value ?? '',
+      commentaire:             this.avisForm.get('commentaire')!.value ?? '',
+      dataAchatTerrain:        this.dataAchatTerrain,
+      dataCreditInvestissement:this.dataInvestisssment,
+      dataCreditCourtTerme:    this.dataCreditCourtTerme,
+      dataGaranties:           this.dataGaranties,
+      typeStructure:           currentUser.typeStructure,
+      structureMere:           currentUser.structureMere,
+      isChargedOrDivision:     this.isChargedOrDivision,
+      // AJOUTER CES 2 CHAMPS :
+      structureLabel:          currentUser.libStructure ?? currentUser.codeStructure ?? '',
+      toStructureCode:         toStructureCode,
+    };
+    // ... suite du code existant ...
+  }</pre>
+</div>
+
+<div class="code-wrap" style="margin-top:8px">
+<div class="code-label"><span>Modification 10b — ajouter cette méthode privée avant la dernière accolade de la classe</span></div>
+<pre>  private resolveToStructureCode(statusValue: string, user: any): string {
+    switch (statusValue) {
+      case 'PRES_VALIDER':
+        return user?.structureMere ?? '';
+      case 'CORRIGER':
+      case 'CORRIGER2':
+        return this.avisForm.get('codeStructureReceptrice')?.value ?? '';
+      case 'VALIDER':
+        if (user?.typeStructure === '1') return user?.structureMere ?? '';
+        if (user?.typeStructure === '2') return '330';
+        if (user?.typeStructure === '5') return '381';
+        return this.avisForm.get('codeStructureReceptrice')?.value ?? '';
+      case 'Envoyer':
+        return this.isChargedOrDivision
+          ? ''
+          : this.avisForm.get('codeStructureReceptrice')?.value ?? '';
+      case 'PEC_CCA':
+      case 'PEC_AVIS_DEC':
+        return user?.codeStructure ?? '';
+      default:
+        return this.avisForm.get('codeStructureReceptrice')?.value ?? '';
+    }
+  }</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 11 — snapshot.service.ts -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f11">
+<div class="file-header fh-ts">
+  <div class="file-num">11</div>
+  <span class="file-path">frontend-app1/src/app/_services/snapshot.service.ts</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>TypeScript — fichier complet</span></div>
+<pre>import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment.development';
+
+export interface SnapshotSummary {
+  snapshotId: number;
+  structureCode: string;
+  structureLabel: string;
+  versionNumber: number;
+  statusAtSnapshot: string;
+  createdBy: string;
+  matricule: string;
+  createdAt: string;
+  observations: string;
+}
+
+export interface EngagementPartie {
+  typePartie: string; nom: string; cin?: string;
+  numSeqPers: number; partCapital?: string;
+  engagementsBNA: any[]; engagementsBCT: any[]; classeBNA: any[];
+}
+
+export interface EngagementDetaille {
+  actionnaires: EngagementPartie[];
+  premierResponsable: EngagementPartie | null;
+  groupe: EngagementPartie[];
+  vendeurs: EngagementPartie[];
+}
+
+export interface SnapshotDetail extends SnapshotSummary {
+  engagementsBNA: any[]; engagementsBCT: any[];
+  classeBNA: any[]; classeBCT: any[]; classeRetour: any[];
+  engagementDetaille: EngagementDetaille;
+  creditsData: any; exploitationData: any; garantiesData: any;
+}
+
+export interface ValidationRequest {
+  fromStructureCode: string; fromStructureLabel: string;
+  toStructureCode: string; matricule: string;
+  observations: string; avisValue: 'FAVORABLE' | 'DEFAVORABLE' | 'SANS_AVIS';
+}
+
+export interface RefoulementRequest {
+  fromStructureCode: string; fromStructureLabel: string;
+  toStructureCode: string; matricule: string; motif: string;
+}
+
+export interface SnapshotResponse {
+  snapshotId: number; versionNumber: number; structureCode: string;
+}
+
+export interface WorkflowLogEntry {
+  logId: number; canevasId: number;
+  fromStructure: string; toStructure: string;
+  action: string; snapshotVersion: number; snapshotId: number;
+  comments: string; performedBy: string; performedAt: string;
+  structureMere?: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class SnapshotService {
+
+  private api = `${environment.apiURL}api/canevas`;
+
+  constructor(private http: HttpClient) {}
+
+  validerEtTransmettre(id: number, req: ValidationRequest): Observable&lt;SnapshotResponse&gt; {
+    return this.http.post&lt;SnapshotResponse&gt;(`${this.api}/${id}/valider`, req);
+  }
+
+  refouler(id: number, req: RefoulementRequest): Observable&lt;SnapshotResponse&gt; {
+    return this.http.post&lt;SnapshotResponse&gt;(`${this.api}/${id}/refouler`, req);
+  }
+
+  getHistory(id: number): Observable&lt;SnapshotSummary[]&gt; {
+    return this.http.get&lt;SnapshotSummary[]&gt;(`${this.api}/${id}/snapshots`);
+  }
+
+  getByStructure(id: number, code: string): Observable&lt;SnapshotDetail&gt; {
+    return this.http.get&lt;SnapshotDetail&gt;(`${this.api}/${id}/snapshots/structure/${code}`);
+  }
+
+  // NOUVEAU — récupérer un snapshot par son ID exact (pour l'icône œil)
+  getBySnapshotId(canevasId: number, snapshotId: number): Observable&lt;SnapshotDetail&gt; {
+    return this.http.get&lt;SnapshotDetail&gt;(
+      `${this.api}/${canevasId}/snapshots/${snapshotId}/detail`
+    );
+  }
+
+  // MODIFIÉ — passe typeStructure + codeStructure pour filtrage serveur
+  getWorkflowLog(
+    id: number,
+    typeStructure?: string,
+    codeStructure?: string
+  ): Observable&lt;WorkflowLogEntry[]&gt; {
+    let params = new HttpParams();
+    if (typeStructure) params = params.set('typeStructure', typeStructure);
+    if (codeStructure) params = params.set('codeStructure', codeStructure);
+    return this.http.get&lt;WorkflowLogEntry[]&gt;(
+      `${this.api}/${id}/snapshots/workflow-log`, { params }
+    );
+  }
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 12 — snapshot-history.component.ts -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f12">
+<div class="file-header fh-ts">
+  <div class="file-num">12</div>
+  <span class="file-path">frontend-app1/.../snapshot-history/snapshot-history.component.ts</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>TypeScript — fichier complet</span></div>
+<pre>import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { MessageService } from 'primeng/api';
+import {
+  SnapshotService, SnapshotSummary, SnapshotDetail,
+  SnapshotResponse, WorkflowLogEntry
+} from '../../../../_services/snapshot.service';
+import { CanevasAgrService } from '../../../../_services/canevas.agr.service';
+import { UserService } from '../../../../_services/user.service';
+
+@Component({
+  selector: 'app-snapshot-history',
+  templateUrl: './snapshot-history.component.html',
+  styleUrls: ['./snapshot-history.component.css'],
+  providers: [MessageService]
+})
+export class SnapshotHistoryComponent implements OnInit {
+
+  private snapshotService = inject(SnapshotService);
+  private canevasAgrService = inject(CanevasAgrService);
+  private messageService = inject(MessageService);
+  userService = inject(UserService);
+
+  // ── State ────────────────────────────────────────────────────────
+  history       = signal&lt;SnapshotSummary[]&gt;([]);
+  workflowLog   = signal&lt;WorkflowLogEntry[]&gt;([]);
+  selectedSnap  = signal&lt;SnapshotDetail | null&gt;(null);
+  loading       = signal(false);
+  activeTab     = signal&lt;'log' | 'snapshots'&gt;('log');
+  showValidDlg  = signal(false);
+  showRefoulDlg = signal(false);
+
+  // ── Rôle utilisateur ─────────────────────────────────────────────
+  private userType = computed(() => this.userService.user()?.typeStructure ?? '');
+  private userCode = computed(() => this.userService.user()?.codeStructure ?? '');
+
+  // ── Filtrage défensif côté client (le serveur filtre déjà) ───────
+  filteredLogs = computed(() => {
+    const logs = this.workflowLog();
+    const type = this.userType();
+    const code = this.userCode();
+    if (type === '1' &amp;&amp; code)
+      return logs.filter(l => l.fromStructure === code || l.toStructure === code);
+    if (type === '2' &amp;&amp; code)
+      return logs.filter(l => l.fromStructure === code || l.toStructure === code || l.structureMere === code);
+    return logs;
+  });
+
+  filteredHistory = computed(() => this.history());
+  totalVersions   = computed(() => this.history().length);
+  totalLogs       = computed(() => this.filteredLogs().length);
+
+  // Les boutons Valider/Refouler sont visibles uniquement pour DR(2) et DC(5)
+  canAct = computed(() => this.userType() === '2' || this.userType() === '5');
+
+  // ── Formulaires ───────────────────────────────────────────────────
+  validForm = {
+    fromStructureCode: '', fromStructureLabel: '',
+    toStructureCode: '', matricule: '',
+    observations: '', avisValue: 'FAVORABLE' as const
+  };
+  refoulForm = {
+    fromStructureCode: '', fromStructureLabel: '',
+    toStructureCode: '', matricule: '', motif: ''
+  };
+  avisOptions = [
+    { label: 'Favorable',   value: 'FAVORABLE'  },
+    { label: 'Défavorable', value: 'DEFAVORABLE' },
+    { label: 'Sans avis',   value: 'SANS_AVIS'   }
+  ];
+
+  // ── Init ─────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (id) this.loadAll(id);
+    const u = this.userService.user();
+    this.validForm.fromStructureCode  = u?.codeStructure ?? '';
+    this.validForm.fromStructureLabel = u?.libStructure  ?? '';
+    this.validForm.matricule          = u?.matricule     ?? '';
+    this.refoulForm.fromStructureCode  = u?.codeStructure ?? '';
+    this.refoulForm.fromStructureLabel = u?.libStructure  ?? '';
+    this.refoulForm.matricule          = u?.matricule     ?? '';
+  }
+
+  private loadAll(id: number): void {
+    this.loading.set(true);
+    const u = this.userService.user();
+    this.snapshotService.getHistory(id).subscribe({
+      next: d => { this.history.set(d); this.loading.set(false); },
+      error: () => this.loading.set(false)
+    });
+    this.snapshotService.getWorkflowLog(id, u?.typeStructure, u?.codeStructure).subscribe({
+      next: d => this.workflowLog.set(d),
+      error: e => console.error('WorkflowLog error', e)
+    });
+  }
+
+  openSnapshot(snap: SnapshotSummary): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id) return;
+    this.loading.set(true);
+    this.snapshotService.getBySnapshotId(id, snap.snapshotId).subscribe({
+      next:  d => { this.selectedSnap.set(d); this.loading.set(false); },
+      error: () => {
+        this.loading.set(false);
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Snapshot introuvable' });
+      }
+    });
+  }
+
+  closeSnapshot(): void { this.selectedSnap.set(null); }
+
+  valider(): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id) return;
+    this.snapshotService.validerEtTransmettre(id, this.validForm).subscribe({
+      next: (res: SnapshotResponse) => {
+        this.messageService.add({ severity: 'success', summary: 'Validé',
+          detail: `Snapshot v${res.versionNumber} créé` });
+        this.showValidDlg.set(false);
+        this.loadAll(id);
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec validation' })
+    });
+  }
+
+  refouler(): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id || !this.refoulForm.motif?.trim()) {
+      this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Motif obligatoire' });
+      return;
+    }
+    this.snapshotService.refouler(id, this.refoulForm).subscribe({
+      next: (res: SnapshotResponse) => {
+        this.messageService.add({ severity: 'warn', summary: 'Refoulé',
+          detail: `Snapshot v${res.versionNumber}` });
+        this.showRefoulDlg.set(false);
+        this.loadAll(id);
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec refoulement' })
+    });
+  }
+
+  // ── Helpers d'affichage ───────────────────────────────────────────
+  actionSeverity(a: string): string {
+    const m: Record&lt;string, string&gt; = {
+      VALIDER:'success', PRE_VALIDER:'info', REFOULER:'danger',
+      CORRIGER:'warning', ANNULER:'danger', PRENDRE_EN_CHARGE:'secondary',
+      ENVOYER:'info', ENVOYER_SUPERVISEUR:'info', DECISION_FINALE:'success'
+    };
+    return m[a] ?? 'secondary';
+  }
+
+  statusSeverity(s: string): string {
+    const m: Record&lt;string, string&gt; = {
+      VALID_DONNEE:'success', CORRIGE_DONNEE:'danger',
+      PEC_DONNEE:'info', PEC_AVIS_DEC:'warning',
+      VALIDER_DR:'success', CORRIGE_AVIS_DEC:'danger',
+      DEC_FINAL_PRISE_ACCORD:'success', DEC_FINAL_PRISE_REJET:'danger'
+    };
+    return m[s] ?? 'secondary';
+  }
+
+  actionLabel(a: string): string {
+    const m: Record&lt;string, string&gt; = {
+      VALIDER:'Valider', PRE_VALIDER:'Pré-Valider', REFOULER:'Refouler',
+      CORRIGER:'Corriger', ANNULER:'Annuler',
+      PRENDRE_EN_CHARGE:'Prise en charge', ENVOYER:'Envoyer',
+      ENVOYER_SUPERVISEUR:'→ Superviseur', DECISION_FINALE:'Décision Finale'
+    };
+    return m[a] ?? a;
+  }
+
+  iconForAction(a: string): string {
+    if (['VALIDER','PRE_VALIDER'].includes(a)) return 'pi pi-check';
+    if (['REFOULER','CORRIGER'].includes(a))   return 'pi pi-times';
+    if (a === 'DECISION_FINALE')               return 'pi pi-star';
+    if (a === 'PRENDRE_EN_CHARGE')             return 'pi pi-inbox';
+    return 'pi pi-send';
+  }
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 13 — snapshot-history.component.html -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f13">
+<div class="file-header fh-html">
+  <div class="file-num">13</div>
+  <span class="file-path">frontend-app1/.../snapshot-history/snapshot-history.component.html</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>Angular HTML — PrimeNG 17 — @if/@for syntax</span></div>
+<pre>&lt;p-toast&gt;&lt;/p-toast&gt;
+
+&lt;!-- BARRE D'ONGLETS --&gt;
+&lt;div class="hist-header"&gt;
+  &lt;div class="hist-tabs"&gt;
+    &lt;button class="hist-tab" [class.active]="activeTab()==='log'"
+            (click)="activeTab.set('log')"&gt;
+      &lt;i class="pi pi-list"&gt;&lt;/i&gt; Journal workflow
+      &lt;span class="hist-count"&gt;{{ totalLogs() }}&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="hist-tab" [class.active]="activeTab()==='snapshots'"
+            (click)="activeTab.set('snapshots')"&gt;
+      &lt;i class="pi pi-camera"&gt;&lt;/i&gt; Snapshots
+      &lt;span class="hist-count"&gt;{{ totalVersions() }}&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+  @if (canAct()) {
+    &lt;div class="hist-actions"&gt;
+      &lt;button pButton label="Valider &amp; Transmettre" icon="pi pi-check"
+              class="p-button-success p-button-sm"
+              (click)="showValidDlg.set(true)"&gt;&lt;/button&gt;
+      &lt;button pButton label="Refouler" icon="pi pi-reply"
+              class="p-button-danger p-button-sm"
+              (click)="showRefoulDlg.set(true)"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+  }
+&lt;/div&gt;
+
+&lt;!-- ONGLET 1 : TIMELINE WORKFLOW LOG --&gt;
+@if (activeTab() === 'log') {
+  @if (loading()) {
+    &lt;div class="flex justify-content-center p-4"&gt;
+      &lt;p-progressSpinner strokeWidth="4" [style]="{width:'40px',height:'40px'}"&gt;&lt;/p-progressSpinner&gt;
+    &lt;/div&gt;
+  } @else if (filteredLogs().length === 0) {
+    &lt;div class="hist-empty"&gt;
+      &lt;i class="pi pi-inbox"&gt;&lt;/i&gt;
+      &lt;p&gt;Aucun log workflow pour ce canvas.&lt;/p&gt;
+    &lt;/div&gt;
+  } @else {
+    &lt;p-timeline [value]="filteredLogs()" align="left" styleClass="hist-timeline"&gt;
+      &lt;ng-template pTemplate="marker" let-log&gt;
+        &lt;span class="tl-marker"
+              [class.tl-valider]="log.action==='VALIDER'||log.action==='PRE_VALIDER'||log.action==='DECISION_FINALE'"
+              [class.tl-refouler]="log.action==='REFOULER'||log.action==='CORRIGER'"
+              [class.tl-pec]="log.action==='PRENDRE_EN_CHARGE'"
+              [class.tl-envoyer]="log.action==='ENVOYER'||log.action==='ENVOYER_SUPERVISEUR'"&gt;
+          &lt;i [class]="iconForAction(log.action)"&gt;&lt;/i&gt;
+        &lt;/span&gt;
+      &lt;/ng-template&gt;
+      &lt;ng-template pTemplate="content" let-log&gt;
+        &lt;div class="tl-card"&gt;
+          &lt;div class="tl-card-header"&gt;
+            &lt;p-tag [value]="actionLabel(log.action)" [severity]="actionSeverity(log.action)" class="mr-2"&gt;&lt;/p-tag&gt;
+            &lt;span class="tl-structures"&gt;
+              &lt;strong&gt;{{ log.fromStructure }}&lt;/strong&gt;
+              @if (log.toStructure &amp;&amp; log.toStructure !== log.fromStructure) {
+                &lt;i class="pi pi-arrow-right mx-1" style="font-size:11px"&gt;&lt;/i&gt;
+                &lt;strong&gt;{{ log.toStructure }}&lt;/strong&gt;
+              }
+            &lt;/span&gt;
+            &lt;span class="tl-date"&gt;{{ log.performedAt | date:'dd/MM/yyyy HH:mm' }}&lt;/span&gt;
+            @if (log.snapshotVersion) {
+              &lt;p-badge [value]="'v'+log.snapshotVersion" severity="info" styleClass="ml-2"&gt;&lt;/p-badge&gt;
+            }
+          &lt;/div&gt;
+          &lt;div class="tl-card-body"&gt;
+            &lt;span class="tl-by"&gt;Par : &lt;strong&gt;{{ log.performedBy }}&lt;/strong&gt;&lt;/span&gt;
+            @if (log.comments) {
+              &lt;span class="tl-comment"&gt;"{{ log.comments }}"&lt;/span&gt;
+            }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/ng-template&gt;
+    &lt;/p-timeline&gt;
+  }
+}
+
+&lt;!-- ONGLET 2 : TABLE SNAPSHOTS --&gt;
+@if (activeTab() === 'snapshots') {
+  &lt;p-table [value]="filteredHistory()" [loading]="loading()"
+           [paginator]="true" [rows]="10" [rowHover]="true"
+           styleClass="p-datatable-sm p-datatable-striped"&gt;
+    &lt;ng-template pTemplate="header"&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Version&lt;/th&gt;&lt;th&gt;Structure&lt;/th&gt;&lt;th&gt;Statut&lt;/th&gt;
+        &lt;th&gt;Créé par&lt;/th&gt;&lt;th&gt;Date&lt;/th&gt;&lt;th&gt;Observations&lt;/th&gt;
+        &lt;th style="width:70px"&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/ng-template&gt;
+    &lt;ng-template pTemplate="body" let-snap&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;p-badge [value]="'v'+snap.versionNumber" severity="info"&gt;&lt;/p-badge&gt;&lt;/td&gt;
+        &lt;td&gt;
+          &lt;p-tag [value]="snap.structureCode" severity="info"&gt;&lt;/p-tag&gt;
+          &lt;span class="ml-1 text-sm text-color-secondary"&gt;{{ snap.structureLabel }}&lt;/span&gt;
+        &lt;/td&gt;
+        &lt;td&gt;&lt;p-tag [value]="snap.statusAtSnapshot" [severity]="statusSeverity(snap.statusAtSnapshot)"&gt;&lt;/p-tag&gt;&lt;/td&gt;
+        &lt;td&gt;{{ snap.createdBy }}&lt;/td&gt;
+        &lt;td&gt;{{ snap.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/td&gt;
+        &lt;td&gt;&lt;span class="text-truncate" style="max-width:160px;display:inline-block"&gt;{{ snap.observations || '—' }}&lt;/span&gt;&lt;/td&gt;
+        &lt;td&gt;
+          &lt;button pButton icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  (click)="openSnapshot(snap)"
+                  pTooltip="Voir le canvas sauvegardé" tooltipPosition="left"&gt;
+          &lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/ng-template&gt;
+    &lt;ng-template pTemplate="emptymessage"&gt;
+      &lt;tr&gt;&lt;td colspan="7" class="text-center p-4"&gt;Aucun snapshot disponible.&lt;/td&gt;&lt;/tr&gt;
+    &lt;/ng-template&gt;
+  &lt;/p-table&gt;
+}
+
+&lt;!-- DÉTAIL SNAPSHOT (clic œil) --&gt;
+@if (selectedSnap()) {
+  &lt;p-fieldset class="mt-3 snap-detail"&gt;
+    &lt;ng-template pTemplate="legend"&gt;
+      &lt;div class="flex align-items-center gap-2"&gt;
+        &lt;i class="pi pi-camera"&gt;&lt;/i&gt;
+        &lt;span&gt;Snapshot v{{ selectedSnap()!.versionNumber }} — {{ selectedSnap()!.structureLabel }}&lt;/span&gt;
+        &lt;p-tag [value]="selectedSnap()!.statusAtSnapshot"
+               [severity]="statusSeverity(selectedSnap()!.statusAtSnapshot)"&gt;&lt;/p-tag&gt;
+      &lt;/div&gt;
+    &lt;/ng-template&gt;
+
+    &lt;div class="snap-meta"&gt;
+      &lt;div&gt;&lt;span class="meta-label"&gt;Créé par&lt;/span&gt;{{ selectedSnap()!.createdBy }}&lt;/div&gt;
+      &lt;div&gt;&lt;span class="meta-label"&gt;Date&lt;/span&gt;{{ selectedSnap()!.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/div&gt;
+      @if (selectedSnap()!.observations) {
+        &lt;div class="snap-obs"&gt;&lt;i class="pi pi-comment mr-1"&gt;&lt;/i&gt;{{ selectedSnap()!.observations }}&lt;/div&gt;
+      }
+      &lt;button pButton icon="pi pi-times" label="Fermer"
+              class="p-button-text p-button-sm ml-auto" (click)="closeSnapshot()"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;p-tabView&gt;
+      &lt;!-- Engagements BNA/BCT --&gt;
+      &lt;p-tabPanel header="Engagements BNA/BCT"&gt;
+        &lt;div class="grid"&gt;
+          &lt;div class="col-12 md:col-6"&gt;
+            &lt;h5 class="snap-sub"&gt;Engagements BNA&lt;/h5&gt;
+            @if (selectedSnap()!.engagementsBNA?.length) {
+              &lt;p-table [value]="selectedSnap()!.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;th&gt;Impayé&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;td&gt;{{e.impaye}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+              &lt;/p-table&gt;
+            } @else { &lt;p class="text-color-secondary"&gt;Aucun engagement BNA.&lt;/p&gt; }
+          &lt;/div&gt;
+          &lt;div class="col-12 md:col-6"&gt;
+            &lt;h5 class="snap-sub"&gt;Engagements BCT&lt;/h5&gt;
+            @if (selectedSnap()!.engagementsBCT?.length) {
+              &lt;p-table [value]="selectedSnap()!.engagementsBCT" styleClass="p-datatable-sm"&gt;
+                &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Banque&lt;/th&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Utilisé&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.banque}}&lt;/td&gt;&lt;td&gt;{{e.typeCredit}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.utilise}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+              &lt;/p-table&gt;
+            } @else { &lt;p class="text-color-secondary"&gt;Aucun engagement BCT.&lt;/p&gt; }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Actionnaires --&gt;
+      &lt;p-tabPanel header="Actionnaires"&gt;
+        @if (selectedSnap()!.engagementDetaille?.actionnaires?.length) {
+          @for (a of selectedSnap()!.engagementDetaille.actionnaires; track a.numSeqPers) {
+            &lt;p-panel [header]="a.nom + (a.partCapital ? ' ('+a.partCapital+'%)' : '')"
+                     [toggleable]="true" [collapsed]="true" class="mb-2"&gt;
+              @if (a.engagementsBNA?.length) {
+                &lt;p-table [value]="a.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                  &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                  &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;/p-table&gt;
+              }
+            &lt;/p-panel&gt;
+          }
+        } @else { &lt;p class="text-color-secondary"&gt;Aucun actionnaire.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- 1er Responsable --&gt;
+      &lt;p-tabPanel header="1er Responsable"&gt;
+        @if (selectedSnap()!.engagementDetaille?.premierResponsable) {
+          &lt;p class="mb-2"&gt;&lt;strong&gt;Nom :&lt;/strong&gt; {{selectedSnap()!.engagementDetaille.premierResponsable!.nom}}
+             &lt;strong class="ml-3"&gt;CIN :&lt;/strong&gt; {{selectedSnap()!.engagementDetaille.premierResponsable!.cin}}&lt;/p&gt;
+          @if (selectedSnap()!.engagementDetaille.premierResponsable!.engagementsBNA?.length) {
+            &lt;p-table [value]="selectedSnap()!.engagementDetaille.premierResponsable!.engagementsBNA" styleClass="p-datatable-sm"&gt;
+              &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+              &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+            &lt;/p-table&gt;
+          }
+        } @else { &lt;p class="text-color-secondary"&gt;Aucun 1er responsable.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Vendeurs --&gt;
+      &lt;p-tabPanel header="Vendeurs"&gt;
+        @if (selectedSnap()!.engagementDetaille?.vendeurs?.length) {
+          @for (v of selectedSnap()!.engagementDetaille.vendeurs; track v.numSeqPers) {
+            &lt;p-panel [header]="v.nom" [toggleable]="true" [collapsed]="true" class="mb-2"&gt;
+              @if (v.engagementsBNA?.length) {
+                &lt;p-table [value]="v.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                  &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                  &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;/p-table&gt;
+              }
+            &lt;/p-panel&gt;
+          }
+        } @else { &lt;p class="text-color-secondary"&gt;Aucun vendeur.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Crédits --&gt;
+      &lt;p-tabPanel header="Crédits"&gt;
+        @if (selectedSnap()!.creditsData) {
+          &lt;pre class="snap-json"&gt;{{selectedSnap()!.creditsData | json}}&lt;/pre&gt;
+        } @else { &lt;p class="text-color-secondary"&gt;Aucune donnée crédit.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+
+      &lt;!-- Exploitation --&gt;
+      &lt;p-tabPanel header="Exploitation"&gt;
+        @if (selectedSnap()!.exploitationData) {
+          &lt;pre class="snap-json"&gt;{{selectedSnap()!.exploitationData | json}}&lt;/pre&gt;
+        } @else { &lt;p class="text-color-secondary"&gt;Aucune donnée exploitation.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+    &lt;/p-tabView&gt;
+  &lt;/p-fieldset&gt;
+}
+
+&lt;!-- DIALOG VALIDER --&gt;
+&lt;p-dialog header="Valider &amp; Transmettre" [(visible)]="showValidDlg"
+          [modal]="true" [style]="{width:'480px'}"&gt;
+  &lt;div class="grid p-fluid"&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Structure source&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="validForm.fromStructureCode" [readonly]="true"/&gt;&lt;/div&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Structure destination *&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="validForm.toStructureCode" placeholder="ex: DR-05"/&gt;&lt;/div&gt;
+    &lt;div class="col-12"&gt;&lt;label&gt;Avis&lt;/label&gt;
+      &lt;p-dropdown [options]="avisOptions" [(ngModel)]="validForm.avisValue"
+                  optionLabel="label" optionValue="value"&gt;&lt;/p-dropdown&gt;&lt;/div&gt;
+    &lt;div class="col-12"&gt;&lt;label&gt;Observations&lt;/label&gt;
+      &lt;textarea pInputTextarea [(ngModel)]="validForm.observations" rows="3"&gt;&lt;/textarea&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;ng-template pTemplate="footer"&gt;
+    &lt;button pButton label="Annuler" class="p-button-text" (click)="showValidDlg.set(false)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Valider" icon="pi pi-check" class="p-button-success" (click)="valider()"&gt;&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/p-dialog&gt;
+
+&lt;!-- DIALOG REFOULER --&gt;
+&lt;p-dialog header="Refouler le dossier" [(visible)]="showRefoulDlg"
+          [modal]="true" [style]="{width:'480px'}"&gt;
+  &lt;div class="grid p-fluid"&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Structure source&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="refoulForm.fromStructureCode" [readonly]="true"/&gt;&lt;/div&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Retourner vers *&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="refoulForm.toStructureCode" placeholder="ex: AGC-001"/&gt;&lt;/div&gt;
+    &lt;div class="col-12"&gt;&lt;label&gt;Motif &lt;span style="color:red"&gt;*&lt;/span&gt;&lt;/label&gt;
+      &lt;textarea pInputTextarea [(ngModel)]="refoulForm.motif" rows="4"
+                placeholder="Motif obligatoire..."&gt;&lt;/textarea&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;ng-template pTemplate="footer"&gt;
+    &lt;button pButton label="Annuler" class="p-button-text" (click)="showRefoulDlg.set(false)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Refouler" icon="pi pi-reply" class="p-button-danger"
+            [disabled]="!refoulForm.motif?.trim()" (click)="refouler()"&gt;&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/p-dialog&gt;</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FILE 14 — snapshot-history.component.css -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="f14">
+<div class="file-header fh-css">
+  <div class="file-num">14</div>
+  <span class="file-path">frontend-app1/.../snapshot-history/snapshot-history.component.css</span>
+  <span class="b-full file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>CSS — fichier complet</span></div>
+<pre>/* ── BARRE D'ONGLETS ─────────────────────────────────────── */
+.hist-header {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 8px 0 12px 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 16px;
+}
+.hist-tabs { display: flex; gap: 4px; }
+.hist-tab {
+  display: flex; align-items: center; gap: 6px; padding: 7px 16px;
+  border-radius: 6px 6px 0 0; border: 1px solid transparent;
+  background: #eceff1; color: #455a64; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.hist-tab:hover { background: #dce8f0; }
+.hist-tab.active {
+  background: #fff; border-color: #cfd8dc; border-bottom-color: #fff;
+  color: #1a7f37; margin-bottom: -2px; z-index: 1;
+}
+.hist-count {
+  background: #1a7f37; color: #fff; border-radius: 20px;
+  padding: 1px 7px; font-size: 11px; font-weight: 700;
+}
+.hist-tab.active .hist-count { background: #1565c0; }
+.hist-actions { display: flex; gap: 6px; margin-left: auto; }
+.hist-empty { text-align: center; padding: 40px; color: #78909c; }
+.hist-empty i { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+/* ── TIMELINE ────────────────────────────────────────────── */
+.hist-timeline { padding: 8px 0; }
+.tl-marker {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #78909c; color: #fff; font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2); flex-shrink: 0;
+}
+.tl-valider  { background: #1a7f37; }
+.tl-refouler { background: #c62828; }
+.tl-pec      { background: #1565c0; }
+.tl-envoyer  { background: #6a1b9a; }
+
+.tl-card {
+  background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06); transition: box-shadow .2s;
+}
+.tl-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+.tl-card-header {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+}
+.tl-structures { font-size: 13px; font-weight: 600; color: #263238; }
+.tl-date { font-size: 11px; color: #78909c; margin-left: auto; }
+.tl-card-body { font-size: 12px; color: #546e7a; display: flex; gap: 12px; flex-wrap: wrap; }
+.tl-comment {
+  font-style: italic; color: #78909c;
+  max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ── DÉTAIL SNAPSHOT ─────────────────────────────────────── */
+.snap-detail { border: 2px solid #1a7f37 !important; }
+.snap-meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: #e8f5e9; border-radius: 6px; padding: 10px 14px;
+  margin-bottom: 14px; font-size: 13px;
+}
+.meta-label { color: #78909c; font-size: 11px; display: block; }
+.snap-obs { color: #455a64; font-style: italic; font-size: 12px; flex: 1; min-width: 200px; }
+.snap-sub { font-size: 13px; font-weight: 700; color: #1565c0; margin-bottom: 8px; }
+.snap-json {
+  font-size: 12px; white-space: pre-wrap; background: #f5f5f5;
+  padding: 12px; border-radius: 6px; max-height: 300px; overflow-y: auto;
+}</pre>
+</div>
+</div>
+
+<hr/>
+<div style="background:var(--green-lt);border:1px solid #a5d6a7;border-radius:8px;padding:14px 18px;font-size:12px;color:var(--gray)">
+  <strong>Ordre d'application :</strong> 1→2→3→4 (SQL + Java entités/repo/service) →
+  5→6→7→8 (Java DTOs + services + controllers) →
+  9→10 (Angular models + avis component) →
+  11→12→13→14 (Angular snapshot).<br/>
+  <strong>Vérification :</strong> <code>mvn clean package -DskipTests</code> puis <code>ng build</code>.
+</div>
+
+</div>
+</body>
+</html>
