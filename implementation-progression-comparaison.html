@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Progression + Comparaison Snapshot — Canvas Agricole</title>
+<style>
+:root{
+  --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+  --blue:#1565c0;--blue-lt:#e3f2fd;
+  --amber:#e65100;--amber-lt:#fff3e0;
+  --red:#c62828;--red-lt:#ffebee;
+  --purple:#6a1b9a;
+  --gray:#455a64;--gray-lt:#eceff1;
+  --bg:#f0f4f8;--card:#fff;--border:#cfd8dc;
+  --text:#263238;--muted:#78909c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.6}
+nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:10px 24px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-wrap:wrap}
+nav .brand{font-size:14px;font-weight:800;margin-right:8px}
+nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:11px;padding:3px 9px;border-radius:20px;transition:background .2s;white-space:nowrap}
+nav a:hover{background:rgba(255,255,255,.2)}
+.page{max-width:1180px;margin:0 auto;padding:20px 16px}
+.hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:10px;padding:26px 34px;margin-bottom:22px}
+.hero h1{font-size:19px;font-weight:800;margin-bottom:6px}
+.hero p{opacity:.85;font-size:12px;max-width:760px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600}
+.file-section{margin-bottom:28px}
+.file-header{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px 8px 0 0;border:1px solid var(--border)}
+.fh-ts{background:#e3f2fd;border-color:#1565c0}
+.fh-html{background:#fce4ec;border-color:#c62828}
+.fh-css{background:#f3e5f5;border-color:#6a1b9a}
+.fh-java{background:#fffde7;border-color:#f9a825}
+.file-num{width:24px;height:24px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.file-path{font-family:'Cascadia Code','Consolas',monospace;font-size:12px;font-weight:700}
+.file-badge{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.b-new{background:#c8e6c9;color:#1b5e20}
+.b-mod{background:#fff3e0;color:#e65100}
+.b-add{background:#e3f2fd;color:#0d47a1}
+.code-wrap{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden}
+.code-label{background:#161b22;padding:5px 14px;font-size:10px;color:#8b949e;font-family:monospace;display:flex;justify-content:space-between;align-items:center}
+.code-label .loc{color:#64b5f6;font-style:italic;font-size:10px}
+pre{background:#0d1117;color:#e6edf3;padding:14px 16px;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;line-height:1.78;margin:0;white-space:pre}
+.alert{border-radius:6px;padding:9px 13px;margin:8px 0;display:flex;gap:8px;font-size:12px;line-height:1.6}
+.ai{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.aw{background:var(--amber-lt);border-left:3px solid var(--amber)}
+.as{background:var(--green-lt);border-left:3px solid var(--green)}
+code{background:var(--gray-lt);padding:1px 5px;border-radius:3px;font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--purple)}
+hr{border:none;border-top:1px solid var(--border);margin:18px 0}
+.summary-box{background:var(--green-lt);border:1px solid #a5d6a7;border-radius:8px;padding:14px 18px;font-size:12px;color:var(--gray);margin-top:20px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌿 Progression + Comparaison</div>
+  <a href="#s1">1·snapshot.service.ts</a>
+  <a href="#s2">2·component.ts</a>
+  <a href="#s3">3·component.html</a>
+  <a href="#s4">4·component.css</a>
+</nav>
+<div class="page">
+
+<div class="hero">
+  <h1>Implémentation — Progression du dossier &amp; Comparaison de snapshots</h1>
+  <p>4 fichiers à modifier pour ajouter : barre de progression workflow, bouton Voir (œil) amélioré, bouton Comparer (⚖) avec diff côte à côte entre un snapshot historique et l'état actuel du canvas.</p>
+  <div class="pills">
+    <span class="pill">Barre de progression</span>
+    <span class="pill">Bouton Comparer ⚖</span>
+    <span class="pill">Diff côte à côte</span>
+    <span class="pill">Angular Signals</span>
+  </div>
+</div>
+
+<div class="alert ai">
+  <span>ℹ️</span>
+  <div>
+    <strong>Stratégie de comparaison :</strong> "État actuel" = le dernier snapshot (version max) qui est automatiquement créé à chaque action de l'utilisateur. Pas de nouveau endpoint backend nécessaire. Le snapshot sélectionné = la version historique choisie par l'utilisateur.
+  </div>
+</div>
+
+<hr/>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FICHIER 1 — snapshot.service.ts -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="s1">
+<div class="file-header fh-ts">
+  <div class="file-num">1</div>
+  <span class="file-path">_services/snapshot.service.ts</span>
+  <span class="b-add file-badge">+2 méthodes</span>
+</div>
+<div class="alert aw"><span>⚠️</span> Ajouter ces 2 méthodes à la fin du service existant (avant la dernière accolade <code>}</code>).</div>
+<div class="code-wrap">
+<div class="code-label"><span>TypeScript — ajouter après getWorkflowLog()</span><span class="loc">snapshot.service.ts</span></div>
+<pre>  // ── Récupérer le snapshot par ID exact (pour l'icône œil) ─────────────────
+  // (déjà présent dans implementation-complete.html)
+
+  // ── Calculer les totaux crédits d'un snapshot ──────────────────────────────
+  // Helper statique — utilisé dans le component pour le diff
+  static computeCreditsTotal(creditsData: any): { ct: number; inv: number; terrain: number; total: number } {
+    const ct      = (creditsData?.courtTerme      ?? []).reduce((s: number, c: any) => s + (Number(c.montant) || 0), 0);
+    const inv     = (creditsData?.investissement  ?? []).reduce((s: number, c: any) => s + (Number(c.montant) || 0), 0);
+    const terrain = (creditsData?.achatTerrain    ?? []).reduce((s: number, c: any) => s + (Number(c.montant) || 0), 0);
+    return { ct, inv, terrain, total: ct + inv + terrain };
+  }
+
+  // ── Calculer le total engagements BNA d'un snapshot ───────────────────────
+  static computeEngagementsTotal(engagements: any[]): { count: number; totalEnc: number } {
+    if (!Array.isArray(engagements)) return { count: 0, totalEnc: 0 };
+    const totalEnc = engagements.reduce((s, e) => s + (Number(e.encours) || 0), 0);
+    return { count: engagements.length, totalEnc };
+  }
+
+  // ── Nombre de sites dans exploitationData ─────────────────────────────────
+  static computeSitesCount(exploitationData: any): number {
+    return (exploitationData?.sites ?? []).length;
+  }</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FICHIER 2 — snapshot-history.component.ts -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="s2">
+<div class="file-header fh-ts">
+  <div class="file-num">2</div>
+  <span class="file-path">snapshot-history/snapshot-history.component.ts</span>
+  <span class="b-mod file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>TypeScript — fichier complet (remplace implementation-complete.html fichier #12)</span><span class="loc">snapshot-history.component.ts</span></div>
+<pre>import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { MessageService } from 'primeng/api';
+import {
+  SnapshotService, SnapshotSummary, SnapshotDetail,
+  SnapshotResponse, WorkflowLogEntry
+} from '../../../../_services/snapshot.service';
+import { CanevasAgrService } from '../../../../_services/canevas.agr.service';
+import { UserService } from '../../../../_services/user.service';
+
+// ── Interface pour une ligne de diff ──────────────────────────────────────────
+interface DiffRow {
+  label: string;
+  snapValue: string;
+  currentValue: string;
+  changed: boolean;
+  unit?: string;
+}
+
+// ── Étape de progression ──────────────────────────────────────────────────────
+interface ProgressStep {
+  label: string;
+  sublabel: string;
+  icon: string;
+  done: boolean;
+  active: boolean;
+}
+
+@Component({
+  selector: 'app-snapshot-history',
+  templateUrl: './snapshot-history.component.html',
+  styleUrls: ['./snapshot-history.component.css'],
+  providers: [MessageService]
+})
+export class SnapshotHistoryComponent implements OnInit {
+
+  private snapshotService = inject(SnapshotService);
+  private canevasAgrService = inject(CanevasAgrService);
+  private messageService = inject(MessageService);
+  userService = inject(UserService);
+
+  // ── State principal ───────────────────────────────────────────────────────
+  history       = signal&lt;SnapshotSummary[]&gt;([]);
+  workflowLog   = signal&lt;WorkflowLogEntry[]&gt;([]);
+  selectedSnap  = signal&lt;SnapshotDetail | null&gt;(null);
+  loading       = signal(false);
+  activeTab     = signal&lt;'log' | 'snapshots'&gt;('log');
+  showValidDlg  = signal(false);
+  showRefoulDlg = signal(false);
+
+  // ── State pour la COMPARAISON ─────────────────────────────────────────────
+  compareMode      = signal(false);                    // panneau diff visible
+  compareOldSnap   = signal&lt;SnapshotDetail | null&gt;(null);  // snapshot historique (choisi)
+  compareNewSnap   = signal&lt;SnapshotDetail | null&gt;(null);  // dernier snapshot = "état actuel"
+  compareLoading   = signal(false);
+  compareOldLabel  = signal('');   // "Snapshot v3 — 20/03/2024"
+  compareNewLabel  = signal('');   // "État actuel — v4 — 22/03/2024"
+
+  // ── Rôle utilisateur ─────────────────────────────────────────────────────
+  private userType = computed(() => this.userService.user()?.typeStructure ?? '');
+  private userCode = computed(() => this.userService.user()?.codeStructure ?? '');
+
+  // ── Filtrage logs par rôle ────────────────────────────────────────────────
+  filteredLogs = computed(() => {
+    const logs = this.workflowLog();
+    const type = this.userType();
+    const code = this.userCode();
+    if (type === '1' &amp;&amp; code)
+      return logs.filter(l => l.fromStructure === code || l.toStructure === code);
+    if (type === '2' &amp;&amp; code)
+      return logs.filter(l => l.fromStructure === code || l.toStructure === code || l.structureMere === code);
+    return logs;
+  });
+
+  filteredHistory = computed(() => this.history());
+  totalVersions   = computed(() => this.history().length);
+  totalLogs       = computed(() => this.filteredLogs().length);
+  canAct          = computed(() => this.userType() === '2' || this.userType() === '5');
+
+  // ── PROGRESSION DU DOSSIER ────────────────────────────────────────────────
+  // Calculée à partir des actions dans le workflowLog
+  progressSteps = computed((): ProgressStep[] => {
+    const logs   = this.workflowLog();
+    const snaps  = this.history();
+    const actions = new Set(logs.map(l => l.action));
+    const statuses = new Set(snaps.map(s => s.statusAtSnapshot));
+
+    const has = (a: string) => actions.has(a);
+    const hasStatus = (s: string) => statuses.has(s);
+
+    // Étape 1 : Saisie Agence → toujours fait si des snapshots existent
+    const step1done = snaps.length &gt; 0;
+
+    // Étape 2 : Validation Agence → PRES_VALIDER ou PRE_VALIDER action
+    const step2done = has('PRE_VALIDER') || hasStatus('VALID_DONNEE');
+
+    // Étape 3 : Analyse Direction Régionale → PEC_AVIS_DEC ou PRENDRE_EN_CHARGE en DR
+    const step3done = has('VALIDER') || hasStatus('VALIDER_DR') || hasStatus('PEC_AVIS_DEC');
+
+    // Étape 4 : Décision Direction Centrale → DECISION_FINALE
+    const step4done = has('DECISION_FINALE') || hasStatus('DEC_FINAL_PRISE_ACCORD') || hasStatus('DEC_FINAL_PRISE_REJET');
+
+    // Étape active = la première non-done
+    const activeStep = !step1done ? 1 : !step2done ? 2 : !step3done ? 3 : !step4done ? 4 : 5;
+
+    return [
+      {
+        label: 'Saisie',
+        sublabel: 'Agence',
+        icon: 'pi pi-pencil',
+        done: step1done,
+        active: activeStep === 1
+      },
+      {
+        label: 'Validation',
+        sublabel: 'Chef Agence',
+        icon: 'pi pi-check-circle',
+        done: step2done,
+        active: activeStep === 2
+      },
+      {
+        label: 'Analyse',
+        sublabel: 'Dir. Régionale',
+        icon: 'pi pi-search',
+        done: step3done,
+        active: activeStep === 3
+      },
+      {
+        label: 'Décision',
+        sublabel: 'Dir. Centrale',
+        icon: 'pi pi-star',
+        done: step4done,
+        active: activeStep === 4
+      }
+    ];
+  });
+
+  currentProgressLabel = computed((): string => {
+    const steps = this.progressSteps();
+    const active = steps.find(s => s.active);
+    if (active) return `En cours — ${active.label} (${active.sublabel})`;
+    const done  = steps.filter(s => s.done);
+    if (done.length === steps.length) return 'Dossier traité — Décision finale rendue';
+    return 'En attente';
+  });
+
+  progressSeverity = computed((): string => {
+    const statuses = new Set(this.history().map(s => s.statusAtSnapshot));
+    if (statuses.has('DEC_FINAL_PRISE_ACCORD')) return 'success';
+    if (statuses.has('DEC_FINAL_PRISE_REJET'))  return 'danger';
+    if (statuses.has('CORRIGE_DONNEE') || statuses.has('CORRIGE_AVIS_DEC')) return 'warning';
+    return 'info';
+  });
+
+  // ── DIFF — lignes calculées pour la comparaison ───────────────────────────
+  diffRows = computed((): DiffRow[] => {
+    const oldSnap = this.compareOldSnap();
+    const newSnap = this.compareNewSnap();
+    if (!oldSnap || !newSnap) return [];
+
+    const rows: DiffRow[] = [];
+
+    // ── Crédits ─────────────────────────────────────────
+    const oldCred = SnapshotService.computeCreditsTotal(oldSnap.creditsData);
+    const newCred = SnapshotService.computeCreditsTotal(newSnap.creditsData);
+
+    rows.push({
+      label: 'Crédit CT total',
+      snapValue: this.fmt(oldCred.ct),
+      currentValue: this.fmt(newCred.ct),
+      changed: oldCred.ct !== newCred.ct,
+      unit: 'TND'
+    });
+    rows.push({
+      label: 'Crédit Investissement total',
+      snapValue: this.fmt(oldCred.inv),
+      currentValue: this.fmt(newCred.inv),
+      changed: oldCred.inv !== newCred.inv,
+      unit: 'TND'
+    });
+    rows.push({
+      label: 'Crédit Achat Terrain total',
+      snapValue: this.fmt(oldCred.terrain),
+      currentValue: this.fmt(newCred.terrain),
+      changed: oldCred.terrain !== newCred.terrain,
+      unit: 'TND'
+    });
+    rows.push({
+      label: 'Total crédits sollicités',
+      snapValue: this.fmt(oldCred.total),
+      currentValue: this.fmt(newCred.total),
+      changed: oldCred.total !== newCred.total,
+      unit: 'TND'
+    });
+
+    // ── Engagements BNA ─────────────────────────────────
+    const oldBNA = SnapshotService.computeEngagementsTotal(oldSnap.engagementsBNA as any[]);
+    const newBNA = SnapshotService.computeEngagementsTotal(newSnap.engagementsBNA as any[]);
+
+    rows.push({
+      label: 'Lignes engagements BNA',
+      snapValue: String(oldBNA.count),
+      currentValue: String(newBNA.count),
+      changed: oldBNA.count !== newBNA.count,
+      unit: 'lignes'
+    });
+    rows.push({
+      label: 'Total encours BNA',
+      snapValue: this.fmt(oldBNA.totalEnc),
+      currentValue: this.fmt(newBNA.totalEnc),
+      changed: oldBNA.totalEnc !== newBNA.totalEnc,
+      unit: 'TND'
+    });
+
+    // ── Engagements BCT ─────────────────────────────────
+    const oldBCT = SnapshotService.computeEngagementsTotal(oldSnap.engagementsBCT as any[]);
+    const newBCT = SnapshotService.computeEngagementsTotal(newSnap.engagementsBCT as any[]);
+
+    rows.push({
+      label: 'Lignes engagements BCT',
+      snapValue: String(oldBCT.count),
+      currentValue: String(newBCT.count),
+      changed: oldBCT.count !== newBCT.count,
+      unit: 'lignes'
+    });
+
+    // ── Sites d'exploitation ─────────────────────────────
+    const oldSites = SnapshotService.computeSitesCount(oldSnap.exploitationData);
+    const newSites = SnapshotService.computeSitesCount(newSnap.exploitationData);
+
+    rows.push({
+      label: 'Sites d\'exploitation',
+      snapValue: String(oldSites),
+      currentValue: String(newSites),
+      changed: oldSites !== newSites,
+      unit: 'sites'
+    });
+
+    // ── Statut ──────────────────────────────────────────
+    rows.push({
+      label: 'Statut canvas',
+      snapValue: oldSnap.statusAtSnapshot ?? '—',
+      currentValue: newSnap.statusAtSnapshot ?? '—',
+      changed: oldSnap.statusAtSnapshot !== newSnap.statusAtSnapshot
+    });
+
+    return rows;
+  });
+
+  // Nombre de différences
+  diffCount = computed(() => this.diffRows().filter(r => r.changed).length);
+
+  // ── Formulaires Valider / Refouler ────────────────────────────────────────
+  validForm = {
+    fromStructureCode: '', fromStructureLabel: '',
+    toStructureCode: '', matricule: '',
+    observations: '', avisValue: 'FAVORABLE' as const
+  };
+  refoulForm = {
+    fromStructureCode: '', fromStructureLabel: '',
+    toStructureCode: '', matricule: '', motif: ''
+  };
+  avisOptions = [
+    { label: 'Favorable',   value: 'FAVORABLE'  },
+    { label: 'Défavorable', value: 'DEFAVORABLE' },
+    { label: 'Sans avis',   value: 'SANS_AVIS'   }
+  ];
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (id) this.loadAll(id);
+    const u = this.userService.user();
+    this.validForm.fromStructureCode  = u?.codeStructure ?? '';
+    this.validForm.fromStructureLabel = u?.libStructure  ?? '';
+    this.validForm.matricule          = u?.matricule     ?? '';
+    this.refoulForm.fromStructureCode  = u?.codeStructure ?? '';
+    this.refoulForm.fromStructureLabel = u?.libStructure  ?? '';
+    this.refoulForm.matricule          = u?.matricule     ?? '';
+  }
+
+  private loadAll(id: number): void {
+    this.loading.set(true);
+    const u = this.userService.user();
+    this.snapshotService.getHistory(id).subscribe({
+      next: d => { this.history.set(d); this.loading.set(false); },
+      error: () => this.loading.set(false)
+    });
+    this.snapshotService.getWorkflowLog(id, u?.typeStructure, u?.codeStructure).subscribe({
+      next: d => this.workflowLog.set(d),
+      error: e => console.error('WorkflowLog error', e)
+    });
+  }
+
+  // ── Actions : Voir (œil) ──────────────────────────────────────────────────
+  openSnapshot(snap: SnapshotSummary): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id) return;
+    this.compareMode.set(false);  // fermer le mode comparaison
+    this.loading.set(true);
+    this.snapshotService.getBySnapshotId(id, snap.snapshotId).subscribe({
+      next:  d => { this.selectedSnap.set(d); this.loading.set(false); },
+      error: () => {
+        this.loading.set(false);
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Snapshot introuvable' });
+      }
+    });
+  }
+
+  closeSnapshot(): void {
+    this.selectedSnap.set(null);
+    this.compareMode.set(false);
+    this.compareOldSnap.set(null);
+    this.compareNewSnap.set(null);
+  }
+
+  // ── Actions : Comparer (⚖) ────────────────────────────────────────────────
+  openCompare(snap: SnapshotSummary): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id) return;
+
+    // Trouver le dernier snapshot (état actuel)
+    const allSnaps  = this.history();
+    const latestSum = allSnaps.reduce((a, b) => a.versionNumber &gt; b.versionNumber ? a : b, allSnaps[0]);
+
+    if (!latestSum || latestSum.snapshotId === snap.snapshotId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Comparaison impossible',
+        detail: 'Ce snapshot est déjà la version la plus récente.'
+      });
+      return;
+    }
+
+    this.compareLoading.set(true);
+    this.compareMode.set(true);
+    this.selectedSnap.set(null);
+    this.compareOldSnap.set(null);
+    this.compareNewSnap.set(null);
+
+    // Charger le snapshot historique (ancien)
+    this.snapshotService.getBySnapshotId(id, snap.snapshotId).subscribe({
+      next: old => {
+        this.compareOldSnap.set(old);
+        this.compareOldLabel.set(`Snapshot v${snap.versionNumber} — ${this.fmtDate(snap.createdAt)}`);
+
+        // Charger le dernier snapshot (actuel)
+        this.snapshotService.getBySnapshotId(id, latestSum.snapshotId).subscribe({
+          next: cur => {
+            this.compareNewSnap.set(cur);
+            this.compareNewLabel.set(`État actuel v${latestSum.versionNumber} — ${this.fmtDate(latestSum.createdAt)}`);
+            this.compareLoading.set(false);
+          },
+          error: () => this.compareLoading.set(false)
+        });
+      },
+      error: () => this.compareLoading.set(false)
+    });
+  }
+
+  closeCompare(): void {
+    this.compareMode.set(false);
+    this.compareOldSnap.set(null);
+    this.compareNewSnap.set(null);
+  }
+
+  // ── Actions Valider / Refouler ────────────────────────────────────────────
+  valider(): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id) return;
+    this.snapshotService.validerEtTransmettre(id, this.validForm).subscribe({
+      next: (res: SnapshotResponse) => {
+        this.messageService.add({ severity: 'success', summary: 'Validé',
+          detail: `Snapshot v${res.versionNumber} créé` });
+        this.showValidDlg.set(false);
+        this.loadAll(id);
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec validation' })
+    });
+  }
+
+  refouler(): void {
+    const id = this.canevasAgrService.currentIdCaneva();
+    if (!id || !this.refoulForm.motif?.trim()) {
+      this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Motif obligatoire' });
+      return;
+    }
+    this.snapshotService.refouler(id, this.refoulForm).subscribe({
+      next: (res: SnapshotResponse) => {
+        this.messageService.add({ severity: 'warn', summary: 'Refoulé',
+          detail: `Snapshot v${res.versionNumber}` });
+        this.showRefoulDlg.set(false);
+        this.loadAll(id);
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec refoulement' })
+    });
+  }
+
+  // ── Helpers visuels ───────────────────────────────────────────────────────
+  actionSeverity(a: string): string {
+    const m: Record&lt;string, string&gt; = {
+      VALIDER:'success', PRE_VALIDER:'info', REFOULER:'danger',
+      CORRIGER:'warning', ANNULER:'danger', PRENDRE_EN_CHARGE:'secondary',
+      ENVOYER:'info', ENVOYER_SUPERVISEUR:'info', DECISION_FINALE:'success'
+    };
+    return m[a] ?? 'secondary';
+  }
+
+  statusSeverity(s: string): string {
+    const m: Record&lt;string, string&gt; = {
+      VALID_DONNEE:'success', CORRIGE_DONNEE:'danger',
+      PEC_DONNEE:'info', PEC_AVIS_DEC:'warning',
+      VALIDER_DR:'success', CORRIGE_AVIS_DEC:'danger',
+      DEC_FINAL_PRISE_ACCORD:'success', DEC_FINAL_PRISE_REJET:'danger'
+    };
+    return m[s] ?? 'secondary';
+  }
+
+  actionLabel(a: string): string {
+    const m: Record&lt;string, string&gt; = {
+      VALIDER:'Valider', PRE_VALIDER:'Pré-Valider', REFOULER:'Refouler',
+      CORRIGER:'Corriger', ANNULER:'Annuler',
+      PRENDRE_EN_CHARGE:'Prise en charge', ENVOYER:'Envoyer',
+      ENVOYER_SUPERVISEUR:'→ Superviseur', DECISION_FINALE:'Décision Finale'
+    };
+    return m[a] ?? a;
+  }
+
+  iconForAction(a: string): string {
+    if (['VALIDER','PRE_VALIDER'].includes(a)) return 'pi pi-check';
+    if (['REFOULER','CORRIGER'].includes(a))   return 'pi pi-times';
+    if (a === 'DECISION_FINALE')               return 'pi pi-star';
+    if (a === 'PRENDRE_EN_CHARGE')             return 'pi pi-inbox';
+    return 'pi pi-send';
+  }
+
+  // ── Formatage ─────────────────────────────────────────────────────────────
+  private fmt(n: number): string {
+    return new Intl.NumberFormat('fr-TN').format(n);
+  }
+
+  fmtDate(d: string): string {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('fr-TN', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  diffArrow(row: DiffRow): string {
+    if (!row.changed) return '=';
+    const a = parseFloat(row.snapValue.replace(/\s/g, ''));
+    const b = parseFloat(row.currentValue.replace(/\s/g, ''));
+    if (isNaN(a) || isNaN(b)) return '≠';
+    return b &gt; a ? '↑' : '↓';
+  }
+
+  diffClass(row: DiffRow): string {
+    if (!row.changed) return 'diff-same';
+    const a = parseFloat(row.snapValue.replace(/\s/g, ''));
+    const b = parseFloat(row.currentValue.replace(/\s/g, ''));
+    if (isNaN(a) || isNaN(b)) return 'diff-changed';
+    return b &gt; a ? 'diff-up' : 'diff-down';
+  }
+}</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FICHIER 3 — snapshot-history.component.html -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="s3">
+<div class="file-header fh-html">
+  <div class="file-num">3</div>
+  <span class="file-path">snapshot-history/snapshot-history.component.html</span>
+  <span class="b-mod file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>Angular HTML — PrimeNG 17 — remplace le fichier #13 de implementation-complete.html</span><span class="loc">snapshot-history.component.html</span></div>
+<pre>&lt;p-toast&gt;&lt;/p-toast&gt;
+
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;!-- BARRE DE PROGRESSION DU DOSSIER                          --&gt;
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+@if (history().length &gt; 0) {
+  &lt;div class="progress-card"&gt;
+    &lt;div class="progress-header"&gt;
+      &lt;span class="progress-title"&gt;Progression du dossier&lt;/span&gt;
+      &lt;p-tag [value]="currentProgressLabel()"
+             [severity]="progressSeverity()" styleClass="text-xs"&gt;&lt;/p-tag&gt;
+      &lt;span class="progress-count"&gt;
+        {{ history().length }} snapshot{{ history().length &gt; 1 ? 's' : '' }} —
+        {{ workflowLog().length }} action{{ workflowLog().length &gt; 1 ? 's' : '' }}
+      &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div class="stepper"&gt;
+      @for (step of progressSteps(); track step.label; let i = $index; let last = $last) {
+        &lt;div class="stepper-item"&gt;
+          &lt;div class="stepper-circle"
+               [class.done]="step.done"
+               [class.active]="step.active &amp;&amp; !step.done"&gt;
+            @if (step.done) {
+              &lt;i class="pi pi-check"&gt;&lt;/i&gt;
+            } @else {
+              &lt;i [class]="step.icon"&gt;&lt;/i&gt;
+            }
+          &lt;/div&gt;
+          &lt;div class="stepper-label"&gt;
+            &lt;span class="stepper-main"&gt;{{ step.label }}&lt;/span&gt;
+            &lt;span class="stepper-sub"&gt;{{ step.sublabel }}&lt;/span&gt;
+          &lt;/div&gt;
+          @if (!last) {
+            &lt;div class="stepper-line" [class.done]="step.done"&gt;&lt;/div&gt;
+          }
+        &lt;/div&gt;
+      }
+    &lt;/div&gt;
+  &lt;/div&gt;
+}
+
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;!-- BARRE D'ONGLETS + BOUTONS D'ACTION                        --&gt;
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;div class="hist-header"&gt;
+  &lt;div class="hist-tabs"&gt;
+    &lt;button class="hist-tab" [class.active]="activeTab()==='log'"
+            (click)="activeTab.set('log')"&gt;
+      &lt;i class="pi pi-list"&gt;&lt;/i&gt; Journal workflow
+      &lt;span class="hist-count"&gt;{{ totalLogs() }}&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="hist-tab" [class.active]="activeTab()==='snapshots'"
+            (click)="activeTab.set('snapshots')"&gt;
+      &lt;i class="pi pi-camera"&gt;&lt;/i&gt; Snapshots
+      &lt;span class="hist-count"&gt;{{ totalVersions() }}&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+  @if (canAct()) {
+    &lt;div class="hist-actions"&gt;
+      &lt;button pButton label="Valider &amp; Transmettre" icon="pi pi-check"
+              class="p-button-success p-button-sm"
+              (click)="showValidDlg.set(true)"&gt;&lt;/button&gt;
+      &lt;button pButton label="Refouler" icon="pi pi-reply"
+              class="p-button-danger p-button-sm"
+              (click)="showRefoulDlg.set(true)"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+  }
+&lt;/div&gt;
+
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;!-- ONGLET 1 : TIMELINE WORKFLOW LOG                          --&gt;
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+@if (activeTab() === 'log') {
+  @if (loading()) {
+    &lt;div class="flex justify-content-center p-4"&gt;
+      &lt;p-progressSpinner strokeWidth="4" [style]="{width:'40px',height:'40px'}"&gt;&lt;/p-progressSpinner&gt;
+    &lt;/div&gt;
+  } @else if (filteredLogs().length === 0) {
+    &lt;div class="hist-empty"&gt;
+      &lt;i class="pi pi-inbox"&gt;&lt;/i&gt;
+      &lt;p&gt;Aucun log workflow pour ce canvas.&lt;/p&gt;
+    &lt;/div&gt;
+  } @else {
+    &lt;p-timeline [value]="filteredLogs()" align="left" styleClass="hist-timeline"&gt;
+      &lt;ng-template pTemplate="marker" let-log&gt;
+        &lt;span class="tl-marker"
+              [class.tl-valider]="log.action==='VALIDER'||log.action==='PRE_VALIDER'||log.action==='DECISION_FINALE'"
+              [class.tl-refouler]="log.action==='REFOULER'||log.action==='CORRIGER'"
+              [class.tl-pec]="log.action==='PRENDRE_EN_CHARGE'"
+              [class.tl-envoyer]="log.action==='ENVOYER'||log.action==='ENVOYER_SUPERVISEUR'"&gt;
+          &lt;i [class]="iconForAction(log.action)"&gt;&lt;/i&gt;
+        &lt;/span&gt;
+      &lt;/ng-template&gt;
+      &lt;ng-template pTemplate="content" let-log&gt;
+        &lt;div class="tl-card"&gt;
+          &lt;div class="tl-card-header"&gt;
+            &lt;p-tag [value]="actionLabel(log.action)" [severity]="actionSeverity(log.action)" class="mr-2"&gt;&lt;/p-tag&gt;
+            &lt;span class="tl-structures"&gt;
+              &lt;strong&gt;{{ log.fromStructure }}&lt;/strong&gt;
+              @if (log.toStructure &amp;&amp; log.toStructure !== log.fromStructure) {
+                &lt;i class="pi pi-arrow-right mx-1" style="font-size:11px"&gt;&lt;/i&gt;
+                &lt;strong&gt;{{ log.toStructure }}&lt;/strong&gt;
+              }
+            &lt;/span&gt;
+            &lt;span class="tl-date"&gt;{{ log.performedAt | date:'dd/MM/yyyy HH:mm' }}&lt;/span&gt;
+            @if (log.snapshotVersion) {
+              &lt;p-badge [value]="'v'+log.snapshotVersion" severity="info" styleClass="ml-2"&gt;&lt;/p-badge&gt;
+            }
+          &lt;/div&gt;
+          &lt;div class="tl-card-body"&gt;
+            &lt;span class="tl-by"&gt;Par : &lt;strong&gt;{{ log.performedBy }}&lt;/strong&gt;&lt;/span&gt;
+            @if (log.comments) {
+              &lt;span class="tl-comment"&gt;"{{ log.comments }}"&lt;/span&gt;
+            }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/ng-template&gt;
+    &lt;/p-timeline&gt;
+  }
+}
+
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;!-- ONGLET 2 : TABLE SNAPSHOTS (avec boutons Voir + Comparer) --&gt;
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+@if (activeTab() === 'snapshots') {
+  &lt;p-table [value]="filteredHistory()" [loading]="loading()"
+           [paginator]="true" [rows]="10" [rowHover]="true"
+           styleClass="p-datatable-sm p-datatable-striped"&gt;
+    &lt;ng-template pTemplate="header"&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Version&lt;/th&gt;&lt;th&gt;Structure&lt;/th&gt;&lt;th&gt;Statut&lt;/th&gt;
+        &lt;th&gt;Créé par&lt;/th&gt;&lt;th&gt;Date&lt;/th&gt;&lt;th&gt;Observations&lt;/th&gt;
+        &lt;th style="width:100px;text-align:center"&gt;Actions&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/ng-template&gt;
+    &lt;ng-template pTemplate="body" let-snap&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;p-badge [value]="'v'+snap.versionNumber" severity="info"&gt;&lt;/p-badge&gt;
+          &lt;!-- Badge "Actuel" sur la dernière version --&gt;
+          @if (snap.versionNumber === history()[history().length-1]?.versionNumber) {
+            &lt;span class="badge-actuel"&gt;Actuel&lt;/span&gt;
+          }
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;p-tag [value]="snap.structureCode" severity="info"&gt;&lt;/p-tag&gt;
+          &lt;span class="ml-1 text-sm text-color-secondary"&gt;{{ snap.structureLabel }}&lt;/span&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;p-tag [value]="snap.statusAtSnapshot"
+                 [severity]="statusSeverity(snap.statusAtSnapshot)"&gt;&lt;/p-tag&gt;
+        &lt;/td&gt;
+        &lt;td&gt;{{ snap.createdBy }}&lt;/td&gt;
+        &lt;td&gt;{{ snap.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/td&gt;
+        &lt;td&gt;
+          &lt;span class="text-truncate" style="max-width:160px;display:inline-block"&gt;
+            {{ snap.observations || '—' }}
+          &lt;/span&gt;
+        &lt;/td&gt;
+        &lt;td style="text-align:center"&gt;
+          &lt;!-- VOIR (œil) --&gt;
+          &lt;button pButton icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  style="width:30px;height:30px"
+                  (click)="openSnapshot(snap)"
+                  pTooltip="Voir le canvas sauvegardé" tooltipPosition="left"&gt;
+          &lt;/button&gt;
+          &lt;!-- COMPARER (⚖) — masqué sur le dernier snapshot --&gt;
+          @if (snap.versionNumber !== history()[history().length-1]?.versionNumber) {
+            &lt;button pButton icon="pi pi-sliders-h"
+                    class="p-button-rounded p-button-text p-button-warning p-button-sm"
+                    style="width:30px;height:30px;margin-left:2px"
+                    (click)="openCompare(snap)"
+                    pTooltip="Comparer avec l'état actuel" tooltipPosition="left"&gt;
+            &lt;/button&gt;
+          }
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/ng-template&gt;
+    &lt;ng-template pTemplate="emptymessage"&gt;
+      &lt;tr&gt;&lt;td colspan="7" class="text-center p-4"&gt;Aucun snapshot disponible.&lt;/td&gt;&lt;/tr&gt;
+    &lt;/ng-template&gt;
+  &lt;/p-table&gt;
+}
+
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;!-- PANNEAU DÉTAIL SNAPSHOT (clic Voir)                       --&gt;
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+@if (selectedSnap() &amp;&amp; !compareMode()) {
+  &lt;p-fieldset class="mt-3 snap-detail"&gt;
+    &lt;ng-template pTemplate="legend"&gt;
+      &lt;div class="flex align-items-center gap-2"&gt;
+        &lt;i class="pi pi-eye"&gt;&lt;/i&gt;
+        &lt;span&gt;Snapshot v{{ selectedSnap()!.versionNumber }} — {{ selectedSnap()!.structureLabel }}&lt;/span&gt;
+        &lt;p-tag [value]="selectedSnap()!.statusAtSnapshot"
+               [severity]="statusSeverity(selectedSnap()!.statusAtSnapshot)"&gt;&lt;/p-tag&gt;
+        &lt;span class="ml-1" style="font-size:11px;color:#78909c"&gt;Lecture seule&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/ng-template&gt;
+
+    &lt;div class="snap-meta"&gt;
+      &lt;div&gt;&lt;span class="meta-label"&gt;Créé par&lt;/span&gt;{{ selectedSnap()!.createdBy }}&lt;/div&gt;
+      &lt;div&gt;&lt;span class="meta-label"&gt;Date&lt;/span&gt;{{ selectedSnap()!.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/div&gt;
+      @if (selectedSnap()!.observations) {
+        &lt;div class="snap-obs"&gt;&lt;i class="pi pi-comment mr-1"&gt;&lt;/i&gt;{{ selectedSnap()!.observations }}&lt;/div&gt;
+      }
+      &lt;div class="ml-auto flex gap-2"&gt;
+        &lt;button pButton icon="pi pi-times" label="Fermer"
+                class="p-button-text p-button-sm" (click)="closeSnapshot()"&gt;&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p-tabView&gt;
+      &lt;p-tabPanel header="Engagements BNA/BCT"&gt;
+        &lt;div class="grid"&gt;
+          &lt;div class="col-12 md:col-6"&gt;
+            &lt;h5 class="snap-sub"&gt;Engagements BNA&lt;/h5&gt;
+            @if (selectedSnap()!.engagementsBNA?.length) {
+              &lt;p-table [value]="selectedSnap()!.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;th&gt;Impayé&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;td&gt;{{e.impaye}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+              &lt;/p-table&gt;
+            } @else { &lt;p class="text-color-secondary"&gt;Aucun engagement BNA.&lt;/p&gt; }
+          &lt;/div&gt;
+          &lt;div class="col-12 md:col-6"&gt;
+            &lt;h5 class="snap-sub"&gt;Engagements BCT&lt;/h5&gt;
+            @if (selectedSnap()!.engagementsBCT?.length) {
+              &lt;p-table [value]="selectedSnap()!.engagementsBCT" styleClass="p-datatable-sm"&gt;
+                &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Banque&lt;/th&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Utilisé&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.banque}}&lt;/td&gt;&lt;td&gt;{{e.typeCredit}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.utilise}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+              &lt;/p-table&gt;
+            } @else { &lt;p class="text-color-secondary"&gt;Aucun engagement BCT.&lt;/p&gt; }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/p-tabPanel&gt;
+      &lt;p-tabPanel header="Actionnaires"&gt;
+        @if (selectedSnap()!.engagementDetaille?.actionnaires?.length) {
+          @for (a of selectedSnap()!.engagementDetaille.actionnaires; track a.numSeqPers) {
+            &lt;p-panel [header]="a.nom" [toggleable]="true" [collapsed]="true" class="mb-2"&gt;
+              @if (a.engagementsBNA?.length) {
+                &lt;p-table [value]="a.engagementsBNA" styleClass="p-datatable-sm"&gt;
+                  &lt;ng-template pTemplate="header"&gt;&lt;tr&gt;&lt;th&gt;Type Risque&lt;/th&gt;&lt;th&gt;Autorisé&lt;/th&gt;&lt;th&gt;Encours&lt;/th&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                  &lt;ng-template pTemplate="body" let-e&gt;&lt;tr&gt;&lt;td&gt;{{e.typeRisque}}&lt;/td&gt;&lt;td&gt;{{e.autorise}}&lt;/td&gt;&lt;td&gt;{{e.encours}}&lt;/td&gt;&lt;/tr&gt;&lt;/ng-template&gt;
+                &lt;/p-table&gt;
+              }
+            &lt;/p-panel&gt;
+          }
+        } @else { &lt;p class="text-color-secondary"&gt;Aucun actionnaire.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+      &lt;p-tabPanel header="1er Responsable"&gt;
+        @if (selectedSnap()!.engagementDetaille?.premierResponsable) {
+          &lt;p class="mb-2"&gt;
+            &lt;strong&gt;Nom :&lt;/strong&gt; {{selectedSnap()!.engagementDetaille.premierResponsable!.nom}}
+            &lt;strong class="ml-3"&gt;CIN :&lt;/strong&gt; {{selectedSnap()!.engagementDetaille.premierResponsable!.cin}}
+          &lt;/p&gt;
+        } @else { &lt;p class="text-color-secondary"&gt;Aucun 1er responsable.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+      &lt;p-tabPanel header="Vendeurs"&gt;
+        @if (selectedSnap()!.engagementDetaille?.vendeurs?.length) {
+          @for (v of selectedSnap()!.engagementDetaille.vendeurs; track v.numSeqPers) {
+            &lt;p-panel [header]="v.nom" [toggleable]="true" [collapsed]="true" class="mb-2"&gt;&lt;/p-panel&gt;
+          }
+        } @else { &lt;p class="text-color-secondary"&gt;Aucun vendeur.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+      &lt;p-tabPanel header="Crédits"&gt;
+        @if (selectedSnap()!.creditsData) {
+          &lt;pre class="snap-json"&gt;{{selectedSnap()!.creditsData | json}}&lt;/pre&gt;
+        } @else { &lt;p class="text-color-secondary"&gt;Aucune donnée crédit.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+      &lt;p-tabPanel header="Exploitation"&gt;
+        @if (selectedSnap()!.exploitationData) {
+          &lt;pre class="snap-json"&gt;{{selectedSnap()!.exploitationData | json}}&lt;/pre&gt;
+        } @else { &lt;p class="text-color-secondary"&gt;Aucune donnée exploitation.&lt;/p&gt; }
+      &lt;/p-tabPanel&gt;
+    &lt;/p-tabView&gt;
+  &lt;/p-fieldset&gt;
+}
+
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+&lt;!-- PANNEAU COMPARAISON ⚖ (clic Comparer)                    --&gt;
+&lt;!-- ══════════════════════════════════════════════════════════ --&gt;
+@if (compareMode()) {
+  &lt;div class="compare-panel mt-3"&gt;
+
+    &lt;!-- En-tête --&gt;
+    &lt;div class="compare-header"&gt;
+      &lt;div class="compare-header-left"&gt;
+        &lt;i class="pi pi-sliders-h mr-2" style="font-size:16px"&gt;&lt;/i&gt;
+        &lt;span&gt;Comparaison de snapshots&lt;/span&gt;
+        @if (diffCount() &gt; 0) {
+          &lt;span class="diff-badge-count"&gt;{{ diffCount() }} différence{{ diffCount() &gt; 1 ? 's' : '' }}&lt;/span&gt;
+        } @else if (!compareLoading()) {
+          &lt;span class="diff-badge-same"&gt;Identiques&lt;/span&gt;
+        }
+      &lt;/div&gt;
+      &lt;button pButton icon="pi pi-times" label="Fermer"
+              class="p-button-text p-button-sm" (click)="closeCompare()"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+
+    @if (compareLoading()) {
+      &lt;div class="flex justify-content-center p-5"&gt;
+        &lt;p-progressSpinner strokeWidth="4" [style]="{width:'44px',height:'44px'}"&gt;&lt;/p-progressSpinner&gt;
+      &lt;/div&gt;
+    } @else if (compareOldSnap() &amp;&amp; compareNewSnap()) {
+
+      &lt;!-- Entêtes des 2 colonnes --&gt;
+      &lt;div class="compare-cols-header"&gt;
+        &lt;div class="col-old-header"&gt;
+          &lt;i class="pi pi-history mr-1"&gt;&lt;/i&gt;
+          &lt;strong&gt;{{ compareOldLabel() }}&lt;/strong&gt;
+          &lt;p-tag [value]="compareOldSnap()!.statusAtSnapshot"
+                 [severity]="statusSeverity(compareOldSnap()!.statusAtSnapshot)"
+                 styleClass="ml-2 text-xs"&gt;&lt;/p-tag&gt;
+        &lt;/div&gt;
+        &lt;div class="col-new-header"&gt;
+          &lt;i class="pi pi-check-circle mr-1"&gt;&lt;/i&gt;
+          &lt;strong&gt;{{ compareNewLabel() }}&lt;/strong&gt;
+          &lt;p-tag [value]="compareNewSnap()!.statusAtSnapshot"
+                 [severity]="statusSeverity(compareNewSnap()!.statusAtSnapshot)"
+                 styleClass="ml-2 text-xs"&gt;&lt;/p-tag&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Tableau de diff --&gt;
+      &lt;table class="diff-table"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th class="th-label"&gt;Indicateur&lt;/th&gt;
+            &lt;th class="th-old"&gt;Version historique&lt;/th&gt;
+            &lt;th class="th-arrow"&gt;&lt;/th&gt;
+            &lt;th class="th-new"&gt;État actuel&lt;/th&gt;
+            &lt;th class="th-status"&gt;Évolution&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          @for (row of diffRows(); track row.label) {
+            &lt;tr [class.diff-row-changed]="row.changed" [class.diff-row-same]="!row.changed"&gt;
+              &lt;td class="td-label"&gt;
+                @if (row.changed) { &lt;span class="changed-dot"&gt;&lt;/span&gt; }
+                {{ row.label }}
+                @if (row.unit) { &lt;span class="unit"&gt;({{ row.unit }}))&lt;/span&gt; }
+              &lt;/td&gt;
+              &lt;td class="td-old"&gt;
+                &lt;span [class.val-old]="row.changed"&gt;{{ row.snapValue }}&lt;/span&gt;
+              &lt;/td&gt;
+              &lt;td class="td-arrow"&gt;
+                &lt;span [class]="diffClass(row)"&gt;{{ diffArrow(row) }}&lt;/span&gt;
+              &lt;/td&gt;
+              &lt;td class="td-new"&gt;
+                &lt;span [class.val-new]="row.changed"&gt;{{ row.currentValue }}&lt;/span&gt;
+              &lt;/td&gt;
+              &lt;td class="td-status"&gt;
+                @if (!row.changed) {
+                  &lt;span class="evo-same"&gt;Inchangé&lt;/span&gt;
+                } @else {
+                  &lt;span [class]="diffClass(row) === 'diff-up' ? 'evo-up' : (diffClass(row) === 'diff-down' ? 'evo-down' : 'evo-changed')"&gt;
+                    {{ diffClass(row) === 'diff-up' ? 'Augmenté' : (diffClass(row) === 'diff-down' ? 'Réduit' : 'Modifié') }}
+                  &lt;/span&gt;
+                }
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          }
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+
+      &lt;!-- Légende --&gt;
+      &lt;div class="diff-legend"&gt;
+        &lt;span class="leg-item"&gt;&lt;span class="changed-dot"&gt;&lt;/span&gt; Valeur modifiée&lt;/span&gt;
+        &lt;span class="leg-item"&gt;&lt;span class="diff-up"&gt;↑&lt;/span&gt; Augmentation&lt;/span&gt;
+        &lt;span class="leg-item"&gt;&lt;span class="diff-down"&gt;↓&lt;/span&gt; Réduction&lt;/span&gt;
+        &lt;span class="leg-item"&gt;&lt;span class="diff-same"&gt;=&lt;/span&gt; Identique&lt;/span&gt;
+      &lt;/div&gt;
+    }
+  &lt;/div&gt;
+}
+
+&lt;!-- DIALOG VALIDER --&gt;
+&lt;p-dialog header="Valider &amp; Transmettre" [(visible)]="showValidDlg"
+          [modal]="true" [style]="{width:'480px'}"&gt;
+  &lt;div class="grid p-fluid"&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Structure source&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="validForm.fromStructureCode" [readonly]="true"/&gt;&lt;/div&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Structure destination *&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="validForm.toStructureCode" placeholder="ex: DR-05"/&gt;&lt;/div&gt;
+    &lt;div class="col-12"&gt;&lt;label&gt;Avis&lt;/label&gt;
+      &lt;p-dropdown [options]="avisOptions" [(ngModel)]="validForm.avisValue"
+                  optionLabel="label" optionValue="value"&gt;&lt;/p-dropdown&gt;&lt;/div&gt;
+    &lt;div class="col-12"&gt;&lt;label&gt;Observations&lt;/label&gt;
+      &lt;textarea pInputTextarea [(ngModel)]="validForm.observations" rows="3"&gt;&lt;/textarea&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;ng-template pTemplate="footer"&gt;
+    &lt;button pButton label="Annuler" class="p-button-text" (click)="showValidDlg.set(false)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Valider" icon="pi pi-check" class="p-button-success" (click)="valider()"&gt;&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/p-dialog&gt;
+
+&lt;!-- DIALOG REFOULER --&gt;
+&lt;p-dialog header="Refouler le dossier" [(visible)]="showRefoulDlg"
+          [modal]="true" [style]="{width:'480px'}"&gt;
+  &lt;div class="grid p-fluid"&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Structure source&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="refoulForm.fromStructureCode" [readonly]="true"/&gt;&lt;/div&gt;
+    &lt;div class="col-6"&gt;&lt;label&gt;Retourner vers *&lt;/label&gt;
+      &lt;input pInputText [(ngModel)]="refoulForm.toStructureCode" placeholder="ex: AGC-001"/&gt;&lt;/div&gt;
+    &lt;div class="col-12"&gt;&lt;label&gt;Motif &lt;span style="color:red"&gt;*&lt;/span&gt;&lt;/label&gt;
+      &lt;textarea pInputTextarea [(ngModel)]="refoulForm.motif" rows="4"
+                placeholder="Motif obligatoire..."&gt;&lt;/textarea&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;ng-template pTemplate="footer"&gt;
+    &lt;button pButton label="Annuler" class="p-button-text" (click)="showRefoulDlg.set(false)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Refouler" icon="pi pi-reply" class="p-button-danger"
+            [disabled]="!refoulForm.motif?.trim()" (click)="refouler()"&gt;&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/p-dialog&gt;</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FICHIER 4 — snapshot-history.component.css -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="file-section" id="s4">
+<div class="file-header fh-css">
+  <div class="file-num">4</div>
+  <span class="file-path">snapshot-history/snapshot-history.component.css</span>
+  <span class="b-mod file-badge">REMPLACER TOUT</span>
+</div>
+<div class="code-wrap">
+<div class="code-label"><span>CSS — fichier complet (ajoute progress bar + diff styles aux styles existants)</span><span class="loc">snapshot-history.component.css</span></div>
+<pre>/* ── BARRE DE PROGRESSION ─────────────────────────────────── */
+.progress-card {
+  background: #fff;
+  border: 1px solid #cfd8dc;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+.progress-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.progress-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #263238;
+}
+.progress-count {
+  font-size: 11px;
+  color: #78909c;
+  margin-left: auto;
+}
+
+/* Stepper */
+.stepper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+.stepper-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+.stepper-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #eceff1;
+  border: 2px solid #cfd8dc;
+  color: #78909c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  position: relative;
+  z-index: 2;
+  transition: all .3s;
+}
+.stepper-circle.done {
+  background: #1a7f37;
+  border-color: #1a7f37;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(26,127,55,.2);
+}
+.stepper-circle.active {
+  background: #1565c0;
+  border-color: #1565c0;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(21,101,192,.2);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(21,101,192,.2); }
+  50%       { box-shadow: 0 0 0 8px rgba(21,101,192,.08); }
+}
+.stepper-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8px;
+  text-align: center;
+}
+.stepper-main {
+  font-size: 12px;
+  font-weight: 700;
+  color: #263238;
+}
+.stepper-sub {
+  font-size: 10px;
+  color: #78909c;
+}
+/* Ligne entre les étapes */
+.stepper-line {
+  position: absolute;
+  top: 19px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e0e0e0;
+  z-index: 1;
+}
+.stepper-line.done {
+  background: linear-gradient(90deg, #1a7f37, #1a7f37);
+}
+
+/* ── BARRE D'ONGLETS ─────────────────────────────────────── */
+.hist-header {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 8px 0 12px 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 16px;
+}
+.hist-tabs { display: flex; gap: 4px; }
+.hist-tab {
+  display: flex; align-items: center; gap: 6px; padding: 7px 16px;
+  border-radius: 6px 6px 0 0; border: 1px solid transparent;
+  background: #eceff1; color: #455a64; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.hist-tab:hover { background: #dce8f0; }
+.hist-tab.active {
+  background: #fff; border-color: #cfd8dc; border-bottom-color: #fff;
+  color: #1a7f37; margin-bottom: -2px; z-index: 1;
+}
+.hist-count {
+  background: #1a7f37; color: #fff; border-radius: 20px;
+  padding: 1px 7px; font-size: 11px; font-weight: 700;
+}
+.hist-tab.active .hist-count { background: #1565c0; }
+.hist-actions { display: flex; gap: 6px; margin-left: auto; }
+.hist-empty { text-align: center; padding: 40px; color: #78909c; }
+.hist-empty i { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+/* Badge "Actuel" sur la dernière version */
+.badge-actuel {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #1a7f37;
+  border: 1px solid #a5d6a7;
+  border-radius: 20px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* ── TIMELINE ────────────────────────────────────────────── */
+.hist-timeline { padding: 8px 0; }
+.tl-marker {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #78909c; color: #fff; font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2); flex-shrink: 0;
+}
+.tl-valider  { background: #1a7f37; }
+.tl-refouler { background: #c62828; }
+.tl-pec      { background: #1565c0; }
+.tl-envoyer  { background: #6a1b9a; }
+.tl-card {
+  background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06); transition: box-shadow .2s;
+}
+.tl-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+.tl-card-header {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+}
+.tl-structures { font-size: 13px; font-weight: 600; color: #263238; }
+.tl-date { font-size: 11px; color: #78909c; margin-left: auto; }
+.tl-card-body { font-size: 12px; color: #546e7a; display: flex; gap: 12px; flex-wrap: wrap; }
+.tl-comment {
+  font-style: italic; color: #78909c;
+  max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ── DÉTAIL SNAPSHOT ─────────────────────────────────────── */
+.snap-detail { border: 2px solid #1a7f37 !important; }
+.snap-meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: #e8f5e9; border-radius: 6px; padding: 10px 14px;
+  margin-bottom: 14px; font-size: 13px;
+}
+.meta-label { color: #78909c; font-size: 11px; display: block; }
+.snap-obs { color: #455a64; font-style: italic; font-size: 12px; flex: 1; min-width: 200px; }
+.snap-sub { font-size: 13px; font-weight: 700; color: #1565c0; margin-bottom: 8px; }
+.snap-json {
+  font-size: 12px; white-space: pre-wrap; background: #f5f5f5;
+  padding: 12px; border-radius: 6px; max-height: 300px; overflow-y: auto;
+}
+
+/* ── PANNEAU COMPARAISON ─────────────────────────────────── */
+.compare-panel {
+  background: #fff;
+  border: 2px solid #e65100;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(230,81,0,.12);
+}
+.compare-header {
+  background: linear-gradient(90deg, #fff3e0, #fff);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #ffe0b2;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e65100;
+}
+.compare-header-left { display: flex; align-items: center; gap: 8px; flex: 1; }
+
+/* Badges résumé */
+.diff-badge-count {
+  background: #ffccbc; color: #bf360c;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 11px; font-weight: 700;
+}
+.diff-badge-same {
+  background: #c8e6c9; color: #1b5e20;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 11px; font-weight: 700;
+}
+
+/* Entêtes des colonnes */
+.compare-cols-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+.col-old-header {
+  padding: 10px 16px;
+  background: #fff8e1;
+  border-right: 1px solid #e0e0e0;
+  font-size: 12px;
+  color: #e65100;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.col-new-header {
+  padding: 10px 16px;
+  background: #e8f5e9;
+  font-size: 12px;
+  color: #1a7f37;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Tableau de diff */
+.diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.diff-table th {
+  background: #f5f5f5;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #78909c;
+  border-bottom: 2px solid #e0e0e0;
+}
+.th-label  { width: 30%; }
+.th-old    { width: 22%; background: #fff8e1; }
+.th-arrow  { width: 6%; text-align: center; }
+.th-new    { width: 22%; background: #e8f5e9; }
+.th-status { width: 20%; }
+
+.diff-table td { padding: 9px 12px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+.diff-row-changed { background: #fffde7; }
+.diff-row-same    { background: #fff; }
+.diff-row-changed:hover td { background: #fff8e1; }
+.diff-row-same:hover td    { background: #f5f5f5; }
+
+.td-label { color: #263238; font-weight: 600; }
+.td-old   { background: rgba(255,248,225,.5); color: #455a64; }
+.td-arrow { text-align: center; font-weight: 700; font-size: 14px; }
+.td-new   { background: rgba(232,245,233,.5); color: #455a64; }
+.td-status {}
+
+/* Indicateur changé */
+.changed-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e65100;
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.unit { font-size: 10px; color: #78909c; margin-left: 4px; }
+
+/* Valeurs diff */
+.val-old { color: #c62828; font-weight: 600; }
+.val-new { color: #1a7f37; font-weight: 700; }
+
+/* Flèche d'évolution */
+.diff-up     { color: #1a7f37; font-weight: 800; font-size: 15px; }
+.diff-down   { color: #c62828; font-weight: 800; font-size: 15px; }
+.diff-same   { color: #78909c; font-weight: 600; }
+.diff-changed{ color: #e65100; font-weight: 700; }
+
+/* Badges d'évolution */
+.evo-same    { background: #eceff1; color: #78909c; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+.evo-up      { background: #c8e6c9; color: #1b5e20; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.evo-down    { background: #ffcdd2; color: #b71c1c; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.evo-changed { background: #fff3e0; color: #e65100; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+
+/* Légende */
+.diff-legend {
+  display: flex;
+  gap: 20px;
+  padding: 10px 16px;
+  background: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+  font-size: 11px;
+  color: #78909c;
+  flex-wrap: wrap;
+}
+.leg-item { display: flex; align-items: center; gap: 5px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stepper { flex-direction: column; }
+  .stepper-line { display: none; }
+  .compare-cols-header { grid-template-columns: 1fr; }
+  .th-arrow, .td-arrow { display: none; }
+}</pre>
+</div>
+</div>
+
+<hr/>
+<div class="summary-box">
+  <strong>Résumé des 4 fichiers à modifier :</strong><br/>
+  <strong>1.</strong> <code>snapshot.service.ts</code> — Ajouter 3 méthodes statiques de calcul (totaux crédits, engagements, sites) à la fin du fichier.<br/>
+  <strong>2.</strong> <code>snapshot-history.component.ts</code> — Réécriture complète : barre de progression (<code>progressSteps</code> computed), logique de comparaison (<code>openCompare()</code>, <code>diffRows</code> computed, <code>diffCount</code>).<br/>
+  <strong>3.</strong> <code>snapshot-history.component.html</code> — Réécriture complète : stepper au-dessus, bouton ⚖ sur chaque ligne, panneau diff côte à côte avec tableau coloré.<br/>
+  <strong>4.</strong> <code>snapshot-history.component.css</code> — Réécriture complète : styles stepper animé, styles diff table (rouge/vert/neutre), styles panneau comparaison.<br/>
+  <br/>
+  <strong>Aucun nouveau fichier backend nécessaire</strong> — La comparaison utilise les 2 appels existants <code>getBySnapshotId()</code>.
+</div>
+
+</div>
+</body>
+</html>
