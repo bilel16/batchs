@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Vérification engagementDetailleJson — Canvas Agricole</title>
+<style>
+:root{
+  --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+  --blue:#1565c0;--blue-lt:#e3f2fd;
+  --amber:#e65100;--amber-lt:#fff3e0;
+  --red:#c62828;--red-lt:#ffebee;
+  --purple:#6a1b9a;--purple-lt:#f3e5f5;
+  --gray:#455a64;--gray-lt:#eceff1;
+  --bg:#f0f4f8;--card:#fff;--border:#cfd8dc;
+  --text:#263238;--muted:#78909c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.65}
+nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:10px 24px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-wrap:wrap}
+nav .brand{font-size:14px;font-weight:800}
+nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+nav a:hover{background:rgba(255,255,255,.2)}
+.page{max-width:1180px;margin:0 auto;padding:20px 16px}
+.hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:10px;padding:26px 34px;margin-bottom:22px}
+.hero h1{font-size:19px;font-weight:800;margin-bottom:6px}
+.hero p{opacity:.85;font-size:12px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600}
+/* SECTIONS */
+section{margin-bottom:36px}
+.sh{display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--green);padding-bottom:8px;margin-bottom:16px}
+.sn{width:32px;height:32px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.sh h2{font-size:16px;font-weight:700}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 18px;box-shadow:0 1px 8px rgba(0,0,0,.07);margin-bottom:12px}
+.card h3{font-size:13px;font-weight:700;margin-bottom:10px}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ALERTS */
+.alert{border-radius:7px;padding:10px 14px;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.6}
+.ai{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.aw{background:var(--amber-lt);border-left:3px solid var(--amber)}
+.as{background:var(--green-lt);border-left:3px solid var(--green)}
+.ad{background:var(--red-lt);border-left:3px solid var(--red)}
+.ap{background:var(--purple-lt);border-left:3px solid var(--purple)}
+/* CODE */
+.cb{background:#0d1117;border-radius:7px;overflow:hidden;margin-bottom:10px}
+.ch{background:#161b22;padding:5px 14px;font-size:10px;color:#8b949e;font-family:monospace;display:flex;justify-content:space-between}
+.cf{color:#58a6ff;font-style:italic}
+pre{background:#0d1117;color:#e6edf3;padding:13px 16px;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;line-height:1.78;margin:0;white-space:pre}
+code{background:var(--gray-lt);padding:1px 5px;border-radius:3px;font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--purple)}
+/* BUG TABLE */
+table.bugs{width:100%;border-collapse:collapse;font-size:12px;box-shadow:0 1px 6px rgba(0,0,0,.08);border-radius:8px;overflow:hidden}
+table.bugs th{background:var(--green-dk);color:#fff;padding:8px 12px;text-align:left;font-size:11px}
+table.bugs td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+table.bugs tr:last-child td{border:none}
+table.bugs tr:nth-child(even) td{background:var(--gray-lt)}
+.severity{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.sev-crit{background:#ffcdd2;color:#b71c1c}
+.sev-major{background:#fff3e0;color:#e65100}
+.sev-minor{background:#e3f2fd;color:#1565c0}
+/* FLOW */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;overflow-x:auto;background:var(--gray-lt);border-radius:8px;padding:14px}
+.flow-box{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;min-width:110px;text-align:center;flex-shrink:0}
+.flow-box.ok{border-color:var(--green);background:var(--green-lt)}
+.flow-box.bug{border-color:var(--red);background:var(--red-lt)}
+.flow-box.warn{border-color:var(--amber);background:var(--amber-lt)}
+.flow-box .fbt{font-weight:700;font-size:11px}
+.flow-box .fbs{font-size:10px;color:var(--muted);margin-top:2px}
+.flow-arr{display:flex;align-items:center;padding:0 4px;color:var(--muted);font-size:16px;flex-shrink:0}
+.flow-arr.bug{color:var(--red)}
+hr{border:none;border-top:1px solid var(--border);margin:18px 0}
+@media(max-width:768px){.card-grid{grid-template-columns:1fr}.flow{flex-direction:column}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌿 engagementDetailleJson — Vérification</div>
+  <a href="#s1">Flux de données</a>
+  <a href="#s2">4 bugs identifiés</a>
+  <a href="#s3">Fix: Associé</a>
+  <a href="#s4">Fix: PremierResp</a>
+  <a href="#s5">Fix: Vendeur</a>
+  <a href="#s6">Fix: classeBCT</a>
+  <a href="#s7">Fix: SQL debug</a>
+</nav>
+<div class="page">
+
+<div class="hero">
+  <h1>engagementDetailleJson — Vérification, bugs et corrections</h1>
+  <p>Analyse complète de comment les données (actionnaires, 1er responsable, vendeurs, groupe) sont récupérées, sérialisées dans <code>engagementDetailleJson</code>, et ce qui doit être corrigé pour que les données stockées correspondent à la réalité.</p>
+  <div class="pills">
+    <span class="pill">4 bugs confirmés</span>
+    <span class="pill">CanevasSnapshotService</span>
+    <span class="pill">Associe.java</span>
+    <span class="pill">ClientCanvas.java</span>
+    <span class="pill">Vendeur.java</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S1 — FLUX DE DONNÉES -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s1">
+<div class="sh"><div class="sn">1</div><h2>Flux de données — comment ça fonctionne actuellement</h2></div>
+
+<div class="alert ai"><span>ℹ️</span><div>
+  <code>engagementDetailleJson</code> est un CLOB Oracle dans la table <code>CANEVAS_STRUCTURE_SNAPSHOT</code>.
+  Il est créé dans <code>CanevasSnapshotService.buildEngagementDetaille()</code> et contient 4 parties :
+  <strong>actionnaires</strong>, <strong>premierResponsable</strong>, <strong>groupe</strong>, <strong>vendeurs</strong>.
+</div></div>
+
+<div class="flow">
+  <div class="flow-box ok">
+    <div class="fbt">1. Déclenchement</div>
+    <div class="fbs">POST /api/avis ou /valider → createSnapshot()</div>
+  </div>
+  <div class="flow-arr">→</div>
+  <div class="flow-box ok">
+    <div class="fbt">2. Load Caneva</div>
+    <div class="fbs">canevaRepository.findById(canevasId)</div>
+  </div>
+  <div class="flow-arr">→</div>
+  <div class="flow-box bug">
+    <div class="fbt">3. Actionnaires ❌</div>
+    <div class="fbs">associeRepo.findAssociesByNumSeqPers(caneva.numSeqpers)</div>
+  </div>
+  <div class="flow-arr bug">→</div>
+  <div class="flow-box bug">
+    <div class="fbt">4. PremierResp ⚠️</div>
+    <div class="fbs">clientCanvasRepo.findByNumSeqpers(numSeqPers)</div>
+  </div>
+  <div class="flow-arr">→</div>
+  <div class="flow-box warn">
+    <div class="fbt">5. Vendeurs ⚠️</div>
+    <div class="fbs">caneva.getCreditAchatTerrains() → getVendeurs()</div>
+  </div>
+  <div class="flow-arr">→</div>
+  <div class="flow-box bug">
+    <div class="fbt">6. Engagements ⚠️</div>
+    <div class="fbs">classeBCT absent pour toutes les parties</div>
+  </div>
+  <div class="flow-arr">→</div>
+  <div class="flow-box ok">
+    <div class="fbt">7. Sérialisation</div>
+    <div class="fbs">objectMapper.writeValueAsString(detaille)</div>
+  </div>
+</div>
+
+<!-- Code actuel -->
+<div class="cb" style="margin-top:14px">
+<div class="ch"><span>CanevasSnapshotService.java — buildEngagementDetaille() — ÉTAT ACTUEL</span><span class="cf">ligne 112–144</span></div>
+<pre>private EngagementDetailleDto buildEngagementDetaille(Caneva caneva) {
+    Long numSeqPers = caneva.getNumSeqpers().longValue();
+
+    // ❌ BUG 1 : cherche les associés dont numSeqPers = numSeqPers du CANVAS PRINCIPAL
+    // Ce n'est pas la bonne colonne — numSeqPers dans Associe = son propre numéro bancaire
+    List&lt;EngagementPartieDto&gt; actionnaires = associeRepository
+            .findAssociesByNumSeqPers(numSeqPers)   // ← MAUVAIS CRITÈRE
+            .stream()
+            .map(this::associeToEngagementPartie)
+            .collect(Collectors.toList());
+
+    // ⚠️ BUG 2 : findByNumSeqpers peut retourner le mauvais ClientCanvas
+    // si plusieurs canvas pour le même client (pas de lien caneva_id)
+    EngagementPartieDto premierResponsable = clientCanvasRepository
+            .findByNumSeqpers(numSeqPers)            // ← AMBIGU sans canevaId
+            .map(this::clientCanvasToPremierResp)
+            .orElse(null);
+
+    // ⚠️ BUG 3 : distinct() sur des entités JPA sans equals()/hashCode()
+    // peut dupliquer les vendeurs — Vendeur.numseqpers est Integer, pas Long
+    List&lt;EngagementPartieDto&gt; vendeurs = caneva.getCreditAchatTerrains().stream()
+            .flatMap(cat -> cat.getVendeurs().stream())
+            .filter(v -> v.getNumseqpers() != null)
+            .distinct()                               // ← NON FIABLE sans equals()
+            .map(this::vendeurToEngagementPartie)
+            .collect(Collectors.toList());
+
+    return EngagementDetailleDto.builder()
+            .actionnaires(actionnaires)
+            .premierResponsable(premierResponsable)
+            .vendeurs(vendeurs)
+            .groupe(List.of())   // ← groupe jamais rempli
+            .build();
+}
+
+// ❌ BUG 4 : classeBCT jamais chargé pour les actionnaires
+private EngagementPartieDto associeToEngagementPartie(Associe associe) {
+    String numSeqPersStr = String.valueOf(associe.getNumSeqPers());
+    EngagementDTO eng = loadEngagementSafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; classeBNA = loadClasseBNASafe(numSeqPersStr);
+    // classeBCT → ABSENT ici
+    return EngagementPartieDto.builder()
+            .typePartie("ACTIONNAIRE")
+            .nom(associe.getName())
+            .numSeqPers(associe.getNumSeqPers())
+            .partCapital(...)
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(classeBNA)
+            // .classeBCT(classeBCT) ← MANQUANT
+            .build();
+}</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S2 — TABLEAU DES 4 BUGS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s2">
+<div class="sh"><div class="sn">2</div><h2>4 bugs identifiés — tableau de synthèse</h2></div>
+
+<table class="bugs">
+<thead>
+  <tr><th>#</th><th>Partie</th><th>Sévérité</th><th>Problème exact</th><th>Effet constaté</th><th>Correction</th></tr>
+</thead>
+<tbody>
+  <tr>
+    <td><strong>B1</strong></td>
+    <td>Actionnaires</td>
+    <td><span class="severity sev-crit">CRITIQUE</span></td>
+    <td>
+      <code>findAssociesByNumSeqPers(caneva.numSeqpers)</code><br/>
+      cherche les associés dont <strong>leur propre</strong> <code>num_seq_pers</code> = <code>numSeqPers du canvas</code>.<br/>
+      Mais dans la table <code>associe</code>, il n'y a pas de colonne <code>caneva_id</code> → impossible de retrouver les actionnaires d'un canvas précis.
+    </td>
+    <td>La liste des actionnaires est toujours <strong>vide</strong> (0 résultats) ou contient les mauvaises personnes.</td>
+    <td>
+      Ajouter un champ <code>canevaId</code> dans <code>Associe.java</code> + migration SQL + nouvelle requête <code>findByCanevaId()</code>.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>B2</strong></td>
+    <td>Premier Responsable</td>
+    <td><span class="severity sev-major">MAJEUR</span></td>
+    <td>
+      <code>findByNumSeqpers(numSeqPers)</code> utilise <code>Optional.findFirst()</code>.<br/>
+      Si un client a créé <strong>plusieurs canvas</strong>, on récupère le premier ClientCanvas trouvé (ordre indéterminé) — pas forcément celui lié au canvas courant.
+    </td>
+    <td>Le 1er responsable peut appartenir à un <strong>autre canvas</strong> du même client.</td>
+    <td>
+      Ajouter <code>canevaId</code> à <code>ClientCanvas.java</code> + migration SQL + requête <code>findByNumSeqpersAndCanevaId()</code>.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>B3</strong></td>
+    <td>Vendeurs</td>
+    <td><span class="severity sev-major">MAJEUR</span></td>
+    <td>
+      <code>.distinct()</code> sur des entités JPA sans <code>equals()</code>/<code>hashCode()</code> définis → chaque objet est considéré unique par référence → <strong>doublons</strong> si un vendeur est dans plusieurs crédits achat terrain.<br/>
+      De plus, <code>Vendeur.numseqpers</code> est <code>Integer</code> mais <code>vendeurToEngagementPartie()</code> cast en <code>Long</code> → erreur potential de conversion.
+    </td>
+    <td>Vendeurs en double dans le JSON. Potentiel crash si <code>numseqpers = null</code>.</td>
+    <td>
+      Remplacer <code>.distinct()</code> par déduplication via <code>Map&lt;Integer, Vendeur&gt;</code> sur <code>numseqpers</code>.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>B4</strong></td>
+    <td>classeBCT manquant</td>
+    <td><span class="severity sev-minor">MINEUR</span></td>
+    <td>
+      Dans <code>associeToEngagementPartie()</code>, <code>clientCanvasToPremierResp()</code> et <code>vendeurToEngagementPartie()</code> : seule <code>classeBNA</code> est chargée. <code>classeBCT</code> n'est jamais chargée malgré l'existence de <code>EngagementPartieDto.classeBCT</code>.
+    </td>
+    <td>L'onglet "Classe BCT" des parties liées est toujours vide dans le snapshot.</td>
+    <td>Appeler <code>loadClasseBCTSafe()</code> dans les 3 méthodes de conversion.</td>
+  </tr>
+</tbody>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S3 — FIX BUG 1 : ASSOCIES -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s3">
+<div class="sh"><div class="sn">3</div><h2>Correction Bug 1 — Actionnaires (Associé) <span style="background:#fff9c4;color:#f57f17;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">Java</span></h2></div>
+
+<div class="alert ad"><span>❌</span><div>
+  <strong>Racine du problème :</strong> La table <code>associe</code> n'a pas de colonne <code>CANEVA_ID</code>.
+  Il est donc impossible de retrouver les actionnaires d'un canvas spécifique.
+  Il faut ajouter cette colonne ET la relation JPA.
+</div></div>
+
+<!-- Étape 3a : Migration SQL -->
+<div class="cb">
+<div class="ch"><span>Étape 3a — Nouveau fichier SQL Flyway</span><span class="cf">db/migration/V10__add_caneva_id_to_associe_and_client_canvas.sql</span></div>
+<pre>-- Ajouter caneva_id dans la table associe
+ALTER TABLE ASSOCIE ADD caneva_id NUMBER(19);
+ALTER TABLE ASSOCIE ADD CONSTRAINT fk_associe_caneva
+    FOREIGN KEY (caneva_id) REFERENCES CANEVAS_AGRICOLE(ID);
+CREATE INDEX idx_associe_caneva_id ON ASSOCIE(caneva_id);
+
+-- Ajouter caneva_id dans la table CLIENT_CANVAS
+ALTER TABLE CLIENT_CANVAS ADD caneva_id NUMBER(19);
+ALTER TABLE CLIENT_CANVAS ADD CONSTRAINT fk_client_canvas_caneva
+    FOREIGN KEY (caneva_id) REFERENCES CANEVAS_AGRICOLE(ID);
+CREATE INDEX idx_client_canvas_caneva_id ON CLIENT_CANVAS(caneva_id);</pre>
+</div>
+
+<!-- Étape 3b : Associe.java -->
+<div class="cb">
+<div class="ch"><span>Étape 3b — Associe.java : ajouter le champ canevaId</span><span class="cf">entities/Associe.java — ajouter après private String pieceNumber;</span></div>
+<pre>    // ── Champ EXISTANT ──────────────────────────────────────
+    @Column(name = "piece_number", nullable = false)
+    private String pieceNumber;
+
+    @Column(name = "birth_creation_date", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date birthOrCreationDate;
+
+    // ── AJOUTER CE CHAMP ──────────────────────────────────────────────────────
+    @Column(name = "caneva_id")
+    private Long canevaId;   // lien vers CANEVAS_AGRICOLE.ID</pre>
+</div>
+
+<!-- Étape 3c : AssocieRepository.java -->
+<div class="cb">
+<div class="ch"><span>Étape 3c — AssocieRepository.java : remplacer tout le fichier</span><span class="cf">repository/AssocieRepository.java</span></div>
+<pre>package net.kachout.saeb.repository;
+
+import net.kachout.saeb.entities.Associe;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.util.List;
+
+public interface AssocieRepository extends JpaRepository&lt;Associe, Long&gt; {
+
+    // EXISTANT — gardé pour rétrocompatibilité (utilisé ailleurs)
+    List&lt;Associe&gt; findAssociesByNumSeqPers(Long numSeqPers);
+
+    // ✅ NOUVEAU — trouver les actionnaires d'un canvas précis
+    List&lt;Associe&gt; findByCanevaId(Long canevaId);
+
+    @Query("SELECT COALESCE(SUM(a.actionsCount), 0) FROM Associe a WHERE a.numSeqPers = :numSeqPers")
+    Integer sumActionsByNumSeqPers(@Param("numSeqPers") Long numSeqPers);
+}</pre>
+</div>
+
+<!-- Étape 3d : correction dans CanevasSnapshotService -->
+<div class="cb">
+<div class="ch"><span>Étape 3d — CanevasSnapshotService.java : corriger buildEngagementDetaille() pour les actionnaires</span><span class="cf">service/CanevasSnapshotService.java — ligne 116</span></div>
+<pre>private EngagementDetailleDto buildEngagementDetaille(Caneva caneva) {
+    Long numSeqPers = caneva.getNumSeqpers().longValue();
+
+    // ✅ CORRECTION BUG 1 — chercher par canevaId, pas par numSeqPers
+    List&lt;EngagementPartieDto&gt; actionnaires = associeRepository
+            .findByCanevaId(caneva.getId())    // ← CORRIGÉ
+            .stream()
+            .map(this::associeToEngagementPartie)
+            .collect(Collectors.toList());
+
+    // ... reste du code ...
+}</pre>
+</div>
+
+<div class="alert as"><span>✅</span><div>
+  <strong>Concernant les anciens enregistrements :</strong> Les associés existants en base n'ont pas de <code>caneva_id</code>.
+  Il faut mettre à jour les données existantes lors de la sauvegarde d'un associé dans le service <code>AssocieService</code>
+  (quand on appelle <code>save(associe)</code>, passer aussi le <code>canevaId</code>).
+</div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S4 — FIX BUG 2 : PREMIER RESPONSABLE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s4">
+<div class="sh"><div class="sn">4</div><h2>Correction Bug 2 — Premier Responsable (ClientCanvas) <span style="background:#fff9c4;color:#f57f17;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">Java</span></h2></div>
+
+<div class="alert aw"><span>⚠️</span><div>
+  La migration SQL V10 (section 3) a déjà ajouté <code>caneva_id</code> à <code>CLIENT_CANVAS</code>.
+  Il faut maintenant mettre à jour l'entité et le repository.
+</div></div>
+
+<!-- ClientCanvas.java -->
+<div class="cb">
+<div class="ch"><span>Étape 4a — ClientCanvas.java : ajouter canevaId</span><span class="cf">entities/ClientCanvas.java — ajouter après private Date dateCreation;</span></div>
+<pre>    // ── Champ EXISTANT ───────────────────────────────────────
+    @Column(name = "DATE_CREATION")
+    @Temporal(TemporalType.DATE)
+    private Date dateCreation;
+
+    // ── AJOUTER CE CHAMP ─────────────────────────────────────
+    @Column(name = "caneva_id")
+    private Long canevaId;   // lien vers CANEVAS_AGRICOLE.ID</pre>
+</div>
+
+<!-- ClientCanvasRepository.java -->
+<div class="cb">
+<div class="ch"><span>Étape 4b — ClientCanvasRepository.java : remplacer tout le fichier</span><span class="cf">repository/ClientCanvasRepository.java</span></div>
+<pre>package net.kachout.saeb.repository;
+
+import net.kachout.saeb.entities.ClientCanvas;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ClientCanvasRepository extends JpaRepository&lt;ClientCanvas, Long&gt; {
+
+    // EXISTANT — gardé pour rétrocompatibilité
+    Optional&lt;ClientCanvas&gt; findByNumSeqpers(Long numSeqpers);
+    boolean existsByNumSeqpers(Long numSeqpers);
+
+    // ✅ NOUVEAU — trouver le responsable d'un canvas précis (sans ambiguïté)
+    Optional&lt;ClientCanvas&gt; findByCanevaId(Long canevaId);
+
+    // ✅ NOUVEAU — si un client a plusieurs canvas : chercher par les deux
+    Optional&lt;ClientCanvas&gt; findByNumSeqpersAndCanevaId(Long numSeqpers, Long canevaId);
+}</pre>
+</div>
+
+<!-- Correction dans CanevasSnapshotService -->
+<div class="cb">
+<div class="ch"><span>Étape 4c — CanevasSnapshotService.java : corriger la recherche du premier responsable</span><span class="cf">service/CanevasSnapshotService.java — ligne 120</span></div>
+<pre>    // ✅ CORRECTION BUG 2 — chercher par canevaId en priorité
+    EngagementPartieDto premierResponsable = clientCanvasRepository
+            .findByCanevaId(caneva.getId())            // ← CORRIGÉ : par canevaId
+            .or(() -> clientCanvasRepository            // ← Fallback : par numSeqpers
+                    .findByNumSeqpers(numSeqPers))
+            .map(this::clientCanvasToPremierResp)
+            .orElse(null);</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S5 — FIX BUG 3 : VENDEURS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s5">
+<div class="sh"><div class="sn">5</div><h2>Correction Bug 3 — Vendeurs (doublons + Integer/Long) <span style="background:#fff9c4;color:#f57f17;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">Java</span></h2></div>
+
+<div class="alert aw"><span>⚠️</span><div>
+  <code>Vendeur.numseqpers</code> est de type <code>Integer</code> dans l'entité. La méthode <code>vendeurToEngagementPartie()</code> cast <code>vendeur.getNumseqpers().longValue()</code> ce qui crash si <code>numseqpers = null</code>.
+  De plus, <code>.distinct()</code> sur des objets JPA sans <code>equals()</code> ne déduplique pas.
+</div></div>
+
+<!-- Correction dans CanevasSnapshotService -->
+<div class="cb">
+<div class="ch"><span>Étape 5a — CanevasSnapshotService.java : corriger la construction de la liste vendeurs</span><span class="cf">service/CanevasSnapshotService.java — ligne 127–134</span></div>
+<pre>    // AVANT (bugué) :
+    // List&lt;EngagementPartieDto&gt; vendeurs = caneva.getCreditAchatTerrains().stream()
+    //         .flatMap(cat -> cat.getVendeurs().stream())
+    //         .filter(v -> v.getNumseqpers() != null)
+    //         .distinct()   // ← NON FIABLE
+    //         .map(this::vendeurToEngagementPartie)
+    //         .collect(Collectors.toList());
+
+    // ✅ APRÈS : déduplication par numseqpers via LinkedHashMap
+    Map&lt;Integer, Vendeur&gt; uniqueVendeurs = new java.util.LinkedHashMap&lt;&gt;();
+    caneva.getCreditAchatTerrains().forEach(cat ->
+        cat.getVendeurs().forEach(v -> {
+            if (v.getNumseqpers() != null) {
+                uniqueVendeurs.putIfAbsent(v.getNumseqpers(), v);  // premier rencontré = gardé
+            }
+        })
+    );
+    List&lt;EngagementPartieDto&gt; vendeurs = uniqueVendeurs.values().stream()
+            .map(this::vendeurToEngagementPartie)
+            .collect(Collectors.toList());</pre>
+</div>
+
+<!-- Correction vendeurToEngagementPartie -->
+<div class="cb">
+<div class="ch"><span>Étape 5b — CanevasSnapshotService.java : corriger vendeurToEngagementPartie() — null-safe</span><span class="cf">service/CanevasSnapshotService.java — ligne 178–188</span></div>
+<pre>private EngagementPartieDto vendeurToEngagementPartie(Vendeur vendeur) {
+    // ✅ Null-safe : numseqpers est Integer, conversion sécurisée
+    String numSeqPersStr = vendeur.getNumseqpers() != null
+            ? String.valueOf(vendeur.getNumseqpers()) : null;
+
+    if (numSeqPersStr == null) {
+        // Vendeur sans numSeqPers bancaire : on retourne sans engagement
+        return EngagementPartieDto.builder()
+                .typePartie("VENDEUR")
+                .nom(vendeur.getNomPrenom())
+                .numSeqPers(null)
+                .engagementsBNA(List.of())
+                .engagementsBCT(List.of())
+                .classeBNA(List.of())
+                .classeBCT(List.of())   // ✅ ajouté
+                .build();
+    }
+
+    EngagementDTO eng      = loadEngagementSafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; bna    = loadClasseBNASafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; bct    = loadClasseBCTSafe(numSeqPersStr);  // ✅ ajouté
+
+    return EngagementPartieDto.builder()
+            .typePartie("VENDEUR")
+            .nom(vendeur.getNomPrenom())
+            .numSeqPers(vendeur.getNumseqpers() != null
+                    ? vendeur.getNumseqpers().longValue() : null)
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(bna)
+            .classeBCT(bct)   // ✅ ajouté
+            .build();
+}</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S6 — FIX BUG 4 : classeBCT manquant -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s6">
+<div class="sh"><div class="sn">6</div><h2>Correction Bug 4 — classeBCT manquant dans Actionnaire et PremierResp <span style="background:#fff9c4;color:#f57f17;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">Java</span></h2></div>
+
+<!-- associeToEngagementPartie -->
+<div class="cb">
+<div class="ch"><span>Étape 6a — CanevasSnapshotService.java : corriger associeToEngagementPartie()</span><span class="cf">service/CanevasSnapshotService.java — ligne 147–161</span></div>
+<pre>private EngagementPartieDto associeToEngagementPartie(Associe associe) {
+    String numSeqPersStr = String.valueOf(associe.getNumSeqPers());
+    EngagementDTO eng       = loadEngagementSafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; classBNA = loadClasseBNASafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; classBCT = loadClasseBCTSafe(numSeqPersStr);  // ✅ AJOUTÉ
+
+    return EngagementPartieDto.builder()
+            .typePartie("ACTIONNAIRE")
+            .nom(associe.getName())
+            .numSeqPers(associe.getNumSeqPers())
+            .partCapital(associe.getPartPercentage() != null
+                    ? associe.getPartPercentage().toString() : null)
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(classBNA)
+            .classeBCT(classBCT)   // ✅ AJOUTÉ
+            .build();
+}</pre>
+</div>
+
+<!-- clientCanvasToPremierResp -->
+<div class="cb">
+<div class="ch"><span>Étape 6b — CanevasSnapshotService.java : corriger clientCanvasToPremierResp()</span><span class="cf">service/CanevasSnapshotService.java — ligne 163–176</span></div>
+<pre>private EngagementPartieDto clientCanvasToPremierResp(ClientCanvas cc) {
+    String numSeqPersStr = String.valueOf(cc.getNumSeqpers());
+    EngagementDTO eng        = loadEngagementSafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; classBNA = loadClasseBNASafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; classBCT = loadClasseBCTSafe(numSeqPersStr);  // ✅ AJOUTÉ
+
+    return EngagementPartieDto.builder()
+            .typePartie("PREMIER_RESPONSABLE")
+            .nom(cc.getNomResponsable() + " " + cc.getPrenomResponsable())
+            .cin(cc.getCinResponsable())
+            .numSeqPers(cc.getNumSeqpers())
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(classBNA)
+            .classeBCT(classBCT)   // ✅ AJOUTÉ
+            .build();
+}</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S7 — VÉRIFICATION SQL EN BASE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="s7">
+<div class="sh"><div class="sn">7</div><h2>Vérification SQL — comment contrôler ce qui est stocké</h2></div>
+
+<div class="alert ai"><span>ℹ️</span><div>
+  Ces requêtes Oracle permettent de vérifier directement en base ce qui est stocké dans <code>engagementDetailleJson</code>
+  et de comparer avec les données réelles des tables source.
+</div></div>
+
+<div class="cb">
+<div class="ch"><span>SQL Oracle — vérifier le contenu de engagementDetailleJson</span><span class="cf">Exécuter sur Oracle SQL Developer</span></div>
+<pre>-- 1. Voir le contenu brut du JSON pour un canvas donné
+SELECT SNAPSHOT_ID, VERSION_NUMBER, STRUCTURE_CODE, STATUS_AT_SNAPSHOT,
+       DBMS_LOB.SUBSTR(DONNEES_ENGAGEMENT_DETAILLE_JSON, 2000, 1) AS ENG_DETAILLE_EXTRAIT
+FROM CANEVAS_STRUCTURE_SNAPSHOT
+WHERE CANEVAS_ID = :votre_id_canevas
+ORDER BY VERSION_NUMBER;
+
+-- 2. Vérifier les actionnaires en table source pour ce canvas
+SELECT a.ID, a.NAME, a.NUM_SEQ_PERS, a.PART_PERCENTAGE, a.CANEVA_ID
+FROM ASSOCIE a
+WHERE a.CANEVA_ID = :votre_id_canevas;   -- après la migration V10
+
+-- 3. Avant migration : voir les associés existants (sans caneva_id)
+SELECT a.ID, a.NAME, a.NUM_SEQ_PERS, a.PART_PERCENTAGE
+FROM ASSOCIE a
+WHERE a.NUM_SEQ_PERS = (
+    SELECT NUM_SEQ_PERS FROM CANEVAS_AGRICOLE WHERE ID = :votre_id_canevas
+);
+
+-- 4. Vérifier le premier responsable en table source
+SELECT cc.ID, cc.NOM_RESPONSABLE, cc.PRENOM_RESPONSABLE, cc.CIN_RESPONSABLE,
+       cc.NUM_SEQ_PERS, cc.CANEVA_ID
+FROM CLIENT_CANVAS cc
+WHERE cc.CANEVA_ID = :votre_id_canevas;   -- après migration V10
+-- OU avant migration :
+-- WHERE cc.NUM_SEQ_PERS = (SELECT NUM_SEQ_PERS FROM CANEVAS_AGRICOLE WHERE ID = :id)
+
+-- 5. Vérifier les vendeurs
+SELECT v.NOM_PRENOM, v.NUM_SEQ_PERS, cat.TERME, cat.MONTANT
+FROM VENDEUR v
+JOIN CREDIT_ACHAT_TERRAIN cat ON v.CREDIT_ACHAT_TERRAIN_ID = cat.ID
+WHERE cat.CANEVA_ID = :votre_id_canevas;
+
+-- 6. Détecter les snapshots avec engagementDetailleJson NULL ou vide
+SELECT SNAPSHOT_ID, CANEVAS_ID, VERSION_NUMBER,
+       CASE
+           WHEN DONNEES_ENGAGEMENT_DETAILLE_JSON IS NULL THEN 'NULL'
+           WHEN DBMS_LOB.GETLENGTH(DONNEES_ENGAGEMENT_DETAILLE_JSON) = 0 THEN 'VIDE'
+           WHEN DBMS_LOB.SUBSTR(DONNEES_ENGAGEMENT_DETAILLE_JSON, 30, 1)
+                LIKE '%actionnaires":[]%' THEN 'ACTIONNAIRES_VIDES'
+           ELSE 'OK'
+       END AS STATUT_ENG_DETAILLE
+FROM CANEVAS_STRUCTURE_SNAPSHOT
+WHERE CANEVAS_ID = :votre_id_canevas
+ORDER BY VERSION_NUMBER;</pre>
+</div>
+
+<div class="cb" style="margin-top:10px">
+<div class="ch"><span>SQL Oracle — mise à jour des données existantes après migration V10</span><span class="cf">À exécuter UNE SEULE FOIS après la migration V10</span></div>
+<pre>-- Mettre à jour caneva_id dans ASSOCIE pour les données existantes
+-- Strategy: matcher les associes dont numSeqPers correspond à un canvas existant
+-- ATTENTION : cette mise à jour est approximative si plusieurs canvas existent pour un même numSeqPers
+UPDATE ASSOCIE a
+SET a.CANEVA_ID = (
+    SELECT MIN(c.ID)
+    FROM CANEVAS_AGRICOLE c
+    WHERE c.NUM_SEQ_PERS = (
+        -- ici, numSeqPers dans Associe = le numSeqPers du client associé, pas du canvas
+        -- On ne peut pas déterminer automatiquement le canevaId sans donnée supplémentaire
+        -- → laisser NULL et remplir manuellement ou via l'UI
+        SELECT NULL FROM DUAL
+    )
+)
+WHERE a.CANEVA_ID IS NULL;
+
+-- Alternative : si vos associes sont liés à des canvas via un autre champ
+-- (ex: via structure ou matricule), adapter la requête.
+
+-- Mettre à jour caneva_id dans CLIENT_CANVAS
+-- Si numSeqpers du ClientCanvas = numSeqpers du Caneva (1-à-1) :
+UPDATE CLIENT_CANVAS cc
+SET cc.CANEVA_ID = (
+    SELECT MIN(c.ID)
+    FROM CANEVAS_AGRICOLE c
+    WHERE c.NUM_SEQ_PERS = cc.NUM_SEQ_PERS
+)
+WHERE cc.CANEVA_ID IS NULL;
+
+-- Vérifier le résultat
+SELECT COUNT(*) AS ASSOCIES_SANS_CANEVA FROM ASSOCIE WHERE CANEVA_ID IS NULL;
+SELECT COUNT(*) AS CC_SANS_CANEVA FROM CLIENT_CANVAS WHERE CANEVA_ID IS NULL;</pre>
+</div>
+
+<!-- Récapitulatif des fichiers -->
+<hr/>
+<div style="background:var(--green-lt);border:1px solid #a5d6a7;border-radius:8px;padding:14px 18px;font-size:12px;color:var(--gray)">
+  <strong>Récapitulatif — fichiers à modifier :</strong><br/>
+  <strong>1.</strong> <code>db/migration/V10__add_caneva_id.sql</code> — NOUVEAU : ALTER TABLE sur <code>ASSOCIE</code> et <code>CLIENT_CANVAS</code><br/>
+  <strong>2.</strong> <code>entities/Associe.java</code> — +1 champ <code>canevaId</code><br/>
+  <strong>3.</strong> <code>entities/ClientCanvas.java</code> — +1 champ <code>canevaId</code><br/>
+  <strong>4.</strong> <code>repository/AssocieRepository.java</code> — +1 méthode <code>findByCanevaId()</code><br/>
+  <strong>5.</strong> <code>repository/ClientCanvasRepository.java</code> — +2 méthodes<br/>
+  <strong>6.</strong> <code>service/CanevasSnapshotService.java</code> — 4 corrections dans <code>buildEngagementDetaille()</code>, <code>associeToEngagementPartie()</code>, <code>clientCanvasToPremierResp()</code>, <code>vendeurToEngagementPartie()</code><br/>
+  <br/>
+  <strong>⚠️ Point d'attention :</strong> Lors de la sauvegarde d'un <code>Associe</code> ou <code>ClientCanvas</code> dans leurs services respectifs (<code>AssocieService</code>, etc.), passer maintenant le <code>canevaId</code> pour que les nouvelles données soient correctement liées.
+</div>
+</section>
+
+</div>
+</body>
+</html>
