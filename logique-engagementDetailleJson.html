@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Logique engagementDetailleJson — Canvas Agricole</title>
+<style>
+:root{
+  --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+  --blue:#1565c0;--blue-lt:#e3f2fd;
+  --amber:#e65100;--amber-lt:#fff3e0;
+  --red:#c62828;--red-lt:#ffebee;
+  --purple:#6a1b9a;--purple-lt:#f3e5f5;
+  --gray:#455a64;--gray-lt:#eceff1;
+  --bg:#f0f4f8;--card:#fff;--border:#cfd8dc;
+  --text:#263238;--muted:#78909c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.65}
+nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:10px 24px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-wrap:wrap}
+nav .brand{font-size:14px;font-weight:800}
+nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+nav a:hover{background:rgba(255,255,255,.2)}
+.page{max-width:1180px;margin:0 auto;padding:20px 16px}
+.hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:10px;padding:26px 34px;margin-bottom:22px}
+.hero h1{font-size:18px;font-weight:800;margin-bottom:6px}
+.hero p{opacity:.85;font-size:12px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600}
+/* ONGLET SECTIONS */
+.onglet-section{margin-bottom:36px}
+.onglet-header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;margin-bottom:14px;font-size:14px;font-weight:700}
+.oh-rel   {background:#e3f2fd;border-left:5px solid var(--blue);color:var(--blue)}
+.oh-act   {background:#e8f5e9;border-left:5px solid var(--green);color:var(--green)}
+.oh-resp  {background:#fff3e0;border-left:5px solid var(--amber);color:var(--amber)}
+.oh-grp   {background:#f3e5f5;border-left:5px solid var(--purple);color:var(--purple)}
+.oh-vend  {background:#ffebee;border-left:5px solid var(--red);color:var(--red)}
+/* STEP CARDS */
+.step-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.step-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.step-card h4{font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.step-num{width:20px;height:20px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.step-num.bug{background:var(--red)}
+.step-num.warn{background:var(--amber)}
+.step-num.ok{background:var(--green)}
+/* FLOW */
+.flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;background:var(--gray-lt);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px}
+.flow-box{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:5px 10px;font-size:11px;text-align:center}
+.flow-box.ok{border-color:var(--green);background:var(--green-lt)}
+.flow-box.bug{border-color:var(--red);background:var(--red-lt)}
+.flow-box.warn{border-color:var(--amber);background:var(--amber-lt)}
+.flow-box .fb-label{font-weight:700;font-size:11px}
+.flow-box .fb-sub{font-size:10px;color:var(--muted)}
+.flow-arr{color:var(--muted);font-size:14px;flex-shrink:0}
+.flow-arr.bug{color:var(--red)}
+/* ALERTS */
+.alert{border-radius:7px;padding:9px 13px;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.6}
+.ai{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.aw{background:var(--amber-lt);border-left:3px solid var(--amber)}
+.as{background:var(--green-lt);border-left:3px solid var(--green)}
+.ad{background:var(--red-lt);border-left:3px solid var(--red)}
+.ap{background:var(--purple-lt);border-left:3px solid var(--purple)}
+/* CODE */
+.cb{background:#0d1117;border-radius:7px;overflow:hidden;margin-bottom:10px}
+.ch{background:#161b22;padding:5px 14px;font-size:10px;color:#8b949e;font-family:monospace;display:flex;justify-content:space-between}
+.cf{color:#58a6ff;font-style:italic}
+pre{background:#0d1117;color:#e6edf3;padding:12px 16px;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:11.5px;line-height:1.78;margin:0;white-space:pre}
+code{background:var(--gray-lt);padding:1px 5px;border-radius:3px;font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--purple)}
+/* BUG/FIX TABLE */
+table.cmp{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;border-radius:8px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+table.cmp th{padding:8px 12px;text-align:left;font-size:11px}
+table.cmp td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+table.cmp tr:last-child td{border:none}
+.th-ui{background:#1565c0;color:#fff}
+.th-snap{background:#c62828;color:#fff}
+.th-fix{background:#1a7f37;color:#fff}
+.verdict{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.v-ok{background:#c8e6c9;color:#1b5e20}
+.v-bug{background:#ffcdd2;color:#b71c1c}
+.v-miss{background:#e1bee7;color:#4a148c}
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+@media(max-width:768px){.step-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌿 Logique engagementDetailleJson</div>
+  <a href="#s0">Vue globale</a>
+  <a href="#s1">Relation</a>
+  <a href="#s2">Actionnaires</a>
+  <a href="#s3">1er Responsable</a>
+  <a href="#s4">Groupe</a>
+  <a href="#s5">Vendeurs</a>
+  <a href="#s6">Corrections</a>
+</nav>
+<div class="page">
+
+<div class="hero">
+  <h1>Logique complète — engagementDetailleJson (Actionnaires / Responsable / Groupe / Vendeurs)</h1>
+  <p>Pour chaque onglet : comment les données sont récupérées dans l'UI réelle, comment elles devraient être stockées dans le snapshot, et le GAP exact à corriger.</p>
+  <div class="pills">
+    <span class="pill">EngagementsComponent</span>
+    <span class="pill">EngagementService (Angular)</span>
+    <span class="pill">EngagementServiceImpl (Java)</span>
+    <span class="pill">CanevasSnapshotService (Java)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S0 — VUE GLOBALE -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s0">
+
+<div class="alert ai"><span>ℹ️</span><div>
+  <strong>La clé pour tout comprendre :</strong> Dans l'entité <code>Associe.java</code>, le champ <code>numSeqPers</code>
+  est utilisé comme <strong>clé étrangère vers le client principal</strong> (le numSeqPers du canvas),
+  pas comme le numéro bancaire propre de l'associé.
+  Le vrai numéro bancaire de l'associé s'obtient via <code>pieceType + pieceNumber</code> → recherche dans le système bancaire.
+  C'est le cœur de tous les bugs d'engagement.
+</div></div>
+
+<table class="cmp">
+<thead>
+  <tr>
+    <th style="background:#263238;color:#fff">Onglet</th>
+    <th class="th-ui">UI réelle — comment numSeqPers est obtenu</th>
+    <th class="th-snap">Snapshot actuel — ce qui est utilisé</th>
+    <th class="th-fix">Verdict</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><strong>RELATION</strong> (onglet 0)</td>
+    <td><code>canevasAgrService.numSeqPers()</code> = numSeqPers du client principal</td>
+    <td><code>String.valueOf(caneva.getNumSeqpers())</code> = identique</td>
+    <td><span class="verdict v-ok">✔ CORRECT</span></td>
+  </tr>
+  <tr>
+    <td><strong>ACTIONNAIRES</strong> (onglet 1)</td>
+    <td>
+      1. Liste depuis <code>/api/structurecapitales/by-num-seq/{numSeqPers_client}</code><br/>
+      2. Sur sélection : <code>getClientByContratCpt(pieceType, pieceNumber)</code> → obtient le vrai numSeqPers bancaire de l'associé<br/>
+      3. <code>engagementService.setNumSeqPersAssocieEngagement(vraiNumSeqPers)</code>
+    </td>
+    <td>
+      <code>associe.getNumSeqPers()</code> = numSeqPers du CLIENT (FK), pas de l'associé<br/>
+      → recherche les engagements du client principal au lieu de l'associé
+    </td>
+    <td><span class="verdict v-bug">❌ MAUVAIS numSeqPers</span></td>
+  </tr>
+  <tr>
+    <td><strong>1er RESPONSABLE</strong> (onglet 2)</td>
+    <td>
+      1. Données du form : <code>premierResponsable.cin</code><br/>
+      2. <code>getClientByContratCpt("2", cin)</code> → obtient le vrai numSeqPers du responsable<br/>
+      3. <code>engagementService.setNumSeqPersPremierResponsableEngagement(vraiNumSeqPers)</code>
+    </td>
+    <td>
+      <code>cc.getNumSeqpers()</code> = numSeqPers du CLIENT (FK du canvas)<br/>
+      → engagements du client, pas du responsable
+    </td>
+    <td><span class="verdict v-bug">❌ MAUVAIS numSeqPers</span></td>
+  </tr>
+  <tr>
+    <td><strong>GROUPE</strong> (onglet 3)</td>
+    <td>
+      Données viennent d'une source externe (entité <code>Groupe</code>)<br/>
+      <code>onSelectionGroupeChange(groupe)</code> → <code>setNumSeqPersGroupeEngagement(groupe.numSeqPers)</code>
+    </td>
+    <td><code>groupe: List.of()</code> → <strong>jamais rempli, toujours vide</strong></td>
+    <td><span class="verdict v-miss">⬜ ABSENT</span></td>
+  </tr>
+  <tr>
+    <td><strong>VENDEURS</strong> (onglet 4)</td>
+    <td>
+      <code>filteredVendeurs</code> computed depuis <code>creditNature1DataToEdit</code><br/>
+      <code>onSelectionVendeurChange(vendeur)</code> → <code>setNumSeqPersVendeurEngagement(vendeur.numseqpers)</code><br/>
+      → <code>vendeur.numseqpers</code> = vrai numSeqPers bancaire du vendeur
+    </td>
+    <td>
+      <code>vendeur.getNumseqpers()</code> = vrai numSeqPers bancaire<br/>
+      → logique correcte, mais <code>distinct()</code> non fiable
+    </td>
+    <td><span class="verdict v-ok">⚠️ LOGIQUE OK / DOUBLONS</span></td>
+  </tr>
+</tbody>
+</table>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S1 — ONGLET 0 : RELATION -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s1">
+<div class="onglet-header oh-rel">🔗 Onglet 0 — RELATION (Client principal)</div>
+
+<div class="step-grid">
+<div class="step-card">
+  <h4><span class="step-num ok">1</span> UI réelle — EngagementsComponent</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">numSeqPers</div><div class="fb-sub">canevasAgrService.numSeqPers() = client principal</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">setNumSeqPersEngagement(num)</div><div class="fb-sub">engagement signal mis à jour</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">GET /api/engagement/all/{num}</div><div class="fb-sub">EngagementController</div></div>
+  </div>
+</div>
+<div class="step-card">
+  <h4><span class="step-num ok">2</span> Snapshot — CanevasSnapshotService</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">caneva.getNumSeqpers()</div><div class="fb-sub">même numSeqPers du client</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">loadEngagementSafe(numStr)</div><div class="fb-sub">getListeEngagementClient()</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">SQL REFCLI/CCI</div><div class="fb-sub">8 types BNA + BCT</div></div>
+  </div>
+</div>
+</div>
+
+<div class="alert as"><span>✅</span><div><strong>Résultat :</strong> L'onglet RELATION est correctement implémenté. Le numSeqPers utilisé dans l'UI et dans le snapshot est le même (numSeqPers du client principal du canvas). Les engagements BNA et BCT stockés dans <code>engagementBnaJson</code> et <code>engagementBctJson</code> sont corrects.</div></div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotService.java — code CORRECT de la partie Relation</span><span class="cf">lignes 61–67</span></div>
+<pre>String numSeqPersStr = String.valueOf(caneva.getNumSeqpers()); // ✅ client principal
+EngagementDTO engagement = loadEngagementSafe(numSeqPersStr);  // ✅ BNA + BCT
+List&lt;ClasseDTO&gt; classeBNA = loadClasseBNASafe(numSeqPersStr);  // ✅
+List&lt;ClasseDTO&gt; classeBCT = loadClasseBCTSafe(numSeqPersStr);  // ✅
+// → stocké dans engagementBnaJson, engagementBctJson, classeBnaJson, classeBctJson ✅</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S2 — ONGLET 1 : ACTIONNAIRES -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s2">
+<div class="onglet-header oh-act">👥 Onglet 1 — ACTIONNAIRES</div>
+
+<div class="alert ad"><span>❌</span><div>
+  <strong>Bug critique de numSeqPers :</strong> Dans la table <code>ASSOCIE</code>, le champ <code>NUM_SEQ_PERS</code>
+  sert de <strong>clé étrangère vers le client principal</strong> (pour regrouper les associés d'un même client).
+  Ce n'est PAS le numéro bancaire propre de l'associé.
+  Le vrai numSeqPers bancaire d'un associé s'obtient en cherchant par <code>pieceType + pieceNumber</code> dans le système bancaire.
+  Le snapshot utilise ce FK comme si c'était le numéro bancaire de l'associé → <strong>engagements du mauvais client</strong>.
+</div></div>
+
+<div class="step-grid">
+<div class="step-card">
+  <h4><span class="step-num ok">UI</span> Comment l'UI récupère les engagements d'un actionnaire</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">Tab 1 cliqué</div><div class="fb-sub">switchHeaders(event) → activeTab=1</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">loadAssocies()</div><div class="fb-sub">GET /api/structurecapitales/by-num-seq/{numSeqPers_client}</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">Liste associés</div><div class="fb-sub">nom, partPercentage, pieceType, pieceNumber</div></div>
+  </div>
+  <div style="margin:8px 0;font-size:11px;color:var(--muted)">→ L'utilisateur sélectionne un associé dans la liste :</div>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">onSelectionChange(associe)</div><div class="fb-sub">pieceType + pieceNumber de l'associé</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">getClientByContratCpt(type, piece)</div><div class="fb-sub">Recherche dans système bancaire par CIN/IU</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">client.personne.numSeqPers</div><div class="fb-sub">VRAI numSeqPers bancaire de l'associé</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">setNumSeqPersAssocieEngagement(vraiNum)</div><div class="fb-sub">GET /api/engagement/all/{vraiNum}</div></div>
+  </div>
+</div>
+<div class="step-card">
+  <h4><span class="step-num bug">SNAP</span> Ce que le snapshot fait actuellement (FAUX)</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">findByCanevaId(id) <br/>ou<br/>findByNumSeqPers(client)</div><div class="fb-sub">liste des Associe en base</div></div>
+    <div class="flow-arr bug">→</div>
+    <div class="flow-box bug"><div class="fb-label">associe.getNumSeqPers()</div><div class="fb-sub">❌ C'est le FK du client, pas l'associé</div></div>
+    <div class="flow-arr bug">→</div>
+    <div class="flow-box bug"><div class="fb-label">loadEngagementSafe(FK_client)</div><div class="fb-sub">❌ Engagements du CLIENT, pas de l'associé</div></div>
+  </div>
+  <div class="alert ad" style="margin-top:6px;font-size:11px">
+    <span>❌</span><div>
+      Le champ <code>Associe.numSeqPers</code> en base = <strong>numSeqPers du canvas client</strong> (utilisé comme FK de regroupement), pas le numéro bancaire de l'associé.
+      Donc les engagements stockés pour chaque actionnaire = engagements du client principal (toujours les mêmes pour tous).
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>EngagementsComponent.ts — LOGIQUE CORRECTE dans l'UI (lignes 431–441)</span><span class="cf">engagements.component.ts</span></div>
+<pre>onSelectionChange(selectedAssocie: Associe|undefined) {
+  if(selectedAssocie) {
+    // 1. Recherche le vrai numSeqPers bancaire via pieceType + pieceNumber
+    this.canevasAgrService.getClientByContratCpt(
+      selectedAssocie.pieceType === PieceType.IU ? "14" : "2",  // 14=IU, 2=CIN
+      selectedAssocie.pieceNumber                               // numéro de pièce
+    ).subscribe({
+      next: client => {
+        // 2. Stocke le VRAI numSeqPers bancaire de l'associé
+        this.engagementService.setNumSeqPersAssocieEngagement(client.personne?.numSeqPers)
+        // → Déclenche GET /api/engagement/all/{vraiNumSeqPers}
+      }
+    });
+  }
+}</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotService.java — LOGIQUE INCORRECTE dans le snapshot (lignes 147–161)</span><span class="cf">service/CanevasSnapshotService.java</span></div>
+<pre>private EngagementPartieDto associeToEngagementPartie(Associe associe) {
+    // ❌ FAUX : associe.getNumSeqPers() = FK vers le client, pas le numSeqPers de l'associé
+    String numSeqPersStr = String.valueOf(associe.getNumSeqPers());
+    EngagementDTO eng = loadEngagementSafe(numSeqPersStr);   // ← engage du CLIENT, pas de l'associé
+    List&lt;ClasseDTO&gt; classeBNA = loadClasseBNASafe(numSeqPersStr);
+    // classeBCT absent également
+
+    return EngagementPartieDto.builder()
+            .typePartie("ACTIONNAIRE")
+            .nom(associe.getName())
+            .numSeqPers(associe.getNumSeqPers())   // ← stocke le FK, pas le vrai numSeqPers
+            .partCapital(associe.getPartPercentage() != null ? associe.getPartPercentage().toString() : null)
+            .engagementsBNA(eng.getListeEngagementBNA())  // ← engagements du CLIENT = faux
+            .engagementsBCT(eng.getListeEngagementBCT())  // ← idem
+            .classeBNA(classeBNA)
+            // classeBCT manquant
+            .build();
+}
+
+// ✅ CORRECTION NÉCESSAIRE — ajouter numSeqPersBancaire dans Associe.java
+// puis utiliser ce vrai numSeqPers pour charger les engagements :
+private EngagementPartieDto associeToEngagementPartie(Associe associe) {
+    // Option A : si on ajoute Associe.numSeqPersBancaire en base
+    String numSeqBancaire = associe.getNumSeqPersBancaire() != null
+        ? String.valueOf(associe.getNumSeqPersBancaire()) : null;
+
+    // Option B : si on cherche par pieceType + pieceNumber via le service
+    // String numSeqBancaire = rechercherNumSeqBancaire(associe.getPieceType(), associe.getPieceNumber());
+
+    EngagementDTO eng      = numSeqBancaire != null ? loadEngagementSafe(numSeqBancaire) : new EngagementDTO();
+    List&lt;ClasseDTO&gt; bna    = numSeqBancaire != null ? loadClasseBNASafe(numSeqBancaire) : List.of();
+    List&lt;ClasseDTO&gt; bct    = numSeqBancaire != null ? loadClasseBCTSafe(numSeqBancaire) : List.of(); // ✅
+
+    return EngagementPartieDto.builder()
+            .typePartie("ACTIONNAIRE")
+            .nom(associe.getName())
+            .numSeqPers(numSeqBancaire != null ? Long.parseLong(numSeqBancaire) : null) // ✅ vrai numSeqPers
+            .partCapital(associe.getPartPercentage() != null ? associe.getPartPercentage().toString() : null)
+            .engagementsBNA(eng.getListeEngagementBNA())  // ✅ engagements du vrai associé
+            .engagementsBCT(eng.getListeEngagementBCT())  // ✅
+            .classeBNA(bna)
+            .classeBCT(bct)  // ✅
+            .build();
+}</pre>
+</div>
+
+<div class="alert aw"><span>⚠️</span><div>
+  <strong>Solution recommandée :</strong> Ajouter un champ <code>numSeqPersBancaire</code> dans l'entité <code>Associe.java</code>.
+  Ce champ doit être rempli dans <code>AssociatesComponent</code> lors de la sauvegarde d'un associé, après avoir appelé
+  <code>getClientByContratCpt(pieceType, pieceNumber)</code> pour obtenir le vrai numSeqPers.
+  Cela évite de refaire la recherche bancaire lors de chaque création de snapshot.
+</div></div>
+
+<div class="cb">
+<div class="ch"><span>Associe.java — ajouter numSeqPersBancaire</span><span class="cf">entities/Associe.java — après pieceNumber</span></div>
+<pre>    @Column(name = "piece_number", nullable = false)
+    private String pieceNumber;
+
+    @Column(name = "birth_creation_date", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date birthOrCreationDate;
+
+    // ✅ AJOUTER — le vrai numSeqPers de l'associé dans le système bancaire BNA/REFCLI
+    // Rempli lors de la sauvegarde d'un associé dans AssociatesComponent
+    // via getClientByContratCpt(pieceType, pieceNumber) → client.personne.numSeqPers
+    @Column(name = "num_seq_pers_bancaire")
+    private Long numSeqPersBancaire;
+
+    // ✅ AJOUTER — le canevaId pour lier à un canvas précis (voir verification-engagementDetailleJson.html)
+    @Column(name = "caneva_id")
+    private Long canevaId;</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>AssociatesComponent — remplir numSeqPersBancaire lors de la création d'un associé</span><span class="cf">associates.component.ts — dans saveAssocie()</span></div>
+<pre>// Dans la méthode qui sauvegarde un associé, après avoir le numSeqPers bancaire :
+saveAssocie(associeFormValue: any): void {
+  // 1. Chercher le vrai numSeqPers bancaire via pieceType + pieceNumber
+  this.canevasAgrService.getClientByContratCpt(
+    associeFormValue.pieceType === 'IU' ? "14" : "2",
+    associeFormValue.pieceNumber
+  ).subscribe({
+    next: client => {
+      const associeDTO = {
+        ...associeFormValue,
+        numSeqPers: +this.numSeqPers,          // FK vers le client principal
+        numSeqPersBancaire: client.personne?.numSeqPers ? +client.personne.numSeqPers : null,  // ✅ VRAI numSeqPers
+        canevaId: this.canevasAgrService.currentIdCaneva()  // ✅ lien vers le canvas
+      };
+      this.associeService.createAssocie(associeDTO).subscribe(...);
+    }
+  });
+}</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S3 — ONGLET 2 : PREMIER RESPONSABLE -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s3">
+<div class="onglet-header oh-resp">👤 Onglet 2 — PREMIER RESPONSABLE</div>
+
+<div class="alert ad"><span>❌</span><div>
+  <strong>Même bug que les actionnaires :</strong> <code>ClientCanvas.numSeqpers</code> est le numSeqPers du CLIENT PRINCIPAL (FK),
+  pas le numSeqPers du premier responsable lui-même.
+  Le snapshot utilise ce FK pour charger les engagements du responsable → engagements du client, pas du responsable.
+</div></div>
+
+<div class="step-grid">
+<div class="step-card">
+  <h4><span class="step-num ok">UI</span> Logique correcte dans EngagementsComponent (tab 2)</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">Données chargées</div><div class="fb-sub">GET /api/client-canvases/by-num-seq-pers/{numSeqPers_client}</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">premierResponsable.cin</div><div class="fb-sub">CIN du responsable (ex: "12345678")</div></div>
+  </div>
+  <div style="margin:8px 0;font-size:11px;color:var(--muted)">→ Quand l'utilisateur clique sur onglet 2 :</div>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">getClientByContratCpt("2", cin)</div><div class="fb-sub">Recherche par CIN dans le système bancaire</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">client.personne.numSeqPers</div><div class="fb-sub">VRAI numSeqPers du responsable</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">setNumSeqPersPremierResponsableEngagement(vraiNum)</div><div class="fb-sub">GET /api/engagement/all/{vraiNum}</div></div>
+  </div>
+</div>
+<div class="step-card">
+  <h4><span class="step-num bug">SNAP</span> Ce que le snapshot fait actuellement (FAUX)</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">findByCanevaId(id)</div><div class="fb-sub">ClientCanvas du canvas</div></div>
+    <div class="flow-arr bug">→</div>
+    <div class="flow-box bug"><div class="fb-label">cc.getNumSeqpers()</div><div class="fb-sub">❌ FK du CLIENT principal</div></div>
+    <div class="flow-arr bug">→</div>
+    <div class="flow-box bug"><div class="fb-label">loadEngagementSafe(FK_client)</div><div class="fb-sub">❌ Engagements du CLIENT</div></div>
+  </div>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>EngagementsComponent.ts — logique CORRECTE onglet 2 (lignes 340–352)</span><span class="cf">engagements.component.ts</span></div>
+<pre>} else if (this.activeTab == 2) {
+  // Si le CIN du responsable est renseigné
+  if(this.premierResponsable.cin)
+    this.canevasAgrService.getClientByContratCpt("2", this.premierResponsable.cin).subscribe({
+      next: client => {
+        this.numSeqPersPremierRespensable = client.personne?.numSeqPers ?? '000'
+        if(this.numSeqPersPremierRespensable !== '000')
+          // ✅ Utilise le VRAI numSeqPers du responsable trouvé via son CIN
+          this.engagementService.setNumSeqPersPremierResponsableEngagement(client.personne?.numSeqPers)
+      }
+    });
+}</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotService.java — CORRECTION clientCanvasToPremierResp()</span><span class="cf">lignes 163–176</span></div>
+<pre>// ❌ ACTUEL — utilise le FK du client
+private EngagementPartieDto clientCanvasToPremierResp(ClientCanvas cc) {
+    String numSeqPersStr = String.valueOf(cc.getNumSeqpers()); // ← FK client, pas du responsable
+    EngagementDTO eng = loadEngagementSafe(numSeqPersStr);
+    ...
+}
+
+// ✅ CORRECTION — utiliser cinResponsable pour trouver le vrai numSeqPers
+// Solution A : Ajouter numSeqPersBancaireResponsable dans ClientCanvas.java (préféré)
+private EngagementPartieDto clientCanvasToPremierResp(ClientCanvas cc) {
+    // ✅ Utiliser le numSeqPers bancaire stocké lors de la création du ClientCanvas
+    String numSeqBancaire = cc.getNumSeqpersBancaireResponsable() != null
+        ? String.valueOf(cc.getNumSeqpersBancaireResponsable()) : null;
+
+    EngagementDTO eng   = numSeqBancaire != null ? loadEngagementSafe(numSeqBancaire) : new EngagementDTO();
+    List&lt;ClasseDTO&gt; bna = numSeqBancaire != null ? loadClasseBNASafe(numSeqBancaire)  : List.of();
+    List&lt;ClasseDTO&gt; bct = numSeqBancaire != null ? loadClasseBCTSafe(numSeqBancaire)  : List.of(); // ✅
+
+    return EngagementPartieDto.builder()
+            .typePartie("PREMIER_RESPONSABLE")
+            .nom(cc.getNomResponsable() + " " + cc.getPrenomResponsable())
+            .cin(cc.getCinResponsable())
+            .numSeqPers(cc.getNumSeqpersBancaireResponsable()) // ✅ vrai numSeqPers
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(bna)
+            .classeBCT(bct)
+            .build();
+}</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>ClientCanvas.java — ajouter numSeqPersBancaireResponsable</span><span class="cf">entities/ClientCanvas.java</span></div>
+<pre>    @Column(name = "CIN_RESPONSABLE")
+    private String cinResponsable;
+
+    // ✅ AJOUTER — le vrai numSeqPers bancaire du responsable (obtenu via CIN dans le système bancaire)
+    // Rempli dans saveClient() via getClientByContratCpt("2", cinResponsable)
+    @Column(name = "num_seq_pers_bancaire_resp")
+    private Long numSeqPersBancaireResponsable;
+
+    // ✅ AJOUTER — lien vers le canvas pour éviter l'ambiguïté multi-canvas
+    @Column(name = "caneva_id")
+    private Long canevaId;</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>EngagementsComponent.ts — remplir numSeqPersBancaireResponsable lors de saveClient()</span><span class="cf">engagements.component.ts — dans saveClient()</span></div>
+<pre>saveClient(): void {
+  // ✅ Chercher le vrai numSeqPers du responsable AVANT de sauvegarder
+  this.canevasAgrService.getClientByContratCpt("2", this.premierResponsable.cin).subscribe({
+    next: client => {
+      const vraiNumSeqPersResponsable = client.personne?.numSeqPers
+        ? +client.personne.numSeqPers : null;
+
+      const clientData = {
+        id: this.ID,
+        numSeqpers: this.client?.personne?.numSeqPers,
+        canevaId: this.canevasAgrService.currentIdCaneva(),     // ✅ lien canvas
+        nomResponsable: this.premierResponsable.nom,
+        prenomResponsable: this.premierResponsable.prenom,
+        cinResponsable: this.premierResponsable.cin,
+        numSeqPersBancaireResponsable: vraiNumSeqPersResponsable, // ✅ vrai numSeqPers
+        // ... autres champs
+      };
+      const apiCall = this.isNewClient
+        ? this.http.post('http://localhost:8081/api/client-canvases', clientData)
+        : this.http.put(`http://localhost:8081/api/client-canvases/${this.ID}`, clientData);
+      apiCall.subscribe(...)
+    }
+  });
+}</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S4 — ONGLET 3 : GROUPE -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s4">
+<div class="onglet-header oh-grp">🏢 Onglet 3 — GROUPE</div>
+
+<div class="alert ap"><span>🟣</span><div>
+  <strong>Le groupe est absent du snapshot :</strong> Dans <code>CanevasSnapshotService.buildEngagementDetaille()</code>,
+  le groupe est toujours <code>List.of()</code> (vide). Pourtant dans l'UI, le groupe est sélectionnable
+  et ses engagements sont chargés. Il faut identifier d'où viennent les données du groupe et les intégrer.
+</div></div>
+
+<div class="step-grid">
+<div class="step-card">
+  <h4><span class="step-num ok">UI</span> Logique du groupe dans EngagementsComponent</h4>
+  <div class="flow">
+    <div class="flow-box warn"><div class="fb-label">Onglet 3 GROUPE</div><div class="fb-sub">canevasAgrService.activeTabEng.set(3)</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box warn"><div class="fb-label">onSelectionGroupeChange(groupe)</div><div class="fb-sub">groupe.numSeqPers = numSeqPers du groupe</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box warn"><div class="fb-label">setNumSeqPersGroupeEngagement(num)</div><div class="fb-sub">GET /api/engagement/all/{numGroupe}</div></div>
+  </div>
+  <div class="alert aw" style="margin-top:6px;font-size:11px"><span>❓</span><div>
+    <strong>Question :</strong> D'où vient la liste de groupes dans l'UI ? Le code montre <code>selectedGroupe: Groupe</code> mais pas comment la liste est chargée dans l'onglet.
+    Il faut vérifier l'entité <code>Groupe.java</code> et le service associé.
+  </div></div>
+</div>
+<div class="step-card">
+  <h4><span class="step-num warn">SNAP</span> Ce que le snapshot fait actuellement</h4>
+  <div class="cb" style="margin:0">
+    <div class="ch"><span>CanevasSnapshotService.java — ligne 138–144</span></div>
+    <pre style="font-size:11px">return EngagementDetailleDto.builder()
+    .actionnaires(actionnaires)
+    .premierResponsable(premierResponsable)
+    .vendeurs(vendeurs)
+    .groupe(List.of())   // ← TOUJOURS VIDE - jamais rempli
+    .build();</pre>
+  </div>
+  <div class="alert ad" style="margin-top:6px;font-size:11px"><span>❌</span><div>
+    Le groupe n'est jamais chargé dans le snapshot. Si des groupes existent en base pour ce canvas, ils ne sont pas archivés.
+  </div></div>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotService.java — CORRECTION pour remplir le groupe</span><span class="cf">À ajouter dans buildEngagementDetaille()</span></div>
+<pre>// ✅ CORRECTION — charger le groupe depuis la base
+// Il faut d'abord identifier l'entité/table qui stocke le groupe
+// Exemple si une entité Groupe existe avec un canevaId :
+
+// @Autowired private GroupeRepository groupeRepository; // à injecter
+
+List&lt;EngagementPartieDto&gt; groupes = groupeRepository
+        .findByCanevaId(caneva.getId())     // ← trouver les groupes du canvas
+        .stream()
+        .map(g -> {
+            String numStr = String.valueOf(g.getNumSeqPers()); // numSeqPers du groupe (entité morale)
+            EngagementDTO eng   = loadEngagementSafe(numStr);
+            List&lt;ClasseDTO&gt; bna = loadClasseBNASafe(numStr);
+            List&lt;ClasseDTO&gt; bct = loadClasseBCTSafe(numStr);
+            return EngagementPartieDto.builder()
+                    .typePartie("GROUPE")
+                    .nom(g.getNom())
+                    .formeJuridique(g.getFormeJuridique())
+                    .numSeqPers(g.getNumSeqPers())
+                    .engagementsBNA(eng.getListeEngagementBNA())
+                    .engagementsBCT(eng.getListeEngagementBCT())
+                    .classeBNA(bna)
+                    .classeBCT(bct)
+                    .build();
+        })
+        .collect(Collectors.toList());
+
+// Dans le builder :
+return EngagementDetailleDto.builder()
+        .actionnaires(actionnaires)
+        .premierResponsable(premierResponsable)
+        .vendeurs(vendeurs)
+        .groupe(groupes)   // ✅ rempli
+        .build();</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S5 — ONGLET 4 : VENDEURS -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s5">
+<div class="onglet-header oh-vend">🏷 Onglet 4 — VENDEURS</div>
+
+<div class="alert as"><span>✅</span><div>
+  <strong>Logique de base correcte :</strong> <code>Vendeur.numseqpers</code> (Integer) est le VRAI numéro bancaire du vendeur dans le système BNA.
+  L'UI utilise directement ce champ (<code>selectedVendeur.numseqpers</code>) pour charger les engagements.
+  Le snapshot utilise également <code>vendeur.getNumseqpers()</code> → <strong>logique cohérente</strong>.
+  Deux problèmes mineurs : doublons et conversion null-safe.
+</div></div>
+
+<div class="step-grid">
+<div class="step-card">
+  <h4><span class="step-num ok">UI</span> Logique vendeur dans EngagementsComponent</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">filteredVendeurs</div><div class="fb-sub">computed() depuis creditNature1DataToEdit (CreditAchatTerrain)</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">vendeur.numseqpers</div><div class="fb-sub">VRAI numSeqPers bancaire (Integer)</div></div>
+  </div>
+  <div style="margin:6px 0 4px;font-size:11px;color:var(--muted)">→ Sélection vendeur :</div>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">onSelectionVendeurChange(v)</div><div class="fb-sub">String(v.numseqpers)</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">setNumSeqPersVendeurEngagement(num)</div><div class="fb-sub">GET /api/engagement/all/{num}</div></div>
+  </div>
+</div>
+<div class="step-card">
+  <h4><span class="step-num ok">SNAP</span> Snapshot — logique correcte mais 2 problèmes</h4>
+  <div class="flow">
+    <div class="flow-box ok"><div class="fb-label">caneva.getCreditAchatTerrains()</div><div class="fb-sub">liste des crédits achat terrain</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">.getVendeurs()</div><div class="fb-sub">liste des vendeurs par crédit</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box warn"><div class="fb-label">.distinct()</div><div class="fb-sub">⚠️ non fiable sans equals()</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box ok"><div class="fb-label">vendeur.numseqpers</div><div class="fb-sub">✅ vrai numSeqPers bancaire</div></div>
+  </div>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>EngagementsComponent.ts — logique CORRECTE vendeur (lignes 459–465)</span><span class="cf">engagements.component.ts</span></div>
+<pre>onSelectionVendeurChange(selectedVendeur: Vendeur|undefined) {
+  if(selectedVendeur) {
+    // ✅ vendeur.numseqpers = vrai numSeqPers bancaire du vendeur (déjà en base via pieceNumber)
+    this.engagementService.setNumSeqPersVendeurEngagement(String(selectedVendeur.numseqpers))
+    // → Déclenche GET /api/engagement/all/{numseqpers_vendeur} ✅
+    this.trucService.setNumSeqPersBilanofVendeur(String(selectedVendeur.numseqpers))
+  }
+}
+
+// filteredVendeurs : computed depuis les crédits en mémoire
+filteredVendeurs = computed(() => {
+  const data = this.creditsNature1();
+  return data
+    .flatMap(credit => credit.vendeurs || [])
+    .filter(vendeur => vendeur.numseqpers !== null &amp;&amp; vendeur.numseqpers !== undefined);
+  // ✅ numseqpers est déjà le vrai numSeqPers bancaire du vendeur
+});</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotService.java — CORRECTIONS vendeur (2 problèmes)</span><span class="cf">service/CanevasSnapshotService.java</span></div>
+<pre>// AVANT (2 bugs) :
+List&lt;EngagementPartieDto&gt; vendeurs = caneva.getCreditAchatTerrains().stream()
+        .flatMap(cat -> cat.getVendeurs().stream())
+        .filter(v -> v.getNumseqpers() != null)
+        .distinct()                          // ❌ BUG 1 : distinct() sur JPA sans equals() = doublons
+        .map(this::vendeurToEngagementPartie)
+        .collect(Collectors.toList());
+
+private EngagementPartieDto vendeurToEngagementPartie(Vendeur vendeur) {
+    String numSeqPersStr = String.valueOf(vendeur.getNumseqpers()); // ⚠️ BUG 2 : NPE si null (Integer)
+    EngagementDTO eng = loadEngagementSafe(numSeqPersStr);
+    // classeBCT absent
+    return EngagementPartieDto.builder()
+            .typePartie("VENDEUR")
+            .nom(vendeur.getNomPrenom())
+            .numSeqPers(vendeur.getNumseqpers().longValue()) // ⚠️ NPE si null
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(loadClasseBNASafe(numSeqPersStr))
+            // classeBCT ABSENT
+            .build();
+}
+
+// ✅ APRÈS (corrigé) :
+// BUG 1 : déduplication fiable par numseqpers (Integer)
+Map&lt;Integer, Vendeur&gt; uniqueVendeurs = new java.util.LinkedHashMap&lt;&gt;();
+caneva.getCreditAchatTerrains().forEach(cat ->
+    cat.getVendeurs().forEach(v -> {
+        if (v.getNumseqpers() != null)
+            uniqueVendeurs.putIfAbsent(v.getNumseqpers(), v); // garde le premier
+    })
+);
+List&lt;EngagementPartieDto&gt; vendeurs = uniqueVendeurs.values().stream()
+        .map(this::vendeurToEngagementPartie)
+        .collect(Collectors.toList());
+
+private EngagementPartieDto vendeurToEngagementPartie(Vendeur vendeur) {
+    // BUG 2 : null-safe + castLong sécurisé
+    String numSeqPersStr = String.valueOf(vendeur.getNumseqpers()); // Integer garanti non-null ici
+    EngagementDTO eng   = loadEngagementSafe(numSeqPersStr);         // ✅ vrai numSeqPers bancaire
+    List&lt;ClasseDTO&gt; bna = loadClasseBNASafe(numSeqPersStr);
+    List&lt;ClasseDTO&gt; bct = loadClasseBCTSafe(numSeqPersStr);         // ✅ AJOUTÉ
+
+    return EngagementPartieDto.builder()
+            .typePartie("VENDEUR")
+            .nom(vendeur.getNomPrenom())
+            .numSeqPers(vendeur.getNumseqpers().longValue())  // ✅ vrai numSeqPers bancaire du vendeur
+            .engagementsBNA(eng.getListeEngagementBNA())
+            .engagementsBCT(eng.getListeEngagementBCT())
+            .classeBNA(bna)
+            .classeBCT(bct)   // ✅ AJOUTÉ
+            .build();
+}</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- S6 — RÉCAPITULATIF DES CORRECTIONS -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="s6">
+<hr/>
+<div style="background:var(--green-lt);border:1px solid #a5d6a7;border-radius:8px;padding:14px 18px;font-size:12px;color:var(--gray)">
+  <strong style="font-size:13px">Récapitulatif des corrections — engagementDetailleJson</strong><br/><br/>
+  <strong>1. ACTIONNAIRES</strong> — Ajouter <code>numSeqPersBancaire</code> dans <code>Associe.java</code>, le remplir lors de la sauvegarde en cherchant par <code>pieceType+pieceNumber</code>, puis utiliser ce champ dans <code>associeToEngagementPartie()</code> pour charger les bons engagements.<br/><br/>
+  <strong>2. PREMIER RESPONSABLE</strong> — Ajouter <code>numSeqPersBancaireResponsable</code> dans <code>ClientCanvas.java</code>, le remplir dans <code>saveClient()</code> en cherchant par CIN, puis utiliser ce champ dans <code>clientCanvasToPremierResp()</code>.<br/><br/>
+  <strong>3. GROUPE</strong> — Identifier l'entité Groupe et la table associée, créer <code>GroupeRepository</code> avec <code>findByCanevaId()</code>, et remplir <code>groupe</code> dans <code>buildEngagementDetaille()</code> au lieu de <code>List.of()</code>.<br/><br/>
+  <strong>4. VENDEURS</strong> — Remplacer <code>.distinct()</code> par <code>LinkedHashMap</code> sur <code>numseqpers</code>. Ajouter <code>loadClasseBCTSafe()</code> dans <code>vendeurToEngagementPartie()</code>.<br/><br/>
+  <strong>5. classeBCT manquant partout</strong> — Ajouter <code>loadClasseBCTSafe()</code> dans <code>associeToEngagementPartie()</code>, <code>clientCanvasToPremierResp()</code> et <code>vendeurToEngagementPartie()</code>.<br/><br/>
+  <strong>Migration SQL nécessaire :</strong> <code>ALTER TABLE ASSOCIE ADD num_seq_pers_bancaire NUMBER(19)</code> et <code>ALTER TABLE CLIENT_CANVAS ADD num_seq_pers_bancaire_resp NUMBER(19)</code>.
+</div>
+</section>
+
+</div>
+</body>
+</html>
