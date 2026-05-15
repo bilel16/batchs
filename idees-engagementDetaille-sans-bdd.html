@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Idées — engagementDetailleJson sans BDD — Canvas Agricole</title>
+<style>
+:root{
+  --green:#1a7f37;--green-lt:#e8f5e9;--green-dk:#1a3a1e;
+  --blue:#1565c0;--blue-lt:#e3f2fd;
+  --amber:#e65100;--amber-lt:#fff3e0;
+  --red:#c62828;--red-lt:#ffebee;
+  --purple:#6a1b9a;--purple-lt:#f3e5f5;
+  --teal:#00695c;--teal-lt:#e0f2f1;
+  --gray:#455a64;--gray-lt:#eceff1;
+  --bg:#f0f4f8;--card:#fff;--border:#cfd8dc;
+  --text:#263238;--muted:#78909c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.65}
+nav{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:10px 24px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3);flex-wrap:wrap}
+nav .brand{font-size:14px;font-weight:800}
+nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+nav a:hover{background:rgba(255,255,255,.2)}
+.page{max-width:1180px;margin:0 auto;padding:20px 16px}
+.hero{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-radius:10px;padding:26px 34px;margin-bottom:22px}
+.hero h1{font-size:19px;font-weight:800;margin-bottom:6px}
+.hero p{opacity:.85;font-size:12px;max-width:800px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600}
+/* IDEA CARDS */
+.idea{background:var(--card);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.09);margin-bottom:28px;overflow:hidden;border:1px solid var(--border)}
+.idea-header{padding:14px 20px;display:flex;align-items:center;gap:14px}
+.idea-num{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0}
+.idea-title{font-size:15px;font-weight:800}
+.idea-subtitle{font-size:12px;opacity:.8;margin-top:2px}
+.i1 .idea-header{background:linear-gradient(90deg,#1a7f37,#43a047)}
+.i2 .idea-header{background:linear-gradient(90deg,#1565c0,#1976d2)}
+.i3 .idea-header{background:linear-gradient(90deg,#e65100,#fb8c00)}
+.i4 .idea-header{background:linear-gradient(90deg,#6a1b9a,#8e24aa)}
+.i5 .idea-header{background:linear-gradient(90deg,#00695c,#00897b)}
+.idea-body{padding:16px 20px}
+/* TAGS */
+.tag-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.t-easy{background:#c8e6c9;color:#1b5e20}
+.t-med{background:#fff3e0;color:#e65100}
+.t-hard{background:#ffcdd2;color:#b71c1c}
+.t-zero{background:#e3f2fd;color:#1565c0}
+.t-min{background:#f3e5f5;color:#6a1b9a}
+.t-rec{background:#fff9c4;color:#f9a825;border:1px solid #f9a825}
+/* PROS/CONS */
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.pros{background:var(--green-lt);border:1px solid #a5d6a7;border-radius:7px;padding:10px 12px}
+.cons{background:var(--red-lt);border:1px solid #ef9a9a;border-radius:7px;padding:10px 12px}
+.pc-title{font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.pros .pc-title{color:var(--green)}
+.cons .pc-title{color:var(--red)}
+ul.pc-list{padding-left:14px;font-size:12px;line-height:1.8}
+/* FLOW */
+.flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;background:var(--gray-lt);border-radius:7px;padding:9px 12px;margin:8px 0;font-size:11px}
+.fb{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:5px 10px;text-align:center;flex-shrink:0}
+.fb.ok{border-color:var(--green);background:var(--green-lt)}
+.fb.new{border-color:var(--blue);background:var(--blue-lt)}
+.fb.exist{border-color:var(--amber);background:var(--amber-lt)}
+.fb .fbt{font-weight:700;font-size:11px}
+.fb .fbs{font-size:10px;color:var(--muted)}
+.fa{color:var(--muted);font-size:14px;flex-shrink:0}
+/* ALERTS */
+.alert{border-radius:6px;padding:9px 13px;margin:8px 0;display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.6}
+.ai{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.aw{background:var(--amber-lt);border-left:3px solid var(--amber)}
+.as{background:var(--green-lt);border-left:3px solid var(--green)}
+.at{background:var(--teal-lt);border-left:3px solid var(--teal)}
+/* CODE */
+.cb{background:#0d1117;border-radius:7px;overflow:hidden;margin:8px 0}
+.ch{background:#161b22;padding:5px 12px;font-size:10px;color:#8b949e;font-family:monospace;display:flex;justify-content:space-between}
+.cf{color:#58a6ff;font-style:italic}
+pre{background:#0d1117;color:#e6edf3;padding:12px 14px;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:11.5px;line-height:1.78;margin:0;white-space:pre}
+code{background:var(--gray-lt);padding:1px 5px;border-radius:3px;font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--purple)}
+/* COMPARE TABLE */
+table.cmp{width:100%;border-collapse:collapse;font-size:12px;border-radius:8px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07);margin:12px 0}
+table.cmp th{background:var(--green-dk);color:#fff;padding:8px 12px;text-align:left;font-size:11px}
+table.cmp td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.cmp tr:last-child td{border:none}
+table.cmp tr:nth-child(even) td{background:var(--gray-lt)}
+.score{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.s5{background:#c8e6c9;color:#1b5e20}
+.s4{background:#dcedc8;color:#33691e}
+.s3{background:#fff9c4;color:#f9a825}
+.s2{background:#ffe0b2;color:#e65100}
+.s1{background:#ffcdd2;color:#b71c1c}
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+@media(max-width:768px){.pc-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌿 Idées — engagementDetailleJson sans BDD</div>
+  <a href="#i1">1·Passer dans AvisDTO</a>
+  <a href="#i2">2·PATCH post-snapshot</a>
+  <a href="#i3">3·Legacy existant</a>
+  <a href="#i4">4·Cache backend</a>
+  <a href="#i5">5·Collecteur frontend</a>
+  <a href="#compare">Comparaison</a>
+</nav>
+<div class="page">
+
+<div class="hero">
+  <h1>5 idées pour stocker l'engagementDetailleJson réel sans modifier la base de données</h1>
+  <p>Le frontend charge déjà les vrais engagements (actionnaires, responsable, groupe, vendeurs) dans des Signals Angular.
+     Ces 5 idées exploitent ce que le code existant possède déjà pour envoyer ces données correctes au backend lors de la création du snapshot.</p>
+  <div class="pills">
+    <span class="pill">0 changement BDD</span>
+    <span class="pill">Colonnes existantes réutilisées</span>
+    <span class="pill">Données temps réel du frontend</span>
+    <span class="pill">EngagementService Signals</span>
+  </div>
+</div>
+
+<div class="alert at"><span>💡</span><div>
+  <strong>Observation clé :</strong> <code>EngagementsComponent.saveClient()</code> construit déjà un objet
+  <code>snapshotData = { relation, associe, premierResponsable, groupe, vendeur }</code> avec les vraies données
+  et l'envoie à <code>POST /api/snapshots</code> (legacy). Il suffit de router ces données vers
+  <code>CanevasStructureSnapshot.engagementDetailleJson</code>.
+</div></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- IDÉE 1 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="idea i1" id="i1">
+<div class="idea-header">
+  <div class="idea-num" style="background:rgba(255,255,255,.25)">1</div>
+  <div>
+    <div class="idea-title">Passer l'engagementDetaille directement dans AvisDTO</div>
+    <div class="idea-subtitle">La solution la plus simple — un seul appel HTTP, données envoyées avec l'avis</div>
+  </div>
+</div>
+<div class="idea-body">
+
+<div class="tag-grid">
+  <span class="tag t-easy">Complexité : Faible</span>
+  <span class="tag t-zero">Changements BDD : ZÉRO</span>
+  <span class="tag t-min">Backend : 2 lignes</span>
+  <span class="tag t-min">Frontend : 10 lignes</span>
+  <span class="tag t-rec">⭐ RECOMMANDÉ</span>
+</div>
+
+<div class="alert as"><span>✅</span><div>
+  <strong>Principe :</strong> Le frontend ajoute un champ <code>engagementDetailleJson</code> (String JSON)
+  dans l'objet AvisDTO avant de l'envoyer. Ce champ contient exactement ce que l'UI voit :
+  les listes d'actionnaires, responsable, groupe, vendeurs avec leurs vrais engagements.
+  Le backend stocke ce JSON directement dans <code>CanevasStructureSnapshot.engagementDetailleJson</code>
+  sans recalculer quoi que ce soit.
+</div></div>
+
+<div class="flow">
+  <div class="fb ok"><div class="fbt">EngagementService Signals</div><div class="fbs">engagementAssocie, engagementPreResp, engagementGroupe, engagementVendeur</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">buildEngagementDetaille() (frontend)</div><div class="fbs">construit l'objet JSON avec toutes les parties</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">AvisDTO.engagementDetailleJson</div><div class="fbs">champ String ajouté</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">POST /api/avis</div><div class="fbs">AvisController reçoit le JSON</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">createSnapshot(…, engDetailleJson)</div><div class="fbs">stocké directement en CLOB</div></div>
+</div>
+
+<div class="pc-grid">
+<div class="pros">
+  <div class="pc-title">✅ Avantages</div>
+  <ul class="pc-list">
+    <li>Un seul appel HTTP (pas de seconde requête)</li>
+    <li>Données 100% synchronisées avec l'UI au moment de l'envoi</li>
+    <li>Zéro modification de la base de données</li>
+    <li>Le backend ne recalcule rien — il stocke tel quel</li>
+    <li>Simple à implémenter (2 lignes backend, ~10 lignes frontend)</li>
+  </ul>
+</div>
+<div class="cons">
+  <div class="pc-title">⚠️ Limites</div>
+  <ul class="pc-list">
+    <li>AvisDTO contient un champ supplémentaire (taille de la requête augmente)</li>
+    <li>Si l'utilisateur n'a pas sélectionné tous les actionnaires/vendeurs, seul le dernier sélectionné est dans le signal</li>
+    <li>Si l'onglet Engagements n'a pas été visité avant l'enregistrement → données vides</li>
+    <li>Il faut serialiser en JSON côté frontend</li>
+  </ul>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>AvisDTO.java — ajouter 1 seul champ</span><span class="cf">backend-saeb/.../dtos_/AvisDTO.java</span></div>
+<pre>// Ajouter à la fin de la liste des champs :
+private String engagementDetailleJson;  // JSON envoyé par le frontend — données temps réel</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>AvisController.java — utiliser le JSON fourni dans createSnapshot()</span><span class="cf">web/AvisController.java — dans saveAvis()</span></div>
+<pre>// DANS saveAvis() — après avoir sauvegardé l'avis, passer le JSON du frontend :
+var snap = snapshotService.createSnapshot(
+    avisDTO.getNumCaneva(), structureCode, structureLabel,
+    matricule, matricule, observations, statusAtSnap,
+    avisJson,                                    // donneesAvisJson (déjà présent)
+    avisDTO.getEngagementDetailleJson()          // ✅ NOUVEAU — le vrai JSON du frontend
+);
+
+// Dans CanevasSnapshotService.createSnapshot() — ajouter le 9e paramètre :
+// public CanevasStructureSnapshot createSnapshot(..., String avisJson, String engDetailleJson)
+// Dans le builder :
+// .engagementDetailleJson(engDetailleJson != null ? engDetailleJson
+//                          : toJson(buildEngagementDetaille(caneva)))  // fallback</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>avis.component.ts — construire et envoyer l'engagementDetailleJson</span><span class="cf">avis.component.ts — dans saveAvis()</span></div>
+<pre>// Injecter EngagementService et AssocieService dans AvisComponent
+private engagementService = inject(EngagementService);
+private associeService    = inject(AssocieService);
+
+saveAvis(): void {
+  // ✅ Construire le JSON avec les données réelles du frontend
+  const engagementDetaille = {
+    actionnaires: [{
+      typePartie: 'ACTIONNAIRE',
+      // Pour avoir TOUS les actionnaires, utiliser la liste associes chargée dans EngagementsComponent
+      // Si AvisComponent n'a pas accès, utiliser un service partagé (voir Idée 5)
+      engagementsBNA:  this.engagementService.engagementAssocie().listeEngagementBNA,
+      engagementsBCT:  this.engagementService.engagementAssocie().listeEngagementBCT,
+      classeBNA:       this.engagementService.engagementAssocie().classeBNA,
+      classeBCT:       this.engagementService.engagementAssocie().classeBCT,
+    }],
+    premierResponsable: {
+      typePartie: 'PREMIER_RESPONSABLE',
+      engagementsBNA:  this.engagementService.engagementPreResp().listeEngagementBNA,
+      engagementsBCT:  this.engagementService.engagementPreResp().listeEngagementBCT,
+      classeBNA:       this.engagementService.engagementPreResp().classeBNA,
+      classeBCT:       this.engagementService.engagementPreResp().classeBCT,
+    },
+    groupe: [{
+      typePartie: 'GROUPE',
+      engagementsBNA:  this.engagementService.engagementGroupe().listeEngagementBNA,
+      engagementsBCT:  this.engagementService.engagementGroupe().listeEngagementBCT,
+      classeBNA:       this.engagementService.engagementGroupe().classeBNA,
+      classeBCT:       this.engagementService.engagementGroupe().classeBCT,
+    }],
+    vendeurs: [{
+      typePartie: 'VENDEUR',
+      engagementsBNA:  this.engagementService.engagementVendeur().listeEngagementBNA,
+      engagementsBCT:  this.engagementService.engagementVendeur().listeEngagementBCT,
+      classeBNA:       this.engagementService.engagementVendeur().classeBNA,
+      classeBCT:       this.engagementService.engagementVendeur().classeBCT,
+    }]
+  };
+
+  const avisDTO: AvisDTO = {
+    // ... tous les champs existants ...
+    toStructureCode:         toStructureCode,
+    engagementDetailleJson:  JSON.stringify(engagementDetaille),  // ✅ NOUVEAU
+  };
+
+  this.avisService.saveAvis(avisDTO).subscribe({...});
+}</pre>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- IDÉE 2 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="idea i2" id="i2">
+<div class="idea-header">
+  <div class="idea-num" style="background:rgba(255,255,255,.25)">2</div>
+  <div>
+    <div class="idea-title">PATCH post-snapshot — mettre à jour engagementDetailleJson après création</div>
+    <div class="idea-subtitle">Deux appels séquentiels — création du snapshot puis enrichissement</div>
+  </div>
+</div>
+<div class="idea-body">
+
+<div class="tag-grid">
+  <span class="tag t-med">Complexité : Moyenne</span>
+  <span class="tag t-zero">Changements BDD : ZÉRO</span>
+  <span class="tag t-min">Backend : 1 endpoint</span>
+  <span class="tag t-min">Frontend : 15 lignes</span>
+</div>
+
+<div class="alert ai"><span>ℹ️</span><div>
+  <strong>Principe :</strong> La création du snapshot se fait normalement via <code>POST /api/avis</code>.
+  La réponse contient le <code>snapshotId</code>. Le frontend fait immédiatement un second appel
+  <code>PATCH /api/canevas/{id}/snapshots/{snapshotId}/engagement-detaille</code> avec les données réelles.
+  Le backend met à jour uniquement le champ <code>engagementDetailleJson</code> du snapshot existant.
+</div></div>
+
+<div class="flow">
+  <div class="fb ok"><div class="fbt">POST /api/avis</div><div class="fbs">createSnapshot() → snapshotId retourné</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">réponse: snapshotId</div><div class="fbs">depuis AvisDTO.saved.snapshotId</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">PATCH /api/canevas/{id}/snapshots/{snapshotId}/engagement</div><div class="fbs">body: {engagementDetailleJson}</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">snapshotRepo.save()</div><div class="fbs">UPDATE SET engagement_detaille_json = ?</div></div>
+</div>
+
+<div class="pc-grid">
+<div class="pros">
+  <div class="pc-title">✅ Avantages</div>
+  <ul class="pc-list">
+    <li>Séparation propre des responsabilités</li>
+    <li>L'AvisDTO reste inchangé</li>
+    <li>Le PATCH peut être appelé depuis n'importe quel composant (pas seulement AvisComponent)</li>
+    <li>Retry possible si le premier appel réussit mais pas le second</li>
+    <li>Peut enrichir des snapshots existants rétrospectivement</li>
+  </ul>
+</div>
+<div class="cons">
+  <div class="pc-title">⚠️ Limites</div>
+  <ul class="pc-list">
+    <li>2 appels HTTP au lieu d'un → légère latence</li>
+    <li>Si le 2e appel échoue, le snapshot est créé mais sans les données correctes</li>
+    <li>AvisController doit retourner le snapshotId dans la réponse (actuellement non)</li>
+  </ul>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotController.java — ajouter l'endpoint PATCH</span><span class="cf">web/CanevasSnapshotController.java</span></div>
+<pre>// ✅ Nouveau endpoint — met à jour uniquement engagementDetailleJson
+@PatchMapping("/{id}/snapshots/{snapshotId}/engagement")
+public ResponseEntity&lt;Void&gt; updateEngagementDetaille(
+        @PathVariable Long id,
+        @PathVariable Long snapshotId,
+        @RequestBody Map&lt;String, String&gt; body) {
+
+    String engJson = body.get("engagementDetailleJson");
+    if (engJson == null || engJson.isBlank()) return ResponseEntity.badRequest().build();
+
+    // Charger le snapshot existant, mettre à jour uniquement ce champ
+    snapshotRepo.findById(snapshotId).ifPresent(snap -> {
+        snap.setEngagementDetailleJson(engJson);
+        snapshotRepo.save(snap);
+    });
+
+    return ResponseEntity.noContent().build();
+}
+
+// Injecter snapshotRepo directement dans le controller (ou via snapshotService.updateEngDetaille()):
+// @Autowired private CanevasSnapshotRepository snapshotRepo;</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>AvisController.java — retourner le snapshotId dans la réponse</span><span class="cf">web/AvisController.java — modifier saveAvis()</span></div>
+<pre>// MODIFIER : retourner AvisDTO enrichi avec le snapshotId
+@PostMapping
+public ResponseEntity&lt;AvisDTO&gt; saveAvis(@RequestBody AvisDTO avisDTO) {
+    // ... code existant ...
+
+    // Après createSnapshot() : stocker le snapshotId dans la réponse
+    if (snapshotId != null) {
+        saved.setLastSnapshotId(snapshotId);  // ajouter champ dans AvisDTO
+    }
+    return ResponseEntity.ok(saved);
+}
+
+// Dans AvisDTO.java — ajouter :
+private Long lastSnapshotId;  // snapshotId créé lors de cet enregistrement</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>avis.component.ts — appel PATCH après saveAvis()</span><span class="cf">avis.component.ts — dans saveAvis()</span></div>
+<pre>this.avisService.saveAvis(avisDTO).subscribe({
+  next: (saved) => {
+    this.currentAvisId.set(saved.id!);
+
+    // ✅ Si un snapshot a été créé, l'enrichir avec les vraies données
+    if (saved.lastSnapshotId) {
+      const engDetaille = this.buildEngagementDetailleFromSignals();
+      this.snapshotService.updateEngagementDetaille(
+        this.numCanva,
+        saved.lastSnapshotId,
+        JSON.stringify(engDetaille)
+      ).subscribe({
+        next: () => console.log('✅ engagementDetailleJson mis à jour'),
+        error: e => console.warn('⚠️ Snapshot créé mais engagement non mis à jour', e)
+      });
+    }
+
+    this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Avis enregistré' });
+    this.isSaving.set(false);
+  }
+});
+
+// Méthode helper dans AvisComponent :
+private buildEngagementDetailleFromSignals() {
+  return {
+    actionnaires: [{ typePartie: 'ACTIONNAIRE',
+      engagementsBNA: this.engagementService.engagementAssocie().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementAssocie().listeEngagementBCT,
+      classeBNA: this.engagementService.engagementAssocie().classeBNA,
+      classeBCT: this.engagementService.engagementAssocie().classeBCT,
+    }],
+    premierResponsable: { typePartie: 'PREMIER_RESPONSABLE',
+      engagementsBNA: this.engagementService.engagementPreResp().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementPreResp().listeEngagementBCT,
+      classeBNA: this.engagementService.engagementPreResp().classeBNA,
+      classeBCT: this.engagementService.engagementPreResp().classeBCT,
+    },
+    groupe: [{ typePartie: 'GROUPE',
+      engagementsBNA: this.engagementService.engagementGroupe().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementGroupe().listeEngagementBCT,
+      classeBNA: this.engagementService.engagementGroupe().classeBNA,
+      classeBCT: this.engagementService.engagementGroupe().classeBCT,
+    }],
+    vendeurs: [{ typePartie: 'VENDEUR',
+      engagementsBNA: this.engagementService.engagementVendeur().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementVendeur().listeEngagementBCT,
+      classeBNA: this.engagementService.engagementVendeur().classeBNA,
+      classeBCT: this.engagementService.engagementVendeur().classeBCT,
+    }]
+  };
+}
+
+// Dans snapshot.service.ts — ajouter la méthode :
+updateEngagementDetaille(canevasId: number, snapshotId: number, json: string): Observable&lt;void&gt; {
+  return this.http.patch&lt;void&gt;(
+    `${this.api}/${canevasId}/snapshots/${snapshotId}/engagement`,
+    { engagementDetailleJson: json }
+  );
+}</pre>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- IDÉE 3 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="idea i3" id="i3">
+<div class="idea-header">
+  <div class="idea-num" style="background:rgba(255,255,255,.25)">3</div>
+  <div>
+    <div class="idea-title">Réutiliser le mécanisme legacy existant (POST /api/snapshots)</div>
+    <div class="idea-subtitle">La solution DÉJÀ IMPLÉMENTÉE — le frontend envoie déjà les données, il faut juste les lire</div>
+  </div>
+</div>
+<div class="idea-body">
+
+<div class="tag-grid">
+  <span class="tag t-easy">Complexité : Faible</span>
+  <span class="tag t-zero">Changements BDD : ZÉRO</span>
+  <span class="tag t-min">Backend : 5 lignes</span>
+  <span class="tag t-zero">Frontend : ZÉRO (déjà fait !)</span>
+  <span class="tag t-rec">⭐ DONNÉES DÉJÀ ENVOYÉES</span>
+</div>
+
+<div class="alert as"><span>✅</span><div>
+  <strong>Découverte importante :</strong> Dans <code>EngagementsComponent.saveClient()</code> (lignes 240–284),
+  le frontend construit déjà <code>snapshotData = { relation, associe, premierResponsable, groupe, vendeur }</code>
+  avec les vraies données et l'envoie à <code>POST /api/snapshots</code> (legacy).
+  Ces données sont stockées dans la table <code>SNAPSHOT</code> dans le champ <code>ENGAGEMENTS</code> (CLOB).
+  Il suffit de lire ce dernier snapshot legacy lors de la création du nouveau snapshot.
+</div></div>
+
+<div class="cb">
+<div class="ch"><span>EngagementsComponent.ts — code EXISTANT qui envoie déjà les données (lignes 240–301)</span><span class="cf">engagements.component.ts — saveClient() — DÉJÀ EN PLACE</span></div>
+<pre>// Code EXISTANT — rien à changer dans le frontend !
+saveClient(): void {
+    const snapshotData = {
+        relation:           this.engagement(),         // ✅ données réelles relation
+        associe:            this.engagementAssocie(),  // ✅ données réelles actionnaire sélectionné
+        premierResponsable: this.engagementPreResp(),  // ✅ données réelles responsable
+        groupe:             this.engagementGroupe(),   // ✅ données réelles groupe
+        vendeur:            this.engagementVendeur()   // ✅ données réelles vendeur sélectionné
+    };
+    // ...
+    const snapshotPayload = {
+        matricule:    this.userService.user().matricule,
+        structure:    this.userService.user().codeStructure,
+        numSeqpers:   this.client?.personne?.numSeqPers,
+        engagements:  JSON.stringify(snapshotData)  // ✅ JSON complet
+    };
+    this.http.post('http://localhost:8081/api/snapshots', snapshotPayload).subscribe(...)
+    // → stocké dans table SNAPSHOT.ENGAGEMENTS comme CLOB JSON
+}</pre>
+</div>
+
+<div class="flow">
+  <div class="fb exist"><div class="fbt">SNAPSHOT.ENGAGEMENTS (legacy)</div><div class="fbs">JSON avec relation + associe + premierResp + groupe + vendeur</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">CanevasSnapshotService.createSnapshot()</div><div class="fbs">lire le dernier legacy snapshot pour numSeqPers</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">engagementDetailleJson</div><div class="fbs">extrait et restructuré depuis le JSON legacy</div></div>
+</div>
+
+<div class="pc-grid">
+<div class="pros">
+  <div class="pc-title">✅ Avantages</div>
+  <ul class="pc-list">
+    <li>Frontend : ZÉRO ligne à changer</li>
+    <li>Données déjà correctes et envoyées</li>
+    <li>Réutilise une infrastructure existante</li>
+    <li>Cohérence garantie (même session)</li>
+  </ul>
+</div>
+<div class="cons">
+  <div class="pc-title">⚠️ Limites</div>
+  <ul class="pc-list">
+    <li>Couplage entre l'ancien et le nouveau système</li>
+    <li>Dépend de l'ordre : saveClient() doit être appelé AVANT createSnapshot()</li>
+    <li>Si le canal legacy n'est pas sauvegardé, le snapshot sera vide</li>
+    <li>Le JSON legacy a une structure différente de EngagementDetailleDto</li>
+  </ul>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotService.java — lire le dernier snapshot legacy lors de createSnapshot()</span><span class="cf">service/CanevasSnapshotService.java</span></div>
+<pre>// Injecter le SnapshotRepository legacy
+private final SnapshotRepository legacySnapshotRepo;   // ← injecter en plus
+
+// Dans buildEngagementDetaille() — remplacer par :
+private String buildEngagementDetailleFromLegacy(Long numSeqPers) {
+    // 1. Trouver le dernier snapshot legacy pour ce numSeqPers
+    return legacySnapshotRepo.findByNumSeqpers(numSeqPers)
+            .stream()
+            .max(Comparator.comparing(Snapshot::getDateCreation))  // le plus récent
+            .map(snap -> {
+                // 2. Le JSON legacy a la structure :
+                // { relation:{...}, associe:{...}, premierResponsable:{...}, groupe:{...}, vendeur:{...} }
+                // On le restructure en EngagementDetailleDto
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(snap.getEngagements());
+                    // Extraire et restructurer :
+                    EngagementDetailleDto dto = EngagementDetailleDto.builder()
+                        .actionnaires(root.has("associe") ?
+                            List.of(mapper.treeToValue(root.get("associe"), EngagementPartieDto.class)) : List.of())
+                        .premierResponsable(root.has("premierResponsable") ?
+                            mapper.treeToValue(root.get("premierResponsable"), EngagementPartieDto.class) : null)
+                        .groupe(root.has("groupe") ?
+                            List.of(mapper.treeToValue(root.get("groupe"), EngagementPartieDto.class)) : List.of())
+                        .vendeurs(root.has("vendeur") ?
+                            List.of(mapper.treeToValue(root.get("vendeur"), EngagementPartieDto.class)) : List.of())
+                        .build();
+                    return toJson(dto);
+                } catch (Exception e) {
+                    log.warn("Erreur lecture snapshot legacy", e);
+                    return null;
+                }
+            })
+            .orElse(null);
+}
+
+// Dans createSnapshot(), utiliser cette méthode comme source principale :
+String engDetailleJson = buildEngagementDetailleFromLegacy(caneva.getNumSeqpers().longValue());
+// Si non trouvé → fallback sur l'ancienne logique (reconstruction backend)
+if (engDetailleJson == null) {
+    engDetailleJson = toJson(buildEngagementDetaille(caneva));  // fallback
+}
+// Puis dans le builder :
+.engagementDetailleJson(engDetailleJson)</pre>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- IDÉE 4 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="idea i4" id="i4">
+<div class="idea-header">
+  <div class="idea-num" style="background:rgba(255,255,255,.25)">4</div>
+  <div>
+    <div class="idea-title">Cache backend en mémoire (ConcurrentHashMap)</div>
+    <div class="idea-subtitle">Le frontend "dépose" les données avant la validation — le backend les récupère lors du snapshot</div>
+  </div>
+</div>
+<div class="idea-body">
+
+<div class="tag-grid">
+  <span class="tag t-med">Complexité : Moyenne</span>
+  <span class="tag t-zero">Changements BDD : ZÉRO</span>
+  <span class="tag t-min">Backend : 1 service + 2 endpoints</span>
+  <span class="tag t-min">Frontend : 1 appel HTTP supplémentaire</span>
+</div>
+
+<div class="alert ai"><span>ℹ️</span><div>
+  <strong>Principe :</strong> Le frontend envoie les données d'engagement à un endpoint de "staging"
+  (<code>PUT /api/canevas/{id}/engagement-staging</code>) juste avant ou pendant la navigation des onglets.
+  Le backend les garde dans un <code>ConcurrentHashMap&lt;Long, String&gt;</code> (clé = canevasId).
+  Lors de <code>createSnapshot()</code>, le backend lit le staging et l'utilise pour <code>engagementDetailleJson</code>.
+  Le cache est vidé après utilisation.
+</div></div>
+
+<div class="flow">
+  <div class="fb ok"><div class="fbt">onSelectionChange() / switchHeaders()</div><div class="fbs">chaque sélection d'actionnaire/vendeur</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">PUT /api/canevas/{id}/engagement-staging</div><div class="fbs">données du signal envoyées</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">EngagementStagingService</div><div class="fbs">ConcurrentHashMap&lt;canevasId, json&gt;</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">createSnapshot()</div><div class="fbs">lit staging[canevasId] → engagementDetailleJson</div></div>
+</div>
+
+<div class="pc-grid">
+<div class="pros">
+  <div class="pc-title">✅ Avantages</div>
+  <ul class="pc-list">
+    <li>Capture les données à chaque sélection → toujours à jour</li>
+    <li>Zéro changement dans AvisDTO</li>
+    <li>Zéro changement dans AvisController</li>
+    <li>Peut capturer TOUS les actionnaires/vendeurs si appelé après chaque sélection</li>
+  </ul>
+</div>
+<div class="cons">
+  <div class="pc-title">⚠️ Limites</div>
+  <ul class="pc-list">
+    <li>Cache en mémoire → perdu au redémarrage du serveur</li>
+    <li>Problématique en environnement multi-instance (load balancer)</li>
+    <li>Il faut gérer l'accumulation des données (merge) si plusieurs actionnaires</li>
+    <li>Appels HTTP multiples si l'utilisateur navigue beaucoup</li>
+  </ul>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>EngagementStagingService.java — service backend en mémoire (NOUVEAU)</span><span class="cf">service/EngagementStagingService.java</span></div>
+<pre>package net.kachout.saeb.service;
+
+import org.springframework.stereotype.Service;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Service
+public class EngagementStagingService {
+
+    // clé = canevasId, valeur = JSON de l'engagementDetaille
+    private final ConcurrentHashMap&lt;Long, String&gt; cache = new ConcurrentHashMap&lt;&gt;();
+
+    // Stocker le JSON pour un canvas
+    public void store(Long canevasId, String engagementDetailleJson) {
+        cache.put(canevasId, engagementDetailleJson);
+    }
+
+    // Récupérer et supprimer (consommation unique)
+    public String consumeAndClear(Long canevasId) {
+        return cache.remove(canevasId);
+    }
+
+    // Récupérer sans supprimer
+    public String peek(Long canevasId) {
+        return cache.get(canevasId);
+    }
+}</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>CanevasSnapshotController.java — ajouter l'endpoint de staging</span><span class="cf">web/CanevasSnapshotController.java</span></div>
+<pre>// Injecter EngagementStagingService
+private final EngagementStagingService stagingService;
+
+// PUT /api/canevas/{id}/engagement-staging
+@PutMapping("/{id}/engagement-staging")
+public ResponseEntity&lt;Void&gt; storeEngagementStaging(
+        @PathVariable Long id,
+        @RequestBody Map&lt;String, String&gt; body) {
+    String json = body.get("engagementDetailleJson");
+    if (json != null) stagingService.store(id, json);
+    return ResponseEntity.noContent().build();
+}
+
+// Dans createSnapshot() — lire le staging :
+// String engDetailleJson = stagingService.consumeAndClear(canevasId);
+// if (engDetailleJson == null) engDetailleJson = toJson(buildEngagementDetaille(caneva));
+// .engagementDetailleJson(engDetailleJson)</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>engagements.component.ts — envoyer au staging lors de chaque sélection</span><span class="cf">engagements.component.ts</span></div>
+<pre>// Injecter SnapshotService (ou HttpClient directement)
+private snapshotService = inject(SnapshotService);
+private canevasId = this.canevasAgrService.currentIdCaneva();
+
+// Appeler après chaque changement de données :
+private pushToStaging(): void {
+  const engDetaille = {
+    actionnaires: [{ typePartie: 'ACTIONNAIRE',
+      engagementsBNA: this.engagementService.engagementAssocie().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementAssocie().listeEngagementBCT,
+      classeBNA:      this.engagementService.engagementAssocie().classeBNA,
+      classeBCT:      this.engagementService.engagementAssocie().classeBCT,
+    }],
+    premierResponsable: {
+      typePartie: 'PREMIER_RESPONSABLE',
+      engagementsBNA: this.engagementService.engagementPreResp().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementPreResp().listeEngagementBCT,
+      classeBNA:      this.engagementService.engagementPreResp().classeBNA,
+      classeBCT:      this.engagementService.engagementPreResp().classeBCT,
+    },
+    groupe: [{ typePartie: 'GROUPE',
+      engagementsBNA: this.engagementService.engagementGroupe().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementGroupe().listeEngagementBCT,
+      classeBNA:      this.engagementService.engagementGroupe().classeBNA,
+      classeBCT:      this.engagementService.engagementGroupe().classeBCT,
+    }],
+    vendeurs: [{ typePartie: 'VENDEUR',
+      engagementsBNA: this.engagementService.engagementVendeur().listeEngagementBNA,
+      engagementsBCT: this.engagementService.engagementVendeur().listeEngagementBCT,
+      classeBNA:      this.engagementService.engagementVendeur().classeBNA,
+      classeBCT:      this.engagementService.engagementVendeur().classeBCT,
+    }]
+  };
+  // Appel non-bloquant (fire and forget)
+  this.http.put(`http://localhost:8081/api/canevas/${this.canevasId}/engagement-staging`,
+    { engagementDetailleJson: JSON.stringify(engDetaille) }
+  ).subscribe();
+}
+
+// Appeler pushToStaging() depuis :
+// - onSelectionChange(associe) → après setNumSeqPersAssocieEngagement()
+// - switchHeaders() tab 2 → après setNumSeqPersPremierResponsableEngagement()
+// - onSelectionVendeurChange(vendeur) → après setNumSeqPersVendeurEngagement()
+// - saveClient() → après la sauvegarde réussie</pre>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- IDÉE 5 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="idea i5" id="i5">
+<div class="idea-header">
+  <div class="idea-num" style="background:rgba(255,255,255,.25)">5</div>
+  <div>
+    <div class="idea-title">Service collecteur Angular — accumulation de TOUTES les parties</div>
+    <div class="idea-subtitle">Un service dédié accumule chaque actionnaire/vendeur sélectionné — solution la plus complète</div>
+  </div>
+</div>
+<div class="idea-body">
+
+<div class="tag-grid">
+  <span class="tag t-med">Complexité : Moyenne</span>
+  <span class="tag t-zero">Changements BDD : ZÉRO</span>
+  <span class="tag t-min">Backend : minimal</span>
+  <span class="tag t-min">Frontend : 1 service Angular</span>
+</div>
+
+<div class="alert ai"><span>ℹ️</span><div>
+  <strong>Principe :</strong> Les idées 1-4 ne capturent que le <strong>dernier actionnaire/vendeur sélectionné</strong>.
+  Pour capturer <strong>TOUS</strong> les actionnaires et TOUS les vendeurs, on crée un service Angular
+  <code>EngagementCollectorService</code> qui accumule chaque sélection dans un <code>Map</code>.
+  Quand l'avis est envoyé, le service fournit le JSON complet avec toutes les parties.
+  Ce service est utilisé conjointement avec l'Idée 1 ou l'Idée 2.
+</div></div>
+
+<div class="flow">
+  <div class="fb ok"><div class="fbt">onSelectionChange(associe1)</div><div class="fbs">actionnaire 1 sélectionné</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">collector.addActionnaire(eng)</div><div class="fbs">Map[numSeqPers] = engagement</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">onSelectionChange(associe2)</div><div class="fbs">actionnaire 2 sélectionné</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">collector.addActionnaire(eng)</div><div class="fbs">Map[numSeqPers2] = engagement</div></div>
+  <div class="fa">→</div>
+  <div class="fb new"><div class="fbt">collector.buildJson()</div><div class="fbs">tous les actionnaires + vendeurs accumulés</div></div>
+  <div class="fa">→</div>
+  <div class="fb ok"><div class="fbt">AvisDTO.engagementDetailleJson</div><div class="fbs">JSON complet (Idée 1)</div></div>
+</div>
+
+<div class="pc-grid">
+<div class="pros">
+  <div class="pc-title">✅ Avantages</div>
+  <ul class="pc-list">
+    <li>Capture TOUS les actionnaires (pas seulement le dernier)</li>
+    <li>Capture TOUS les vendeurs</li>
+    <li>Aucun changement backend si combiné avec Idée 1</li>
+    <li>Données toujours fraîches (Signal-driven)</li>
+    <li>Service réutilisable partout dans l'app</li>
+  </ul>
+</div>
+<div class="cons">
+  <div class="pc-title">⚠️ Limites</div>
+  <ul class="pc-list">
+    <li>Nécessite que l'utilisateur sélectionne CHAQUE actionnaire avant l'envoi</li>
+    <li>Si l'utilisateur ne parcourt pas tous les onglets, données incomplètes</li>
+    <li>Mémoire Angular réinitialisée si l'utilisateur recharge la page</li>
+    <li>Cycle de vie à gérer (reset entre canvas)</li>
+  </ul>
+</div>
+</div>
+
+<div class="cb">
+<div class="ch"><span>EngagementCollectorService.ts — nouveau service Angular</span><span class="cf">_services/engagement-collector.service.ts</span></div>
+<pre">import { Injectable, signal, computed } from '@angular/core';
+import { Engagement } from '../_models/Engagement';
+
+export interface PartieEngagement {
+  typePartie: string;
+  nom?: string;
+  cin?: string;
+  numSeqPers?: string;
+  partCapital?: string;
+  engagementsBNA: any[];
+  engagementsBCT: any[];
+  classeBNA: any[];
+  classeBCT: any[];
+}
+
+@Injectable({ providedIn: 'root' })
+export class EngagementCollectorService {
+
+  // Map pour chaque type — clé = numSeqPers (évite les doublons)
+  private actionnairesMap = new Map&lt;string, PartieEngagement&gt;();
+  private vendeursMap     = new Map&lt;string, PartieEngagement&gt;();
+  private premierResp     = signal&lt;PartieEngagement | null&gt;(null);
+  private groupeMap       = new Map&lt;string, PartieEngagement&gt;();
+
+  // ── Ajouter un actionnaire (appelé dans onSelectionChange) ──────────
+  addActionnaire(numSeqPers: string, nom: string, partCapital: string, eng: Engagement): void {
+    this.actionnairesMap.set(numSeqPers, {
+      typePartie: 'ACTIONNAIRE',
+      nom, partCapital, numSeqPers,
+      engagementsBNA: eng.listeEngagementBNA,
+      engagementsBCT: eng.listeEngagementBCT,
+      classeBNA:      eng.classeBNA,
+      classeBCT:      eng.classeBCT,
+    });
+    console.log(`✅ Actionnaire ${nom} (${numSeqPers}) collecté — total: ${this.actionnairesMap.size}`);
+  }
+
+  // ── Définir le premier responsable ──────────────────────────────────
+  setPremierResponsable(nom: string, cin: string, numSeqPers: string, eng: Engagement): void {
+    this.premierResp.set({
+      typePartie: 'PREMIER_RESPONSABLE',
+      nom, cin, numSeqPers,
+      engagementsBNA: eng.listeEngagementBNA,
+      engagementsBCT: eng.listeEngagementBCT,
+      classeBNA:      eng.classeBNA,
+      classeBCT:      eng.classeBCT,
+    });
+  }
+
+  // ── Ajouter un vendeur ───────────────────────────────────────────────
+  addVendeur(numSeqPers: string, nom: string, eng: Engagement): void {
+    this.vendeursMap.set(numSeqPers, {
+      typePartie: 'VENDEUR',
+      nom, numSeqPers,
+      engagementsBNA: eng.listeEngagementBNA,
+      engagementsBCT: eng.listeEngagementBCT,
+      classeBNA:      eng.classeBNA,
+      classeBCT:      eng.classeBCT,
+    });
+  }
+
+  // ── Ajouter un groupe ────────────────────────────────────────────────
+  addGroupe(numSeqPers: string, nom: string, eng: Engagement): void {
+    this.groupeMap.set(numSeqPers, {
+      typePartie: 'GROUPE',
+      nom, numSeqPers,
+      engagementsBNA: eng.listeEngagementBNA,
+      engagementsBCT: eng.listeEngagementBCT,
+      classeBNA:      eng.classeBNA,
+      classeBCT:      eng.classeBCT,
+    });
+  }
+
+  // ── Construire le JSON complet ───────────────────────────────────────
+  buildEngagementDetailleJson(): string {
+    const detaille = {
+      actionnaires:       Array.from(this.actionnairesMap.values()),
+      premierResponsable: this.premierResp(),
+      groupe:             Array.from(this.groupeMap.values()),
+      vendeurs:           Array.from(this.vendeursMap.values()),
+    };
+    console.log(`📸 Snapshot engagement: ${this.actionnairesMap.size} actionnaires, ${this.vendeursMap.size} vendeurs`);
+    return JSON.stringify(detaille);
+  }
+
+  // ── Reset pour un nouveau canvas ─────────────────────────────────────
+  reset(): void {
+    this.actionnairesMap.clear();
+    this.vendeursMap.clear();
+    this.groupeMap.clear();
+    this.premierResp.set(null);
+  }
+
+  // ── Statistiques ─────────────────────────────────────────────────────
+  get stats() {
+    return {
+      actionnaires: this.actionnairesMap.size,
+      vendeurs:     this.vendeursMap.size,
+      groupes:      this.groupeMap.size,
+      hasResponsable: this.premierResp() !== null
+    };
+  }
+}</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>engagements.component.ts — utiliser le CollectorService dans les méthodes de sélection</span><span class="cf">engagements.component.ts</span></div>
+<pre>private collectorService = inject(EngagementCollectorService);
+
+// Modifier onSelectionChange pour alimenter le collecteur :
+onSelectionChange(selectedAssocie: Associe|undefined) {
+  if(selectedAssocie) {
+    this.canevasAgrService.getClientByContratCpt(
+      selectedAssocie.pieceType === PieceType.IU ? "14" : "2",
+      selectedAssocie.pieceNumber
+    ).subscribe({
+      next: client => {
+        const vraiNum = client.personne?.numSeqPers ?? '';
+        this.engagementService.setNumSeqPersAssocieEngagement(vraiNum);
+
+        // ✅ Attendre que le signal se mette à jour puis collecter
+        setTimeout(() => {
+          this.collectorService.addActionnaire(
+            vraiNum,
+            selectedAssocie.name,
+            selectedAssocie.partPercentage?.toString() ?? '0',
+            this.engagementService.engagementAssocie()  // signal mis à jour
+          );
+        }, 1000);  // délai pour que le signal soit chargé
+      }
+    });
+  }
+}
+
+// Modifier switchHeaders pour le premier responsable (tab 2) :
+} else if (this.activeTab == 2) {
+  if(this.premierResponsable.cin)
+    this.canevasAgrService.getClientByContratCpt("2", this.premierResponsable.cin).subscribe({
+      next: client => {
+        const vraiNum = client.personne?.numSeqPers ?? '000';
+        this.engagementService.setNumSeqPersPremierResponsableEngagement(vraiNum);
+        setTimeout(() => {
+          this.collectorService.setPremierResponsable(
+            `${this.premierResponsable.nom} ${this.premierResponsable.prenom}`,
+            this.premierResponsable.cin ?? '',
+            vraiNum,
+            this.engagementService.engagementPreResp()  // signal mis à jour
+          );
+        }, 1000);
+      }
+    });
+}
+
+// Modifier onSelectionVendeurChange :
+onSelectionVendeurChange(selectedVendeur: Vendeur|undefined) {
+  if(selectedVendeur) {
+    this.engagementService.setNumSeqPersVendeurEngagement(String(selectedVendeur.numseqpers));
+    setTimeout(() => {
+      this.collectorService.addVendeur(
+        String(selectedVendeur.numseqpers),
+        selectedVendeur.nomPrenom ?? '',
+        this.engagementService.engagementVendeur()
+      );
+    }, 1000);
+  }
+}</pre>
+</div>
+
+<div class="cb">
+<div class="ch"><span>avis.component.ts — utiliser le CollectorService pour envoyer les données complètes</span><span class="cf">avis.component.ts — dans saveAvis()</span></div>
+<pre">private collectorService = inject(EngagementCollectorService);
+
+saveAvis(): void {
+  const avisDTO: AvisDTO = {
+    // ... champs existants ...
+    engagementDetailleJson: this.collectorService.buildEngagementDetailleJson(), // ✅ TOUTES les parties
+  };
+
+  console.log('📸 Engagement stats:', this.collectorService.stats);
+  // → { actionnaires: 3, vendeurs: 2, groupes: 1, hasResponsable: true }
+
+  this.avisService.saveAvis(avisDTO).subscribe({...});
+}</pre>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- TABLEAU COMPARATIF -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="compare" style="margin-bottom:28px">
+<hr/>
+<h2 style="font-size:16px;font-weight:700;margin-bottom:14px">Comparaison des 5 idées</h2>
+
+<table class="cmp">
+<thead>
+  <tr>
+    <th>#</th>
+    <th>Idée</th>
+    <th>Changements BDD</th>
+    <th>Tous actionnaires/vendeurs ?</th>
+    <th>Appels HTTP</th>
+    <th>Complexité</th>
+    <th>Score</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><strong>1</strong></td>
+    <td>Passer dans AvisDTO</td>
+    <td>✅ Zéro</td>
+    <td>⚠️ Dernier sélectionné seulement</td>
+    <td>1 (avis)</td>
+    <td>Faible</td>
+    <td><span class="score s4">4/5</span></td>
+  </tr>
+  <tr>
+    <td><strong>2</strong></td>
+    <td>PATCH post-snapshot</td>
+    <td>✅ Zéro</td>
+    <td>⚠️ Dernier sélectionné seulement</td>
+    <td>2 (avis + patch)</td>
+    <td>Faible-Moyenne</td>
+    <td><span class="score s4">4/5</span></td>
+  </tr>
+  <tr>
+    <td><strong>3</strong></td>
+    <td>Legacy existant</td>
+    <td>✅ Zéro</td>
+    <td>⚠️ Dernier sélectionné (saveClient)</td>
+    <td>0 (déjà fait)</td>
+    <td>Faible</td>
+    <td><span class="score s4">4/5</span></td>
+  </tr>
+  <tr>
+    <td><strong>4</strong></td>
+    <td>Cache backend</td>
+    <td>✅ Zéro</td>
+    <td>⚠️ Selon fréquence d'appel</td>
+    <td>2+ (staging + avis)</td>
+    <td>Moyenne</td>
+    <td><span class="score s3">3/5</span></td>
+  </tr>
+  <tr>
+    <td><strong>5</strong></td>
+    <td>Collecteur Angular</td>
+    <td>✅ Zéro</td>
+    <td>✅ TOUS les actionnaires/vendeurs</td>
+    <td>1 (avis)</td>
+    <td>Moyenne</td>
+    <td><span class="score s5">5/5</span></td>
+  </tr>
+</tbody>
+</table>
+
+<div class="alert as"><span>🏆</span><div>
+  <strong>Recommandation optimale :</strong> Combiner <strong>Idée 5 + Idée 1</strong> :
+  <br/>→ Idée 5 : créer <code>EngagementCollectorService</code> pour accumuler TOUS les actionnaires/vendeurs au fil des sélections
+  <br/>→ Idée 1 : ajouter <code>engagementDetailleJson</code> dans <code>AvisDTO</code>, rempli depuis <code>collectorService.buildEngagementDetailleJson()</code>
+  <br/>→ Backend : 0 changement BDD, utilise le JSON fourni si non null (sinon fallback sur l'ancienne logique)
+  <br/><br/>
+  <strong>Si vous voulez ZÉRO ligne de code frontend :</strong> Idée 3 (legacy existant) — le frontend envoie déjà les données à <code>POST /api/snapshots</code>, il suffit de lire le dernier legacy snapshot côté backend.
+</div></div>
+</div>
+
+</div>
+</body>
+</html>
