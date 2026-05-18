@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGCANVAS - Guide Technique pour Débutant</title>
+  <style>
+    :root {
+      --primary: #1a3c6e;
+      --secondary: #2d6a4f;
+      --accent: #e9a825;
+      --danger: #c0392b;
+      --info: #2980b9;
+      --light: #f8f9fa;
+      --border: #dee2e6;
+      --text: #2c3e50;
+      --muted: #6c757d;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #eef2f7;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--primary);
+      color: #fff;
+      padding: 0 2rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      overflow-x: auto;
+      height: 56px;
+    }
+    nav .logo { font-size: 1.2rem; font-weight: 700; white-space: nowrap; margin-right: 1rem; }
+    nav a {
+      color: rgba(255,255,255,.8); text-decoration: none;
+      font-size: .88rem; white-space: nowrap; padding: 4px 8px;
+      border-radius: 4px; transition: background .2s;
+    }
+    nav a:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #2a5298 100%);
+      color: #fff; border-radius: 12px;
+      padding: 2.5rem 2rem; margin-bottom: 2.5rem;
+      box-shadow: 0 4px 20px rgba(26,60,110,.3);
+    }
+    .hero h1 { font-size: 2rem; margin-bottom: .5rem; }
+    .hero p { opacity: .85; font-size: 1.05rem; max-width: 700px; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.2rem; }
+    .badge {
+      background: rgba(255,255,255,.18); border-radius: 20px;
+      padding: 3px 12px; font-size: .8rem; font-weight: 600;
+    }
+
+    /* ── SECTION ── */
+    section {
+      background: var(--bg); border-radius: 12px;
+      padding: 2rem; margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+    }
+    section h2 {
+      font-size: 1.4rem; color: var(--primary);
+      border-left: 4px solid var(--accent);
+      padding-left: .75rem; margin-bottom: 1.5rem;
+    }
+    section h3 {
+      font-size: 1.1rem; color: var(--primary);
+      margin: 1.4rem 0 .7rem;
+    }
+    section h4 { font-size: .95rem; color: var(--muted); margin: 1rem 0 .4rem; }
+    p { margin-bottom: .8rem; }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin: 1rem 0;
+    }
+    .card {
+      border-radius: 10px; padding: 1.2rem;
+      border: 2px solid transparent;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+    .card .card-icon { font-size: 2rem; margin-bottom: .5rem; }
+    .card h4 { font-size: .95rem; margin-bottom: .4rem; }
+    .card p { font-size: .85rem; margin: 0; }
+
+    .card-blue   { background: #ebf3fb; border-color: #aed6f1; }
+    .card-green  { background: #eafaf1; border-color: #a9dfbf; }
+    .card-orange { background: #fef9e7; border-color: #f9e79f; }
+    .card-red    { background: #fdedec; border-color: #f5b7b1; }
+    .card-purple { background: #f4ecf7; border-color: #d7bde2; }
+    .card-teal   { background: #e8f8f5; border-color: #a2d9ce; }
+
+    /* ── CODE & FLOW ── */
+    code {
+      background: #f0f3f7; border-radius: 4px;
+      padding: 2px 6px; font-size: .85em;
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: #c0392b;
+    }
+    pre {
+      background: #1e2a38; color: #abb2bf;
+      border-radius: 8px; padding: 1.2rem;
+      overflow-x: auto; font-size: .82rem;
+      line-height: 1.6; margin: .8rem 0;
+    }
+    pre .kw  { color: #c678dd; }
+    pre .str { color: #98c379; }
+    pre .cmt { color: #5c6370; font-style: italic; }
+    pre .fn  { color: #61afef; }
+    pre .num { color: #d19a66; }
+    pre .cls { color: #e5c07b; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex; flex-direction: column;
+      align-items: flex-start; gap: 0; margin: 1rem 0;
+    }
+    .flow-step {
+      display: flex; align-items: flex-start; gap: .75rem;
+      position: relative; padding-bottom: 0;
+    }
+    .flow-left { display: flex; flex-direction: column; align-items: center; }
+    .flow-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .85rem; flex-shrink: 0;
+      z-index: 1; position: relative;
+    }
+    .flow-line {
+      width: 2px; background: #bdc3c7;
+      flex-grow: 1; min-height: 20px; margin: 0 auto;
+    }
+    .flow-content {
+      background: #f8f9fa; border: 1px solid #dee2e6;
+      border-radius: 8px; padding: .6rem .9rem;
+      margin-bottom: .6rem; flex: 1;
+    }
+    .flow-content strong { color: var(--primary); display: block; }
+    .flow-content span { font-size: .83rem; color: var(--muted); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; margin: .8rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th {
+      background: var(--primary); color: #fff;
+      padding: .6rem .9rem; text-align: left;
+    }
+    td { padding: .55rem .9rem; border-bottom: 1px solid #dee2e6; }
+    tr:nth-child(even) td { background: #f8f9fa; }
+
+    /* ── HIGHLIGHT BOX ── */
+    .box {
+      border-radius: 8px; padding: 1rem 1.2rem;
+      margin: .8rem 0; border-left: 4px solid;
+    }
+    .box-info    { background: #ebf3fb; border-color: var(--info); }
+    .box-warning { background: #fef9e7; border-color: var(--accent); }
+    .box-success { background: #eafaf1; border-color: var(--secondary); }
+    .box-danger  { background: #fdedec; border-color: var(--danger); }
+    .box strong  { display: block; margin-bottom: .3rem; }
+
+    /* ── RELATION DIAGRAM ── */
+    .rel-diagram {
+      background: #f0f3f7; border-radius: 10px;
+      padding: 1.5rem; overflow-x: auto;
+      font-family: 'Consolas', monospace; font-size: .83rem;
+      line-height: 1.8; white-space: pre;
+      color: #2c3e50;
+    }
+    .rel-diagram .node   { color: var(--primary); font-weight: 700; }
+    .rel-diagram .arrow  { color: #888; }
+    .rel-diagram .label  { color: var(--secondary); font-style: italic; }
+
+    /* ── ENDPOINT LIST ── */
+    .endpoint {
+      display: flex; align-items: baseline; gap: .6rem;
+      padding: .45rem .6rem; border-radius: 6px;
+      margin: .3rem 0; background: #f8f9fa;
+      border: 1px solid #e9ecef;
+    }
+    .method {
+      font-size: .75rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px;
+      color: #fff; flex-shrink: 0;
+    }
+    .get    { background: #27ae60; }
+    .post   { background: #2980b9; }
+    .put    { background: #e67e22; }
+    .url    { font-family: monospace; font-size: .83rem; color: var(--info); flex: 1; }
+    .desc   { font-size: .8rem; color: var(--muted); }
+
+    /* ── TABS ── */
+    .tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0; }
+    .tab-item {
+      background: var(--light); border: 2px solid var(--border);
+      border-radius: 8px; padding: .45rem 1rem;
+      font-size: .85rem; font-weight: 600; cursor: default;
+    }
+    .tab-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ── SCHEMA LEGEND ── */
+    .schema-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: .8rem; margin: .8rem 0;
+    }
+    .schema-box {
+      border-radius: 8px; padding: .8rem 1rem;
+      font-size: .83rem;
+    }
+    .schema-box .schema-name { font-weight: 700; font-size: .9rem; margin-bottom: .3rem; }
+    .schema-box ul { padding-left: 1.1rem; }
+    .schema-box li { margin: .1rem 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; color: var(--muted);
+      font-size: .83rem; padding: 2rem 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="logo">PGCANVAS</span>
+  <a href="#overview">Vue d'ensemble</a>
+  <a href="#engagement">Engagements</a>
+  <a href="#responsable">1er Responsable</a>
+  <a href="#groupe">Groupe</a>
+  <a href="#vendeur">Vendeur</a>
+  <a href="#fetch">Récupération données</a>
+  <a href="#relations">Relations</a>
+  <a href="#api">API</a>
+  <a href="#schemas">BDD</a>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>PGCANVAS — Guide Technique</h1>
+    <p>
+      Comprendre les engagements, les relations entre entités, et comment les données
+      sont récupérées — expliqué pas à pas pour un débutant.
+    </p>
+    <div class="badge-row">
+      <span class="badge">Angular 17+</span>
+      <span class="badge">Spring Boot 3</span>
+      <span class="badge">Oracle DB</span>
+      <span class="badge">PrimeNG</span>
+      <span class="badge">Keycloak</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       1. VUE D'ENSEMBLE
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="overview">
+    <h2>1. Vue d'ensemble du projet</h2>
+
+    <p>
+      <strong>PGCANVAS</strong> est une application bancaire de financement agricole.
+      Elle permet à des agents bancaires de créer des <em>canvas</em> (dossiers de demande
+      de crédit) pour des clients agriculteurs, de consulter leurs <em>engagements</em>
+      bancaires existants, et d'analyser leurs données financières.
+    </p>
+
+    <div class="card-grid">
+      <div class="card card-blue">
+        <div class="card-icon">🖥️</div>
+        <h4>Frontend (Angular)</h4>
+        <p>Interface utilisateur dans <code>frontend-app1/</code> avec composants PrimeNG.</p>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">⚙️</div>
+        <h4>Backend (Spring Boot)</h4>
+        <p>API REST dans <code>backend-saeb/</code>. Gère la logique métier et les requêtes SQL.</p>
+      </div>
+      <div class="card card-orange">
+        <div class="card-icon">🗄️</div>
+        <h4>Base de données (Oracle)</h4>
+        <p>Multi-schémas : REFCLI, SAEB, SMILE, BI_USER, CCI, SAEBAGR…</p>
+      </div>
+      <div class="card card-purple">
+        <div class="card-icon">🔒</div>
+        <h4>Sécurité (Keycloak/JWT)</h4>
+        <p>Authentification via Keycloak + tokens JWT pour sécuriser toutes les API.</p>
+      </div>
+    </div>
+
+    <h3>Structure des dossiers clés</h3>
+    <pre><span class="cmt">/* BACKEND */</span>
+backend-saeb/src/main/java/net/kachout/saeb/
+├── web/              <span class="cmt">← Contrôleurs REST (les "portes d'entrée" de l'API)</span>
+├── service/          <span class="cmt">← Logique métier</span>
+├── dtos/             <span class="cmt">← Objets de transfert de données (ce qu'on renvoie au frontend)</span>
+├── entities/         <span class="cmt">← Entités JPA (tables de la BDD locale)</span>
+├── queryconfig/      <span class="cmt">← Gestion des requêtes SQL externes</span>
+└── datasource/       <span class="cmt">← Configuration des deux sources de données (SAEB + BI)</span>
+
+backend-saeb/src/main/resources/
+├── sql/              <span class="cmt">← Fichiers SQL (.sql, .properties)</span>
+└── db/migration/     <span class="cmt">← Migrations Flyway (historique des changements BDD)</span>
+
+<span class="cmt">/* FRONTEND */</span>
+frontend-app1/src/app/
+├── _services/        <span class="cmt">← Services HTTP (appels à l'API)</span>
+├── _models/          <span class="cmt">← Interfaces TypeScript (structure des données)</span>
+└── _components/      <span class="cmt">← Composants Angular (pages/blocs UI)</span></pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       2. ENGAGEMENTS
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="engagement">
+    <h2>2. Les Engagements — Définition et fonctionnement</h2>
+
+    <div class="box box-info">
+      <strong>C'est quoi un engagement ?</strong>
+      Un engagement est une <strong>obligation financière</strong> qu'un client a envers la banque.
+      Cela inclut les crédits accordés, les découverts autorisés, les escomptes, etc.
+      Dans PGCANVAS, on distingue deux sources d'engagements : <strong>BNA</strong> (système interne)
+      et <strong>BCT</strong> (Banque Centrale de Tunisie, via le système BI).
+    </div>
+
+    <h3>Les 8 types d'engagements BNA</h3>
+    <div class="card-grid">
+      <div class="card card-blue"><h4>FCDP</h4><p>Facilité de Caisse &amp; Découvert Permanent</p></div>
+      <div class="card card-green"><h4>CME</h4><p>Crédit de Marché aux Entreprises</p></div>
+      <div class="card card-orange"><h4>EPS</h4><p>Engagements par signature</p></div>
+      <div class="card card-red"><h4>ESC</h4><p>Escompte (effets de commerce)</p></div>
+      <div class="card card-purple"><h4>INV</h4><p>Crédits d'investissement (CMT)</p></div>
+      <div class="card card-teal"><h4>BPN</h4><p>Crédits BPN / CCI</p></div>
+      <div class="card card-blue"><h4>AGR</h4><p>Crédits Agricoles</p></div>
+      <div class="card card-green"><h4>SBE</h4><p>Encours CDI (SBE)</p></div>
+    </div>
+
+    <h3>Structure d'un objet Engagement (TypeScript)</h3>
+    <pre><span class="cmt">// frontend-app1/src/app/_models/Engagement.ts</span>
+<span class="kw">interface</span> <span class="cls">Engagement</span> {
+  numSeqPers:          <span class="cls">string</span>;            <span class="cmt">// Numéro séquentiel client</span>
+  listeEngagementBNA:  <span class="cls">EngagementBNA</span>[];  <span class="cmt">// 8 types d'engagements internes</span>
+  listeEngagementBCT:  <span class="cls">EngagementBct</span>[];  <span class="cmt">// Engagements BCT (BCI)</span>
+  classeBNA:           <span class="cls">Classe</span>[];         <span class="cmt">// Historique classification BNA (3 ans)</span>
+  classeBCT:           <span class="cls">Classe</span>[];         <span class="cmt">// Historique classification BCT (3 ans)</span>
+}
+
+<span class="cmt">// Un seul type d'engagement BNA</span>
+<span class="kw">interface</span> <span class="cls">EngagementBNA</span> {
+  typeRisque: <span class="cls">string</span>;   <span class="cmt">// Ex: "FCDP", "CME", "AGR"…</span>
+  autorise:   <span class="cls">number</span>;   <span class="cmt">// Montant autorisé</span>
+  encours:    <span class="cls">number</span>;   <span class="cmt">// Montant en cours (utilisé)</span>
+  impaye:     <span class="cls">number</span>;   <span class="cmt">// Montant impayé</span>
+  utilise:    <span class="cls">number</span>;   <span class="cmt">// Montant effectivement utilisé</span>
+  engagements: <span class="cls">DetailsEngagement</span>[]; <span class="cmt">// Détails de chaque crédit</span>
+}</pre>
+
+    <h3>Comment les engagements sont récupérés — Flux complet</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">1</div>
+          <div class="flow-line" style="height:30px"></div>
+        </div>
+        <div class="flow-content">
+          <strong>Déclencheur Angular (frontend)</strong>
+          <span>L'utilisateur clique sur un client. Le <code>EngagementService</code> reçoit le signal <code>numSeqPers</code> via un Angular Signal.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">2</div>
+          <div class="flow-line" style="height:30px"></div>
+        </div>
+        <div class="flow-content">
+          <strong>Appel HTTP (Angular Service)</strong>
+          <span><code>EngagementService.getEngagementsClientByNumSeqPers(numSeqPers)</code> — envoie un GET à <code>/api/engagement/all/{numSeqPers}</code></span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">3</div>
+          <div class="flow-line" style="height:30px"></div>
+        </div>
+        <div class="flow-content">
+          <strong>Contrôleur REST (Spring Boot)</strong>
+          <span><code>EngagementsController.getEngagementClientByNumSeqPers()</code> reçoit la requête et délègue au service.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">4</div>
+          <div class="flow-line" style="height:30px"></div>
+        </div>
+        <div class="flow-content">
+          <strong>Service métier (EngagementServiceImpl)</strong>
+          <span>Lance <strong>8 requêtes SQL parallèles</strong> pour les BNA (FCDP, CME, EPS, ESC, INV, BPN, AGR, SBE) + 1 pour BCT.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">5</div>
+          <div class="flow-line" style="height:30px"></div>
+        </div>
+        <div class="flow-content">
+          <strong>JdbcClient → Oracle (BDD)</strong>
+          <span>Les requêtes SQL sont dans <code>resources/sql/engagements/engagement-queries.properties</code> et sont exécutées sur les schémas SAEB, BI_USER, SAEBAGR, GEN.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">6</div>
+          <div class="flow-line" style="height:30px"></div>
+        </div>
+        <div class="flow-content">
+          <strong>Cache Caffeine (24h)</strong>
+          <span>Le résultat est mis en cache 24h pour éviter des requêtes répétées sur les mêmes données.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">7</div>
+        </div>
+        <div class="flow-content">
+          <strong>Retour au frontend</strong>
+          <span>L'objet <code>EngagementDTO</code> (BNA + BCT + classifications) est sérialisé en JSON et renvoyé à Angular qui l'affiche.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Exemple de requête SQL (Engagement FCDP)</h3>
+    <pre><span class="cmt">-- engagement-queries.properties : clé "engagementFCDP"</span>
+<span class="kw">SELECT</span>
+    e.NUM_ENG_COTCG        <span class="kw">AS</span> numEng,
+    e.MONT_AUT_ECOTCG      <span class="kw">AS</span> autorise,
+    e.MONT_UTI_ECOTCG      <span class="kw">AS</span> utilise,
+    e.ECH_FIN_ECOTCG       <span class="kw">AS</span> dateEcheance
+<span class="kw">FROM</span>  SAEB.ENGAG_COTE     e
+<span class="kw">JOIN</span>  SAEB.ENGCOT_PRODUIT ep <span class="kw">ON</span> e.NUM_ENG_COTCG = ep.NUM_ENG_COTCG
+<span class="kw">WHERE</span> e.NUM_SEQ_PERS   = <span class="str">:numSeqPers</span>      <span class="cmt">-- paramètre dynamique</span>
+  <span class="kw">AND</span> ep.GP_PRODUIT_CTCG = <span class="str">'FC'</span>             <span class="cmt">-- filtre sur type FC/DP</span>
+  <span class="kw">AND</span> e.COD_DETAT_ECOTCG = <span class="str">'V'</span>             <span class="cmt">-- seulement les actifs</span></pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       3. 1ER RESPONSABLE
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="responsable">
+    <h2>3. Le 1er Responsable</h2>
+
+    <div class="box box-success">
+      <strong>Définition</strong>
+      Le <strong>1er responsable</strong> est la personne physique principale liée à un compte.
+      Pour une entreprise (personne morale), c'est le gérant, directeur, ou président.
+      Il peut avoir ses propres engagements bancaires que l'on consulte séparément.
+    </div>
+
+    <h3>Structure de données (DTO Backend)</h3>
+    <pre><span class="cmt">// ResponsableDTO.java</span>
+<span class="kw">public class</span> <span class="cls">ResponsableDTO</span> {
+    <span class="kw">private</span> <span class="cls">String</span> nomResp;        <span class="cmt">// Nom</span>
+    <span class="kw">private</span> <span class="cls">String</span> prenomResp;     <span class="cmt">// Prénom</span>
+    <span class="kw">private</span> <span class="cls">String</span> cinResp;        <span class="cmt">// Numéro CIN (carte d'identité)</span>
+    <span class="kw">private</span> <span class="cls">String</span> dateNaissResp;  <span class="cmt">// Date de naissance</span>
+    <span class="kw">private</span> <span class="cls">String</span> contact;        <span class="cmt">// Téléphone / contact</span>
+}</pre>
+
+    <h3>Comment le responsable est récupéré</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">1</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Inclus dans le ClientDTO</strong>
+          <span>Quand on charge un client via <code>GET /api/client/getClientByPiece/{typePiece}/{numPiece}</code>, le responsable est déjà inclus dans la réponse.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">2</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Requête SQL sur SMILE</strong>
+          <span>Le backend exécute <code>get1erResponsableByNumSeqPers.sql</code> qui joint les tables SMILE.CONTRAT_CPT, SMILE.MANDAT et SMILE.PERSONNE.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">3</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Filtre sur le rôle</strong>
+          <span>Seules les personnes avec le rôle <em>Gérant</em>, <em>Président</em>, ou <em>Directeur</em> (LIB_QUAL_MP LIKE '%G%', '%PR%', '%DIR%') sont retournées.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">4</div></div>
+        <div class="flow-content">
+          <strong>Engagements du responsable (onglet 2)</strong>
+          <span>Quand l'utilisateur clique l'onglet "1er Responsable", Angular récupère le <code>numSeqPers</code> du responsable et charge ses propres engagements via <code>/api/engagement/all/{numSeqPersResponsable}</code>.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>SQL de récupération simplifié</h3>
+    <pre><span class="cmt">-- get1erResponsableByNumSeqPers.sql</span>
+<span class="kw">SELECT</span>
+    p.NOM_NOM_PERS   <span class="kw">AS</span> nomResp,
+    p.NOM_PRN_PERS   <span class="kw">AS</span> prenomResp,
+    p.NUM_PCE_PERS   <span class="kw">AS</span> cinResp,
+    p.NUM_TEL_PERS   <span class="kw">AS</span> contact,
+    p.DAT_NAIS_PERS  <span class="kw">AS</span> dateNaissResp
+<span class="kw">FROM</span>  SMILE.CONTRAT_CPT     cpt
+<span class="kw">JOIN</span>  SMILE.MANDAT          m   <span class="kw">ON</span> (compte correspondant)
+<span class="kw">JOIN</span>  SMILE.MANDAT_PERSONNE mp  <span class="kw">ON</span> m.NUM_MAND_MAND = mp.NUM_MAND_MAND
+<span class="kw">JOIN</span>  SMILE.PERSONNE        p   <span class="kw">ON</span> mp.NUM_SEQ_PERS = p.NUM_SEQ_PERS
+<span class="kw">WHERE</span> cpt.num_seq_pers   = <span class="str">:numSeqPers</span>     <span class="cmt">-- client recherché</span>
+  <span class="kw">AND</span> cpt.COD_ETAT_CCPT  = <span class="str">'V'</span>            <span class="cmt">-- compte actif</span>
+  <span class="kw">AND</span> m.COD_ETAT_MAND    = <span class="str">'V'</span>            <span class="cmt">-- mandat actif</span>
+  <span class="kw">AND</span> (UPPER(mp.LIB_QUAL_MP) <span class="kw">LIKE</span> <span class="str">'%G%'</span>  <span class="cmt">-- Gérant</span>
+    <span class="kw">OR</span> UPPER(mp.LIB_QUAL_MP) <span class="kw">LIKE</span> <span class="str">'%PR%'</span> <span class="cmt">-- Président</span>
+    <span class="kw">OR</span> UPPER(mp.LIB_QUAL_MP) <span class="kw">LIKE</span> <span class="str">'%DIR%'</span>) <span class="cmt">-- Directeur</span>
+<span class="kw">ORDER BY</span> m.NUM_MAND_MAND <span class="kw">DESC</span>
+<span class="kw">FETCH FIRST</span> <span class="num">1</span> <span class="kw">ROWS ONLY</span>   <span class="cmt">-- le plus récent seulement</span></pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       4. GROUPE
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="groupe">
+    <h2>4. Le Groupe</h2>
+
+    <div class="box box-warning">
+      <strong>Définition</strong>
+      Un <strong>groupe</strong> est un regroupement d'entreprises ou de personnes physiques
+      liées entre elles (holding, groupe familial, etc.). Un client appartenant à un groupe
+      peut voir les engagements de <em>chaque membre</em> du groupe afin d'avoir une vision
+      consolidée de l'exposition bancaire.
+    </div>
+
+    <h3>Structure de données</h3>
+    <pre><span class="cmt">// GroupeDTO.java (Backend) / Groupe.ts (Frontend)</span>
+{
+  numSeqPers:    <span class="str">"12345"</span>,     <span class="cmt">// Numéro séquentiel du membre</span>
+  relation:      <span class="str">"SARL AGRI"</span>, <span class="cmt">// Raison sociale ou nom</span>
+  formeJuridique:<span class="str">"SARL"</span>,      <span class="cmt">// Forme juridique</span>
+  capital:       <span class="str">"100000"</span>,   <span class="cmt">// Capital social</span>
+  activite:      <span class="str">"Élevage"</span>,  <span class="cmt">// Activité principale</span>
+  identifiant:   <span class="str">"M123456"</span>,  <span class="cmt">// Matricule fiscal</span>
+  dateCreGrp:    <span class="str">"2010-03-15"</span>,<span class="cmt">// Date de création</span>
+  gerant:        <span class="str">"Ali Ben Salah"</span> <span class="cmt">// Nom du gérant</span>
+}</pre>
+
+    <h3>Comment les groupes sont récupérés</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">1</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Vérification du code groupe</strong>
+          <span>Quand on charge le client, on vérifie si <code>codGrpPers</code> est non-null dans REFCLI.PERSONNE. S'il existe, le client appartient à un groupe.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">2</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Requête SQL sur REFCLI</strong>
+          <span><code>getListeGroupesByNumGRP.sql</code> récupère tous les membres du groupe via <code>COD_GRP_GRP = :numGrpGrp</code> dans REFCLI.PERSONNE.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">3</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Onglet 3 — Sélection d'un membre</strong>
+          <span>L'utilisateur sélectionne un membre du groupe dans la liste. Angular charge ses engagements individuels via <code>/api/engagement/all/{numSeqPersMembre}</code>.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">4</div></div>
+        <div class="flow-content">
+          <strong>Placements aussi récupérés</strong>
+          <span>En plus des engagements, les placements du membre sont chargés via <code>GET /api/client/placements/{numSeqPers}</code>.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>SQL de récupération</h3>
+    <pre><span class="cmt">-- getListeGroupesByNumGRP.sql</span>
+<span class="kw">SELECT</span>
+    p.NUM_SEQ_PERS <span class="kw">AS</span> numSeqPers,
+    p.DAT_DLV_PERS <span class="kw">AS</span> dateCreGrp,
+    p.NUM_PCE_PERS <span class="kw">AS</span> identifiant,
+    <span class="kw">CASE WHEN</span> p.NOM_RS_PERS <span class="kw">IS NOT NULL</span>
+        <span class="kw">THEN</span> p.NOM_RS_PERS || <span class="str">' '</span> || p.LIB_SIGL_PERS   <span class="cmt">-- Personne morale</span>
+        <span class="kw">ELSE</span> p.NOM_NOM_PERS || <span class="str">' '</span> || p.NOM_PRN_PERS   <span class="cmt">-- Personne physique</span>
+    <span class="kw">END AS</span> relation,
+    a.LIB_ACT_ACT  <span class="kw">AS</span> activite,
+    j.LIB_FJ_FJ    <span class="kw">AS</span> formeJuridique
+<span class="kw">FROM</span>  REFCLI.PERSONNE p
+<span class="kw">JOIN</span>  REFCLI.CLIENT   c <span class="kw">ON</span> p.num_seq_pers = c.num_seq_pers
+<span class="kw">LEFT JOIN</span> REFCLI.ACTIVITE        a <span class="kw">ON</span> p.COD_ACT_ACT = a.COD_ACT_ACT
+<span class="kw">LEFT JOIN</span> REFCLI.FORME_JURIDIQUE  j <span class="kw">ON</span> p.COD_FJ_FJ   = j.COD_FJ_FJ
+<span class="kw">WHERE</span> COD_GRP_GRP = <span class="str">:numGrpGrp</span>     <span class="cmt">-- tous les membres de ce groupe</span></pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       5. VENDEUR
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="vendeur">
+    <h2>5. Le Vendeur</h2>
+
+    <div class="box box-danger">
+      <strong>Définition</strong>
+      Un <strong>vendeur</strong> est le propriétaire actuel d'un terrain / bien immobilier
+      que le client souhaite acheter via un <em>Crédit Achat Terrain (Nature 1)</em>.
+      Il est lié à ce crédit et peut lui-même être un client de la banque
+      (via son <code>numseqpers</code>), auquel cas ses engagements peuvent être consultés.
+    </div>
+
+    <h3>Structure de données</h3>
+    <pre><span class="cmt">// VendeurDto.java (Backend) / Vendeur interface (Frontend)</span>
+{
+  id:          <span class="str">"v-001"</span>,            <span class="cmt">// Identifiant interne</span>
+  nomPrenom:   <span class="str">"Mohamed Trabelsi"</span>,<span class="cmt">// Nom complet</span>
+  typePiece:   <span class="str">"CIN"</span>,              <span class="cmt">// Type de pièce d'identité</span>
+  numPiece:    <span class="str">"12345678"</span>,         <span class="cmt">// Numéro de la pièce</span>
+  numseqpers:  <span class="num">98765</span>               <span class="cmt">// Lien vers REFCLI.PERSONNE (optionnel)</span>
+}</pre>
+
+    <h3>Table en base de données (créée par migration Flyway V7)</h3>
+    <pre><span class="kw">CREATE TABLE</span> <span class="cls">VENDEUR</span> (
+    id                        VARCHAR2(<span class="num">50</span>)  <span class="kw">NOT NULL</span>,
+    nomPrenom                 VARCHAR2(<span class="num">255</span>),
+    typePiece                 VARCHAR2(<span class="num">20</span>),
+    numPiece                  VARCHAR2(<span class="num">20</span>),
+    credit_achat_terrain_id   VARCHAR2(<span class="num">50</span>),  <span class="cmt">-- FK vers CREDIT_ACHAT_TERRAIN</span>
+    <span class="kw">CONSTRAINT</span> pk_vendeur  <span class="kw">PRIMARY KEY</span> (id),
+    <span class="kw">CONSTRAINT</span> fk_vendeur  <span class="kw">FOREIGN KEY</span> (credit_achat_terrain_id)
+                           <span class="kw">REFERENCES</span> credit_achat_terrain(id)
+);</pre>
+
+    <h3>Comment les vendeurs sont récupérés</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">1</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Pas d'endpoint direct pour les vendeurs</strong>
+          <span>Les vendeurs font partie du <code>CreditAchatTerrain</code>. Ils sont inclus dans la réponse de <code>GET /api/canevas/{idCaneva}</code>.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">2</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Filtrage côté Angular (computed signal)</strong>
+          <span>Angular filtre <em>tous les vendeurs</em> qui ont un <code>numseqpers</code> non-null, car c'est la condition pour pouvoir charger leurs engagements.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">3</div></div>
+        <div class="flow-content">
+          <strong>Onglet 4 — Sélection vendeur</strong>
+          <span>L'utilisateur sélectionne un vendeur. Angular charge ses engagements via <code>/api/engagement/all/{numseqpersVendeur}</code> et aussi les données bilan.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       6. RÉCUPÉRATION DES DONNÉES — VUE GLOBALE
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="fetch">
+    <h2>6. Comment les données sont récupérées — Vue globale</h2>
+
+    <h3>6.1 La recherche d'un client (point de départ)</h3>
+    <pre><span class="cmt">// CanevasAgrService (Angular)</span>
+<span class="fn">onSearchClient</span>(typePiece: <span class="cls">TypePiece</span>, critere: <span class="cls">string</span>) {
+  <span class="kw">this</span>.searchSubject$.next({ typePiece, critere });
+}
+
+<span class="cmt">// Le Subject déclenche automatiquement un appel HTTP :</span>
+searchSubject$.pipe(
+  <span class="fn">switchMap</span>(({ typePiece, critere }) =>
+    <span class="kw">this</span>.http.<span class="fn">get</span>(<span class="str">`/api/client/getClientByPiece/<span class="kw">${</span>typePiece<span class="kw">}</span>/<span class="kw">${</span>critere<span class="kw">}</span>`</span>)
+  )
+).subscribe(client => {
+  <span class="kw">this</span>.numSeqPers.<span class="fn">set</span>(client.personne.numSeqPers); <span class="cmt">// Signal Angular</span>
+});</pre>
+
+    <h3>6.2 Les Angular Signals (réactivité)</h3>
+    <div class="box box-info">
+      <strong>C'est quoi un Signal Angular ?</strong>
+      C'est une valeur réactive. Quand elle change, tous les composants qui l'utilisent
+      se mettent à jour automatiquement. C'est comme un "abonnement" automatique.
+    </div>
+    <pre><span class="cmt">// EngagementService — tous les états sont des Signals</span>
+numSeqPers = <span class="fn">signal</span>(<span class="str">''</span>);                      <span class="cmt">// numSeqPers du client principal</span>
+selectedNumSeqPersGroupe = <span class="fn">signal</span>(<span class="str">''</span>);        <span class="cmt">// membre de groupe sélectionné</span>
+selectedNumSeqPersPremResp = <span class="fn">signal</span>(<span class="str">''</span>);     <span class="cmt">// responsable sélectionné</span>
+selectedNumSeqPersVendeur = <span class="fn">signal</span>(<span class="str">''</span>);       <span class="cmt">// vendeur sélectionné</span>
+
+<span class="cmt">// Effect : dès que numSeqPers change → recharge les engagements</span>
+<span class="fn">effect</span>(() => {
+  <span class="kw">const</span> seq = <span class="kw">this</span>.numSeqPers();
+  <span class="kw">if</span> (seq) <span class="kw">this</span>.<span class="fn">chargerEngagements</span>(seq);
+});</pre>
+
+    <h3>6.3 Les deux sources de données Oracle</h3>
+    <div class="card-grid">
+      <div class="card card-blue">
+        <div class="card-icon">🏦</div>
+        <h4>Datasource Principale (SAEB)</h4>
+        <p>Contient REFCLI, SAEB, SAEBAGR, SMILE, GEN, CCI. C'est le système bancaire principal BNA.</p>
+      </div>
+      <div class="card card-orange">
+        <div class="card-icon">📊</div>
+        <h4>Datasource Secondaire (BI)</h4>
+        <p>Contient BI_USER. C'est le système Business Intelligence pour les données BCT (reporting external).</p>
+      </div>
+    </div>
+
+    <h3>6.4 Pattern de requête SQL (JdbcClient Spring)</h3>
+    <pre><span class="cmt">// QueryConfig.java — charge les fichiers .properties au démarrage</span>
+<span class="fn">@Value</span>(<span class="str">"classpath:sql/engagements/engagement-queries.properties"</span>)
+<span class="kw">private</span> <span class="cls">Resource</span> engagementQueriesResource;
+
+<span class="cmt">// EngagementServiceImpl — exécution d'une requête</span>
+<span class="cls">List</span>&lt;<span class="cls">DetailsEngagementBNADTO</span>&gt; result = jdbcClient
+    .<span class="fn">sql</span>(queryConfig.<span class="fn">getQuery</span>(<span class="str">"engagementFCDP"</span>))   <span class="cmt">// nom de la clé dans .properties</span>
+    .<span class="fn">param</span>(<span class="str">"numSeqPers"</span>, numSeqPers)                  <span class="cmt">// paramètre nommé :numSeqPers</span>
+    .<span class="fn">query</span>(<span class="cls">EngagementBNARowMapper</span>::<span class="fn">new</span>)              <span class="cmt">// mappeur ResultSet → DTO</span>
+    .<span class="fn">list</span>();</pre>
+
+    <h3>6.5 Le cache Caffeine</h3>
+    <pre><span class="cmt">// application.properties ou config cache</span>
+spring.cache.caffeine.spec=maximumSize=<span class="num">500</span>,expireAfterWrite=<span class="num">24</span>h
+
+<span class="cmt">// @Cacheable sur les méthodes de service</span>
+<span class="fn">@Cacheable</span>(<span class="str">"engagementBNA"</span>)
+<span class="kw">public</span> <span class="cls">List</span>&lt;<span class="cls">EngagementBNADTO</span>&gt; <span class="fn">getListeEngagementsBNAByClient</span>(<span class="cls">String</span> numSeqPers) {
+    <span class="cmt">// Exécuté UNE SEULE FOIS par client, puis lu depuis le cache pendant 24h</span>
+    ...
+}</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       7. RELATIONS ENTRE ENTITÉS
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="relations">
+    <h2>7. Relations entre les entités — Schéma général</h2>
+
+    <div class="rel-diagram">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                     CLIENT (Personne)                           │
+  │              identifié par NUM_SEQ_PERS (PK)                   │
+  │              stocké dans REFCLI.PERSONNE                       │
+  └────────┬──────────────┬──────────────┬──────────────┬──────────┘
+           │              │              │              │
+           ▼              ▼              ▼              ▼
+  ┌──────────────┐ ┌──────────────┐ ┌───────────┐ ┌──────────────┐
+  │ 1er          │ │  GROUPE      │ │  ASSOCIÉ  │ │  CANVAS      │
+  │ RESPONSABLE  │ │  (membres)   │ │           │ │  (dossier)   │
+  │              │ │              │ │           │ │              │
+  │ SMILE.MANDAT │ │ REFCLI.      │ │ table     │ │ CANEVAS_     │
+  │ SMILE.PERS.  │ │ PERSONNE     │ │ ASSOCIE   │ │ AGRICOLE     │
+  └──────┬───────┘ └──────┬───────┘ └─────┬─────┘ └──────┬───────┘
+         │                │               │               │
+         │  a ses         │  chaque        │  peut avoir   │  contient
+         │  propres       │  membre a      │  engagements  │  des crédits
+         ▼                ▼               ▼               ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                 ENGAGEMENTS (BNA + BCT)                         │
+  │  FCDP │ CME │ EPS │ ESC │ INV │ BPN │ AGR │ SBE  │ BCT        │
+  │  Schémas: SAEB / SAEBAGR / GEN / BI_USER                       │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                  CANVAS AGRICOLE (dossier)                      │
+  │  Lié au CLIENT via NUM_SEQPERS                                  │
+  ├──────────────────┬──────────────────┬───────────────────────────┤
+  │ CREDIT NATURE 1  │ CREDIT NATURE 2  │ CREDIT NATURE 3           │
+  │ Achat Terrain    │ Investissement   │ Court Terme               │
+  ├──────────────────┤                  │                           │
+  │ ┌─────────────┐  │                  │                           │
+  │ │  VENDEUR    │  │                  │                           │
+  │ │  (vendeur   │  │                  │                           │
+  │ │  du terrain)│  │                  │                           │
+  │ │  → peut     │  │                  │                           │
+  │ │  avoir un   │  │                  │                           │
+  │ │  numseqpers │  │                  │                           │
+  │ │  → engag.   │  │                  │                           │
+  │ └─────────────┘  │                  │                           │
+  └──────────────────┴──────────────────┴───────────────────────────┘
+    </div>
+
+    <h3>Tableau comparatif des 4 entités liées aux engagements</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Client Principal</th>
+            <th>1er Responsable</th>
+            <th>Groupe</th>
+            <th>Vendeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Onglet UI</strong></td>
+            <td>Onglet 1 (Relation)</td>
+            <td>Onglet 2</td>
+            <td>Onglet 3</td>
+            <td>Onglet 4</td>
+          </tr>
+          <tr>
+            <td><strong>Source SQL</strong></td>
+            <td>REFCLI.PERSONNE</td>
+            <td>SMILE.MANDAT + SMILE.PERSONNE</td>
+            <td>REFCLI.PERSONNE (COD_GRP)</td>
+            <td>Table VENDEUR locale</td>
+          </tr>
+          <tr>
+            <td><strong>Signal Angular</strong></td>
+            <td><code>numSeqPers</code></td>
+            <td><code>selectedNumSeqPersPremResp</code></td>
+            <td><code>selectedNumSeqPersGroupe</code></td>
+            <td><code>selectedNumSeqPersVendeur</code></td>
+          </tr>
+          <tr>
+            <td><strong>Engagements ?</strong></td>
+            <td>Oui — toujours</td>
+            <td>Oui — si a un numSeqPers</td>
+            <td>Oui — par membre sélectionné</td>
+            <td>Oui — si numseqpers non-null</td>
+          </tr>
+          <tr>
+            <td><strong>Identifiant clé</strong></td>
+            <td>numSeqPers</td>
+            <td>numSeqPers (du responsable)</td>
+            <td>codGrpPers (code groupe)</td>
+            <td>numseqpers (lien client)</td>
+          </tr>
+          <tr>
+            <td><strong>Données affichées</strong></td>
+            <td>Nom, adresse, classe, placements</td>
+            <td>CIN, date naissance, contact</td>
+            <td>Raison sociale, capital, gérant</td>
+            <td>Nom, type pièce, num pièce</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Les onglets de la page Engagements</h3>
+    <div class="tabs">
+      <div class="tab-item active">Onglet 1 : Relation (client principal)</div>
+      <div class="tab-item">Onglet 2 : 1er Responsable</div>
+      <div class="tab-item">Onglet 3 : Groupe</div>
+      <div class="tab-item">Onglet 4 : Vendeur</div>
+    </div>
+    <p>
+      Chaque onglet charge les engagements d'une <em>entité différente</em> liée au même client.
+      La logique est gérée dans <code>engagements.component.ts</code> via un <code>switch</code>
+      sur <code>activeTab</code>.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       8. API ENDPOINTS
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="api">
+    <h2>8. API REST — Tous les endpoints clés</h2>
+
+    <h3>Engagements</h3>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/engagement/all/{numSeqPers}</span>
+      <span class="desc">BNA + BCT + classifications (tout en un)</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/engagement/bna/{numSeqPers}</span>
+      <span class="desc">Uniquement les engagements BNA</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/engagement/bct/{numSeqPers}</span>
+      <span class="desc">Uniquement les engagements BCT</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/engagement/classeBNA/{numSeqPers}</span>
+      <span class="desc">Historique classification BNA (3 ans)</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/engagement/classeBCT/{numSeqPers}</span>
+      <span class="desc">Historique classification BCT (3 ans)</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/engagement/effort/{numSeqPers}</span>
+      <span class="desc">Montants des termes (calendrier de remboursement)</span>
+    </div>
+
+    <h3>Client</h3>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/client/getClientByPiece/{codeTypePiece}/{numPiece}</span>
+      <span class="desc">Charge client + responsable + groupes + comptes + placements</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/client/{numSeqPers}</span>
+      <span class="desc">Détails personne par numSeqPers</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/client/getGroupes/{numGrpGrp}</span>
+      <span class="desc">Liste des membres d'un groupe</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/client/placements/{numSeqPers}</span>
+      <span class="desc">Placements bancaires du client</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/client/getNameAndNumSeqPers/{typePiece}/{numPiece}</span>
+      <span class="desc">Nom + numSeqPers d'une personne (utile pour vendeur)</span>
+    </div>
+
+    <h3>Canvas &amp; Crédits</h3>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="url">/api/canevas/{idCaneva}</span>
+      <span class="desc">Canvas complet avec tous les crédits (nature 1/2/3) et vendeurs inclus</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="url">/api/canevas</span>
+      <span class="desc">Créer un nouveau canvas agricole</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="url">/api/credit-achat-terrain</span>
+      <span class="desc">Créer un crédit achat terrain (avec vendeurs)</span>
+    </div>
+    <div class="endpoint">
+      <span class="method put">PUT</span>
+      <span class="url">/api/credit-achat-terrain/{id}</span>
+      <span class="desc">Modifier un crédit achat terrain</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="url">/api/client-canvases</span>
+      <span class="desc">Sauvegarder les données du client canvas (fiche client)</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="url">/api/snapshots</span>
+      <span class="desc">Sauvegarder un snapshot d'engagement (photo des données à un instant T)</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       9. SCHÉMAS DE BASE DE DONNÉES
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="schemas">
+    <h2>9. Les schémas Oracle utilisés</h2>
+
+    <div class="schema-grid">
+      <div class="schema-box" style="background:#ebf3fb; border-left:4px solid #2980b9;">
+        <div class="schema-name">REFCLI</div>
+        <div style="color:#666;font-size:.8rem;margin-bottom:.3rem">Données client de référence</div>
+        <ul>
+          <li>PERSONNE</li>
+          <li>CLIENT</li>
+          <li>GROUPE</li>
+          <li>ACTIVITE</li>
+          <li>FORME_JURIDIQUE</li>
+        </ul>
+      </div>
+      <div class="schema-box" style="background:#eafaf1; border-left:4px solid #27ae60;">
+        <div class="schema-name">SAEB</div>
+        <div style="color:#666;font-size:.8rem;margin-bottom:.3rem">Engagements bancaires BNA</div>
+        <ul>
+          <li>ENGAG_COTE</li>
+          <li>ENGCOT_PRODUIT</li>
+          <li>CREDIT_CGEPS</li>
+          <li>CREDITS_CME</li>
+          <li>CREDITS_INV</li>
+          <li>CREDIT_ESC</li>
+          <li>CREDITCCI</li>
+          <li>HIST_CLASS_BNA</li>
+        </ul>
+      </div>
+      <div class="schema-box" style="background:#fef9e7; border-left:4px solid #e9a825;">
+        <div class="schema-name">SAEBAGR</div>
+        <div style="color:#666;font-size:.8rem;margin-bottom:.3rem">Crédits agricoles</div>
+        <ul>
+          <li>CREDIT_AGRI</li>
+        </ul>
+      </div>
+      <div class="schema-box" style="background:#f4ecf7; border-left:4px solid #9b59b6;">
+        <div class="schema-name">SMILE</div>
+        <div style="color:#666;font-size:.8rem;margin-bottom:.3rem">Contrats &amp; mandats</div>
+        <ul>
+          <li>CONTRAT_CPT</li>
+          <li>MANDAT</li>
+          <li>MANDAT_PERSONNE</li>
+          <li>PERSONNE</li>
+        </ul>
+      </div>
+      <div class="schema-box" style="background:#fdedec; border-left:4px solid #e74c3c;">
+        <div class="schema-name">BI_USER</div>
+        <div style="color:#666;font-size:.8rem;margin-bottom:.3rem">Business Intelligence (BCT)</div>
+        <ul>
+          <li>RETOUR_ENGAGEMENT_BCT</li>
+          <li>RETOUR_CLASSE_BCT</li>
+        </ul>
+      </div>
+      <div class="schema-box" style="background:#e8f8f5; border-left:4px solid #1abc9c;">
+        <div class="schema-name">GEN / CCI</div>
+        <div style="color:#666;font-size:.8rem;margin-bottom:.3rem">Données générales</div>
+        <ul>
+          <li>SBE_TOT_ENCOURS_CDI_PERS</li>
+          <li>(CCI — interdits chèques)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Tables locales (créées par Flyway migrations)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Table</th><th>Description</th><th>Relation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>CANEVAS_AGRICOLE</code></td><td>Dossier de demande de crédit agricole</td><td>→ CLIENT (num_seqpers)</td></tr>
+          <tr><td><code>SITES</code></td><td>Sites d'exploitation géolocalisés</td><td>→ CANEVAS_AGRICOLE</td></tr>
+          <tr><td><code>CREDIT_ACHAT_TERRAIN</code></td><td>Crédit nature 1 — achat terrain</td><td>→ CANEVAS_AGRICOLE</td></tr>
+          <tr><td><code>VENDEUR</code></td><td>Vendeur du terrain à financer</td><td>→ CREDIT_ACHAT_TERRAIN</td></tr>
+          <tr><td><code>ITEM_ACHAT_TERRAIN</code></td><td>Composantes du bien acheté</td><td>→ CREDIT_ACHAT_TERRAIN</td></tr>
+          <tr><td><code>RENDEMENT_VEGITAL</code></td><td>Rendements agricoles par culture</td><td>→ ITEM_ACHAT_TERRAIN</td></tr>
+          <tr><td><code>RESSOURCE_HYDRIQUE</code></td><td>Points d'eau, débit, salinité</td><td>→ ITEM_ACHAT_TERRAIN</td></tr>
+          <tr><td><code>ELEVAGE</code></td><td>Cheptel (type, race, nombre)</td><td>→ CREDIT_ACHAT_TERRAIN</td></tr>
+          <tr><td><code>MATERIEL</code></td><td>Équipements agricoles existants</td><td>→ CREDIT_ACHAT_TERRAIN</td></tr>
+          <tr><td><code>CREDIT_INVESTISSEMENT</code></td><td>Crédit nature 2</td><td>→ CANEVAS_AGRICOLE</td></tr>
+          <tr><td><code>CLIENT_CANVAS</code></td><td>Fiche client enrichie (observations, PPE…)</td><td>→ CLIENT</td></tr>
+          <tr><td><code>ASSOCIE</code></td><td>Associés / actionnaires</td><td>→ CLIENT</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       RÉSUMÉ FINAL
+  ═══════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>10. Résumé — Le cycle de vie d'une consultation</h2>
+
+    <div class="box box-success">
+      <strong>En 6 étapes simples, voici ce qui se passe quand un agent bancaire ouvre un dossier :</strong>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">1</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Recherche du client</strong>
+          <span>L'agent saisit un numéro CIN/Matricule. Angular appelle <code>/api/client/getClientByPiece</code> et charge toutes les infos du client (personne, groupe, responsable, comptes).</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">2</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Chargement des engagements (Onglet 1)</strong>
+          <span>Angular appelle <code>/api/engagement/all/{numSeqPers}</code>. Spring Boot lance 9 requêtes SQL (8 BNA + 1 BCT) en parallèle sur Oracle.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">3</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Engagements du 1er Responsable (Onglet 2)</strong>
+          <span>Si l'agent clique l'onglet 2, Angular récupère le <code>numSeqPers</code> du responsable et appelle le même endpoint d'engagements pour lui.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">4</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Engagements d'un membre du Groupe (Onglet 3)</strong>
+          <span>Si le client appartient à un groupe, la liste des membres est affichée. Sélectionner un membre charge ses engagements individuels.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">5</div><div class="flow-line" style="height:24px"></div></div>
+        <div class="flow-content">
+          <strong>Engagements du Vendeur (Onglet 4)</strong>
+          <span>Si le canvas contient un crédit achat terrain, les vendeurs identifiés dans la BNA sont listés. Sélectionner un vendeur charge ses engagements.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">6</div></div>
+        <div class="flow-content">
+          <strong>Mise en cache</strong>
+          <span>Toutes les données sont mises en cache (Caffeine, 24h). Si l'agent revient sur le même client dans la journée, aucune requête SQL n'est relancée.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  PGCANVAS — Documentation technique générée pour débutants · Projet bancaire de financement agricole
+</footer>
+
+</body>
+</html>
