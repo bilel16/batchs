@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Documentation Snapshot-History – Canevas Agricole</title>
+  <style>
+    :root {
+      --primary:   #1a6b3a;
+      --accent:    #2e9e57;
+      --light:     #f0f7f2;
+      --border:    #cde0d4;
+      --warn:      #b05e00;
+      --info:      #1455a4;
+      --danger:    #9b1c1c;
+      --code-bg:   #1e2530;
+      --code-txt:  #d6e8f0;
+      --text:      #1a1a1a;
+      --muted:     #5a6272;
+      --radius:    8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+      background: #f5f5f5;
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .page-wrapper { display: flex; min-height: 100vh; }
+
+    nav.sidebar {
+      width: 270px; min-width: 270px;
+      background: var(--primary);
+      color: #fff;
+      padding: 24px 0;
+      position: sticky; top: 0; height: 100vh;
+      overflow-y: auto;
+    }
+    nav.sidebar h2 {
+      font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px;
+      padding: 0 20px 12px; opacity: .65; border-bottom: 1px solid rgba(255,255,255,.15);
+    }
+    nav.sidebar ul { list-style: none; padding: 8px 0; }
+    nav.sidebar ul li a {
+      display: block; padding: 8px 20px;
+      color: rgba(255,255,255,.85); text-decoration: none; font-size: 13.5px;
+      border-left: 3px solid transparent; transition: all .15s;
+    }
+    nav.sidebar ul li a:hover,
+    nav.sidebar ul li a.active {
+      background: rgba(255,255,255,.12);
+      border-left-color: #7dffb3;
+      color: #fff;
+    }
+    nav.sidebar ul li.group { margin-top: 14px; }
+    nav.sidebar ul li.group > span {
+      display: block; padding: 4px 20px;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      opacity: .5;
+    }
+
+    main.content {
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 1100px;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #0f3d22 100%);
+      color: #fff; border-radius: var(--radius);
+      padding: 40px 48px; margin-bottom: 40px;
+    }
+    .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .hero p  { opacity: .8; font-size: 15px; max-width: 700px; }
+    .hero .badges { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-green  { background: rgba(125,255,179,.2); color: #7dffb3; }
+    .badge-blue   { background: rgba(100,180,255,.2); color: #90c8ff; }
+    .badge-orange { background: rgba(255,190,80,.2);  color: #ffd580; }
+
+    /* ── Section titles ──────────────────────────────────── */
+    section { margin-bottom: 48px; }
+    section h2 {
+      font-size: 22px; font-weight: 700; color: var(--primary);
+      border-left: 5px solid var(--accent); padding-left: 14px;
+      margin-bottom: 20px;
+    }
+    section h3 {
+      font-size: 17px; font-weight: 700; color: #2a2a2a;
+      margin: 24px 0 10px;
+    }
+    section h4 {
+      font-size: 14px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .8px;
+      margin: 18px 0 8px;
+    }
+    p { margin-bottom: 12px; }
+
+    /* ── Cards ──────────────────────────────────────────── */
+    .card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .card-mini {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+    }
+    .card-mini .icon { font-size: 28px; margin-bottom: 8px; }
+    .card-mini h4 { font-size: 13px; margin-bottom: 4px; color: var(--muted); text-transform: uppercase; letter-spacing:.6px;}
+    .card-mini p  { font-size: 13.5px; color: var(--text); margin: 0; }
+
+    /* ── Info / warning / tip boxes ─────────────────────── */
+    .box {
+      border-radius: var(--radius); padding: 14px 18px;
+      margin: 16px 0; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .box-icon { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+    .box.info    { background: #e8f1fb; border-left: 4px solid var(--info); }
+    .box.warn    { background: #fff4e5; border-left: 4px solid var(--warn); }
+    .box.tip     { background: #e8f8ee; border-left: 4px solid var(--accent); }
+    .box.danger  { background: #fde8e8; border-left: 4px solid var(--danger); }
+
+    /* ── Code blocks ─────────────────────────────────────── */
+    pre {
+      background: var(--code-bg); color: var(--code-txt);
+      border-radius: var(--radius); padding: 18px 20px;
+      overflow-x: auto; font-size: 13px; line-height: 1.65;
+      margin: 12px 0 20px;
+    }
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+    p code, li code {
+      background: #eef; color: #3a3a8a;
+      padding: 1px 5px; border-radius: 4px; font-size: 13px;
+    }
+    .kw  { color: #79c0ff; } /* keyword */
+    .ty  { color: #ffa657; } /* type */
+    .str { color: #a5d6ff; } /* string */
+    .cmt { color: #6a8f6a; } /* comment */
+    .fn  { color: #d2a8ff; } /* function */
+
+    /* ── Tables ──────────────────────────────────────────── */
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13.5px; margin: 14px 0 24px;
+    }
+    th {
+      background: var(--primary); color: #fff;
+      padding: 10px 14px; text-align: left; font-weight: 600;
+    }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--light); }
+    tr:hover td { background: #e0f0e8; }
+
+    /* ── Flow diagram ─────────────────────────────────────── */
+    .flow {
+      display: flex; flex-direction: column; gap: 0;
+      margin: 20px 0;
+    }
+    .flow-step {
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .flow-line {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .flow-dot {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; flex-shrink: 0;
+    }
+    .flow-connector {
+      width: 2px; flex: 1; min-height: 30px;
+      background: var(--border); margin: 4px auto;
+    }
+    .flow-body {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 18px;
+      flex: 1; margin-bottom: 8px;
+    }
+    .flow-body strong { font-size: 14px; }
+    .flow-body p { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+
+    /* ── Architecture diagram (ASCII-style) ──────────────── */
+    .arch {
+      background: var(--code-bg); color: #b0d8c0;
+      border-radius: var(--radius); padding: 24px;
+      font-family: monospace; font-size: 13px; line-height: 1.7;
+      overflow-x: auto; margin: 16px 0;
+    }
+    .arch .layer { color: #7dffb3; font-weight: 700; }
+    .arch .box-a { color: #ffa657; }
+    .arch .arrow { color: #6b9dcc; }
+    .arch .db    { color: #e8c97a; }
+
+    /* ── Improvements grid ───────────────────────────────── */
+    .improve-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px; margin: 20px 0;
+    }
+    .improve-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px;
+      border-top: 4px solid var(--accent);
+    }
+    .improve-card.high   { border-top-color: var(--danger); }
+    .improve-card.medium { border-top-color: var(--warn);  }
+    .improve-card.low    { border-top-color: var(--info);  }
+    .improve-card .tag {
+      display: inline-block; padding: 2px 9px; border-radius: 12px;
+      font-size: 11px; font-weight: 700; margin-bottom: 10px;
+    }
+    .improve-card.high   .tag { background: #fee; color: var(--danger); }
+    .improve-card.medium .tag { background: #fff3e0; color: var(--warn); }
+    .improve-card.low    .tag { background: #e8f1fb; color: var(--info); }
+    .improve-card h3 { font-size: 15px; margin-bottom: 8px; }
+    .improve-card p  { font-size: 13px; color: var(--muted); }
+
+    /* ── Tabs ─────────────────────────────────────────────── */
+    .tab-row { display: flex; gap: 4px; margin-bottom: 0; }
+    .tab-btn {
+      padding: 8px 18px; border-radius: 6px 6px 0 0;
+      border: 1px solid var(--border); border-bottom: none;
+      background: #eee; cursor: pointer; font-size: 13px;
+      transition: background .15s;
+    }
+    .tab-btn.active { background: #fff; font-weight: 700; color: var(--primary); }
+    .tab-panel {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 0 6px 6px 6px; padding: 20px 24px;
+      display: none;
+    }
+    .tab-panel.active { display: block; }
+
+    /* ── Misc helpers ─────────────────────────────────────── */
+    .muted      { color: var(--muted); }
+    .center     { text-align: center; }
+    ul.fancy li { padding: 4px 0 4px 20px; position: relative; }
+    ul.fancy li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+    ol.steps li { margin-bottom: 10px; }
+    hr.thin { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    .file-ref {
+      display: inline-block;
+      background: #f0f7f2; border: 1px solid var(--border);
+      border-radius: 4px; padding: 1px 7px;
+      font-family: monospace; font-size: 12px; color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+<!-- ──────────────── SIDEBAR ──────────────── -->
+<nav class="sidebar">
+  <h2>Snapshot History</h2>
+  <ul>
+    <li><a href="#vue-ensemble">Vue d'ensemble</a></li>
+    <li class="group"><span>Fonctionnel</span></li>
+    <li><a href="#fonctionnel-quoi">C'est quoi ?</a></li>
+    <li><a href="#fonctionnel-workflow">Workflow métier</a></li>
+    <li><a href="#fonctionnel-ui">Interface utilisateur</a></li>
+    <li><a href="#fonctionnel-roles">Rôles &amp; permissions</a></li>
+    <li class="group"><span>Technique Frontend</span></li>
+    <li><a href="#tech-frontend-structure">Structure fichiers</a></li>
+    <li><a href="#tech-frontend-signals">Signals Angular</a></li>
+    <li><a href="#tech-frontend-service">SnapshotService</a></li>
+    <li><a href="#tech-frontend-computed">Computed properties</a></li>
+    <li class="group"><span>Technique Backend</span></li>
+    <li><a href="#tech-backend-controller">Controller REST</a></li>
+    <li><a href="#tech-backend-service">Service métier</a></li>
+    <li><a href="#tech-backend-entities">Entités &amp; DTOs</a></li>
+    <li><a href="#tech-backend-bdd">Base de données</a></li>
+    <li class="group"><span>Flux de données</span></li>
+    <li><a href="#flux-creation">Création snapshot</a></li>
+    <li><a href="#flux-lecture">Lecture historique</a></li>
+    <li><a href="#flux-comparaison">Comparaison</a></li>
+    <li class="group"><span>Améliorations</span></li>
+    <li><a href="#amelio-bugs">Bugs potentiels</a></li>
+    <li><a href="#amelio-perf">Performance</a></li>
+    <li><a href="#amelio-arch">Architecture</a></li>
+    <li><a href="#amelio-ux">UX / Fonctionnel</a></li>
+  </ul>
+</nav>
+
+<!-- ──────────────── MAIN ──────────────── -->
+<main class="content">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Snapshot History — Documentation Technique &amp; Fonctionnelle</h1>
+    <p>Guide complet pour comprendre, maintenir et améliorer le système d'historique de snapshots du projet Canevas Agricole. Destiné aux développeurs débutants.</p>
+    <div class="badges">
+      <span class="badge badge-green">Angular 16+ Signals</span>
+      <span class="badge badge-blue">Spring Boot</span>
+      <span class="badge badge-orange">Oracle / JPA</span>
+      <span class="badge badge-green">REST API</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       VUE D'ENSEMBLE
+  ════════════════════════════════════════ -->
+  <section id="vue-ensemble">
+    <h2>1. Vue d'ensemble</h2>
+    <p>Le <strong>Snapshot History</strong> est le cœur du système de traçabilité du canevas agricole. À chaque action importante (validation, refoulement), une "photo" complète de toutes les données est sauvegardée. L'historique permet de voir qui a fait quoi et quand, de comparer deux versions, et de visualiser le détail d'une version passée.</p>
+
+    <div class="card-grid">
+      <div class="card-mini">
+        <div class="icon">📸</div>
+        <h4>Snapshot</h4>
+        <p>Photo immuable de toutes les données d'un canevas à un instant T (engagements, crédits, exploitation…)</p>
+      </div>
+      <div class="card-mini">
+        <div class="icon">📜</div>
+        <h4>Workflow Log</h4>
+        <p>Trace de chaque action métier (qui, quoi, quand, de quelle structure vers quelle structure)</p>
+      </div>
+      <div class="card-mini">
+        <div class="icon">🔀</div>
+        <h4>Comparaison</h4>
+        <p>Affiche les différences entre une version passée et la version courante (montants, statuts, comptes)</p>
+      </div>
+      <div class="card-mini">
+        <div class="icon">⚡</div>
+        <h4>Actions métier</h4>
+        <p>Valider &amp; Transmettre (VALID_DONNEE) ou Refouler (CORRIGE_DONNEE) déclenche un nouveau snapshot</p>
+      </div>
+    </div>
+
+    <div class="box info">
+      <span class="box-icon">💡</span>
+      <div><strong>Principe clé :</strong> Un snapshot est <em>immuable</em> — une fois créé, il ne change jamais. C'est comme un commit Git : vous ne modifiez pas l'historique, vous ajoutez toujours une nouvelle version. Cela garantit l'intégrité de l'audit.</div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FONCTIONNEL — C'EST QUOI
+  ════════════════════════════════════════ -->
+  <section id="fonctionnel-quoi">
+    <h2>2. C'est quoi un Snapshot ? (Fonctionnel)</h2>
+
+    <p>Imaginez un dossier de demande de crédit agricole. Ce dossier passe entre plusieurs services (Agence → Région → Direction). À chaque passage, on fait une photocopie de l'état du dossier à ce moment précis. C'est exactement ce qu'est un snapshot.</p>
+
+    <div class="card">
+      <h3>Ce qu'un snapshot capture</h3>
+      <table>
+        <thead><tr><th>Donnée capturée</th><th>Pourquoi ?</th><th>Format stocké</th></tr></thead>
+        <tbody>
+          <tr><td>Engagements BNA</td><td>Situation bancaire du client à la BNA</td><td>JSON (CLOB)</td></tr>
+          <tr><td>Engagements BCT</td><td>Situation bancaire nationale (Banque Centrale)</td><td>JSON (CLOB)</td></tr>
+          <tr><td>Données des parties liées</td><td>Actionnaires, responsable, groupe, vendeurs</td><td>JSON (CLOB)</td></tr>
+          <tr><td>Crédits</td><td>Court terme, investissement, achat terrain</td><td>JSON (CLOB)</td></tr>
+          <tr><td>Exploitation</td><td>Sites d'exploitation agricole</td><td>JSON (CLOB)</td></tr>
+          <tr><td>Garanties</td><td>Garanties associées au crédit</td><td>JSON (CLOB)</td></tr>
+          <tr><td>Métadonnées</td><td>Qui, quand, statut, structure, version</td><td>Colonnes SQL</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box tip">
+      <span class="box-icon">🌱</span>
+      <div><strong>Pour débutant :</strong> CLOB = "Character Large Object". C'est comme un champ texte dans la base de données, mais capable de stocker des millions de caractères. Ici, on y stocke du JSON (format texte structuré) représentant des objets complexes.</div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       WORKFLOW MÉTIER
+  ════════════════════════════════════════ -->
+  <section id="fonctionnel-workflow">
+    <h2>3. Workflow Métier</h2>
+
+    <p>Le canevas suit un circuit d'approbation à plusieurs niveaux. Chaque étape crée un snapshot.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>INIT_DONNEE — Saisie (AGC)</strong>
+          <p>L'agence (AGC) saisit les données du canevas agricole. Pas encore de snapshot.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>VALID_DONNEE — Validation AGC ➜ DR</strong>
+          <p>L'AGC clique "Valider &amp; Transmettre". Un snapshot V1 est créé et le dossier part à la Direction Régionale (DR). Un log "VALIDER" est enregistré.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>CORRIGE_DONNEE — Refoulement DR ➜ AGC</strong>
+          <p>La DR constate une erreur et "Refoule" le dossier. Un snapshot V2 est créé avec le motif de refoulement. Le dossier retourne à l'AGC pour correction.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>PEC_DONNEE → VALIDER_DR → DEC_FINAL…</strong>
+          <p>La DR prend en charge, donne son avis, puis la DC prend la décision finale (accord ou rejet). À chaque étape, un nouveau snapshot est créé.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Statuts possibles d'un snapshot</h3>
+    <table>
+      <thead><tr><th>Statut (code)</th><th>Signification</th><th>Qui l'atteint ?</th></tr></thead>
+      <tbody>
+        <tr><td><code>INIT_DONNEE</code></td><td>Données en cours de saisie</td><td>AGC</td></tr>
+        <tr><td><code>VALID_DONNEE</code></td><td>Données validées, transmises au DR</td><td>AGC</td></tr>
+        <tr><td><code>CORRIGE_DONNEE</code></td><td>Données renvoyées pour correction</td><td>DR / DC</td></tr>
+        <tr><td><code>PEC_DONNEE</code></td><td>Prise en charge par le DR</td><td>DR</td></tr>
+        <tr><td><code>PEC_AVIS_DEC</code></td><td>Avis / décision en cours</td><td>DR</td></tr>
+        <tr><td><code>VALIDER_DR</code></td><td>Validé par le DR, transmis DC</td><td>DR</td></tr>
+        <tr><td><code>CORRIGE_AVIS_DEC</code></td><td>Avis/décision renvoyé pour correction</td><td>DC</td></tr>
+        <tr><td><code>DEC_FINAL_PRISE_ACCORD</code></td><td>Décision finale : ACCORDÉ</td><td>DC</td></tr>
+        <tr><td><code>DEC_FINAL_PRISE_REJET</code></td><td>Décision finale : REFUSÉ</td><td>DC</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       INTERFACE UTILISATEUR
+  ════════════════════════════════════════ -->
+  <section id="fonctionnel-ui">
+    <h2>4. Interface Utilisateur</h2>
+
+    <div class="card">
+      <h3>Structure de la page (en 3 zones)</h3>
+      <pre><code>┌────────────────────────────────────────────────────────────┐
+│  CARTE PROGRESSION              [Stepper 4 étapes]         │
+│  Saisie → Validation → Analyse → Décision                  │
+│  Badge statut courant : "En cours de validation" [WARNING] │
+└────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│  [ONGLET 1 : Journal Workflow] [ONGLET 2 : Snapshots]      │
+├────────────────────────────────────────────────────────────┤
+│  Onglet 1 – Timeline                                        │
+│  ● Validation AGC001 → DR01  |  12/01/2025 10:30           │
+│  ● Refoulement DR01 → AGC001 |  15/01/2025 14:00           │
+├────────────────────────────────────────────────────────────┤
+│  Onglet 2 – Tableau Snapshots                               │
+│  V# | Structure | Statut | Créé par | Date | [👁] [≈]      │
+│   1 | AGC-001   | VALID  | Ali.B    | ...  |  ✓   ✓       │
+│   2 | DR-05     | CORRIG | Sara.K   | ...  |  ✓   ✓       │
+└────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│  [Boutons action] : [Valider &amp; Transmettre] [Refouler]      │
+│  (visibles seulement si l'utilisateur a le rôle adéquat)   │
+└────────────────────────────────────────────────────────────┘</code></pre>
+    </div>
+
+    <h3>Panneau Détail d'un Snapshot (clic sur 👁)</h3>
+    <p>Ouvre un panneau latéral avec 7 onglets de données :</p>
+    <table>
+      <thead><tr><th>Onglet</th><th>Contenu</th><th>Source données</th></tr></thead>
+      <tbody>
+        <tr><td>Engagements BNA</td><td>Tableau des engagements à la BNA</td><td><code>engagementBnaJson</code></td></tr>
+        <tr><td>Engagements BCT</td><td>Tableau de la situation BCT nationale</td><td><code>engagementBctJson</code></td></tr>
+        <tr><td>Actionnaires</td><td>Liste des actionnaires + leurs engagements</td><td><code>engagementDetaille.actionnaires</code></td></tr>
+        <tr><td>1er Responsable</td><td>Données du responsable principal</td><td><code>engagementDetaille.premierResponsable</code></td></tr>
+        <tr><td>Vendeurs</td><td>Vendeurs de terrain (si crédit achat terrain)</td><td><code>engagementDetaille.vendeurs</code></td></tr>
+        <tr><td>Crédits</td><td>JSON brut des crédits (CT, invest., terrain)</td><td><code>donneesCreditsJson</code></td></tr>
+        <tr><td>Exploitation</td><td>JSON brut des sites d'exploitation</td><td><code>donneesExploitationJson</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Mode Comparaison (clic sur ≈)</h3>
+    <p>Compare le snapshot sélectionné avec la version la plus récente. Affiche 13 indicateurs de différence :</p>
+    <pre><code>┌─────────────────────┬────────────┬───────────┬──────────────┐
+│ Indicateur          │ Avant      │ Après     │ Évolution    │
+├─────────────────────┼────────────┼───────────┼──────────────┤
+│ Total crédits CT    │ 150 000 DT │ 200 000 DT│ ↑ Augmenté   │
+│ Total crédits Inv.  │ 300 000 DT │ 300 000 DT│ = Inchangé   │
+│ Nb engagements BNA  │ 3          │ 4         │ ↑ Augmenté   │
+│ Statut              │ VALID_DONN.│CORRIG_DON.│ ★ Modifié    │
+│ ...                 │ ...        │ ...       │ ...          │
+└─────────────────────┴────────────┴───────────┴──────────────┘</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       RÔLES ET PERMISSIONS
+  ════════════════════════════════════════ -->
+  <section id="fonctionnel-roles">
+    <h2>5. Rôles &amp; Permissions</h2>
+
+    <table>
+      <thead><tr><th>Rôle</th><th>Type</th><th>Peut agir ?</th><th>Voit dans le journal</th></tr></thead>
+      <tbody>
+        <tr><td>AGC (Agence)</td><td>1</td><td>Oui (type 2 OU 5 dans le code)</td><td>Ses propres logs uniquement</td></tr>
+        <tr><td>DR (Direction Régionale)</td><td>2</td><td>Oui</td><td>Ses logs + logs des AGC sous sa tutelle</td></tr>
+        <tr><td>DC (Direction Centrale)</td><td>5+</td><td>Oui</td><td>Tous les logs</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box warn">
+      <span class="box-icon">⚠️</span>
+      <div><strong>Attention — incohérence dans le code :</strong> La propriété calculée <code>canAct</code> vérifie <code>type === 2 || type === 5</code> (DR et DC), mais les AGC (type 1) ne peuvent donc pas déclencher d'actions depuis cette vue. Ce comportement est peut-être intentionnel, mais mérite vérification.</div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TECH FRONTEND — STRUCTURE FICHIERS
+  ════════════════════════════════════════ -->
+  <section id="tech-frontend-structure">
+    <h2>6. Structure des Fichiers Frontend</h2>
+
+    <pre><code>frontend-app1/src/app/
+│
+├── _services/
+│   └── <span class="fn">snapshot.service.ts</span>          ← Appels HTTP vers le backend
+│
+├── _components/pages/canvas.agricole/
+│   └── snapshot-history/
+│       ├── <span class="fn">snapshot-history.component.ts</span>  ← Logique principale (479 lignes)
+│       ├── <span class="fn">snapshot-history.component.html</span> ← Template HTML (415 lignes)
+│       └── <span class="fn">snapshot-history.component.css</span>  ← Styles (341 lignes)
+│
+├── canvas.agricole/
+│   ├── <span class="fn">canvas.agricole.module.ts</span>       ← Déclaration du composant (ligne 227)
+│   └── <span class="fn">canvas.agricole-routing.module.ts</span> ← Route 'snapshots' (ligne 44)</code></pre>
+
+    <div class="box info">
+      <span class="box-icon">📂</span>
+      <div><strong>Convention Angular :</strong> Chaque composant a 3 fichiers : <code>.ts</code> (logique), <code>.html</code> (template), <code>.css</code> (styles). Le fichier <code>.ts</code> est le plus important — c'est là que toute la logique vit.</div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TECH FRONTEND — ANGULAR SIGNALS
+  ════════════════════════════════════════ -->
+  <section id="tech-frontend-signals">
+    <h2>7. Gestion d'État avec Angular Signals</h2>
+
+    <p>Ce projet utilise les <strong>Signals Angular 16+</strong> pour gérer l'état du composant. C'est une alternative moderne à RxJS/NgRx, plus simple à comprendre.</p>
+
+    <div class="box tip">
+      <span class="box-icon">🌱</span>
+      <div><strong>Signal = variable réactive :</strong> Quand sa valeur change, Angular re-rend automatiquement seulement les parties du DOM qui en dépendent. C'est comme <code>useState</code> en React, mais pour Angular.</div>
+    </div>
+
+    <h3>Tous les Signals du composant</h3>
+    <pre><code><span class="cmt">// === ÉTAT PRINCIPAL ===</span>
+<span class="fn">history</span>       = signal&lt;<span class="ty">SnapshotSummary[]</span>&gt;([])   <span class="cmt">// liste des snapshots</span>
+<span class="fn">workflowLog</span>   = signal&lt;<span class="ty">WorkflowLogEntry[]</span>&gt;([]) <span class="cmt">// journal des actions</span>
+<span class="fn">selectedSnap</span>  = signal&lt;<span class="ty">SnapshotDetail | null</span>&gt;(null) <span class="cmt">// snapshot ouvert</span>
+<span class="fn">loading</span>       = signal(<span class="kw">false</span>)               <span class="cmt">// indicateur chargement</span>
+
+<span class="cmt">// === NAVIGATION ===</span>
+<span class="fn">activeTab</span>     = signal&lt;<span class="str">'log' | 'snapshots'</span>&gt;(<span class="str">'log'</span>)
+
+<span class="cmt">// === DIALOGUES ===</span>
+<span class="fn">showValidDlg</span>  = signal(<span class="kw">false</span>)
+<span class="fn">showRefoulDlg</span> = signal(<span class="kw">false</span>)
+
+<span class="cmt">// === MODE COMPARAISON ===</span>
+<span class="fn">compareMode</span>    = signal(<span class="kw">false</span>)
+<span class="fn">compareOldSnap</span> = signal&lt;<span class="ty">SnapshotDetail | null</span>&gt;(null)
+<span class="fn">compareNewSnap</span> = signal&lt;<span class="ty">SnapshotDetail | null</span>&gt;(null)
+<span class="fn">compareLoading</span> = signal(<span class="kw">false</span>)
+<span class="fn">compareOldLabel</span>= signal(<span class="str">''</span>)
+<span class="fn">compareNewLabel</span>= signal(<span class="str">''</span>)</code></pre>
+
+    <h3>Computed Properties (valeurs dérivées automatiques)</h3>
+    <p>Les <code>computed()</code> recalculent automatiquement leur valeur quand les signals dont ils dépendent changent :</p>
+    <pre><code><span class="cmt">// Filtre les logs selon le rôle utilisateur</span>
+<span class="fn">filteredLogs</span> = computed(() => {
+  <span class="kw">const</span> logs = this.<span class="fn">workflowLog</span>()    <span class="cmt">// lit le signal</span>
+  <span class="kw">if</span> (userType === 1) <span class="kw">return</span> logs.filter(l => l.fromStructure === myCode)
+  <span class="kw">if</span> (userType === 2) <span class="kw">return</span> logs.filter(l => l.fromStructure === myCode
+                                          || l.structureMere === myCode)
+  <span class="kw">return</span> logs <span class="cmt">// type 5+ : DC voit tout</span>
+})
+
+<span class="cmt">// Construit les 4 étapes du stepper de progression</span>
+<span class="fn">progressSteps</span> = computed(() => {
+  <span class="kw">const</span> logs = this.<span class="fn">workflowLog</span>()
+  <span class="kw">return</span> [
+    { label: <span class="str">'Saisie'</span>, done: logs.some(l => l.action === <span class="str">'VALIDER'</span>) },
+    { label: <span class="str">'Validation'</span>, done: logs.some(l => l.action === <span class="str">'VALIDER_DR'</span>) },
+    { label: <span class="str">'Analyse'</span>,    done: logs.some(l => l.action === <span class="str">'PEC_AVIS_DEC'</span>) },
+    { label: <span class="str">'Décision'</span>,   done: logs.some(l => l.action.startsWith(<span class="str">'DEC_FINAL'</span>)) }
+  ]
+})
+
+<span class="cmt">// Construit le tableau de comparaison (13 lignes de diff)</span>
+<span class="fn">diffRows</span> = computed(() => {
+  <span class="kw">const</span> oldSnap = this.<span class="fn">compareOldSnap</span>()
+  <span class="kw">const</span> newSnap = this.<span class="fn">compareNewSnap</span>()
+  <span class="kw">if</span> (!oldSnap || !newSnap) <span class="kw">return</span> []
+  <span class="cmt">// Compare chaque indicateur et retourne les différences</span>
+})</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TECH FRONTEND — SERVICE
+  ════════════════════════════════════════ -->
+  <section id="tech-frontend-service">
+    <h2>8. SnapshotService (Appels HTTP)</h2>
+
+    <p>Le service est la couche de communication entre le composant Angular et le serveur backend. Il utilise <code>HttpClient</code> d'Angular.</p>
+
+    <pre><code><span class="kw">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="kw">export class</span> <span class="ty">SnapshotService</span> {
+
+  <span class="cmt">// URL de base de l'API</span>
+  <span class="kw">private</span> base = <span class="str">`/api/canevas`</span>
+
+  <span class="cmt">// ① Récupère la liste de tous les snapshots d'un canevas</span>
+  <span class="fn">getHistory</span>(id: <span class="ty">number</span>): Observable&lt;<span class="ty">SnapshotSummary[]</span>&gt; {
+    <span class="kw">return</span> this.http.get&lt;<span class="ty">SnapshotSummary[]</span>&gt;(`${this.base}/${id}/snapshots`)
+  }
+
+  <span class="cmt">// ② Récupère le détail complet d'un snapshot spécifique</span>
+  <span class="fn">getBySnapshotId</span>(canevasId: <span class="ty">number</span>, snapshotId: <span class="ty">number</span>) {
+    <span class="kw">return</span> this.http.get(`${this.base}/${canevasId}/snapshots/${snapshotId}/detail`)
+  }
+
+  <span class="cmt">// ③ Récupère les logs filtrés par rôle</span>
+  <span class="fn">getWorkflowLog</span>(id: <span class="ty">number</span>, typeStructure?: <span class="ty">number</span>, codeStructure?: <span class="ty">string</span>) {
+    <span class="kw">let</span> params = <span class="kw">new</span> <span class="ty">HttpParams</span>()
+    <span class="kw">if</span> (typeStructure) params = params.set(<span class="str">'typeStructure'</span>, typeStructure)
+    <span class="kw">if</span> (codeStructure)  params = params.set(<span class="str">'codeStructure'</span>, codeStructure)
+    <span class="kw">return</span> this.http.get(`${this.base}/${id}/snapshots/workflow-log`, { params })
+  }
+
+  <span class="cmt">// ④ Valide et transmet le canevas → crée snapshot VALID_DONNEE</span>
+  <span class="fn">validerEtTransmettre</span>(id: <span class="ty">number</span>, req: <span class="ty">ValidationRequest</span>) {
+    <span class="kw">return</span> this.http.post(`${this.base}/${id}/valider`, req)
+  }
+
+  <span class="cmt">// ⑤ Refoule le canevas → crée snapshot CORRIGE_DONNEE</span>
+  <span class="fn">refouler</span>(id: <span class="ty">number</span>, req: <span class="ty">RefoulementRequest</span>) {
+    <span class="kw">return</span> this.http.post(`${this.base}/${id}/refouler`, req)
+  }
+}</code></pre>
+
+    <h3>Interfaces TypeScript (modèles de données frontend)</h3>
+    <pre><code><span class="kw">interface</span> <span class="ty">SnapshotSummary</span> {           <span class="cmt">// Pour la liste historique</span>
+  snapshotId:       <span class="ty">number</span>
+  structureCode:    <span class="ty">string</span>            <span class="cmt">// ex: "AGC-001"</span>
+  structureLabel:   <span class="ty">string</span>            <span class="cmt">// ex: "Agence Tunis Centre"</span>
+  versionNumber:    <span class="ty">number</span>            <span class="cmt">// 1, 2, 3…</span>
+  statusAtSnapshot: <span class="ty">string</span>            <span class="cmt">// ex: "VALID_DONNEE"</span>
+  createdBy:        <span class="ty">string</span>            <span class="cmt">// nom utilisateur</span>
+  matricule:        <span class="ty">string</span>            <span class="cmt">// matricule agent</span>
+  createdAt:        <span class="ty">string</span>            <span class="cmt">// date ISO</span>
+  observations:     <span class="ty">string</span>
+}
+
+<span class="kw">interface</span> <span class="ty">SnapshotDetail</span> <span class="kw">extends</span> <span class="ty">SnapshotSummary</span> { <span class="cmt">// Pour le détail</span>
+  engagementsBNA:      <span class="ty">any[]</span>
+  engagementsBCT:      <span class="ty">any[]</span>
+  classeBNA:           <span class="ty">any[]</span>
+  classeBCT:           <span class="ty">any[]</span>
+  classeRetour:        <span class="ty">any[]</span>
+  engagementDetaille:  <span class="ty">EngagementDetaille</span>  <span class="cmt">// 5 parties</span>
+  creditsData:         <span class="ty">any</span>
+  exploitationData:    <span class="ty">any</span>
+  garantiesData:       <span class="ty">any</span>
+}</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TECH FRONTEND — COMPUTED
+  ════════════════════════════════════════ -->
+  <section id="tech-frontend-computed">
+    <h2>9. Méthodes Clés du Composant</h2>
+
+    <div class="card">
+      <h3>Méthodes et leur rôle</h3>
+      <table>
+        <thead><tr><th>Méthode</th><th>Lignes</th><th>Ce qu'elle fait</th></tr></thead>
+        <tbody>
+          <tr><td><code>ngOnInit()</code></td><td>270-293</td><td>Charge l'historique et les logs au démarrage du composant</td></tr>
+          <tr><td><code>openSnapshot(snap)</code></td><td>296-308</td><td>Charge le détail complet d'un snapshot et l'affiche</td></tr>
+          <tr><td><code>closeSnapshot()</code></td><td>309-316</td><td>Ferme le panneau de détail</td></tr>
+          <tr><td><code>openCompare(snap)</code></td><td>318-350</td><td>Charge l'ancien snapshot + le dernier, active le mode comparaison</td></tr>
+          <tr><td><code>closeCompare()</code></td><td>351-365</td><td>Désactive le mode comparaison</td></tr>
+          <tr><td><code>valider()</code></td><td>368-385</td><td>Appelle le service pour valider, recharge l'historique</td></tr>
+          <tr><td><code>refouler()</code></td><td>386-397</td><td>Appelle le service pour refouler, recharge l'historique</td></tr>
+          <tr><td><code>computeCreditsTotal(snap)</code></td><td>463-468</td><td>Additionne tous les montants de crédits d'un snapshot</td></tr>
+          <tr><td><code>computeEngagementsTotal(snap)</code></td><td>469-473</td><td>Compte le nb total d'engagements BNA + BCT</td></tr>
+          <tr><td><code>computeSitesCount(snap)</code></td><td>474-478</td><td>Compte le nb de sites d'exploitation</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TECH BACKEND — CONTROLLER
+  ════════════════════════════════════════ -->
+  <section id="tech-backend-controller">
+    <h2>10. Controller REST (Backend)</h2>
+
+    <p>Le controller est le point d'entrée HTTP. Il reçoit les requêtes, délègue au service, et renvoie la réponse.</p>
+    <p>Fichier : <span class="file-ref">backend-saeb/…/web/CanevasSnapshotController.java</span></p>
+
+    <table>
+      <thead><tr><th>Méthode HTTP</th><th>URL</th><th>Action</th><th>Retour</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST</code></td><td><code>/api/canevas/{id}/valider</code></td><td>Valider &amp; Transmettre</td><td><code>SnapshotResponseDto</code></td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/canevas/{id}/refouler</code></td><td>Refouler</td><td><code>SnapshotResponseDto</code></td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/canevas/{id}/snapshots</code></td><td>Historique liste</td><td><code>List&lt;SnapshotSummaryDto&gt;</code></td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/canevas/{id}/snapshots/{snId}/detail</code></td><td>Détail snapshot</td><td><code>SnapshotDetailDto</code></td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/canevas/{id}/snapshots/structure/{code}</code></td><td>Dernier snapshot d'une structure</td><td><code>SnapshotDetailDto</code></td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/canevas/{id}/snapshots/workflow-log</code></td><td>Logs filtrés</td><td><code>List&lt;WorkflowLog&gt;</code></td></tr>
+      </tbody>
+    </table>
+
+    <pre><code><span class="cmt">// Exemple : endpoint validation</span>
+<span class="kw">@PostMapping</span>(<span class="str">"/{id}/valider"</span>)
+<span class="kw">public</span> ResponseEntity&lt;<span class="ty">SnapshotResponseDto</span>&gt; <span class="fn">valider</span>(
+    <span class="kw">@PathVariable</span> <span class="ty">Long</span> id,
+    <span class="kw">@RequestBody</span> <span class="ty">ValidationRequestDto</span> req
+) {
+    <span class="cmt">// 1. Crée le snapshot avec le statut VALID_DONNEE</span>
+    <span class="ty">CanevasStructureSnapshot</span> snap = snapshotService.<span class="fn">createSnapshot</span>(id, req, <span class="str">"VALID_DONNEE"</span>)
+    <span class="cmt">// 2. Enregistre le log "VALIDER"</span>
+    workflowLogService.<span class="fn">log</span>(id, req.fromStructureCode(), req.toStructureCode(),
+                           <span class="str">"VALIDER"</span>, snap.getVersionNumber(), snap.getSnapshotId(),
+                           req.observations(), req.matricule(), null)
+    <span class="cmt">// 3. Renvoie l'ID, la version, et le code structure</span>
+    <span class="kw">return</span> ResponseEntity.<span class="fn">ok</span>(<span class="kw">new</span> <span class="ty">SnapshotResponseDto</span>(snap.getSnapshotId(),
+                                                         snap.getVersionNumber(),
+                                                         snap.getStructureCode()))
+}</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       TECH BACKEND — SERVICE
+  ════════════════════════════════════════ -->
+  <section id="tech-backend-service">
+    <h2>11. CanevasSnapshotService (Cœur Métier)</h2>
+
+    <p>Fichier : <span class="file-ref">backend-saeb/…/service/CanevasSnapshotService.java</span> — 590 lignes</p>
+    <p>C'est le service le plus important. Il fait tout le travail de "photographier" les données.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>createSnapshot() — Lignes 46-120</strong>
+          <p>Calcule le numéro de version suivant (MAX + 1), charge le canevas complet, puis délègue à 4 méthodes de construction</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>buildFullEngagementDetailleJson() — Lignes 127-192</strong>
+          <p>Construit les 5 onglets de parties liées : relation principale, actionnaires, responsable, groupe, vendeurs</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>buildCreditsJson() — Lignes 408-441</strong>
+          <p>Sérialise tous les types de crédits (court terme, investissement, achat terrain) en JSON</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>buildExploitationJson() + buildGarantiesJson() — Lignes 442-464</strong>
+          <p>Sérialise les sites d'exploitation et les garanties</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot">5</div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <strong>snapshotRepo.save(snapshot)</strong>
+          <p>Persiste le snapshot en base de données avec toutes les colonnes CLOB remplies</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Méthodes de chargement sécurisé (Safe Loading)</h3>
+    <div class="box warn">
+      <span class="box-icon">🛡️</span>
+      <div>Ces méthodes (lignes 472-516) utilisent des blocs <code>try-catch</code> pour ne pas faire planter la création du snapshot si une donnée secondaire est introuvable. Si <code>loadEngagementSafe()</code> échoue, le snapshot est quand même créé avec les autres données disponibles.</div>
+    </div>
+
+    <pre><code><span class="kw">private</span> <span class="ty">EngagementBNADTO</span> <span class="fn">loadEngagementSafe</span>(<span class="ty">Long</span> numSeqPers) {
+    <span class="kw">try</span> {
+        <span class="kw">return</span> engagementService.<span class="fn">getByNumSeqPers</span>(numSeqPers)
+    } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+        log.warn(<span class="str">"Engagement not found for {}"</span>, numSeqPers)
+        <span class="kw">return null</span>  <span class="cmt">// snapshot continue sans cette donnée</span>
+    }
+}</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       ENTITÉS ET DTOs
+  ════════════════════════════════════════ -->
+  <section id="tech-backend-entities">
+    <h2>12. Entités &amp; DTOs Backend</h2>
+
+    <div class="box info">
+      <span class="box-icon">💡</span>
+      <div><strong>DTO vs Entité :</strong> Une <em>Entité</em> représente une table en base de données (@Entity). Un <em>DTO</em> (Data Transfer Object) est un objet "emballage" utilisé pour envoyer/recevoir des données via l'API. Le service fait le mapping entre les deux.</div>
+    </div>
+
+    <div class="card">
+      <h3>CanevasStructureSnapshot (Entité principale)</h3>
+      <p>Fichier : <span class="file-ref">…/entities/CanevasStructureSnapshot.java</span> — Table : <code>CANEVAS_STRUCTURE_SNAPSHOT</code></p>
+      <table>
+        <thead><tr><th>Colonne Java</th><th>Colonne SQL</th><th>Type</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td>snapshotId</td><td>SNAPSHOT_ID</td><td>Long (PK)</td><td>Identifiant unique auto-incrémenté</td></tr>
+          <tr><td>canevasId</td><td>CANEVAS_ID</td><td>Long (FK)</td><td>Référence au canevas</td></tr>
+          <tr><td>structureCode</td><td>STRUCTURE_CODE</td><td>VARCHAR(20)</td><td>Code de la structure (AGC-001, DR-05…)</td></tr>
+          <tr><td>versionNumber</td><td>VERSION_NUMBER</td><td>INTEGER</td><td>Numéro de version (1, 2, 3…)</td></tr>
+          <tr><td>statusAtSnapshot</td><td>STATUS_AT_SNAPSHOT</td><td>VARCHAR(50)</td><td>Statut workflow au moment du snapshot</td></tr>
+          <tr><td>createdBy</td><td>CREATED_BY</td><td>VARCHAR</td><td>Nom de l'utilisateur créateur</td></tr>
+          <tr><td>createdAt</td><td>CREATED_AT</td><td>TIMESTAMP</td><td>Date/heure de création (auto)</td></tr>
+          <tr><td>engagementBnaJson</td><td>ENGAGEMENT_BNA_JSON</td><td>CLOB</td><td>JSON : liste engagements BNA</td></tr>
+          <tr><td>engagementBctJson</td><td>ENGAGEMENT_BCT_JSON</td><td>CLOB</td><td>JSON : liste engagements BCT</td></tr>
+          <tr><td>engagementDetailleJson</td><td>ENGAGEMENT_DETAILLE_JSON</td><td>CLOB</td><td>JSON : 5 onglets parties liées</td></tr>
+          <tr><td>donneesCreditsJson</td><td>DONNEES_CREDITS_JSON</td><td>CLOB</td><td>JSON : tous les crédits</td></tr>
+          <tr><td>donneesExploitationJson</td><td>DONNEES_EXPLOITATION_JSON</td><td>CLOB</td><td>JSON : sites d'exploitation</td></tr>
+          <tr><td>donneesGarantiesJson</td><td>DONNEES_GARANTIES_JSON</td><td>CLOB</td><td>JSON : garanties</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>CanevasWorkflowLog (Journal d'actions)</h3>
+      <p>Table : <code>CANEVAS_WORKFLOW_LOG</code></p>
+      <table>
+        <thead><tr><th>Colonne</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td>logId</td><td>PK auto-incrémenté</td></tr>
+          <tr><td>canevasId</td><td>FK vers le canevas</td></tr>
+          <tr><td>fromStructure</td><td>Structure émettrice (ex: AGC-001)</td></tr>
+          <tr><td>toStructure</td><td>Structure destinataire (ex: DR-05)</td></tr>
+          <tr><td>action</td><td>VALIDER / REFOULER / DECISION_FINALE…</td></tr>
+          <tr><td>snapshotVersion</td><td>Numéro de version du snapshot associé</td></tr>
+          <tr><td>snapshotId</td><td>FK vers le snapshot qui a déclenché ce log</td></tr>
+          <tr><td>performedBy</td><td>Matricule de l'agent</td></tr>
+          <tr><td>performedAt</td><td>Horodatage automatique</td></tr>
+          <tr><td>structureMere</td><td>Structure parente (DR supérieur de l'AGC) — pour le filtrage hiérarchique</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       BASE DE DONNÉES
+  ════════════════════════════════════════ -->
+  <section id="tech-backend-bdd">
+    <h2>13. Base de Données</h2>
+
+    <div class="arch">
+<span class="layer">TABLE : CANEVAS_AGRICOLE (table principale)</span>
+  CANEVAS_ID  (PK)
+  ...
+  CURRENT_VERSION     ← Numéro de la version courante
+  CURRENT_STRUCTURE   ← Structure qui a le dossier en ce moment
+  LAST_SNAPSHOT_ID    ← FK vers le dernier snapshot créé
+
+<span class="arrow">    ↓ 1:N</span>
+
+<span class="layer">TABLE : CANEVAS_STRUCTURE_SNAPSHOT</span>
+  SNAPSHOT_ID   (PK, auto-incrémenté)
+  CANEVAS_ID    (FK → CANEVAS_AGRICOLE)
+  VERSION_NUMBER
+  STRUCTURE_CODE
+  STATUS_AT_SNAPSHOT
+  CREATED_AT  /  CREATED_BY
+  [10 colonnes CLOB pour stocker les JSON]
+
+<span class="arrow">    ↑ FK (snapshotId)</span>
+
+<span class="layer">TABLE : CANEVAS_WORKFLOW_LOG</span>
+  LOG_ID       (PK, auto-incrémenté)
+  CANEVAS_ID   (FK → CANEVAS_AGRICOLE)
+  FROM_STRUCTURE  /  TO_STRUCTURE
+  ACTION
+  SNAPSHOT_ID  (FK → CANEVAS_STRUCTURE_SNAPSHOT)
+  PERFORMED_BY  /  PERFORMED_AT
+  STRUCTURE_MERE
+    </div>
+
+    <h3>Repository JPA (requêtes SQL déclaratives)</h3>
+    <pre><code><span class="cmt">// Pas besoin d'écrire du SQL ! Spring Data JPA génère les requêtes</span>
+<span class="cmt">// à partir du nom de la méthode Java :</span>
+
+<span class="cmt">// SELECT * FROM snapshot WHERE canevas_id=? ORDER BY version_number ASC</span>
+List&lt;<span class="ty">CanevasStructureSnapshot</span>&gt; <span class="fn">findByCanevasIdOrderByVersionNumberAsc</span>(<span class="ty">Long</span> canevasId)
+
+<span class="cmt">// SELECT MAX(version_number) FROM snapshot WHERE canevas_id=?</span>
+<span class="kw">@Query</span>(<span class="str">"SELECT MAX(s.versionNumber) FROM CanevasStructureSnapshot s WHERE s.canevasId = :canevasId"</span>)
+Optional&lt;<span class="ty">Integer</span>&gt; <span class="fn">findMaxVersionByCanevasId</span>(<span class="ty">Long</span> canevasId)</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FLUX CRÉATION
+  ════════════════════════════════════════ -->
+  <section id="flux-creation">
+    <h2>14. Flux Complet : Création d'un Snapshot</h2>
+
+    <div class="arch">
+<span class="layer">1. UTILISATEUR</span>  clique "Valider &amp; Transmettre" + remplit le formulaire
+          |
+          | POST /api/canevas/42/valider
+          | Body: { fromStructure: "AGC-001", toStructure: "DR-05", avis: "FAVORABLE", obs: "..." }
+          ↓
+<span class="box-a">2. CanevasSnapshotController.valider()</span>
+          |  ← Reçoit la requête HTTP
+          |  ← Délègue au service
+          ↓
+<span class="box-a">3. CanevasSnapshotService.createSnapshot(42, req, "VALID_DONNEE")</span>
+          |
+          |  a) MAX(versionNumber) + 1 → version = 3
+          |  b) Charge le Caneva avec toutes ses relations JPA
+          |  c) buildFullEngagementDetailleJson() → JSON 5 onglets
+          |  d) loadEngagementSafe() pour BNA et BCT
+          |  e) buildCreditsJson() → JSON crédits
+          |  f) buildExploitationJson() → JSON sites
+          |  g) buildGarantiesJson() → JSON garanties
+          |  h) CanevasStructureSnapshot.builder()....build()
+          ↓
+<span class="db">4. CanevasSnapshotRepository.save(snapshot)</span>
+          |  ← INSERT INTO CANEVAS_STRUCTURE_SNAPSHOT (...)
+          ↓
+<span class="box-a">5. WorkflowLogService.log(42, "AGC-001", "DR-05", "VALIDER", 3, snapshotId, obs, matricule)</span>
+          |
+          ↓
+<span class="db">6. CanevasWorkflowLogRepository.save(log)</span>
+          |  ← INSERT INTO CANEVAS_WORKFLOW_LOG (...)
+          ↓
+<span class="layer">7. Réponse HTTP 200</span>  { snapshotId: 15, versionNumber: 3, structureCode: "AGC-001" }
+          |
+          ↓
+<span class="layer">8. FRONTEND</span>  recharge l'historique et les logs → l'UI se met à jour
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FLUX LECTURE
+  ════════════════════════════════════════ -->
+  <section id="flux-lecture">
+    <h2>15. Flux Complet : Lecture de l'Historique</h2>
+
+    <pre><code><span class="cmt">// ngOnInit() — lancé au chargement du composant</span>
+
+<span class="cmt">// Requête 1 : liste résumée des snapshots</span>
+this.snapshotService.<span class="fn">getHistory</span>(canevasId)
+  .subscribe(data => this.history.<span class="fn">set</span>(data))   <span class="cmt">// met à jour le signal</span>
+
+<span class="cmt">// Requête 2 : logs filtrés selon le rôle</span>
+this.snapshotService.<span class="fn">getWorkflowLog</span>(canevasId, userType, userCode)
+  .subscribe(data => this.workflowLog.<span class="fn">set</span>(data))
+
+<span class="cmt">// Angular re-rend automatiquement le template car les signals ont changé</span>
+
+<span class="cmt">// Clic sur 👁 — charge le détail complet (lazy)</span>
+<span class="fn">openSnapshot</span>(snap: SnapshotSummary) {
+  this.snapshotService.<span class="fn">getBySnapshotId</span>(canevasId, snap.snapshotId)
+    .subscribe(detail => this.selectedSnap.<span class="fn">set</span>(detail))
+}</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FLUX COMPARAISON
+  ════════════════════════════════════════ -->
+  <section id="flux-comparaison">
+    <h2>16. Flux Comparaison de Snapshots</h2>
+
+    <pre><code><span class="fn">openCompare</span>(oldSnap: SnapshotSummary) {
+  this.compareLoading.<span class="fn">set</span>(<span class="kw">true</span>)
+
+  <span class="cmt">// Charge les 2 snapshots en parallèle (forkJoin = "attends que les 2 terminent")</span>
+  forkJoin({
+    old: this.snapshotService.<span class="fn">getBySnapshotId</span>(canevasId, oldSnap.snapshotId),
+    new: this.snapshotService.<span class="fn">getBySnapshotId</span>(canevasId, latestSnapshotId)
+  }).subscribe(({ old, <span class="kw">new</span>: newSnap }) => {
+    this.compareOldSnap.<span class="fn">set</span>(old)
+    this.compareNewSnap.<span class="fn">set</span>(newSnap)
+    this.compareMode.<span class="fn">set</span>(<span class="kw">true</span>)
+    this.compareLoading.<span class="fn">set</span>(<span class="kw">false</span>)
+  })
+
+  <span class="cmt">// diffRows computed() recalcule automatiquement dès que compareOldSnap/compareNewSnap changent</span>
+}</code></pre>
+
+    <div class="box tip">
+      <span class="box-icon">🔄</span>
+      <div><strong>forkJoin</strong> est un opérateur RxJS qui attend que <em>toutes</em> les observables se terminent avant d'émettre. C'est l'équivalent de <code>Promise.all()</code> en JavaScript classique.</div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       AMÉLIORATIONS — BUGS
+  ════════════════════════════════════════ -->
+  <section id="amelio-bugs">
+    <h2>17. Bugs Potentiels &amp; Points d'Attention</h2>
+
+    <div class="improve-grid">
+      <div class="improve-card high">
+        <span class="tag">CRITIQUE</span>
+        <h3>Types <code>any</code> dans les interfaces</h3>
+        <p><code>creditsData: any</code>, <code>exploitationData: any</code> désactivent le typage TypeScript. Si la structure du JSON change côté backend, le frontend plantera silencieusement sans erreur de compilation.</p>
+      </div>
+      <div class="improve-card high">
+        <span class="tag">CRITIQUE</span>
+        <h3>Pas de gestion d'erreur HTTP</h3>
+        <p>Les appels <code>.subscribe(data => ...)</code> n'ont pas de handler d'erreur <code>.subscribe({ error: err => ... })</code>. Si l'API échoue, l'utilisateur voit une page vide sans message.</p>
+      </div>
+      <div class="improve-card high">
+        <span class="tag">CRITIQUE</span>
+        <h3>Incohérence rôle AGC</h3>
+        <p><code>canAct = type === 2 || type === 5</code> exclut le type 1 (AGC). Mais l'AGC doit pouvoir valider. À vérifier et corriger si nécessaire.</p>
+      </div>
+      <div class="improve-card medium">
+        <span class="tag">MOYEN</span>
+        <h3>N+1 requêtes dans buildGroupeMembers()</h3>
+        <p>Pour chaque membre du groupe, une requête SQL séparée est lancée. Avec 20 membres = 21 requêtes. Il faut utiliser une requête avec JOIN ou un <code>findAllById()</code>.</p>
+      </div>
+      <div class="improve-card medium">
+        <span class="tag">MOYEN</span>
+        <h3>Entité Snapshot legacy non utilisée</h3>
+        <p>L'entité <code>Snapshot.java</code> (ancienne version) coexiste avec <code>CanevasStructureSnapshot.java</code>. Cela crée de la confusion. L'ancienne devrait être supprimée.</p>
+      </div>
+      <div class="improve-card medium">
+        <span class="tag">MOYEN</span>
+        <h3>Pas de pagination sur l'historique</h3>
+        <p>L'API charge TOUS les snapshots en une fois. Pour un canevas avec 100 versions, cela charge toutes les métadonnées d'un coup. Ajouter <code>Pageable</code> Spring.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       AMÉLIORATIONS — PERFORMANCE
+  ════════════════════════════════════════ -->
+  <section id="amelio-perf">
+    <h2>18. Améliorations de Performance</h2>
+
+    <div class="improve-grid">
+      <div class="improve-card medium">
+        <span class="tag">PERFORMANCE</span>
+        <h3>Cache côté frontend</h3>
+        <p>Si l'utilisateur ouvre le même snapshot 3 fois, 3 appels HTTP sont faits. Stocker les snapshots déjà chargés dans un <code>Map&lt;id, detail&gt;</code>.</p>
+      </div>
+      <div class="improve-card medium">
+        <span class="tag">PERFORMANCE</span>
+        <h3>Chargement lazy des CLOB</h3>
+        <p>Pour la liste historique, le backend charge aussi les champs CLOB (gros JSON). Utiliser <code>@Basic(fetch = LAZY)</code> JPA ou une projection sans CLOB pour la liste.</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">OPTIMISATION</span>
+        <h3>Compression JSON</h3>
+        <p>Les JSON stockés en CLOB peuvent être très volumineux. Activer la compression gzip sur l'API REST (<code>server.compression.enabled=true</code> dans Spring Boot).</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">OPTIMISATION</span>
+        <h3>Index BDD</h3>
+        <p>Ajouter un index sur <code>(CANEVAS_ID, VERSION_NUMBER)</code> dans CANEVAS_STRUCTURE_SNAPSHOT et <code>(CANEVAS_ID, PERFORMED_AT)</code> dans WORKFLOW_LOG.</p>
+      </div>
+    </div>
+
+    <h3>Exemple : corriger le problème N+1</h3>
+    <pre><code><span class="cmt">// AVANT (mauvais) : 1 requête par membre du groupe</span>
+<span class="kw">for</span> (AssocieMembre membre : membres) {
+    <span class="ty">EngagementBNADTO</span> eng = engagementService.<span class="fn">getByNumSeqPers</span>(membre.getNumSeqPers())
+}
+
+<span class="cmt">// APRÈS (bon) : 1 seule requête pour tous les membres</span>
+List&lt;<span class="ty">Long</span>&gt; ids = membres.stream()
+    .map(<span class="ty">AssocieMembre</span>::getNumSeqPers)
+    .collect(<span class="ty">Collectors</span>.toList())
+Map&lt;<span class="ty">Long, EngagementBNADTO</span>&gt; engagementsMap = engagementService.<span class="fn">findAllByIds</span>(ids)</code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       AMÉLIORATIONS — ARCHITECTURE
+  ════════════════════════════════════════ -->
+  <section id="amelio-arch">
+    <h2>19. Améliorations d'Architecture</h2>
+
+    <div class="improve-grid">
+      <div class="improve-card medium">
+        <span class="tag">ARCHITECTURE</span>
+        <h3>Typer les JSON CLOB</h3>
+        <p>Créer des classes Java dédiées (<code>CreditsSnapshot</code>, <code>ExploitationSnapshot</code>) et utiliser le converter JPA <code>@Convert</code> avec <code>ObjectMapper</code>. Plus de <code>Object creditsData</code> non typé.</p>
+      </div>
+      <div class="improve-card medium">
+        <span class="tag">ARCHITECTURE</span>
+        <h3>Extraire le service workflow</h3>
+        <p><code>CanevasSnapshotService</code> fait trop de choses (590 lignes). Extraire la construction des données (<code>SnapshotBuilderService</code>) et la logique workflow (<code>WorkflowService</code>).</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">ARCHITECTURE</span>
+        <h3>Ajouter des tests unitaires</h3>
+        <p><code>diffRows</code> computed et les méthodes <code>compute*()</code> sont des fonctions pures idéales pour les tests. Ajouter des tests Jasmine/Jest pour chaque indicateur de comparaison.</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">ARCHITECTURE</span>
+        <h3>Enum pour les statuts</h3>
+        <p>Les statuts (<code>"VALID_DONNEE"</code>, <code>"CORRIGE_DONNEE"</code>…) sont des strings partout. Créer un <code>enum SnapshotStatus</code> Java et un <code>type SnapshotStatus</code> TypeScript pour éviter les fautes de frappe.</p>
+      </div>
+    </div>
+
+    <h3>Exemple : Enum Java pour les statuts</h3>
+    <pre><code><span class="cmt">// AVANT (fragile)</span>
+snapshotService.<span class="fn">createSnapshot</span>(id, req, <span class="str">"VALID_DONNEE"</span>) <span class="cmt">// string libre</span>
+
+<span class="cmt">// APRÈS (robuste)</span>
+<span class="kw">public enum</span> <span class="ty">SnapshotStatus</span> {
+    INIT_DONNEE, VALID_DONNEE, CORRIGE_DONNEE,
+    PEC_DONNEE, VALIDER_DR, DEC_FINAL_PRISE_ACCORD, DEC_FINAL_PRISE_REJET
+}
+
+snapshotService.<span class="fn">createSnapshot</span>(id, req, <span class="ty">SnapshotStatus</span>.VALID_DONNEE) <span class="cmt">// sûr</span></code></pre>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       AMÉLIORATIONS — UX
+  ════════════════════════════════════════ -->
+  <section id="amelio-ux">
+    <h2>20. Améliorations UX / Fonctionnelles</h2>
+
+    <div class="improve-grid">
+      <div class="improve-card low">
+        <span class="tag">UX</span>
+        <h3>Messages d'erreur utilisateur</h3>
+        <p>Ajouter un <code>p-toast</code> PrimeNG pour afficher "Erreur lors du chargement" ou "Validation réussie" avec un vrai retour visuel à l'utilisateur.</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">UX</span>
+        <h3>Export PDF / Excel</h3>
+        <p>Ajouter un bouton "Exporter l'historique" qui génère un tableau PDF ou Excel des snapshots, utile pour les audits officiels.</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">UX</span>
+        <h3>Confirmation avant action</h3>
+        <p>Ajouter un dialogue de confirmation "<em>Êtes-vous sûr de vouloir valider ?</em>" avec <code>p-confirmDialog</code> avant de déclencher les actions irréversibles.</p>
+      </div>
+      <div class="improve-card low">
+        <span class="tag">UX</span>
+        <h3>Recherche dans l'historique</h3>
+        <p>Ajouter un champ de filtre sur le tableau snapshots pour chercher par structure, statut, ou date. Utiliser le composant <code>p-table</code> avec filtre intégré.</p>
+      </div>
+    </div>
+
+    <hr class="thin"/>
+
+    <h3>Résumé : Par où commencer ?</h3>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Corriger les erreurs HTTP non gérées</strong> — ajouter <code>catchError</code> dans le service et des toasts dans le composant. Impact immédiat sur l'expérience utilisateur.</li>
+        <li><strong>Typer les <code>any</code></strong> — créer des interfaces TypeScript pour <code>creditsData</code> et <code>exploitationData</code>. Évite des bugs silencieux.</li>
+        <li><strong>Corriger le N+1 dans <code>buildGroupeMembers()</code></strong> — gain de performance significatif pour les gros groupes.</li>
+        <li><strong>Ajouter un enum <code>SnapshotStatus</code></strong> côté Java et TypeScript. Améliore la maintenabilité à long terme.</li>
+        <li><strong>Supprimer l'entité <code>Snapshot.java</code> legacy</strong> — nettoyage du code mort.</li>
+      </ol>
+    </div>
+
+    <div class="box tip">
+      <span class="box-icon">🚀</span>
+      <div><strong>Conseil pour débutant :</strong> Commencez par lire <code>snapshot-history.component.ts</code> de haut en bas. Identifiez chaque <code>signal()</code> et <code>computed()</code>. Puis lisez <code>CanevasSnapshotService.java</code> en partant de la méthode <code>createSnapshot()</code>. Ces deux fichiers sont le cœur du système.</div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="card center muted" style="margin-top:40px; font-size:13px;">
+    Documentation générée pour le projet <strong>Canevas Agricole</strong><br/>
+    Analyse automatique de la base de code — Mai 2026
+  </div>
+
+</main>
+</div>
+
+<script>
+  // Active sidebar link on scroll
+  const sections = document.querySelectorAll('section[id]')
+  const links    = document.querySelectorAll('nav.sidebar a')
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'))
+        const active = document.querySelector(`nav.sidebar a[href="#${entry.target.id}"]`)
+        if (active) active.classList.add('active')
+      }
+    })
+  }, { rootMargin: '-30% 0px -60% 0px' })
+
+  sections.forEach(s => observer.observe(s))
+</script>
+</body>
+</html>
