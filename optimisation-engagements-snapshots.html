@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Optimisation Engagements & Snapshots — Canevas Agricole</title>
+  <style>
+    :root {
+      --red:    #b91c1c; --red-bg:    #fef2f2;
+      --orange: #c2410c; --orange-bg: #fff7ed;
+      --green:  #166534; --green-bg:  #f0fdf4;
+      --blue:   #1e40af; --blue-bg:   #eff6ff;
+      --purple: #6b21a8; --purple-bg: #faf5ff;
+      --gray:   #374151; --gray-bg:   #f9fafb;
+      --border: #e5e7eb;
+      --accent: #15803d;
+      --code-bg: #0d1117;
+      --radius: 8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14.5px; line-height: 1.7; color: #111;
+      background: #f1f5f9;
+    }
+
+    /* ── Layout ── */
+    .layout { display: flex; min-height: 100vh; }
+    nav {
+      width: 260px; min-width: 260px;
+      background: #0f172a; color: #94a3b8;
+      padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    nav .nav-header {
+      background: #1e293b; padding: 20px 18px 16px;
+      border-bottom: 1px solid #334155;
+    }
+    nav .nav-header h2 { font-size: 13px; color: #f1f5f9; font-weight: 700; }
+    nav .nav-header p  { font-size: 11px; color: #64748b; margin-top: 2px; }
+    nav ul { list-style: none; padding: 8px 0; }
+    nav ul li a {
+      display: block; padding: 7px 18px;
+      color: #94a3b8; text-decoration: none; font-size: 12.5px;
+      border-left: 3px solid transparent; transition: all .15s;
+    }
+    nav ul li a:hover  { background: #1e293b; color: #e2e8f0; border-left-color: #475569; }
+    nav ul li a.active { background: #1e293b; color: #4ade80; border-left-color: #4ade80; }
+    nav ul li.grp { padding: 14px 18px 4px; font-size: 10px; text-transform: uppercase;
+                    letter-spacing: 1px; color: #475569; }
+    main {
+      flex: 1; padding: 36px 48px; max-width: 1060px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+      color: #fff; border-radius: var(--radius);
+      padding: 36px 44px; margin-bottom: 36px;
+    }
+    .hero h1 { font-size: 26px; font-weight: 800; }
+    .hero p  { opacity: .75; max-width: 680px; margin-top: 8px; font-size: 14px; }
+    .badges  { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .badge { padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-r { background: rgba(239,68,68,.2);  color: #fca5a5; }
+    .badge-g { background: rgba(74,222,128,.2); color: #86efac; }
+    .badge-b { background: rgba(96,165,250,.2); color: #93c5fd; }
+    .badge-o { background: rgba(251,146,60,.2); color: #fdba74; }
+
+    /* ── Diagnostic bar ── */
+    .diag {
+      background: var(--red-bg); border: 2px solid var(--red);
+      border-radius: var(--radius); padding: 20px 24px; margin-bottom: 32px;
+    }
+    .diag h3 { color: var(--red); font-size: 16px; margin-bottom: 10px; }
+    .diag-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .diag-item { background: #fff; border-radius: 6px; padding: 12px 14px; text-align: center; }
+    .diag-item .num { font-size: 28px; font-weight: 800; color: var(--red); }
+    .diag-item .lbl { font-size: 11px; color: #6b7280; }
+
+    /* ── Section ── */
+    section { margin-bottom: 50px; }
+    section > h2 {
+      font-size: 20px; font-weight: 800; color: #0f172a;
+      border-left: 5px solid var(--accent); padding-left: 14px;
+      margin-bottom: 18px;
+    }
+    h3 { font-size: 15.5px; font-weight: 700; margin: 20px 0 10px; color: #1e293b; }
+    h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .7px;
+         color: #6b7280; margin: 16px 0 8px; }
+    p  { margin-bottom: 10px; }
+
+    /* ── Solution cards ── */
+    .sol-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .sol-header {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .sol-header .prio {
+      min-width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px; color: #fff; flex-shrink: 0;
+    }
+    .prio-1 { background: #dc2626; }
+    .prio-2 { background: #ea580c; }
+    .prio-3 { background: #d97706; }
+    .prio-4 { background: #16a34a; }
+    .prio-5 { background: #2563eb; }
+    .prio-6 { background: #7c3aed; }
+    .prio-7 { background: #0891b2; }
+    .sol-title { flex: 1; }
+    .sol-title h3 { margin: 0 0 4px; font-size: 16px; }
+    .sol-title p  { margin: 0; font-size: 13px; color: #6b7280; }
+    .sol-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+    .tag {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+    }
+    .tag-red    { background: var(--red-bg);    color: var(--red);    }
+    .tag-orange { background: var(--orange-bg); color: var(--orange); }
+    .tag-green  { background: var(--green-bg);  color: var(--green);  }
+    .tag-blue   { background: var(--blue-bg);   color: var(--blue);   }
+    .tag-purple { background: var(--purple-bg); color: var(--purple); }
+    .sol-body { padding: 20px 24px; }
+
+    /* ── Code ── */
+    pre {
+      background: var(--code-bg); color: #e6edf3;
+      border-radius: var(--radius); padding: 18px 20px;
+      overflow-x: auto; font-size: 12.5px; line-height: 1.65;
+      margin: 12px 0; position: relative;
+    }
+    pre .file-tag {
+      position: absolute; top: 8px; right: 12px;
+      background: #21262d; color: #8b949e;
+      font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    }
+    code { font-family: 'Cascadia Code','Fira Code','Consolas',monospace; }
+    p code, li code, td code {
+      background: #f3f4f6; color: #b91c1c;
+      padding: 1px 5px; border-radius: 4px; font-size: 12.5px;
+    }
+    .kw  { color: #ff7b72; }
+    .ty  { color: #ffa657; }
+    .str { color: #a5d6ff; }
+    .fn  { color: #d2a8ff; }
+    .cmt { color: #4d6d4d; font-style: italic; }
+    .ann { color: #f8cc5a; }
+    .num { color: #79c0ff; }
+    .ok  { color: #3fb950; }
+
+    /* ── Before / After ── */
+    .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+    .diff-before { background: #1a0000; border-top: 3px solid #dc2626; }
+    .diff-after  { background: #001a0a; border-top: 3px solid #16a34a; }
+    .diff-label  { padding: 6px 14px; font-size: 11px; font-weight: 700; }
+    .diff-before .diff-label { color: #f87171; }
+    .diff-after  .diff-label { color: #4ade80; }
+
+    /* ── Info boxes ── */
+    .box { border-radius: 6px; padding: 12px 16px; margin: 12px 0; display: flex; gap: 10px; }
+    .box-ico { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+    .box.info   { background: var(--blue-bg);   border-left: 4px solid #3b82f6; }
+    .box.warn   { background: var(--orange-bg); border-left: 4px solid #f97316; }
+    .box.tip    { background: var(--green-bg);  border-left: 4px solid #22c55e; }
+    .box.danger { background: var(--red-bg);    border-left: 4px solid #ef4444; }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+    th { background: #0f172a; color: #f1f5f9; padding: 9px 12px; text-align: left; font-weight: 600; }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--gray-bg); }
+
+    /* ── Impact meter ── */
+    .impact { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+    .impact-bar { height: 8px; border-radius: 4px; }
+    .impact-bar-r { background: #dc2626; }
+    .impact-bar-o { background: #ea580c; }
+    .impact-bar-g { background: #16a34a; }
+
+    /* ── Steps ── */
+    .steps { counter-reset: step; list-style: none; }
+    .steps li {
+      counter-increment: step;
+      padding: 8px 0 8px 40px; position: relative;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 8px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px;
+    }
+
+    /* ── Summary table ── */
+    .summary { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-top: 24px; }
+    .summary-header { background: #0f172a; color: #f1f5f9; padding: 14px 20px; font-weight: 700; }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+    .muted { color: #6b7280; }
+    .center { text-align: center; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ────────── NAV ────────── -->
+<nav>
+  <div class="nav-header">
+    <h2>Optimisation Performance</h2>
+    <p>Engagements &amp; Snapshots</p>
+  </div>
+  <ul>
+    <li class="grp">Diagnostic</li>
+    <li><a href="#diagnostic">Analyse du problème</a></li>
+    <li><a href="#calcul">Calcul des requêtes</a></li>
+    <li class="grp">Solutions Immédiates</li>
+    <li><a href="#sol1">1 · Réactiver le cache</a></li>
+    <li><a href="#sol2">2 · Supprimer le double chargement</a></li>
+    <li><a href="#sol3">3 · Batch IN clause</a></li>
+    <li class="grp">Solutions Efficaces</li>
+    <li><a href="#sol4">4 · UNION ALL Oracle</a></li>
+    <li><a href="#sol5">5 · JOIN FETCH / EntityGraph</a></li>
+    <li><a href="#sol6">6 · Snapshot asynchrone</a></li>
+    <li class="grp">Solutions Avancées</li>
+    <li><a href="#sol7">7 · Projection DTO liste</a></li>
+    <li><a href="#ordre">Ordre d'implémentation</a></li>
+    <li><a href="#gains">Gains attendus</a></li>
+  </ul>
+</nav>
+
+<!-- ────────── MAIN ────────── -->
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Optimisation : Engagements &amp; Création de Snapshot</h1>
+  <p>Solutions concrètes, compatibles Oracle 11g et Spring Boot, pour réduire le temps de traitement lors de l'enregistrement d'un avis ou d'une validation.</p>
+  <div class="badges">
+    <span class="badge badge-r">Oracle 11g</span>
+    <span class="badge badge-g">Spring Boot + JPA</span>
+    <span class="badge badge-b">Spring Cache (EhCache)</span>
+    <span class="badge badge-o">Angular</span>
+  </div>
+</div>
+
+<!-- DIAGNOSTIC -->
+<section id="diagnostic">
+  <h2>Diagnostic : Ce qui se passe aujourd'hui</h2>
+
+  <div class="diag">
+    <h3>⚠ Bilan : Une seule sauvegarde d'avis = explosion de requêtes SQL</h3>
+    <div class="diag-grid">
+      <div class="diag-item"><div class="num">103+</div><div class="lbl">Requêtes SQL pour 5 actionnaires, 10 membres groupe, 3 vendeurs</div></div>
+      <div class="diag-item"><div class="num">2×</div><div class="lbl">Chargement dupliqué des engagements du client principal</div></div>
+      <div class="diag-item"><div class="num">8</div><div class="lbl">Requêtes séparées pour construire UN engagement BNA</div></div>
+      <div class="diag-item"><div class="num">0</div><div class="lbl">Caches actifs (tous commentés dans le code)</div></div>
+    </div>
+  </div>
+
+  <h3>Localisation exacte des problèmes</h3>
+  <table>
+    <thead><tr><th>Problème</th><th>Fichier</th><th>Lignes</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>@Cacheable tous commentés</td><td>EngagementServiceImpl.java</td><td>71, 437, 451, 487, 504, 526</td><td><span class="tag tag-red">CRITIQUE</span></td></tr>
+      <tr><td>Double chargement engagement principal</td><td>CanevasSnapshotService.java</td><td>69 vs 135</td><td><span class="tag tag-red">CRITIQUE</span></td></tr>
+      <tr><td>N+1 sur actionnaires</td><td>CanevasSnapshotService.java</td><td>164-168</td><td><span class="tag tag-orange">ÉLEVÉ</span></td></tr>
+      <tr><td>N+1 sur membres du groupe</td><td>CanevasSnapshotService.java</td><td>251-273</td><td><span class="tag tag-orange">ÉLEVÉ</span></td></tr>
+      <tr><td>N+1 sur vendeurs</td><td>CanevasSnapshotService.java</td><td>183-188</td><td><span class="tag tag-orange">ÉLEVÉ</span></td></tr>
+      <tr><td>8 requêtes séparées par engagement BNA</td><td>EngagementServiceImpl.java</td><td>95-106</td><td><span class="tag tag-orange">ÉLEVÉ</span></td></tr>
+      <tr><td>Lazy loading non contrôlé sur Caneva</td><td>Caneva.java</td><td>relations @OneToMany</td><td><span class="tag tag-blue">MOYEN</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CALCUL -->
+<section id="calcul">
+  <h2>Calcul détaillé des requêtes</h2>
+
+  <pre><code><span class="cmt">Scénario réaliste : 5 actionnaires, 10 membres de groupe, 3 vendeurs</span>
+
+<span class="fn">Chargement base (client principal)</span>
+  ├─ loadEngagementSafe() × 2 (doublons lignes 69 + 135)   = 2 × 9  = <span class="num">18</span> requêtes
+  ├─ loadClasseBNASafe()  × 2                              = 2 × 1  = <span class="num"> 2</span> requêtes
+  ├─ loadClasseBCTSafe()  × 2                              = 2 × 1  = <span class="num"> 2</span> requêtes
+  ├─ loadClasseRetourBCTSafe() × 2                         = 2 × 1  = <span class="num"> 2</span> requêtes
+  └─ soldes + mouvements + placements + clientCanvas       =         <span class="num"> 4</span> requêtes
+
+<span class="fn">Actionnaires (5 × 3 requêtes chacun)</span>
+  ├─ findAssociesByNumSeqPers()                            =         <span class="num"> 1</span> requête
+  └─ buildActionnaire() × 5                               = 5 × 3  = <span class="num">15</span> requêtes
+
+<span class="fn">Premier Responsable</span>
+  ├─ findByNumSeqpers()                                    =         <span class="num"> 1</span> requête
+  └─ buildPremierResponsable()                             =         <span class="num"> 3</span> requêtes
+
+<span class="fn">Membres du Groupe (10 × 4 requêtes chacun)</span>
+  ├─ getListeGroupesByNumGRP()                             =         <span class="num"> 1</span> requête
+  └─ engagement + BNA + BCT + placements × 10             = 10 × 4 = <span class="num">40</span> requêtes
+
+<span class="fn">Vendeurs (3 × 3 requêtes chacun)</span>
+  ├─ getCreditAchatTerrains() + getVendeurs()              =         <span class="num"> 2</span> requêtes
+  └─ buildVendeur() × 3                                   = 3 × 3  = <span class="num"> 9</span> requêtes
+
+<span class="fn">AvisService (sauvegarde + mise à jour canevas)</span>
+  └─ save avis + update caneva + lookups                   =         <span class="num"> 6</span> requêtes
+                                                                   ───────────
+<span class="ok">TOTAL                                                                  106 requêtes</span>
+<span class="cmt">dont 28 auraient pu être évitées juste en décommentant @Cacheable</span>
+  </code></pre>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SOL 1 : RÉACTIVER LE CACHE
+═══════════════════════════════════════════ -->
+<section id="sol1">
+  <h2>Solutions</h2>
+  <div class="sol-card">
+    <div class="sol-header">
+      <div class="prio prio-1">1</div>
+      <div class="sol-title">
+        <h3>Réactiver les @Cacheable dans EngagementServiceImpl</h3>
+        <p>Décommenter 6 annotations déjà écrites — gain immédiat, aucun risque, 30 min de travail</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-red">PRIORITÉ MAXIMALE</span>
+        <span class="tag tag-green">30 min</span>
+        <span class="tag tag-blue">Oracle 11g ✓</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <div class="box danger">
+        <span class="box-ico">🚨</span>
+        <div>Toutes les annotations <code>@Cacheable</code> sont <strong>déjà écrites</strong> dans le code mais <strong>commentées</strong>. C'est la correction la plus rapide et la plus impactante de toute cette liste.</div>
+      </div>
+
+      <div class="diff-grid">
+        <div>
+          <pre class="diff-before"><span class="diff-label">✗ AVANT (état actuel)</span><code><span class="cmt">// EngagementServiceImpl.java ligne 71</span>
+
+<span class="cmt">//@Cacheable(value = ENGAGEMENT_BNA_CACHE,</span>
+<span class="cmt">//           key = "#numSeqPers")</span>
+<span class="kw">public</span> List&lt;<span class="ty">EngagementBNADTO</span>&gt;
+  <span class="fn">getListeEngagementsBNAByClient</span>(
+    String numSeqPers) {
+  <span class="cmt">// 8 requêtes SQL lancées à chaque appel</span>
+}</code></pre>
+        </div>
+        <div>
+          <pre class="diff-after"><span class="diff-label">✓ APRÈS (juste décommenter)</span><code><span class="cmt">// EngagementServiceImpl.java ligne 71</span>
+
+<span class="ann">@Cacheable</span>(value = ENGAGEMENT_BNA_CACHE,
+           key = <span class="str">"#numSeqPers"</span>)
+<span class="kw">public</span> List&lt;<span class="ty">EngagementBNADTO</span>&gt;
+  <span class="fn">getListeEngagementsBNAByClient</span>(
+    String numSeqPers) {
+  <span class="cmt">// 8 requêtes SQL lancées UNE SEULE FOIS</span>
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>6 annotations à décommenter (même fichier)</h3>
+      <pre><code><span class="cmt">// Fichier : EngagementServiceImpl.java</span>
+
+<span class="ann">@Cacheable</span>(value = ENGAGEMENT_BNA_CACHE,      key = <span class="str">"#numSeqPers"</span>)   <span class="cmt">// ligne 71</span>
+<span class="ann">@Cacheable</span>(value = HISTORIQUE_CLASSE_BNA_CACHE,key = <span class="str">"#numSeqPers"</span>)   <span class="cmt">// ligne 437</span>
+<span class="ann">@Cacheable</span>(value = HISTORIQUE_CLASSE_BCT_CACHE,key = <span class="str">"#numSeqPers"</span>)   <span class="cmt">// ligne 451</span>
+<span class="ann">@Cacheable</span>(value = HISTORIQUE_RETOUR_CLASSE_BCT_CACHE, key = <span class="str">"#numSeqPers"</span>)  <span class="cmt">// ligne 487</span>
+<span class="ann">@Cacheable</span>(value = ENGAGEMENT_BCT_CACHE,      key = <span class="str">"#numSeqPers"</span>)   <span class="cmt">// ligne 504</span>
+<span class="ann">@Cacheable</span>(value = MONTANT_TERME_CACHE,        key = <span class="str">"#numSeqPers"</span>)   <span class="cmt">// ligne 526</span></code></pre>
+
+      <h3>Activer Spring Cache dans la configuration</h3>
+      <p>Vérifier que <code>@EnableCaching</code> est présent dans la classe principale :</p>
+      <pre><code><span class="cmt">// Fichier : SaebApplication.java (ou la classe @SpringBootApplication)</span>
+
+<span class="ann">@SpringBootApplication</span>
+<span class="ann">@EnableCaching</span>   <span class="ok">← ajouter si absent</span>
+<span class="kw">public class</span> <span class="ty">SaebApplication</span> { ... }</code></pre>
+
+      <h3>Configuration EhCache (compatible Oracle 11g, pas de changement BDD)</h3>
+      <p>Ajouter dans <code>pom.xml</code> si pas encore présent :</p>
+      <pre><code><span class="cmt">&lt;!-- pom.xml --&gt;</span>
+&lt;<span class="kw">dependency</span>&gt;
+  &lt;<span class="kw">groupId</span>&gt;org.springframework.boot&lt;/<span class="kw">groupId</span>&gt;
+  &lt;<span class="kw">artifactId</span>&gt;spring-boot-starter-cache&lt;/<span class="kw">artifactId</span>&gt;
+&lt;/<span class="kw">dependency</span>&gt;
+
+<span class="cmt">&lt;!-- Option simple : cache Caffeine (en mémoire, aucun serveur requis) --&gt;</span>
+&lt;<span class="kw">dependency</span>&gt;
+  &lt;<span class="kw">groupId</span>&gt;com.github.ben-manes.caffeine&lt;/<span class="kw">groupId</span>&gt;
+  &lt;<span class="kw">artifactId</span>&gt;caffeine&lt;/<span class="kw">artifactId</span>&gt;
+&lt;/<span class="kw">dependency</span>&gt;</code></pre>
+
+      <p>Et dans <code>application.properties</code> :</p>
+      <pre><code><span class="cmt"># application.properties</span>
+spring.cache.type=caffeine
+<span class="cmt"># TTL = 10 minutes, max 500 entrées par cache</span>
+spring.cache.caffeine.spec=maximumSize=500,expireAfterWrite=600s</code></pre>
+
+      <div class="box tip">
+        <span class="box-ico">💡</span>
+        <div><strong>Invalidation du cache :</strong> Quand un engagement change côté Oracle SAEB (système externe), le cache se régénère automatiquement après expiration. Si vous avez besoin d'une invalidation immédiate, ajoutez <code>@CacheEvict(value = ENGAGEMENT_BNA_CACHE, key = "#numSeqPers")</code> sur les méthodes de mise à jour.</div>
+      </div>
+
+      <div class="impact">
+        <span>Gain estimé :</span>
+        <div class="impact-bar impact-bar-r" style="width:180px"></div>
+        <strong>−28 à −60 requêtes par snapshot</strong>
+      </div>
+    </div>
+  </div>
+
+<!-- ═══ SOL 2 ═══ -->
+  <div class="sol-card" id="sol2">
+    <div class="sol-header">
+      <div class="prio prio-2">2</div>
+      <div class="sol-title">
+        <h3>Supprimer le double chargement de l'engagement principal</h3>
+        <p>Le même engagement est chargé 2 fois (lignes 69 et 135). Charger une fois, passer en paramètre.</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-orange">PRIORITÉ HAUTE</span>
+        <span class="tag tag-green">1h</span>
+        <span class="tag tag-blue">Oracle 11g ✓</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <p>Dans <code>CanevasSnapshotService.java</code>, les lignes <strong>69-72</strong> chargent l'engagement, puis les lignes <strong>135-138</strong> dans <code>buildFullEngagementDetailleJson()</code> rechargent <em>exactement les mêmes données</em>.</p>
+
+      <div class="diff-grid">
+        <div>
+          <pre class="diff-before"><span class="diff-label">✗ AVANT — CanevasSnapshotService.java</span><code><span class="cmt">// createSnapshot() — lignes 69-72</span>
+<span class="ty">EngagementDTO</span> engagement =
+  <span class="fn">loadEngagementSafe</span>(numSeqPers);   <span class="cmt">// 9 req</span>
+List classeBNA = <span class="fn">loadClasseBNASafe</span>(numSeqPers); <span class="cmt">// 1 req</span>
+List classeBCT = <span class="fn">loadClasseBCTSafe</span>(numSeqPers); <span class="cmt">// 1 req</span>
+List classeRetour = <span class="fn">loadClasseRetourBCTSafe</span>(numSeqPers);
+
+<span class="cmt">// ... plus bas, buildFullEngagementDetailleJson()</span>
+<span class="cmt">// lignes 135-138 : RECHARGEMENT IDENTIQUE !</span>
+<span class="ty">EngagementDTO</span> engRelation =
+  <span class="fn">loadEngagementSafe</span>(numSeqPers);   <span class="cmt">// 9 req de plus</span>
+List classeBNARel = <span class="fn">loadClasseBNASafe</span>(numSeqPers);
+...</code></pre>
+        </div>
+        <div>
+          <pre class="diff-after"><span class="diff-label">✓ APRÈS — passer en paramètre</span><code><span class="cmt">// createSnapshot() — charger UNE FOIS</span>
+<span class="ty">EngagementDTO</span> engagement =
+  <span class="fn">loadEngagementSafe</span>(numSeqPers);   <span class="cmt">// 9 req</span>
+List classeBNA = <span class="fn">loadClasseBNASafe</span>(numSeqPers); <span class="cmt">// 1 req</span>
+List classeBCT = <span class="fn">loadClasseBCTSafe</span>(numSeqPers); <span class="cmt">// 1 req</span>
+List classeRetour = <span class="fn">loadClasseRetourBCTSafe</span>(numSeqPers);
+
+<span class="cmt">// Passer les données déjà chargées</span>
+<span class="fn">buildFullEngagementDetailleJson</span>(
+  numSeqPers,
+  engagement,   <span class="ok">← déjà chargé, pas de re-requête</span>
+  classeBNA,
+  classeBCT,
+  classeRetour
+);</code></pre>
+        </div>
+      </div>
+
+      <h3>Modifier la signature de buildFullEngagementDetailleJson()</h3>
+      <pre><code><span class="cmt">// CanevasSnapshotService.java</span>
+
+<span class="cmt">// AVANT</span>
+<span class="kw">private</span> String <span class="fn">buildFullEngagementDetailleJson</span>(Long numSeqPers) {
+    <span class="ty">EngagementDTO</span> engRelation = <span class="fn">loadEngagementSafe</span>(numSeqPers);  <span class="cmt">// ← SUPPRIMER</span>
+    List&lt;<span class="ty">ClasseDTO</span>&gt; classeBNA = <span class="fn">loadClasseBNASafe</span>(numSeqPers);  <span class="cmt">// ← SUPPRIMER</span>
+    ...
+}
+
+<span class="cmt">// APRÈS — recevoir les données déjà chargées</span>
+<span class="kw">private</span> String <span class="fn">buildFullEngagementDetailleJson</span>(
+    Long numSeqPers,
+    <span class="ty">EngagementDTO</span> engRelation,        <span class="ok">// ← reçu en paramètre</span>
+    List&lt;<span class="ty">ClasseDTO</span>&gt; classeBNA,         <span class="ok">// ← reçu en paramètre</span>
+    List&lt;<span class="ty">ClasseDTO</span>&gt; classeBCT,
+    List&lt;<span class="ty">ClasseBctDTO</span>&gt; classeRetour
+) {
+    <span class="cmt">// Utiliser directement les paramètres, sans recharger</span>
+}</code></pre>
+
+      <div class="impact">
+        <span>Gain estimé :</span>
+        <div class="impact-bar impact-bar-o" style="width:130px"></div>
+        <strong>−12 requêtes garanties par snapshot</strong>
+      </div>
+    </div>
+  </div>
+
+<!-- ═══ SOL 3 ═══ -->
+  <div class="sol-card" id="sol3">
+    <div class="sol-header">
+      <div class="prio prio-3">3</div>
+      <div class="sol-title">
+        <h3>Charger tous les engagements des parties liées en une seule requête batch (IN clause)</h3>
+        <p>Au lieu de N requêtes pour N actionnaires/vendeurs, une seule requête avec WHERE id IN (...)</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-orange">PRIORITÉ HAUTE</span>
+        <span class="tag tag-green">2-3h</span>
+        <span class="tag tag-blue">Oracle 11g ✓</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <div class="box warn">
+        <span class="box-ico">⚠️</span>
+        <div><strong>Oracle 11g limite</strong> : La clause <code>IN</code> supporte jusqu'à <strong>1000 valeurs</strong> par liste. Pour des cas rares avec plus de 1000 éléments, diviser en sous-listes. Dans la pratique pour ce projet, le nombre de parties liées sera toujours bien en dessous de 1000.</div>
+      </div>
+
+      <h3>Principe : collecter tous les IDs puis une seule requête</h3>
+      <pre><code><span class="cmt">// CanevasSnapshotService.java — méthode buildFullEngagementDetailleJson()</span>
+
+<span class="cmt">// ─── ÉTAPE 1 : Collecter tous les numSeqPers en une passe ───</span>
+List&lt;<span class="ty">Associe</span>&gt; actionnaires = associeRepository.<span class="fn">findAssociesByNumSeqPers</span>(numSeqPers);
+Optional&lt;<span class="ty">ClientCanvas</span>&gt; respOpt = clientCanvasRepository.<span class="fn">findByNumSeqpers</span>(numSeqPers);
+List&lt;<span class="ty">GroupeDTO</span>&gt; groupes = clientService.<span class="fn">getListeGroupesByNumGRP</span>(codGrp);
+List&lt;<span class="ty">Vendeur</span>&gt; vendeurs = <span class="fn">getVendeurs</span>(caneva);
+
+<span class="cmt">// Rassembler tous les IDs de personnes dont on a besoin</span>
+Set&lt;String&gt; allNumSeqPers = <span class="kw">new</span> HashSet&lt;&gt;();
+actionnaires.stream().map(a -&gt; String.valueOf(a.getNumSeqpers())).forEach(allNumSeqPers::add);
+respOpt.map(r -&gt; String.valueOf(r.getNumSeqpers())).ifPresent(allNumSeqPers::add);
+groupes.stream().map(<span class="ty">GroupeDTO</span>::getNumSeqPers).forEach(allNumSeqPers::add);
+vendeurs.stream().map(v -&gt; String.valueOf(v.getNumSeqpers())).forEach(allNumSeqPers::add);
+
+<span class="cmt">// ─── ÉTAPE 2 : UNE SEULE requête pour tous les engagements BNA ───</span>
+Map&lt;String, List&lt;<span class="ty">EngagementBNADTO</span>&gt;&gt; bnaByPers =
+    engagementService.<span class="fn">getEngagementsBNABatch</span>(allNumSeqPers);
+<span class="cmt">// clé = numSeqPers, valeur = liste de ses engagements</span>
+
+Map&lt;String, List&lt;<span class="ty">ClasseDTO</span>&gt;&gt; classBnaByPers =
+    engagementService.<span class="fn">getClasseBNABatch</span>(allNumSeqPers);
+
+<span class="cmt">// ─── ÉTAPE 3 : Construire les DTO avec les données déjà en mémoire ───</span>
+List&lt;<span class="ty">EngagementPartieDto</span>&gt; actionnairesDto = actionnaires.stream()
+    .map(a -&gt; <span class="ty">EngagementPartieDto</span>.builder()
+        .nom(a.getNom())
+        .engagementsBNA(bnaByPers.<span class="fn">getOrDefault</span>(String.valueOf(a.getNumSeqpers()), List.of()))
+        .classeBNA(classBnaByPers.<span class="fn">getOrDefault</span>(String.valueOf(a.getNumSeqpers()), List.of()))
+        .build())
+    .collect(Collectors.toList());
+<span class="cmt">// ZÉRO requête SQL dans cette boucle !</span></code></pre>
+
+      <h3>Ajouter les méthodes batch dans EngagementService</h3>
+      <pre><code><span class="cmt">// IEngagementService.java — ajouter ces signatures</span>
+Map&lt;String, List&lt;<span class="ty">EngagementBNADTO</span>&gt;&gt; <span class="fn">getEngagementsBNABatch</span>(Set&lt;String&gt; numSeqPersList);
+Map&lt;String, List&lt;<span class="ty">ClasseDTO</span>&gt;&gt;         <span class="fn">getClasseBNABatch</span>(Set&lt;String&gt; numSeqPersList);
+Map&lt;String, List&lt;<span class="ty">ClasseDTO</span>&gt;&gt;         <span class="fn">getClasseBCTBatch</span>(Set&lt;String&gt; numSeqPersList);</code></pre>
+
+      <pre><code><span class="cmt">// EngagementServiceImpl.java — implémentation exemple</span>
+<span class="kw">public</span> Map&lt;String, List&lt;<span class="ty">EngagementBNADTO</span>&gt;&gt;
+    <span class="fn">getEngagementsBNABatch</span>(Set&lt;String&gt; numSeqPersList) {
+
+  <span class="kw">if</span> (numSeqPersList.isEmpty()) <span class="kw">return</span> Map.of();
+
+  Map&lt;String, List&lt;<span class="ty">EngagementBNADTO</span>&gt;&gt; result = <span class="kw">new</span> HashMap&lt;&gt;();
+
+  <span class="cmt">// Initialiser chaque clé avec une liste vide</span>
+  numSeqPersList.forEach(id -&gt; result.put(id, <span class="kw">new</span> ArrayList&lt;&gt;()));
+
+  <span class="cmt">// Charger chaque type en batch (IN clause) — compatible Oracle 11g</span>
+  <span class="fn">addEngagementFCDPBatch</span>(result, numSeqPersList);
+  <span class="fn">addEngagementCMEBatch</span>(result, numSeqPersList);
+  <span class="fn">addEngagementINVBatch</span>(result, numSeqPersList);
+  <span class="cmt">// ... etc pour les 8 types</span>
+
+  <span class="kw">return</span> result;
+}</code></pre>
+
+      <h3>Requête SQL batch Oracle 11g (compatible)</h3>
+      <pre><code><span class="cmt">// Dans le repository ou la couche JDBC</span>
+
+<span class="cmt">-- Oracle 11g supporte IN clause avec paramètres</span>
+<span class="kw">SELECT</span> NUM_SEQ_PERS, MONTANT_ENGAGE, TYPE_CREDIT, ...
+<span class="kw">FROM</span> ENG_FCDF_VIEW
+<span class="kw">WHERE</span> NUM_SEQ_PERS <span class="kw">IN</span> (:numSeqPersList)
+<span class="kw">ORDER BY</span> NUM_SEQ_PERS
+
+<span class="cmt">// Avec Spring Data JPA :</span>
+<span class="ann">@Query</span>(<span class="str">"SELECT e FROM EngFCDF e WHERE e.numSeqPers IN :ids"</span>)
+List&lt;<span class="ty">EngFCDF</span>&gt; <span class="fn">findAllByNumSeqPersIn</span>(<span class="ann">@Param</span>(<span class="str">"ids"</span>) Collection&lt;String&gt; ids);</code></pre>
+
+      <div class="impact">
+        <span>Gain estimé :</span>
+        <div class="impact-bar impact-bar-o" style="width:160px"></div>
+        <strong>−40 à −60 requêtes (N parties × 3 remplacées par 3 requêtes batch)</strong>
+      </div>
+    </div>
+  </div>
+
+<!-- ═══ SOL 4 ═══ -->
+  <div class="sol-card" id="sol4">
+    <div class="sol-header">
+      <div class="prio prio-4">4</div>
+      <div class="sol-title">
+        <h3>Fusionner les 8 requêtes BNA en une seule UNION ALL Oracle</h3>
+        <p>Remplacer 8 appels séparés (FCDF, CME, EPS, ESC, INV, BPN, AGR, SBE) par une seule requête unifiée</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-green">PRIORITÉ MOYENNE</span>
+        <span class="tag tag-green">3-4h</span>
+        <span class="tag tag-blue">Oracle 11g ✓ UNION ALL</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <p>Actuellement, <code>getListeEngagementsBNAByClient()</code> appelle 8 méthodes séquentielles (lignes 95-106 de EngagementServiceImpl.java), chacune faisant une requête SQL.</p>
+
+      <h3>Requête Oracle 11g unifiée avec UNION ALL</h3>
+      <pre><code><span class="cmt">-- Remplacer 8 requêtes par cette seule vue SQL Oracle</span>
+<span class="cmt">-- À créer dans Oracle comme vue (VIEW) ou utilisée directement en JPQL natif</span>
+
+<span class="kw">SELECT</span>
+  NUM_SEQ_PERS,
+  <span class="str">'FCDF'</span>     <span class="kw">AS</span> TYPE_ENGAGEMENT,
+  MONTANT_ENGAGE,
+  NUM_COMPTE,
+  DATE_OCTROI
+<span class="kw">FROM</span> ENG_FCDF_VIEW
+<span class="kw">WHERE</span> NUM_SEQ_PERS = :numSeqPers
+
+<span class="kw">UNION ALL</span>
+
+<span class="kw">SELECT</span>
+  NUM_SEQ_PERS,
+  <span class="str">'CME'</span>      <span class="kw">AS</span> TYPE_ENGAGEMENT,
+  MONTANT_ENGAGE,
+  NUM_COMPTE,
+  DATE_OCTROI
+<span class="kw">FROM</span> ENG_CME_VIEW
+<span class="kw">WHERE</span> NUM_SEQ_PERS = :numSeqPers
+
+<span class="kw">UNION ALL</span>
+
+<span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'EPS'</span> <span class="kw">AS</span> TYPE_ENGAGEMENT, MONTANT_ENGAGE, NUM_COMPTE, DATE_OCTROI
+<span class="kw">FROM</span> ENG_EPS_VIEW <span class="kw">WHERE</span> NUM_SEQ_PERS = :numSeqPers
+
+<span class="cmt">-- ... UNION ALL pour INV, BPN, AGR, SBE</span></code></pre>
+
+      <h3>Créer une vue Oracle (recommandé)</h3>
+      <pre><code><span class="cmt">-- Script SQL Oracle 11g à exécuter une fois</span>
+<span class="cmt">-- Fichier : create_view_engagements_bna_unified.sql</span>
+
+<span class="kw">CREATE OR REPLACE VIEW</span> V_ENGAGEMENTS_BNA_UNIFIED <span class="kw">AS</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'FCDF'</span> <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_FCDF_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'CME'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_CME_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'EPS'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_EPS_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'ESC'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_ESC_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'INV'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_INV_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'BPN'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_BPN_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'AGR'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_AGR_VIEW
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> NUM_SEQ_PERS, <span class="str">'SBE'</span>  <span class="kw">AS</span> TYPE_ENG, MONTANT_ENG, NUM_CPT, DT_OCTROI
+    <span class="kw">FROM</span> SAEB.ENG_SBE_VIEW;
+<span class="cmt">-- INDEX sur la vue si possible : CREATE INDEX IDX_V_ENG_BNA ON V_ENGAGEMENTS_BNA_UNIFIED(NUM_SEQ_PERS);</span></code></pre>
+
+      <h3>Utilisation dans Spring Boot</h3>
+      <pre><code><span class="cmt">// Ajouter dans EngagementServiceImpl</span>
+<span class="ann">@Query</span>(value = <span class="str">"SELECT * FROM V_ENGAGEMENTS_BNA_UNIFIED WHERE NUM_SEQ_PERS = :seq"</span>,
+       nativeQuery = <span class="kw">true</span>)
+List&lt;<span class="ty">EngagementBNAUnifiedProjection</span>&gt; <span class="fn">findAllEngagementsBNA</span>(<span class="ann">@Param</span>(<span class="str">"seq"</span>) String seq);
+
+<span class="cmt">// Interface de projection Spring Data</span>
+<span class="kw">public interface</span> <span class="ty">EngagementBNAUnifiedProjection</span> {
+    String <span class="fn">getNumSeqPers</span>();
+    String <span class="fn">getTypeEng</span>();
+    BigDecimal <span class="fn">getMontantEng</span>();
+    String <span class="fn">getNumCpt</span>();
+}</code></pre>
+
+      <div class="impact">
+        <span>Gain estimé :</span>
+        <div class="impact-bar impact-bar-g" style="width:100px"></div>
+        <strong>8 requêtes → 1 requête par appel d'engagement</strong>
+      </div>
+    </div>
+  </div>
+
+<!-- ═══ SOL 5 ═══ -->
+  <div class="sol-card" id="sol5">
+    <div class="sol-header">
+      <div class="prio prio-5">5</div>
+      <div class="sol-title">
+        <h3>JOIN FETCH pour le chargement du Caneva et ses relations</h3>
+        <p>Charger le Caneva avec toutes ses collections en une requête au lieu de déclencher le lazy loading</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-green">PRIORITÉ MOYENNE</span>
+        <span class="tag tag-green">1-2h</span>
+        <span class="tag tag-blue">Oracle 11g ✓</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <p>Quand <code>canevaRepository.findById(id)</code> est appelé dans <code>createSnapshot()</code>, les collections <code>creditAchatTerrains</code>, <code>creditInvestissements</code>, <code>creditCourtTermes</code>, <code>selectedSites</code> sont en <strong>LAZY</strong> — chaque accès déclenche une requête SQL séparée.</p>
+
+      <h3>Ajouter une requête avec JOIN FETCH dans CanevaRepository</h3>
+      <pre><code><span class="cmt">// CanevaRepository.java — ajouter cette méthode</span>
+
+<span class="ann">@Query</span>(<span class="str">"SELECT DISTINCT c FROM Caneva c "</span> +
+       <span class="str">"LEFT JOIN FETCH c.creditCourtTermes "</span> +
+       <span class="str">"LEFT JOIN FETCH c.creditInvestissements "</span> +
+       <span class="str">"LEFT JOIN FETCH c.creditAchatTerrains cat "</span> +
+       <span class="str">"LEFT JOIN FETCH cat.vendeurs "</span> +  <span class="ok">// charge les vendeurs en même temps</span>
+       <span class="str">"LEFT JOIN FETCH c.selectedSites "</span> +
+       <span class="str">"WHERE c.id = :id"</span>)
+Optional&lt;<span class="ty">Caneva</span>&gt; <span class="fn">findByIdWithAllRelations</span>(<span class="ann">@Param</span>(<span class="str">"id"</span>) Long id);</code></pre>
+
+      <h3>Utiliser dans CanevasSnapshotService</h3>
+      <pre><code><span class="cmt">// CanevasSnapshotService.java — méthode createSnapshot()</span>
+
+<span class="cmt">// AVANT</span>
+<span class="ty">Caneva</span> caneva = canevaRepository.<span class="fn">findById</span>(canevasId)
+    .orElseThrow(...);  <span class="cmt">// lazy loading sur chaque accès</span>
+
+<span class="cmt">// APRÈS</span>
+<span class="ty">Caneva</span> caneva = canevaRepository.<span class="fn">findByIdWithAllRelations</span>(canevasId)
+    .orElseThrow(...);  <span class="ok">// tout chargé en UNE requête SQL avec JOINs</span></code></pre>
+
+      <div class="box info">
+        <span class="box-ico">ℹ️</span>
+        <div><strong>DISTINCT obligatoire</strong> : Avec plusieurs JOIN FETCH, JPA peut multiplier les résultats. <code>SELECT DISTINCT</code> garantit un seul objet Caneva en retour, même avec plusieurs collections jointes.</div>
+      </div>
+
+      <div class="impact">
+        <span>Gain estimé :</span>
+        <div class="impact-bar impact-bar-g" style="width:80px"></div>
+        <strong>−4 à −6 requêtes lazy supprimées</strong>
+      </div>
+    </div>
+  </div>
+
+<!-- ═══ SOL 6 ═══ -->
+  <div class="sol-card" id="sol6">
+    <div class="sol-header">
+      <div class="prio prio-6">6</div>
+      <div class="sol-title">
+        <h3>Créer le snapshot en arrière-plan (asynchrone)</h3>
+        <p>L'utilisateur reçoit la réponse HTTP immédiatement, le snapshot se crée en tâche de fond</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-green">PRIORITÉ MOYENNE</span>
+        <span class="tag tag-green">2h</span>
+        <span class="tag tag-blue">Oracle 11g ✓</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <div class="box warn">
+        <span class="box-ico">⚠️</span>
+        <div>Cette solution améliore <strong>la perception de lenteur</strong> par l'utilisateur, mais ne réduit pas le nombre de requêtes SQL. À combiner avec les solutions 1-3 pour un effet maximal. Attention : si le snapshot échoue en arrière-plan, il faut une stratégie de notification d'erreur.</div>
+      </div>
+
+      <h3>Architecture : répondre vite, créer en arrière-plan</h3>
+      <pre><code><span class="cmt">// AvisController.java</span>
+
+<span class="ann">@PostMapping</span>(<span class="str">"/avis"</span>)
+<span class="kw">public</span> ResponseEntity&lt;<span class="ty">AvisResponseDTO</span>&gt; <span class="fn">saveAvis</span>(<span class="ann">@RequestBody</span> <span class="ty">AvisDTO</span> avisDto) {
+
+    <span class="cmt">// 1. Sauvegarder l'avis et mettre à jour le canevas (rapide)</span>
+    <span class="ty">Avis</span> avis = avisService.<span class="fn">saveAvis</span>(avisDto);          <span class="cmt">// 6 req seulement</span>
+    avisService.<span class="fn">updateCaneva</span>(avisDto);
+    avisService.<span class="fn">createAffectation</span>(avisDto);
+
+    <span class="cmt">// 2. Lancer la création du snapshot en arrière-plan</span>
+    snapshotService.<span class="fn">createSnapshotAsync</span>(avisDto.getCanevasId(), avisDto);
+
+    <span class="cmt">// 3. Répondre IMMÉDIATEMENT à l'utilisateur</span>
+    <span class="kw">return</span> ResponseEntity.<span class="fn">ok</span>(<span class="kw">new</span> <span class="ty">AvisResponseDTO</span>(avis.getId(), <span class="str">"ENREGISTRE"</span>));
+    <span class="cmt">// ↑ L'utilisateur ne patiente plus les 100+ requêtes !</span>
+}</code></pre>
+
+      <h3>Méthode asynchrone Spring</h3>
+      <pre><code><span class="cmt">// CanevasSnapshotService.java</span>
+
+<span class="ann">@Async</span>            <span class="ok">// ← exécuté dans un thread séparé</span>
+<span class="ann">@Transactional</span>    <span class="ok">// ← sa propre transaction</span>
+<span class="kw">public</span> CompletableFuture&lt;<span class="ty">Void</span>&gt; <span class="fn">createSnapshotAsync</span>(Long canevasId, <span class="ty">AvisDTO</span> dto) {
+    <span class="kw">try</span> {
+        <span class="fn">createSnapshot</span>(canevasId, dto, <span class="str">"PEC_AVIS_DEC"</span>);
+    } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+        log.error(<span class="str">"Snapshot async échoué pour canevas {}: {}"</span>, canevasId, e.getMessage());
+        <span class="cmt">// Enregistrer l'erreur pour retry ou alerte</span>
+    }
+    <span class="kw">return</span> CompletableFuture.<span class="fn">completedFuture</span>(<span class="kw">null</span>);
+}</code></pre>
+
+      <h3>Activer @Async dans Spring Boot</h3>
+      <pre><code><span class="cmt">// SaebApplication.java</span>
+
+<span class="ann">@SpringBootApplication</span>
+<span class="ann">@EnableCaching</span>
+<span class="ann">@EnableAsync</span>    <span class="ok">← ajouter</span>
+<span class="kw">public class</span> <span class="ty">SaebApplication</span> {
+    <span class="cmt">// Configurer le pool de threads pour les tâches async</span>
+    <span class="ann">@Bean</span>
+    <span class="kw">public</span> <span class="ty">ThreadPoolTaskExecutor</span> <span class="fn">taskExecutor</span>() {
+        <span class="ty">ThreadPoolTaskExecutor</span> exec = <span class="kw">new</span> <span class="ty">ThreadPoolTaskExecutor</span>();
+        exec.<span class="fn">setCorePoolSize</span>(<span class="num">2</span>);
+        exec.<span class="fn">setMaxPoolSize</span>(<span class="num">5</span>);
+        exec.<span class="fn">setQueueCapacity</span>(<span class="num">50</span>);
+        exec.<span class="fn">setThreadNamePrefix</span>(<span class="str">"snapshot-"</span>);
+        <span class="kw">return</span> exec;
+    }
+}</code></pre>
+
+      <h3>Côté Angular : indicateur de progression (optionnel)</h3>
+      <pre><code><span class="cmt">// snapshot-history.component.ts — après sauvegarde de l'avis</span>
+
+<span class="fn">valider</span>() {
+  this.snapshotService.<span class="fn">validerEtTransmettre</span>(this.canevasId, req)
+    .subscribe(response => {
+      <span class="cmt">// La réponse arrive vite maintenant (snapshot en arrière-plan)</span>
+      this.showValidDlg.<span class="fn">set</span>(<span class="kw">false</span>)
+
+      <span class="cmt">// Recharger l'historique après un délai (le snapshot est en cours)</span>
+      setTimeout(() => {
+        this.snapshotService.<span class="fn">getHistory</span>(this.canevasId)
+          .subscribe(h => this.history.<span class="fn">set</span>(h))
+      }, <span class="num">2000</span>)  <span class="cmt">// 2 secondes suffisent en général</span>
+    })
+}</code></pre>
+    </div>
+  </div>
+
+<!-- ═══ SOL 7 ═══ -->
+  <div class="sol-card" id="sol7">
+    <div class="sol-header">
+      <div class="prio prio-7">7</div>
+      <div class="sol-title">
+        <h3>Projection DTO pour la liste historique (sans charger les CLOB)</h3>
+        <p>La liste des snapshots n'a pas besoin des 10 colonnes CLOB — ne charger que les métadonnées</p>
+      </div>
+      <div class="sol-meta">
+        <span class="tag tag-blue">PRIORITÉ BASSE</span>
+        <span class="tag tag-green">1h</span>
+        <span class="tag tag-blue">Oracle 11g ✓</span>
+      </div>
+    </div>
+    <div class="sol-body">
+      <p>Quand l'historique est affiché (onglet Snapshots), le backend charge toute l'entité <code>CanevasStructureSnapshot</code> incluant les 10 champs CLOB (JSON volumineux). Ces données ne sont pas utilisées dans la liste.</p>
+
+      <h3>Interface de projection (sans CLOB)</h3>
+      <pre><code><span class="cmt">// Créer : SnapshotListProjection.java</span>
+
+<span class="kw">public interface</span> <span class="ty">SnapshotListProjection</span> {
+    Long        <span class="fn">getSnapshotId</span>();
+    String      <span class="fn">getStructureCode</span>();
+    String      <span class="fn">getStructureLabel</span>();
+    Integer     <span class="fn">getVersionNumber</span>();
+    String      <span class="fn">getStatusAtSnapshot</span>();
+    String      <span class="fn">getCreatedBy</span>();
+    String      <span class="fn">getMatricule</span>();
+    LocalDateTime <span class="fn">getCreatedAt</span>();
+    String      <span class="fn">getObservations</span>();
+    <span class="cmt">// Pas de CLOB ! (engagementBnaJson, donneesCreditsJson, etc.)</span>
+}</code></pre>
+
+      <h3>Requête dans CanevasSnapshotRepository</h3>
+      <pre><code><span class="cmt">// CanevasSnapshotRepository.java — ajouter</span>
+
+<span class="ann">@Query</span>(<span class="str">"SELECT s.snapshotId      AS snapshotId, "</span> +
+       <span class="str">"       s.structureCode  AS structureCode, "</span> +
+       <span class="str">"       s.structureLabel AS structureLabel, "</span> +
+       <span class="str">"       s.versionNumber  AS versionNumber, "</span> +
+       <span class="str">"       s.statusAtSnapshot AS statusAtSnapshot, "</span> +
+       <span class="str">"       s.createdBy      AS createdBy, "</span> +
+       <span class="str">"       s.matricule      AS matricule, "</span> +
+       <span class="str">"       s.createdAt      AS createdAt, "</span> +
+       <span class="str">"       s.observations   AS observations "</span> +
+       <span class="str">"FROM CanevasStructureSnapshot s "</span> +
+       <span class="str">"WHERE s.canevasId = :canevasId "</span> +
+       <span class="str">"ORDER BY s.versionNumber ASC"</span>)
+List&lt;<span class="ty">SnapshotListProjection</span>&gt; <span class="fn">findSummaryByCanevasId</span>(<span class="ann">@Param</span>(<span class="str">"canevasId"</span>) Long canevasId);
+
+<span class="cmt">// Oracle 11g ne charge pas les CLOB si on ne les sélectionne pas !</span></code></pre>
+
+      <div class="impact">
+        <span>Gain estimé :</span>
+        <div class="impact-bar impact-bar-g" style="width:60px"></div>
+        <strong>Transfert réseau allégé (−90% données de la liste)</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ORDRE D'IMPLÉMENTATION ═══ -->
+<section id="ordre">
+  <h2>Ordre d'implémentation recommandé</h2>
+
+  <div class="box tip">
+    <span class="box-ico">🎯</span>
+    <div>Les solutions 1 et 2 peuvent être faites en <strong>une demi-journée</strong> et résolvent à elles seules ~40% du problème. Commencer par elles avant d'attaquer les solutions plus complexes.</div>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <strong>Décommenter les @Cacheable</strong> — 30 min, aucun risque<br/>
+      <span class="muted">Fichier : EngagementServiceImpl.java, lignes 71, 437, 451, 487, 504, 526</span>
+    </li>
+    <li>
+      <strong>Ajouter @EnableCaching + dépendance Caffeine</strong> — 15 min<br/>
+      <span class="muted">pom.xml + SaebApplication.java + application.properties</span>
+    </li>
+    <li>
+      <strong>Supprimer le double chargement</strong> — 1h<br/>
+      <span class="muted">Modifier la signature de buildFullEngagementDetailleJson() pour recevoir les données en paramètre</span>
+    </li>
+    <li>
+      <strong>Ajouter findByIdWithAllRelations() dans CanevaRepository</strong> — 30 min<br/>
+      <span class="muted">Évite le lazy loading des collections du canevas</span>
+    </li>
+    <li>
+      <strong>Implémenter le chargement batch (IN clause)</strong> — 2-3h<br/>
+      <span class="muted">Ajouter getEngagementsBNABatch() et getClasseBNABatch() dans EngagementService</span>
+    </li>
+    <li>
+      <strong>Créer la vue Oracle V_ENGAGEMENTS_BNA_UNIFIED</strong> — 1h (script SQL)<br/>
+      <span class="muted">Nécessite accès DBA ou coordination avec l'équipe Oracle SAEB</span>
+    </li>
+    <li>
+      <strong>Snapshot asynchrone (@Async)</strong> — 2h<br/>
+      <span class="muted">Améliore la réactivité de l'UI même si les requêtes SQL restent nombreuses</span>
+    </li>
+    <li>
+      <strong>Projection DTO pour la liste</strong> — 1h<br/>
+      <span class="muted">Optimisation réseau, implémentable à tout moment</span>
+    </li>
+  </ol>
+</section>
+
+<!-- ═══ GAINS ═══ -->
+<section id="gains">
+  <h2>Gains attendus (estimation)</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Solution</th>
+        <th>Requêtes économisées</th>
+        <th>Effort</th>
+        <th>Risque</th>
+        <th>Compatible Oracle 11g</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1 · Réactiver @Cacheable</td>
+        <td><strong>−28 à −60</strong> (si même utilisateur/session recharge)</td>
+        <td>30 min</td>
+        <td>Très faible</td>
+        <td>✅ Oui (cache en mémoire)</td>
+      </tr>
+      <tr>
+        <td>2 · Supprimer double chargement</td>
+        <td><strong>−12 garanties</strong> par snapshot</td>
+        <td>1h</td>
+        <td>Très faible</td>
+        <td>✅ Oui</td>
+      </tr>
+      <tr>
+        <td>3 · Batch IN clause</td>
+        <td><strong>−(N+M+K)×3 + 3</strong> (ex: −60 pour 20 parties)</td>
+        <td>2-3h</td>
+        <td>Faible</td>
+        <td>✅ Oui (IN clause Oracle 11g)</td>
+      </tr>
+      <tr>
+        <td>4 · UNION ALL Oracle</td>
+        <td>8 req → 1 req <strong>par personne</strong></td>
+        <td>3-4h</td>
+        <td>Moyen (accès DBA)</td>
+        <td>✅ Oui (UNION ALL Oracle 11g)</td>
+      </tr>
+      <tr>
+        <td>5 · JOIN FETCH Caneva</td>
+        <td><strong>−4 à −6</strong> lazy loads</td>
+        <td>1-2h</td>
+        <td>Très faible</td>
+        <td>✅ Oui</td>
+      </tr>
+      <tr>
+        <td>6 · Async snapshot</td>
+        <td>0 (mais UX : réponse instantanée)</td>
+        <td>2h</td>
+        <td>Moyen (gestion erreurs)</td>
+        <td>✅ Oui (@Async Spring)</td>
+      </tr>
+      <tr>
+        <td>7 · Projection liste CLOB</td>
+        <td>Mêmes requêtes mais 90% moins de données</td>
+        <td>1h</td>
+        <td>Très faible</td>
+        <td>✅ Oui (projection interface)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box tip" style="margin-top: 20px;">
+    <span class="box-ico">📊</span>
+    <div>
+      <strong>Résultat estimé après solutions 1 + 2 + 3 :</strong><br/>
+      Scénario (5 actionnaires, 10 groupe, 3 vendeurs) : <strong>106 requêtes → ~20 requêtes</strong><br/>
+      Temps de traitement estimé : de ~3-5 secondes à <strong>moins de 500ms</strong> avec cache actif.
+    </div>
+  </div>
+
+  <div class="box warn" style="margin-top: 12px;">
+    <span class="box-ico">⚠️</span>
+    <div><strong>Note Oracle 11g spécifique :</strong> Les solutions proposées utilisent uniquement des fonctionnalités disponibles en Oracle 11g (UNION ALL, IN clause, vues, pas de fonctions JSON, pas de WITH clause complexe). Aucune migration de base de données n'est nécessaire pour les solutions 1 à 3 et 5 à 7.</div>
+  </div>
+</section>
+
+<div class="sol-card center" style="padding: 20px; margin-top: 12px; color: #6b7280; font-size: 12.5px; background: #fff;">
+  Documentation générée pour le projet Canevas Agricole — Mai 2026<br/>
+  Analyse basée sur : CanevasSnapshotService.java, EngagementServiceImpl.java, AvisController.java, AvisService.java
+</div>
+
+</main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('section[id]')
+  const links    = document.querySelectorAll('nav ul li a')
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'))
+        const a = document.querySelector(`nav ul li a[href="#${e.target.id}"]`)
+        if (a) a.classList.add('active')
+      }
+    })
+  }, { rootMargin: '-20% 0px -70% 0px' })
+  sections.forEach(s => obs.observe(s))
+</script>
+</body>
+</html>
