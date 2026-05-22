@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>Guide : Ajouter "Projet Court Terme" dans buildExploitationJson</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; line-height: 1.7; }
+
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a4f 100%);
+    color: white; padding: 48px 40px; text-align: center;
+  }
+  .hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
+  .hero p { font-size: 1.1rem; opacity: 0.85; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+  .toc {
+    background: white; border-radius: 10px; padding: 24px 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08); margin-bottom: 32px;
+  }
+  .toc h2 { color: #1e3a5f; margin-bottom: 14px; font-size: 1.2rem; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: #2d6a4f; text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  .card {
+    background: white; border-radius: 10px; padding: 28px 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08); margin-bottom: 28px;
+  }
+  .card h2 {
+    color: #1e3a5f; font-size: 1.35rem; margin-bottom: 18px;
+    padding-bottom: 10px; border-bottom: 3px solid #2d6a4f;
+  }
+  .card h3 { color: #2d6a4f; font-size: 1.1rem; margin: 20px 0 10px; }
+  .card p { margin-bottom: 12px; }
+
+  .step-badge {
+    display: inline-block; background: #2d6a4f; color: white;
+    border-radius: 50%; width: 28px; height: 28px; line-height: 28px;
+    text-align: center; font-weight: 700; font-size: 0.9rem; margin-right: 8px;
+  }
+
+  pre {
+    background: #0d1117; color: #c9d1d9; border-radius: 8px;
+    padding: 20px 24px; overflow-x: auto; font-size: 0.88rem;
+    line-height: 1.6; margin: 14px 0; position: relative;
+  }
+  .lang-label {
+    position: absolute; top: 8px; right: 12px;
+    background: #30363d; color: #8b949e; padding: 2px 8px;
+    border-radius: 4px; font-size: 0.75rem; font-family: monospace;
+  }
+
+  .kw  { color: #ff7b72; }   /* keywords: private, final, if, new, etc. */
+  .cls { color: #79c0ff; }   /* class names, types */
+  .str { color: #a5d6ff; }   /* strings */
+  .cmt { color: #8b949e; font-style: italic; } /* comments */
+  .met { color: #d2a8ff; }   /* method names */
+  .ann { color: #ffa657; }   /* annotations */
+  .num { color: #f2cc60; }   /* numbers */
+  .var { color: #c9d1d9; }   /* variables */
+
+  .highlight-box {
+    border-left: 4px solid #2d6a4f; background: #f0fff4;
+    padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 14px 0;
+  }
+  .warning-box {
+    border-left: 4px solid #d69e2e; background: #fffbeb;
+    padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 14px 0;
+  }
+  .info-box {
+    border-left: 4px solid #3182ce; background: #ebf8ff;
+    padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 14px 0;
+  }
+
+  .file-path {
+    background: #e8f5e9; border: 1px solid #a5d6a7;
+    border-radius: 6px; padding: 8px 14px; font-family: monospace;
+    font-size: 0.85rem; color: #1b5e20; display: inline-block; margin: 8px 0;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem; }
+  th { background: #1e3a5f; color: white; padding: 10px 14px; text-align: left; }
+  td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f7fafc; }
+
+  .diff-add { background: #0d4a1f; color: #56d364; display: block; padding: 0 4px; }
+  .diff-ctx { display: block; padding: 0 4px; color: #8b949e; }
+  .diff-note { background: #1c2128; display: block; padding: 2px 8px; color: #8b949e; font-size:0.8rem; }
+
+  .json-key   { color: #79c0ff; }
+  .json-str   { color: #a5d6ff; }
+  .json-num   { color: #f2cc60; }
+  .json-bool  { color: #ff7b72; }
+  .json-null  { color: #8b949e; }
+
+  @media (max-width: 700px) {
+    .hero { padding: 28px 16px; }
+    .card { padding: 18px 14px; }
+    pre { padding: 12px 10px; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Guide d'implémentation : Section "Projet : Court Terme"</h1>
+  <p>Ajouter les 4 types de calcul dans <code>buildExploitationJson</code> de <code>CanevasSnapshotService</code></p>
+</div>
+
+<div class="container">
+
+  <!-- TABLE DES MATIÈRES -->
+  <div class="toc card">
+    <h2>Table des matières</h2>
+    <ol>
+      <li><a href="#contexte">Comprendre le contexte : comment ça marche déjà</a></li>
+      <li><a href="#architecture">Architecture des classes concernées</a></li>
+      <li><a href="#etape1">Étape 1 — Injecter les 4 services dans CanevasSnapshotService</a></li>
+      <li><a href="#etape2">Étape 2 — Modifier buildExploitationJson()</a></li>
+      <li><a href="#etape3">Étape 3 — Code complet final à copier</a></li>
+      <li><a href="#resultat">Résultat JSON attendu</a></li>
+      <li><a href="#verif">Comment vérifier que ça marche</a></li>
+    </ol>
+  </div>
+
+  <!-- SECTION 1 : CONTEXTE -->
+  <div class="card" id="contexte">
+    <h2><span class="step-badge">1</span> Comprendre le contexte</h2>
+
+    <p>Dans ce projet, <strong>deux services</strong> gèrent les données d'exploitation court terme :</p>
+
+    <table>
+      <tr><th>Service</th><th>Rôle</th></tr>
+      <tr>
+        <td><code>FicheEtudeServiceImpl</code></td>
+        <td>Génère le PDF (Fiche Étude). Contient déjà les 4 rubriques Bareme, CA Réalisé, CA Prévisionnel, 3 Mois Achat pour la génération PDF.</td>
+      </tr>
+      <tr>
+        <td><code>CanevasSnapshotService</code></td>
+        <td>Crée un "snapshot" (photo instantanée) des données du caneva lors d'un changement de workflow. Stocke ces données en JSON dans la base de données.</td>
+      </tr>
+    </table>
+
+    <div class="info-box">
+      <strong>Pourquoi faire ça ?</strong><br/>
+      Quand un dossier passe d'un état à un autre (ex: "En cours" → "Validé"), le système prend un snapshot de toutes les données. Actuellement, le snapshot de l'exploitation ne contient que les <em>sites</em>. Il faut y ajouter les 4 types de calcul court terme pour que les données soient complètes dans l'historique.
+    </div>
+
+    <h3>Ce que fait actuellement <code>buildExploitationJson</code> (ligne 442)</h3>
+    <div class="file-path">canva_agricole/backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java</div>
+    <pre><span class="cmt">// Code ACTUEL (incomplet) — lignes 442 à 457</span>
+<span class="kw">private</span> <span class="cls">String</span> <span class="met">buildExploitationJson</span>(<span class="cls">Caneva</span> caneva) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; exploitation = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+    <span class="cmt">// Seul les sites sont stockés → INCOMPLET</span>
+    exploitation.<span class="met">put</span>(<span class="str">"sites"</span>, caneva.<span class="met">getSelectedSites</span>() != <span class="kw">null</span>
+            ? caneva.<span class="met">getSelectedSites</span>().<span class="met">stream</span>()
+            .<span class="met">map</span>(s -&gt; {
+                <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+                m.<span class="met">put</span>(<span class="str">"id"</span>, s.<span class="met">getId</span>());
+                m.<span class="met">put</span>(<span class="str">"gouvernorat"</span>, s.<span class="met">getGouvernorat</span>());
+                m.<span class="met">put</span>(<span class="str">"delegation"</span>, s.<span class="met">getDelegation</span>());
+                m.<span class="met">put</span>(<span class="str">"latitude"</span>, s.<span class="met">getLatitude</span>());
+                m.<span class="met">put</span>(<span class="str">"longitude"</span>, s.<span class="met">getLongitude</span>());
+                <span class="kw">return</span> m;
+            }).<span class="met">toList</span>()
+            : <span class="cls">List</span>.<span class="met">of</span>());
+
+    <span class="kw">return</span> <span class="met">toJson</span>(exploitation);
+}</pre>
+
+    <h3>Ce que fait <code>FicheEtudeServiceImpl</code> (modèle à suivre, lignes 1188–1250)</h3>
+    <p>Il appelle 4 services pour charger les données :</p>
+    <table>
+      <tr><th>Rubrique</th><th>Service appelé</th><th>Méthode</th><th>DTO retourné</th></tr>
+      <tr><td>Type de calcul : Bareme</td><td><code>baremeCourtTermeService</code></td><td><code>findByNumSeqpersAndNumCanva()</code></td><td><code>BaremeCourtTermeDTO</code></td></tr>
+      <tr><td>Type de calcul : CA réalisé</td><td><code>caCourtTermeService</code></td><td><code>findByNumSeqpersAndNumCanva()</code></td><td><code>CACourtTermeDTO</code></td></tr>
+      <tr><td>Type de calcul : CA prévisionnel</td><td><code>caPrevCourtTermeService</code></td><td><code>findByNumSeqpersAndNumCanva()</code></td><td><code>CAPrevCourtTermeDTO</code></td></tr>
+      <tr><td>Type de calcul : 3 mois achat au comptant</td><td><code>moisAchatCourtTermeService</code></td><td><code>findByNumSeqpersAndNumCanva()</code></td><td><code>MoisAchatCourtTermeDTO</code></td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 2 : ARCHITECTURE -->
+  <div class="card" id="architecture">
+    <h2><span class="step-badge">2</span> Architecture des classes concernées</h2>
+
+    <h3>Les DTOs et leurs champs importants</h3>
+    <table>
+      <tr><th>DTO</th><th>Champs métier principaux</th><th>Champ commun</th></tr>
+      <tr>
+        <td><code>BaremeCourtTermeDTO</code></td>
+        <td><code>superfecieTete</code>, <code>bareme</code>, <code>creditPossible</code>, <code>retenu</code>, <code>sites</code></td>
+        <td><code>creditCourtTerme</code> (produit, taux, marge…)</td>
+      </tr>
+      <tr>
+        <td><code>CACourtTermeDTO</code></td>
+        <td><code>caRealise</code>, <code>pourcentageCa</code>, <code>totalCreditAccorde</code>, <code>creditPossible</code>, <code>retenu</code>, <code>sites</code></td>
+        <td><code>creditCourtTerme</code></td>
+      </tr>
+      <tr>
+        <td><code>CAPrevCourtTermeDTO</code></td>
+        <td><code>caPrevisionnel</code>, <code>pourcentageCa</code>, <code>totalCreditAccorde</code>, <code>creditPossible</code>, <code>retenu</code>, <code>sites</code></td>
+        <td><code>creditCourtTerme</code></td>
+      </tr>
+      <tr>
+        <td><code>MoisAchatCourtTermeDTO</code></td>
+        <td><code>achatConsomme</code>, <code>creditFournisseur</code>, <code>creditPossible</code>, <code>retenu</code>, <code>sites</code></td>
+        <td><code>creditCourtTerme</code></td>
+      </tr>
+    </table>
+
+    <div class="highlight-box">
+      <strong>Note importante sur le champ <code>retenu</code> :</strong><br/>
+      La valeur <code>-999.0</code> signifie "non sélectionné". Si <code>retenu != -999</code>, cette rubrique a été retenue par l'agent bancaire. Utilisez ce test pour filtrer dans le JSON.
+    </div>
+
+    <h3>Clés d'identification utilisées par les services</h3>
+    <table>
+      <tr><th>Paramètre</th><th>Source dans CanevasSnapshotService</th><th>Type</th></tr>
+      <tr><td><code>numSeqpers</code></td><td><code>caneva.getNumSeqpers().longValue()</code></td><td><code>Long</code></td></tr>
+      <tr><td><code>numCanva</code> (canevaId)</td><td><code>caneva.getId()</code></td><td><code>Long</code></td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 3 : ETAPE 1 -->
+  <div class="card" id="etape1">
+    <h2><span class="step-badge">3</span> Étape 1 — Injecter les 4 services</h2>
+
+    <p>
+      <code>CanevasSnapshotService</code> utilise l'injection de dépendances via <code>@RequiredArgsConstructor</code> de Lombok.
+      Cela signifie que <strong>tous les champs <code>final</code> sont automatiquement injectés par Spring</strong>
+      — vous n'avez pas besoin d'écrire de constructeur.
+    </p>
+
+    <div class="file-path">CanevasSnapshotService.java — lignes 30 à 39 (bloc actuel)</div>
+    <pre><span class="ann">@Service</span>
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="ann">@Slf4j</span>
+<span class="kw">public class</span> <span class="cls">CanevasSnapshotService</span> {
+
+    <span class="kw">private final</span> <span class="cls">CanevasSnapshotRepository</span> snapshotRepo;
+    <span class="kw">private final</span> <span class="cls">CanevasWorkflowLogRepository</span> workflowRepo;
+    <span class="kw">private final</span> <span class="cls">CanevaRepository</span> canevaRepository;
+    <span class="kw">private final</span> <span class="cls">AssocieRepository</span> associeRepository;
+    <span class="kw">private final</span> <span class="cls">ClientCanvasRepository</span> clientCanvasRepository;
+    <span class="kw">private final</span> <span class="cls">IEngagementService</span> engagementService;
+    <span class="kw">private final</span> <span class="cls">IClientService</span> clientService;
+    <span class="kw">private final</span> <span class="cls">ObjectMapper</span> objectMapper;
+    <span class="cmt">// ← Ajouter les 4 lignes ci-dessous ici</span>
+}</pre>
+
+    <h3>Code à ajouter après la ligne 39 (après <code>ObjectMapper objectMapper</code>)</h3>
+    <pre><span class="diff-add">+    private final BaremeCourtTermeService     baremeCourtTermeService;</span>
+<span class="diff-add">+    private final CACourtTermeService          caCourtTermeService;</span>
+<span class="diff-add">+    private final CAPrevCourtTermeService      caPrevCourtTermeService;</span>
+<span class="diff-add">+    private final MoisAchatCourtTermeService   moisAchatCourtTermeService;</span></pre>
+
+    <div class="info-box">
+      <strong>Pourquoi <code>final</code> ?</strong><br/>
+      Lombok lit tous les champs <code>final</code> non initialisés et génère automatiquement un constructeur qui les reçoit en paramètre. Spring voit ce constructeur et injecte les beans correspondants.
+    </div>
+
+    <div class="warning-box">
+      <strong>Vérifier les imports :</strong> Assurez-vous que les 4 classes sont bien importées en haut du fichier. Si votre IDE (IntelliJ/VS Code) ne les résout pas automatiquement, vérifiez dans <code>FicheEtudeServiceImpl.java</code> lignes 49–58 comment elles sont importées.
+    </div>
+  </div>
+
+  <!-- SECTION 4 : ETAPE 2 -->
+  <div class="card" id="etape2">
+    <h2><span class="step-badge">4</span> Étape 2 — Modifier <code>buildExploitationJson()</code></h2>
+
+    <p>
+      La méthode reçoit un objet <code>Caneva</code> qui contient <code>numSeqpers</code> et <code>id</code> (= canevaId).
+      On appelle les 4 services avec ces deux clés, exactement comme dans <code>FicheEtudeServiceImpl</code>.
+    </p>
+
+    <h3>Logique de construction du JSON</h3>
+    <p>Pour chaque type de calcul, on crée une liste de maps. Chaque map représente une ligne du tableau avec ses champs.</p>
+
+    <h3>Méthode helper : convertir un DTO Bareme en Map</h3>
+    <pre><span class="kw">private</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; <span class="met">baremeToMap</span>(<span class="cls">BaremeCourtTermeDTO</span> b) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+    m.<span class="met">put</span>(<span class="str">"id"</span>,             b.<span class="met">getId</span>());
+    m.<span class="met">put</span>(<span class="str">"superfecieTete"</span>, b.<span class="met">getSuperfecieTete</span>());
+    m.<span class="met">put</span>(<span class="str">"bareme"</span>,         b.<span class="met">getBareme</span>());
+    m.<span class="met">put</span>(<span class="str">"creditPossible"</span>, b.<span class="met">getCreditPossible</span>());
+    m.<span class="met">put</span>(<span class="str">"sites"</span>,          b.<span class="met">getSites</span>());
+    <span class="cls">boolean</span> retenu = b.<span class="met">getRetenu</span>() != <span class="kw">null</span> &amp;&amp; b.<span class="met">getRetenu</span>().<span class="met">doubleValue</span>() != -<span class="num">999.0</span>;
+    m.<span class="met">put</span>(<span class="str">"retenu"</span>,         retenu ? b.<span class="met">getRetenu</span>() : <span class="kw">null</span>);
+    <span class="cls">CreditCourtTermeDto</span> c = b.<span class="met">getCreditCourtTerme</span>();
+    <span class="kw">if</span> (c != <span class="kw">null</span>) {
+        m.<span class="met">put</span>(<span class="str">"produit"</span>,           c.<span class="met">getProduit</span>());
+        m.<span class="met">put</span>(<span class="str">"natureSpeculation"</span>, c.<span class="met">getNatureSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"codeSpeculation"</span>,   c.<span class="met">getCodeSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"taux"</span>,              c.<span class="met">getTaux</span>());
+        m.<span class="met">put</span>(<span class="str">"marge"</span>,             c.<span class="met">getMarge</span>());
+        m.<span class="met">put</span>(<span class="str">"fond"</span>,              c.<span class="met">getFond</span>());
+        m.<span class="met">put</span>(<span class="str">"montant"</span>,           c.<span class="met">getMontant</span>());
+    }
+    <span class="kw">return</span> m;
+}</pre>
+
+    <div class="info-box">
+      On crée des méthodes helper séparées (une par type de calcul) pour garder le code lisible. Ce pattern est identique à <code>flattenExploitationBaremeCourtTerme()</code> dans <code>FicheEtudeServiceImpl</code>, mais simplifié pour un JSON (sans formatage PDF).
+    </div>
+  </div>
+
+  <!-- SECTION 5 : CODE COMPLET -->
+  <div class="card" id="etape3">
+    <h2><span class="step-badge">5</span> Étape 3 — Code complet final à copier</h2>
+
+    <p>Voici le code complet à insérer dans <code>CanevasSnapshotService.java</code>.
+    Il y a deux parties : 1) les champs injectés, 2) la méthode modifiée + les 4 helpers.</p>
+
+    <h3>Partie A — Champs à ajouter (après ligne 39)</h3>
+    <div class="file-path">CanevasSnapshotService.java — après <code>private final ObjectMapper objectMapper;</code></div>
+    <pre style="position:relative"><span class="lang-label">Java</span><span class="kw">private final</span> <span class="cls">BaremeCourtTermeService</span>   baremeCourtTermeService;
+<span class="kw">private final</span> <span class="cls">CACourtTermeService</span>        caCourtTermeService;
+<span class="kw">private final</span> <span class="cls">CAPrevCourtTermeService</span>    caPrevCourtTermeService;
+<span class="kw">private final</span> <span class="cls">MoisAchatCourtTermeService</span> moisAchatCourtTermeService;</pre>
+
+    <h3>Partie B — Remplacer entièrement <code>buildExploitationJson()</code> (lignes 442–457)</h3>
+    <div class="file-path">CanevasSnapshotService.java — remplacer les lignes 442 à 457</div>
+    <pre style="position:relative"><span class="lang-label">Java</span><span class="kw">private</span> <span class="cls">String</span> <span class="met">buildExploitationJson</span>(<span class="cls">Caneva</span> caneva) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; exploitation = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+    <span class="cmt">// ── Sites (déjà présent) ──────────────────────────────────────────</span>
+    exploitation.<span class="met">put</span>(<span class="str">"sites"</span>, caneva.<span class="met">getSelectedSites</span>() != <span class="kw">null</span>
+            ? caneva.<span class="met">getSelectedSites</span>().<span class="met">stream</span>()
+            .<span class="met">map</span>(s -&gt; {
+                <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+                m.<span class="met">put</span>(<span class="str">"id"</span>,          s.<span class="met">getId</span>());
+                m.<span class="met">put</span>(<span class="str">"gouvernorat"</span>, s.<span class="met">getGouvernorat</span>());
+                m.<span class="met">put</span>(<span class="str">"delegation"</span>,  s.<span class="met">getDelegation</span>());
+                m.<span class="met">put</span>(<span class="str">"latitude"</span>,    s.<span class="met">getLatitude</span>());
+                m.<span class="met">put</span>(<span class="str">"longitude"</span>,   s.<span class="met">getLongitude</span>());
+                <span class="kw">return</span> m;
+            }).<span class="met">toList</span>()
+            : <span class="cls">List</span>.<span class="met">of</span>());
+
+    <span class="cmt">// ── Projet : Court Terme — 4 types de calcul (NOUVEAU) ──────────</span>
+    <span class="cls">Long</span> numSeqpers = caneva.<span class="met">getNumSeqpers</span>() != <span class="kw">null</span>
+            ? caneva.<span class="met">getNumSeqpers</span>().<span class="met">longValue</span>() : <span class="kw">null</span>;
+    <span class="cls">Long</span> canevaId   = caneva.<span class="met">getId</span>();
+
+    <span class="kw">if</span> (numSeqpers != <span class="kw">null</span> &amp;&amp; canevaId != <span class="kw">null</span>) {
+        <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; projetCourtTerme = <span class="kw">new</span> <span class="cls">LinkedHashMap</span>&lt;&gt;();
+
+        <span class="cmt">// — Type de calcul : Bareme ———————————————————————————————</span>
+        <span class="kw">try</span> {
+            <span class="cls">List</span>&lt;<span class="cls">BaremeCourtTermeDTO</span>&gt; baremeList =
+                    baremeCourtTermeService.<span class="met">findByNumSeqpersAndNumCanva</span>(numSeqpers, canevaId);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"bareme"</span>, baremeList != <span class="kw">null</span>
+                    ? baremeList.<span class="met">stream</span>().<span class="met">map</span>(<span class="kw">this</span>::<span class="met">snapshotBareme</span>).<span class="met">toList</span>()
+                    : <span class="cls">List</span>.<span class="met">of</span>());
+        } <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+            log.<span class="met">warn</span>(<span class="str">"Snapshot bareme CT échoué canevaId={}"</span>, canevaId, e);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"bareme"</span>, <span class="cls">List</span>.<span class="met">of</span>());
+        }
+
+        <span class="cmt">// — Type de calcul : CA réalisé ———————————————————————————</span>
+        <span class="kw">try</span> {
+            <span class="cls">List</span>&lt;<span class="cls">CACourtTermeDTO</span>&gt; caList =
+                    caCourtTermeService.<span class="met">findByNumSeqpersAndNumCanva</span>(numSeqpers, canevaId);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"caRealise"</span>, caList != <span class="kw">null</span>
+                    ? caList.<span class="met">stream</span>().<span class="met">map</span>(<span class="kw">this</span>::<span class="met">snapshotCaRealise</span>).<span class="met">toList</span>()
+                    : <span class="cls">List</span>.<span class="met">of</span>());
+        } <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+            log.<span class="met">warn</span>(<span class="str">"Snapshot CA réalisé CT échoué canevaId={}"</span>, canevaId, e);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"caRealise"</span>, <span class="cls">List</span>.<span class="met">of</span>());
+        }
+
+        <span class="cmt">// — Type de calcul : CA prévisionnel ——————————————————————</span>
+        <span class="kw">try</span> {
+            <span class="cls">List</span>&lt;<span class="cls">CAPrevCourtTermeDTO</span>&gt; caPrevList =
+                    caPrevCourtTermeService.<span class="met">findByNumSeqpersAndNumCanva</span>(numSeqpers, canevaId);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"caPrevisionnel"</span>, caPrevList != <span class="kw">null</span>
+                    ? caPrevList.<span class="met">stream</span>().<span class="met">map</span>(<span class="kw">this</span>::<span class="met">snapshotCaPrev</span>).<span class="met">toList</span>()
+                    : <span class="cls">List</span>.<span class="met">of</span>());
+        } <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+            log.<span class="met">warn</span>(<span class="str">"Snapshot CA prévi CT échoué canevaId={}"</span>, canevaId, e);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"caPrevisionnel"</span>, <span class="cls">List</span>.<span class="met">of</span>());
+        }
+
+        <span class="cmt">// — Type de calcul : 3 mois achat au comptant —————————————</span>
+        <span class="kw">try</span> {
+            <span class="cls">List</span>&lt;<span class="cls">MoisAchatCourtTermeDTO</span>&gt; maList =
+                    moisAchatCourtTermeService.<span class="met">findByNumSeqpersAndNumCanva</span>(numSeqpers, canevaId);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"moisAchat"</span>, maList != <span class="kw">null</span>
+                    ? maList.<span class="met">stream</span>().<span class="met">map</span>(<span class="kw">this</span>::<span class="met">snapshotMoisAchat</span>).<span class="met">toList</span>()
+                    : <span class="cls">List</span>.<span class="met">of</span>());
+        } <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+            log.<span class="met">warn</span>(<span class="str">"Snapshot moisAchat CT échoué canevaId={}"</span>, canevaId, e);
+            projetCourtTerme.<span class="met">put</span>(<span class="str">"moisAchat"</span>, <span class="cls">List</span>.<span class="met">of</span>());
+        }
+
+        exploitation.<span class="met">put</span>(<span class="str">"projetCourtTerme"</span>, projetCourtTerme);
+    }
+
+    <span class="kw">return</span> <span class="met">toJson</span>(exploitation);
+}</pre>
+
+    <h3>Partie C — Les 4 méthodes helper (ajouter après <code>buildExploitationJson</code>)</h3>
+    <div class="file-path">À insérer entre <code>buildExploitationJson()</code> et <code>buildGarantiesJson()</code> (après ligne 457)</div>
+    <pre style="position:relative"><span class="lang-label">Java</span><span class="cmt">// ── Helpers snapshot Projet Court Terme ─────────────────────────────────</span>
+
+<span class="kw">private</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; <span class="met">snapshotBareme</span>(<span class="cls">BaremeCourtTermeDTO</span> b) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">LinkedHashMap</span>&lt;&gt;();
+    m.<span class="met">put</span>(<span class="str">"id"</span>,             b.<span class="met">getId</span>());
+    m.<span class="met">put</span>(<span class="str">"superfecieTete"</span>, b.<span class="met">getSuperfecieTete</span>());
+    m.<span class="met">put</span>(<span class="str">"bareme"</span>,         b.<span class="met">getBareme</span>());
+    m.<span class="met">put</span>(<span class="str">"creditPossible"</span>, b.<span class="met">getCreditPossible</span>());
+    m.<span class="met">put</span>(<span class="str">"sites"</span>,          b.<span class="met">getSites</span>());
+    m.<span class="met">put</span>(<span class="str">"retenu"</span>, b.<span class="met">getRetenu</span>() != <span class="kw">null</span> &amp;&amp; b.<span class="met">getRetenu</span>().<span class="met">doubleValue</span>() != -<span class="num">999.0</span>
+            ? b.<span class="met">getRetenu</span>() : <span class="kw">null</span>);
+    <span class="cls">CreditCourtTermeDto</span> c = b.<span class="met">getCreditCourtTerme</span>();
+    <span class="kw">if</span> (c != <span class="kw">null</span>) {
+        m.<span class="met">put</span>(<span class="str">"produit"</span>,           c.<span class="met">getProduit</span>());
+        m.<span class="met">put</span>(<span class="str">"natureSpeculation"</span>, c.<span class="met">getNatureSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"codeSpeculation"</span>,   c.<span class="met">getCodeSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"taux"</span>,              c.<span class="met">getTaux</span>());
+        m.<span class="met">put</span>(<span class="str">"marge"</span>,             c.<span class="met">getMarge</span>());
+        m.<span class="met">put</span>(<span class="str">"fond"</span>,              c.<span class="met">getFond</span>());
+        m.<span class="met">put</span>(<span class="str">"montant"</span>,           c.<span class="met">getMontant</span>());
+    }
+    <span class="kw">return</span> m;
+}
+
+<span class="kw">private</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; <span class="met">snapshotCaRealise</span>(<span class="cls">CACourtTermeDTO</span> ca) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">LinkedHashMap</span>&lt;&gt;();
+    m.<span class="met">put</span>(<span class="str">"id"</span>,                 ca.<span class="met">getId</span>());
+    m.<span class="met">put</span>(<span class="str">"caRealise"</span>,           ca.<span class="met">getCaRealise</span>());
+    m.<span class="met">put</span>(<span class="str">"pourcentageCa"</span>,       ca.<span class="met">getPourcentageCa</span>());
+    m.<span class="met">put</span>(<span class="str">"totalCreditAccorde"</span>,  ca.<span class="met">getTotalCreditAccorde</span>());
+    m.<span class="met">put</span>(<span class="str">"creditPossible"</span>,      ca.<span class="met">getCreditPossible</span>());
+    m.<span class="met">put</span>(<span class="str">"sites"</span>,               ca.<span class="met">getSites</span>());
+    m.<span class="met">put</span>(<span class="str">"retenu"</span>, ca.<span class="met">getRetenu</span>() != <span class="kw">null</span> &amp;&amp; ca.<span class="met">getRetenu</span>().<span class="met">doubleValue</span>() != -<span class="num">999.0</span>
+            ? ca.<span class="met">getRetenu</span>() : <span class="kw">null</span>);
+    <span class="cls">CreditCourtTermeDto</span> c = ca.<span class="met">getCreditCourtTerme</span>();
+    <span class="kw">if</span> (c != <span class="kw">null</span>) {
+        m.<span class="met">put</span>(<span class="str">"produit"</span>,           c.<span class="met">getProduit</span>());
+        m.<span class="met">put</span>(<span class="str">"natureSpeculation"</span>, c.<span class="met">getNatureSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"codeSpeculation"</span>,   c.<span class="met">getCodeSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"taux"</span>,              c.<span class="met">getTaux</span>());
+        m.<span class="met">put</span>(<span class="str">"marge"</span>,             c.<span class="met">getMarge</span>());
+        m.<span class="met">put</span>(<span class="str">"fond"</span>,              c.<span class="met">getFond</span>());
+        m.<span class="met">put</span>(<span class="str">"montant"</span>,           c.<span class="met">getMontant</span>());
+        m.<span class="met">put</span>(<span class="str">"echeance"</span>,          c.<span class="met">getEcheance</span>());
+    }
+    <span class="kw">return</span> m;
+}
+
+<span class="kw">private</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; <span class="met">snapshotCaPrev</span>(<span class="cls">CAPrevCourtTermeDTO</span> ca) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">LinkedHashMap</span>&lt;&gt;();
+    m.<span class="met">put</span>(<span class="str">"id"</span>,                 ca.<span class="met">getId</span>());
+    m.<span class="met">put</span>(<span class="str">"caPrevisionnel"</span>,     ca.<span class="met">getCaPrevisionnel</span>());
+    m.<span class="met">put</span>(<span class="str">"pourcentageCa"</span>,       ca.<span class="met">getPourcentageCa</span>());
+    m.<span class="met">put</span>(<span class="str">"totalCreditAccorde"</span>,  ca.<span class="met">getTotalCreditAccorde</span>());
+    m.<span class="met">put</span>(<span class="str">"creditPossible"</span>,      ca.<span class="met">getCreditPossible</span>());
+    m.<span class="met">put</span>(<span class="str">"sites"</span>,               ca.<span class="met">getSites</span>());
+    m.<span class="met">put</span>(<span class="str">"retenu"</span>, ca.<span class="met">getRetenu</span>() != <span class="kw">null</span> &amp;&amp; ca.<span class="met">getRetenu</span>().<span class="met">doubleValue</span>() != -<span class="num">999.0</span>
+            ? ca.<span class="met">getRetenu</span>() : <span class="kw">null</span>);
+    <span class="cls">CreditCourtTermeDto</span> c = ca.<span class="met">getCreditCourtTerme</span>();
+    <span class="kw">if</span> (c != <span class="kw">null</span>) {
+        m.<span class="met">put</span>(<span class="str">"produit"</span>,           c.<span class="met">getProduit</span>());
+        m.<span class="met">put</span>(<span class="str">"natureSpeculation"</span>, c.<span class="met">getNatureSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"codeSpeculation"</span>,   c.<span class="met">getCodeSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"taux"</span>,              c.<span class="met">getTaux</span>());
+        m.<span class="met">put</span>(<span class="str">"marge"</span>,             c.<span class="met">getMarge</span>());
+        m.<span class="met">put</span>(<span class="str">"fond"</span>,              c.<span class="met">getFond</span>());
+        m.<span class="met">put</span>(<span class="str">"montant"</span>,           c.<span class="met">getMontant</span>());
+        m.<span class="met">put</span>(<span class="str">"echeance"</span>,          c.<span class="met">getEcheance</span>());
+    }
+    <span class="kw">return</span> m;
+}
+
+<span class="kw">private</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; <span class="met">snapshotMoisAchat</span>(<span class="cls">MoisAchatCourtTermeDTO</span> ma) {
+    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; m = <span class="kw">new</span> <span class="cls">LinkedHashMap</span>&lt;&gt;();
+    m.<span class="met">put</span>(<span class="str">"id"</span>,               ma.<span class="met">getId</span>());
+    m.<span class="met">put</span>(<span class="str">"achatConsomme"</span>,    ma.<span class="met">getAchatConsomme</span>());
+    m.<span class="met">put</span>(<span class="str">"creditFournisseur"</span>, ma.<span class="met">getCreditFournisseur</span>());
+    m.<span class="met">put</span>(<span class="str">"creditPossible"</span>,   ma.<span class="met">getCreditPossible</span>());
+    m.<span class="met">put</span>(<span class="str">"sites"</span>,             ma.<span class="met">getSites</span>());
+    m.<span class="met">put</span>(<span class="str">"retenu"</span>, ma.<span class="met">getRetenu</span>() != <span class="kw">null</span> &amp;&amp; ma.<span class="met">getRetenu</span>().<span class="met">doubleValue</span>() != -<span class="num">999.0</span>
+            ? ma.<span class="met">getRetenu</span>() : <span class="kw">null</span>);
+    <span class="cls">CreditCourtTermeDto</span> c = ma.<span class="met">getCreditCourtTerme</span>();
+    <span class="kw">if</span> (c != <span class="kw">null</span>) {
+        m.<span class="met">put</span>(<span class="str">"produit"</span>,           c.<span class="met">getProduit</span>());
+        m.<span class="met">put</span>(<span class="str">"natureSpeculation"</span>, c.<span class="met">getNatureSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"codeSpeculation"</span>,   c.<span class="met">getCodeSpeculation</span>());
+        m.<span class="met">put</span>(<span class="str">"taux"</span>,              c.<span class="met">getTaux</span>());
+        m.<span class="met">put</span>(<span class="str">"marge"</span>,             c.<span class="met">getMarge</span>());
+        m.<span class="met">put</span>(<span class="str">"fond"</span>,              c.<span class="met">getFond</span>());
+        m.<span class="met">put</span>(<span class="str">"montant"</span>,           c.<span class="met">getMontant</span>());
+        m.<span class="met">put</span>(<span class="str">"echeance"</span>,          c.<span class="met">getEcheance</span>());
+    }
+    <span class="kw">return</span> m;
+}</pre>
+  </div>
+
+  <!-- SECTION 6 : JSON RÉSULTAT -->
+  <div class="card" id="resultat">
+    <h2><span class="step-badge">6</span> Résultat JSON attendu</h2>
+    <p>Après l'implémentation, le champ <code>donneesExploitationJson</code> du snapshot aura cette structure :</p>
+    <pre style="position:relative"><span class="lang-label">JSON</span>{
+  <span class="json-key">"sites"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"gouvernorat"</span>: <span class="json-str">"Tunis"</span>,
+      <span class="json-key">"delegation"</span>: <span class="json-str">"Bab Bhar"</span>,
+      <span class="json-key">"latitude"</span>: <span class="json-num">36.8</span>,
+      <span class="json-key">"longitude"</span>: <span class="json-num">10.18</span>
+    }
+  ],
+  <span class="json-key">"projetCourtTerme"</span>: {
+
+    <span class="json-key">"bareme"</span>: [
+      {
+        <span class="json-key">"id"</span>: <span class="json-str">"abc-123"</span>,
+        <span class="json-key">"superfecieTete"</span>: <span class="json-num">5.0</span>,
+        <span class="json-key">"bareme"</span>: <span class="json-num">1200.0</span>,
+        <span class="json-key">"creditPossible"</span>: <span class="json-num">6000.0</span>,
+        <span class="json-key">"sites"</span>: [<span class="json-num">1</span>, <span class="json-num">2</span>],
+        <span class="json-key">"retenu"</span>: <span class="json-num">6000.0</span>,
+        <span class="json-key">"produit"</span>: <span class="json-str">"CACT"</span>,
+        <span class="json-key">"natureSpeculation"</span>: <span class="json-str">"Céréales"</span>,
+        <span class="json-key">"taux"</span>: <span class="json-str">"8.5"</span>,
+        <span class="json-key">"marge"</span>: <span class="json-str">"1"</span>,
+        <span class="json-key">"fond"</span>: <span class="json-str">"BNA"</span>,
+        <span class="json-key">"montant"</span>: <span class="json-num">6000.0</span>
+      }
+    ],
+
+    <span class="json-key">"caRealise"</span>: [
+      {
+        <span class="json-key">"id"</span>: <span class="json-str">"def-456"</span>,
+        <span class="json-key">"caRealise"</span>: <span class="json-num">50000.0</span>,
+        <span class="json-key">"pourcentageCa"</span>: <span class="json-num">20.0</span>,
+        <span class="json-key">"totalCreditAccorde"</span>: <span class="json-num">8000.0</span>,
+        <span class="json-key">"creditPossible"</span>: <span class="json-num">10000.0</span>,
+        <span class="json-key">"retenu"</span>: <span class="json-null">null</span>,
+        <span class="cmt">// null = non retenu (valeur -999 en base)</span>
+        <span class="json-key">"produit"</span>: <span class="json-str">"CACT"</span>
+      }
+    ],
+
+    <span class="json-key">"caPrevisionnel"</span>: [ <span class="json-str">"..."</span> ],
+
+    <span class="json-key">"moisAchat"</span>: [
+      {
+        <span class="json-key">"id"</span>: <span class="json-str">"ghi-789"</span>,
+        <span class="json-key">"achatConsomme"</span>: <span class="json-num">15000.0</span>,
+        <span class="json-key">"creditFournisseur"</span>: <span class="json-num">30.0</span>,
+        <span class="json-key">"creditPossible"</span>: <span class="json-num">4500.0</span>,
+        <span class="json-key">"retenu"</span>: <span class="json-null">null</span>
+      }
+    ]
+  }
+}</pre>
+  </div>
+
+  <!-- SECTION 7 : VÉRIFICATION -->
+  <div class="card" id="verif">
+    <h2><span class="step-badge">7</span> Comment vérifier que ça marche</h2>
+
+    <h3>1. Compilation</h3>
+    <pre>mvn compile</pre>
+    <p>Si Spring se plaint d'un bean manquant → vérifier que les interfaces <code>BaremeCourtTermeService</code>, <code>CACourtTermeService</code>, etc. sont bien des <code>@Service</code> ou <code>@Component</code>.</p>
+
+    <h3>2. Test manuel en base de données</h3>
+    <p>Après avoir déclenché une transition de workflow (ce qui appelle <code>createSnapshot</code>), exécuter cette requête SQL :</p>
+    <pre>SELECT donnees_exploitation_json
+FROM canevas_structure_snapshot
+WHERE canevas_id = &lt;votre_id&gt;
+ORDER BY version_number DESC
+LIMIT 1;</pre>
+    <p>Vous devriez voir le JSON avec la clé <code>projetCourtTerme</code>.</p>
+
+    <h3>3. Points d'attention</h3>
+    <table>
+      <tr><th>Problème possible</th><th>Solution</th></tr>
+      <tr>
+        <td>Erreur <code>NullPointerException</code> sur <code>caneva.getNumSeqpers()</code></td>
+        <td>La guard <code>if (numSeqpers != null && canevaId != null)</code> vous protège déjà.</td>
+      </tr>
+      <tr>
+        <td>Les listes sont vides alors qu'il y a des données</td>
+        <td>Vérifier que les services appellent bien la bonne table avec les bons paramètres (<code>numSeqpers</code> + <code>canevaId</code>).</td>
+      </tr>
+      <tr>
+        <td>Import <code>CreditCourtTermeDto</code> introuvable</td>
+        <td>Chercher la classe exacte dans <code>net.kachout.saeb.dtos_</code> (avec underscore).</td>
+      </tr>
+      <tr>
+        <td>Spring injection fail : "No qualifying bean of type..."</td>
+        <td>Vérifier que le service cible est annoté <code>@Service</code> et que le package est bien scanné.</td>
+      </tr>
+    </table>
+
+    <div class="highlight-box">
+      <strong>Résumé des fichiers modifiés :</strong><br/>
+      Un seul fichier à modifier : <code>CanevasSnapshotService.java</code><br/>
+      — Ajouter 4 champs <code>final</code> (lignes ~39)<br/>
+      — Remplacer <code>buildExploitationJson()</code> (lignes 442–457)<br/>
+      — Ajouter 4 méthodes helper (après ligne 457)
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
