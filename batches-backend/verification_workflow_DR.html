@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vérification Workflow DR — Boule Bleue / Verte</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2d3148;
+      --text: #e8eaf6;
+      --muted: #7b8099;
+      --radius: 10px;
+      --green: #1a7f37;
+      --blue: #1565c0;
+      --orange: #f39c12;
+      --red: #c62828;
+      --yellow: #f1c40f;
+      --purple: #6a1b9a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; }
+
+    header {
+      background: linear-gradient(135deg, #1a1d27, #0f1117 60%, #1a0a2e);
+      border-bottom: 2px solid #c62828;
+      padding: 30px 48px;
+    }
+    header h1 { font-size: 24px; color: #fff; }
+    header h1 span { color: #f87171; }
+    header p { color: var(--muted); margin-top: 6px; font-size: 13px; }
+    .header-badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .badge { padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .b-red    { background: rgba(198,40,40,.2); color: #f87171; border: 1px solid rgba(198,40,40,.4); }
+    .b-blue   { background: rgba(21,101,192,.2); color: #82b4ff; border: 1px solid rgba(21,101,192,.4); }
+    .b-green  { background: rgba(26,127,55,.2);  color: #69f0ae; border: 1px solid rgba(26,127,55,.4); }
+    .b-orange { background: rgba(243,156,18,.2); color: #ffcc02; border: 1px solid rgba(243,156,18,.4); }
+
+    .container { max-width: 1300px; margin: 0 auto; padding: 0 32px 60px; }
+
+    /* sections */
+    section { margin: 36px 0; }
+    section > h2 {
+      font-size: 18px; font-weight: 700; color: #fff;
+      padding-bottom: 10px; border-bottom: 2px solid var(--border);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+    }
+    section > h2 .icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    h3 { font-size: 14px; font-weight: 700; color: #c5cae9; margin: 20px 0 10px; }
+
+    /* cards */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 22px; margin-bottom: 14px;
+    }
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 13px; color: var(--muted); }
+    .card ul { padding-left: 16px; }
+    .card ul li { margin: 4px 0; }
+    .card-red    { border-left: 4px solid var(--red); }
+    .card-green  { border-left: 4px solid var(--green); }
+    .card-blue   { border-left: 4px solid var(--blue); }
+    .card-orange { border-left: 4px solid var(--orange); }
+    .card-purple { border-left: 4px solid var(--purple); }
+
+    /* alert */
+    .alert {
+      border-radius: 8px; padding: 14px 18px; margin: 12px 0;
+      font-size: 13px; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .alert-icon { font-size: 18px; flex-shrink: 0; }
+    .alert-danger  { background: rgba(198,40,40,.1);  border: 1px solid rgba(198,40,40,.35); }
+    .alert-info    { background: rgba(21,101,192,.1); border: 1px solid rgba(21,101,192,.35); }
+    .alert-success { background: rgba(26,127,55,.1);  border: 1px solid rgba(26,127,55,.35); }
+    .alert-warn    { background: rgba(243,156,18,.1); border: 1px solid rgba(243,156,18,.35); }
+
+    /* code blocks */
+    pre {
+      background: #080b12; border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 20px; overflow-x: auto; font-size: 12.5px; line-height: 1.75;
+      color: #cdd3f0; margin: 10px 0; font-family: 'Consolas','Fira Code',monospace;
+    }
+    .kw { color: #82aaff; }
+    .ty { color: #ffcb6b; }
+    .st { color: #c3e88d; }
+    .cm { color: #546e7a; font-style: italic; }
+    .hl-red  { background: rgba(198,40,40,.25); color: #ff8a80; padding: 1px 4px; border-radius: 3px; }
+    .hl-green{ background: rgba(26,127,55,.25);  color: #69f0ae; padding: 1px 4px; border-radius: 3px; }
+    .hl-blue { background: rgba(21,101,192,.25); color: #82b4ff; padding: 1px 4px; border-radius: 3px; }
+
+    /* file path */
+    .filepath {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 12px; font-size: 11px;
+      color: #82b4ff; font-family: monospace; margin-bottom: 8px;
+    }
+
+    /* ── STEPPER SIMULATION ───────────────────────────────── */
+    .sim-block {
+      background: #fff; border: 1px solid #cfd8dc; border-radius: 10px;
+      padding: 20px 24px; margin-bottom: 16px;
+    }
+    .sim-title {
+      font-size: 13px; font-weight: 700; color: #263238; margin-bottom: 4px;
+    }
+    .sim-subtitle { font-size: 11px; color: #78909c; margin-bottom: 16px; }
+    .sim-state-tag {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; margin-bottom: 12px;
+    }
+    .sim-bug  { background: #fce4ec; color: #c62828; border: 1px solid #ef9a9a; }
+    .sim-ok   { background: #e8f5e9; color: #1a7f37; border: 1px solid #a5d6a7; }
+
+    /* Stepper identique à l'app */
+    .stepper {
+      display: flex; align-items: flex-start; gap: 0;
+    }
+    .stepper-item {
+      display: flex; flex-direction: column; align-items: center;
+      flex: 1; position: relative;
+    }
+    .stepper-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #eceff1; border: 2px solid #cfd8dc; color: #78909c;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; position: relative; z-index: 2; transition: all .3s;
+    }
+    .stepper-circle.done {
+      background: #1a7f37; border-color: #1a7f37; color: #fff;
+      box-shadow: 0 0 0 3px rgba(26,127,55,.25);
+    }
+    .stepper-circle.active {
+      background: #1565c0; border-color: #1565c0; color: #fff;
+      box-shadow: 0 0 0 4px rgba(21,101,192,.2);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(21,101,192,.2); }
+      50%      { box-shadow: 0 0 0 9px rgba(21,101,192,.07); }
+    }
+    .stepper-label { display: flex; flex-direction: column; align-items: center; margin-top: 8px; text-align: center; }
+    .stepper-main  { font-size: 12px; font-weight: 700; color: #263238; }
+    .stepper-sub   { font-size: 10px; color: #78909c; }
+    .stepper-line  {
+      position: absolute; top: 19px; left: 50%; width: 100%; height: 2px;
+      background: #e0e0e0; z-index: 1;
+    }
+    .stepper-line.done { background: linear-gradient(90deg, #1a7f37, #1a7f37); }
+
+    /* bug annotation arrow */
+    .bug-arrow {
+      text-align: center; font-size: 11px; color: #f87171;
+      margin-top: -4px; margin-bottom: 8px;
+    }
+
+    /* diff box */
+    .diff-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+    .diff-box {
+      border-radius: 8px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .diff-header {
+      padding: 8px 14px; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .diff-header.bad  { background: rgba(198,40,40,.2); color: #f87171; }
+    .diff-header.good { background: rgba(26,127,55,.2);  color: #69f0ae; }
+    .diff-body { padding: 12px 14px; background: #080b12; }
+    .diff-line { font-size: 12px; font-family: monospace; line-height: 1.8; }
+    .diff-line.removed { color: #ff8a80; background: rgba(198,40,40,.1); padding: 0 4px; border-radius: 3px; }
+    .diff-line.added   { color: #69f0ae; background: rgba(26,127,55,.1);  padding: 0 4px; border-radius: 3px; }
+    .diff-line.ctx     { color: #546e7a; }
+
+    /* table */
+    .tbl-wrap { overflow-x: auto; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--surface2); }
+    th { padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 600;
+         color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+         border-bottom: 2px solid var(--border); }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .tag {
+      display: inline-block; padding: 2px 9px; border-radius: 12px;
+      font-size: 11px; font-weight: 700;
+    }
+    .tag-red    { background: rgba(198,40,40,.2); color: #f87171; }
+    .tag-green  { background: rgba(26,127,55,.2); color: #69f0ae; }
+    .tag-blue   { background: rgba(21,101,192,.2); color: #82b4ff; }
+    .tag-orange { background: rgba(243,156,18,.2); color: #ffcc02; }
+    .tag-grey   { background: rgba(120,144,156,.2); color: #b0bec5; }
+
+    /* summary box */
+    .summary {
+      background: linear-gradient(135deg, rgba(21,101,192,.1), rgba(26,127,55,.08));
+      border: 1px solid rgba(21,101,192,.3); border-radius: var(--radius);
+      padding: 20px 24px; margin: 24px 0;
+    }
+    .summary h4 { color: #fff; font-size: 14px; margin-bottom: 10px; }
+    .summary ol { padding-left: 18px; }
+    .summary li { font-size: 13px; color: var(--muted); margin: 6px 0; }
+    .summary li strong { color: var(--text); }
+
+    footer {
+      text-align: center; padding: 24px; color: var(--muted);
+      font-size: 12px; border-top: 1px solid var(--border); margin-top: 50px;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 20px; }
+      .container { padding: 0 14px 40px; }
+      .card-grid, .diff-wrap { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span>VÉRIFICATION</span> — Boule DR : Bleue → Verte (Workflow Journal)</h1>
+  <p>Analyse du comportement réel vs comportement attendu pour les étapes P3 / P4 de la Direction Régionale</p>
+  <div class="header-badges">
+    <span class="badge b-red">BUG IDENTIFIÉ · ligne 117</span>
+    <span class="badge b-blue">snapshot-history.component.ts</span>
+    <span class="badge b-blue">PEC_AVIS_DEC dans step3done</span>
+    <span class="badge b-green">Correction disponible</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ═══ SECTION 1 — RAPPEL DES DEUX ÉTAPES DR ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(243,156,18,.15)">📋</span>1. Les deux étapes DR concernées</h2>
+
+    <div class="card-grid">
+      <div class="card card-orange">
+        <h4>Étape P3 — Directeur PEC Avis (PROFILE3 · Page 3)</h4>
+        <ul>
+          <li><strong>Action :</strong> Prise en charge de la phase d'opinion</li>
+          <li><strong>Stade résultant :</strong> <span class="tag tag-orange">PEC_AVIS_DEC</span></li>
+          <li><strong>Action log :</strong> <code>PRENDRE_EN_CHARGE</code></li>
+          <li><strong>Signification :</strong> Le directeur régional reconnaît avoir reçu le canvas et commence l'analyse — <em>travail en cours, pas terminé</em></li>
+          <li><strong>Boule attendue :</strong> <span style="color:#1565c0;font-weight:700">BLEUE (active, pulsante)</span></li>
+        </ul>
+      </div>
+      <div class="card card-green">
+        <h4>Étape P4 — Directeur Validation Avis (PROFILE4 · Page 4)</h4>
+        <ul>
+          <li><strong>Action :</strong> Émission de l'avis formel DR (FAVORABLE / DÉFAVORABLE)</li>
+          <li><strong>Stade résultant :</strong> <span class="tag tag-green">VALIDER_DR</span></li>
+          <li><strong>Action log :</strong> <code>VALIDER</code></li>
+          <li><strong>Signification :</strong> Le directeur a rendu sa décision ET le canvas est envoyé au centrale — <em>travail DR terminé</em></li>
+          <li><strong>Boule attendue :</strong> <span style="color:#1565c0;font-weight:700">BLEUE</span> jusqu'à envoi central, puis <span style="color:#1a7f37;font-weight:700">VERTE ✓</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ️</span>
+      <div>
+        <strong>Règle métier visée :</strong> La "boule Direction Régionale" dans le stepper du Journal Workflow doit rester
+        <strong style="color:#82b4ff">BLEUE (en cours)</strong> tant que P3 seul a agi. Elle ne passe au
+        <strong style="color:#69f0ae">VERT (terminé)</strong> que lorsque P4 a validé l'avis <em>ET</em> le canvas a été transmis au pôle central (affectation vers commission).
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 2 — LE BUG EXACT ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(198,40,40,.15)">🐛</span>2. Le bug exact — ligne 117</h2>
+
+    <div class="filepath">📄 frontend-app1/src/app/_components/pages/canvas.agricole/snapshot-history/snapshot-history.component.ts</div>
+
+    <pre><code><span class="cm">// ── LIGNE 101-134 — progressSteps (computed) ─────────────────────────────</span>
+progressSteps = computed((): ProgressStep[] => {
+  <span class="kw">const</span> logs    = this.workflowLog();
+  <span class="kw">const</span> snaps   = this.history();
+  <span class="kw">const</span> actions = <span class="kw">new</span> Set(logs.map(l => l.action));
+  <span class="kw">const</span> statuses = <span class="kw">new</span> Set(snaps.map(s => s.statusAtSnapshot));
+
+  <span class="kw">const</span> has       = (a: <span class="ty">string</span>) => actions.has(a);
+  <span class="kw">const</span> hasStatus = (s: <span class="ty">string</span>) => statuses.has(s);
+
+  <span class="cm">// Étape 1 : Saisie Agence</span>
+  <span class="kw">const</span> step1done = snaps.length > 0;
+
+  <span class="cm">// Étape 2 : Validation Agence</span>
+  <span class="kw">const</span> step2done = has(<span class="st">'PRE_VALIDER'</span>) || hasStatus(<span class="st">'VALID_DONNEE'</span>);
+
+  <span class="cm">// ⚠️  LIGNE 117 — BUG ICI :</span>
+  <span class="kw">const</span> step3done = has(<span class="st">'VALIDER'</span>) || hasStatus(<span class="st">'VALIDER_DR'</span>) || <span class="hl-red">hasStatus('PEC_AVIS_DEC')</span>;
+  <span class="cm">//                                                              ↑</span>
+  <span class="cm">//                                     PEC_AVIS_DEC = P3 a agi = EN COURS (pas terminé !)</span>
+  <span class="cm">//                                     Mais ce prédicat rend step3done = true → boule VERTE</span>
+
+  <span class="cm">// Étape 4 : Décision Direction Centrale</span>
+  <span class="kw">const</span> step4done = has(<span class="st">'DECISION_FINALE'</span>)
+      || hasStatus(<span class="st">'DEC_FINAL_PRISE_ACCORD'</span>)
+      || hasStatus(<span class="st">'DEC_FINAL_PRISE_REJET'</span>)
+      || hasStatus(<span class="st">'VALID_CENTRALE_COMM'</span>);
+
+  <span class="cm">// Étape active = première non-done</span>
+  <span class="kw">const</span> activeStep = !step1done ? 1 : !step2done ? 2 : !step3done ? 3 : !step4done ? 4 : 5;
+  <span class="cm">//   ↑ Quand step3done = true (causé par PEC_AVIS_DEC), activeStep saute à 4</span>
+  <span class="cm">//   ↑ Donc step3.active = false ET step3.done = true → cercle VERT immédiatement</span>
+  ...
+});</code></pre>
+
+    <div class="alert alert-danger">
+      <span class="alert-icon">❌</span>
+      <div>
+        <strong>Conséquence directe :</strong> Dès que Directeur P3 effectue la prise en charge et que le stade devient
+        <code>PEC_AVIS_DEC</code>, le signal <code>step3done = true</code> est déclenché. La boule "Dir. Régionale"
+        passe <strong>immédiatement au VERT</strong> (CSS <code>.stepper-circle.done</code> → <code>background: #1a7f37</code>)
+        sans que P4 ait agi et sans que le canvas soit transmis au centrale.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 3 — SIMULATION VISUELLE ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(21,101,192,.15)">👁️</span>3. Simulation visuelle — Comportement actuel vs Attendu</h2>
+
+    <!-- === Scénario A : AVANT toute action DR === -->
+    <h3>Scénario A — Avant l'action P3 (stade : VALID_DONNEE)</h3>
+    <div class="sim-block">
+      <div class="sim-title">État stepper — Résultat correct ✓</div>
+      <div class="sim-subtitle">step1done=true · step2done=true · step3done=false → activeStep=3</div>
+      <span class="sim-state-tag sim-ok">Comportement CORRECT</span>
+      <div class="stepper">
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Saisie</span><span class="stepper-sub">Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Validation</span><span class="stepper-sub">Chef Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle active"><i>🔍</i></div>
+          <div class="stepper-label"><span class="stepper-main">Analyse</span><span class="stepper-sub">Dir. Régionale</span></div>
+          <div class="stepper-line"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle"><i>⭐</i></div>
+          <div class="stepper-label"><span class="stepper-main">Décision</span><span class="stepper-sub">Dir. Centrale</span></div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#78909c;margin-top:12px">✓ La boule DR est BLEUE (active/pulsante) = en attente d'action DR. C'est correct.</p>
+    </div>
+
+    <!-- === Scénario B : APRÈS action P3 — BUG === -->
+    <h3>Scénario B — Après action P3 seulement (stade : PEC_AVIS_DEC) — <span style="color:#f87171">BUG</span></h3>
+    <div class="sim-block">
+      <div class="sim-title">État stepper — COMPORTEMENT ACTUEL (bugué) ✗</div>
+      <div class="sim-subtitle">step3done devient TRUE à cause de hasStatus('PEC_AVIS_DEC') → activeStep=4</div>
+      <span class="sim-state-tag sim-bug">BUG — Boule DR VERTE prématurément</span>
+      <div class="stepper">
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Saisie</span><span class="stepper-sub">Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Validation</span><span class="stepper-sub">Chef Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle done" style="box-shadow:0 0 0 3px rgba(198,40,40,.35); border-color:#c62828; background:#c62828"><i>✓</i></div>
+          <div class="stepper-label">
+            <span class="stepper-main" style="color:#c62828">Analyse</span>
+            <span class="stepper-sub" style="color:#c62828">Dir. Régionale</span>
+          </div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle active"><i>⭐</i></div>
+          <div class="stepper-label"><span class="stepper-main">Décision</span><span class="stepper-sub">Dir. Centrale</span></div>
+        </div>
+      </div>
+      <div class="bug-arrow">↑ Boule VERTE alors que P4 n'a pas encore agi et le canvas n'est pas encore au centrale !</div>
+      <p style="font-size:11px;color:#c62828;margin-top:4px">✗ P3 a seulement "pris en charge" (PRENDRE_EN_CHARGE). P4 n'a pas émis l'avis. Pourtant la boule DR passe au vert et le stepper saute à l'étape 4.</p>
+    </div>
+
+    <!-- === Scénario B — COMPORTEMENT ATTENDU === -->
+    <div class="sim-block">
+      <div class="sim-title">État stepper — COMPORTEMENT ATTENDU ✓</div>
+      <div class="sim-subtitle">step3done doit rester FALSE → activeStep=3 → boule BLEUE pulsante</div>
+      <span class="sim-state-tag sim-ok">ATTENDU — Boule DR BLEUE (en cours)</span>
+      <div class="stepper">
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Saisie</span><span class="stepper-sub">Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Validation</span><span class="stepper-sub">Chef Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle active"><i>🔍</i></div>
+          <div class="stepper-label"><span class="stepper-main">Analyse</span><span class="stepper-sub">Dir. Régionale</span></div>
+          <div class="stepper-line"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle"><i>⭐</i></div>
+          <div class="stepper-label"><span class="stepper-main">Décision</span><span class="stepper-sub">Dir. Centrale</span></div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#1565c0;margin-top:12px">✓ Après P3 (PEC_AVIS_DEC) : boule DR reste BLEUE — P4 n'a pas encore validé, le canvas n'est pas encore au centrale.</p>
+    </div>
+
+    <!-- === Scénario C : APRÈS P4 + envoi central === -->
+    <h3>Scénario C — Après P4 ET envoi au centrale (stade : VALIDER_DR + PEC_CHARGEE_COMM) — <span style="color:#69f0ae">Attendu</span></h3>
+    <div class="sim-block">
+      <div class="sim-title">État stepper — COMPORTEMENT ATTENDU ✓</div>
+      <div class="sim-subtitle">step3done = TRUE (VALIDER_DR présent + canvas au centrale) → boule VERTE</div>
+      <span class="sim-state-tag sim-ok">CORRECT — Boule DR VERTE ✓</span>
+      <div class="stepper">
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Saisie</span><span class="stepper-sub">Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Validation</span><span class="stepper-sub">Chef Agence</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle done"><i>✓</i></div>
+          <div class="stepper-label"><span class="stepper-main">Analyse</span><span class="stepper-sub">Dir. Régionale</span></div>
+          <div class="stepper-line done"></div>
+        </div>
+        <div class="stepper-item">
+          <div class="stepper-circle active"><i>⭐</i></div>
+          <div class="stepper-label"><span class="stepper-main">Décision</span><span class="stepper-sub">Dir. Centrale</span></div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#1a7f37;margin-top:12px">✓ P4 a validé (VALIDER_DR) ET le canvas est arrivé au centrale (PEC_CHARGEE_COMM) → DR marquée terminée (VERTE).</p>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 4 — ANALYSE CSS ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(106,27,154,.15)">🎨</span>4. Mapping CSS — Couleurs des boules</h2>
+
+    <div class="filepath">📄 snapshot-history.component.css — Lignes 42–71</div>
+
+    <div class="card-grid">
+      <div class="card card-blue">
+        <h4 style="color:#82b4ff">Boule BLEUE — <code>.stepper-circle.active</code></h4>
+        <p>Signification : <strong>Étape en cours</strong> (activeStep = cette étape)</p>
+        <pre style="margin:8px 0"><code>.stepper-circle.active {
+  background: <span class="hl-blue">#1565c0</span>;
+  border-color: #1565c0;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(21,101,192,.2);
+  animation: pulse 1.5s ease-in-out infinite;
+}</code></pre>
+        <p>Condition : <code>step.active === true</code> ET <code>step.done === false</code></p>
+        <p>Logic : <code>activeStep === 3</code> → ce qui nécessite <code>step3done = false</code></p>
+      </div>
+      <div class="card card-green">
+        <h4 style="color:#69f0ae">Boule VERTE — <code>.stepper-circle.done</code></h4>
+        <p>Signification : <strong>Étape terminée</strong></p>
+        <pre style="margin:8px 0"><code>.stepper-circle.done {
+  background: <span class="hl-green">#1a7f37</span>;
+  border-color: #1a7f37;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(26,127,55,.2);
+}</code></pre>
+        <p>Condition : <code>step.done === true</code></p>
+        <p>Logic : <code>step3done = true</code> → déclenché prématurément par <code>PEC_AVIS_DEC</code></p>
+      </div>
+    </div>
+
+    <h3>Template HTML — Logique d'application des classes (ligne 62-63)</h3>
+    <div class="filepath">📄 snapshot-history.component.html — Lignes 62–63</div>
+    <pre><code>&lt;div class="stepper-circle"
+     [class.done]="<span class="hl-green">step.done</span>"
+     [class.active]="<span class="hl-blue">step.active && !step.done</span>"&gt;
+  @if (step.done) &#123;
+    &lt;i class="pi pi-check"&gt;&lt;/i&gt;   <span class="cm">&lt;!-- icône coche blanche sur fond vert --&gt;</span>
+  &#125; @else &#123;
+    &lt;i [class]="step.icon"&gt;&lt;/i&gt;  <span class="cm">&lt;!-- icône générique sur fond bleu --&gt;</span>
+  &#125;
+&lt;/div&gt;
+
+<span class="cm">&lt;!-- Ligne entre les étapes --&gt;</span>
+&lt;div class="stepper-line" [class.done]="<span class="hl-green">step.done</span>"&gt;&lt;/div&gt;
+<span class="cm">&lt;!-- stepper-line.done → background: linear-gradient(90deg, #1a7f37, #1a7f37) --&gt;</span></code></pre>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        La ligne de connexion entre les boules (<code>stepper-line</code>) passe aussi au VERT (<code>#1a7f37</code>)
+        dès que <code>step.done = true</code>. Elle est donc également affectée par le bug :
+        la ligne "Validation Agence → Dir. Régionale" devient verte prématurément après P3.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 5 — TABLE DES ÉTATS ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(243,156,18,.15)">📊</span>5. Tableau — Quel stade produit quel résultat dans le stepper</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Situation</th>
+            <th>Stades présents</th>
+            <th>step3done (actuel)</th>
+            <th>step3done (attendu)</th>
+            <th>Boule DR actuelle</th>
+            <th>Boule DR attendue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Avant P3 — canvas validé agence</td>
+            <td><span class="tag tag-green">VALID_DONNEE</span></td>
+            <td><span class="tag tag-green">false ✓</span></td>
+            <td><span class="tag tag-green">false ✓</span></td>
+            <td><span class="tag tag-blue">BLEUE ✓</span></td>
+            <td><span class="tag tag-blue">BLEUE ✓</span></td>
+          </tr>
+          <tr style="background:rgba(198,40,40,.05)">
+            <td><strong>P3 a agi — PEC seule</strong></td>
+            <td><span class="tag tag-orange">PEC_AVIS_DEC</span></td>
+            <td><span class="tag tag-red">true ✗ BUG</span></td>
+            <td><span class="tag tag-green">false ✓</span></td>
+            <td><span class="tag tag-red">VERTE ✗</span></td>
+            <td><span class="tag tag-blue">BLEUE (attendu)</span></td>
+          </tr>
+          <tr style="background:rgba(198,40,40,.05)">
+            <td><strong>P4 a validé, pas encore au central</strong></td>
+            <td><span class="tag tag-orange">VALIDER_DR</span></td>
+            <td><span class="tag tag-red">true ✗ (prématuré)</span></td>
+            <td><span class="tag tag-red">false (pas encore)</span></td>
+            <td><span class="tag tag-red">VERTE (prématuré)</span></td>
+            <td><span class="tag tag-blue">BLEUE (attendu)</span></td>
+          </tr>
+          <tr style="background:rgba(26,127,55,.05)">
+            <td><strong>P4 validé + canvas au centrale</strong></td>
+            <td><span class="tag tag-green">VALIDER_DR</span> + <span class="tag tag-blue">PEC_CHARGEE_COMM</span></td>
+            <td><span class="tag tag-green">true ✓</span></td>
+            <td><span class="tag tag-green">true ✓</span></td>
+            <td><span class="tag tag-green">VERTE ✓</span></td>
+            <td><span class="tag tag-green">VERTE ✓</span></td>
+          </tr>
+          <tr>
+            <td>Commission en cours</td>
+            <td><span class="tag tag-blue">PEC_DEVISION_COMM</span></td>
+            <td><span class="tag tag-green">true ✓</span></td>
+            <td><span class="tag tag-green">true ✓</span></td>
+            <td><span class="tag tag-green">VERTE ✓</span></td>
+            <td><span class="tag tag-green">VERTE ✓</span></td>
+          </tr>
+          <tr>
+            <td>Décision finale</td>
+            <td><span class="tag tag-green">VALID_CENTRALE_COMM</span></td>
+            <td><span class="tag tag-green">true ✓</span></td>
+            <td><span class="tag tag-green">true ✓</span></td>
+            <td><span class="tag tag-green">VERTE ✓</span></td>
+            <td><span class="tag tag-green">VERTE ✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 6 — CORRECTION ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(26,127,55,.15)">🔧</span>6. Correction proposée — ligne 117</h2>
+
+    <div class="diff-wrap">
+      <div class="diff-box">
+        <div class="diff-header bad">❌ Code actuel (bugué)</div>
+        <div class="diff-body">
+          <div class="diff-line ctx">// Étape 3 : Analyse Direction Régionale</div>
+          <div class="diff-line removed">const step3done = has('VALIDER')</div>
+          <div class="diff-line removed">    || hasStatus('VALIDER_DR')</div>
+          <div class="diff-line removed">    || hasStatus('PEC_AVIS_DEC');  // ← BUG</div>
+        </div>
+      </div>
+      <div class="diff-box">
+        <div class="diff-header good">✅ Code corrigé</div>
+        <div class="diff-body">
+          <div class="diff-line ctx">// Étape 3 : Analyse Direction Régionale</div>
+          <div class="diff-line added">// DR = terminée seulement quand P4 a validé</div>
+          <div class="diff-line added">// ET le canvas est passé au centrale</div>
+          <div class="diff-line added">const drValidated = has('VALIDER')</div>
+          <div class="diff-line added">    || hasStatus('VALIDER_DR');</div>
+          <div class="diff-line added">const sentToCentral =</div>
+          <div class="diff-line added">    hasStatus('PEC_CHARGEE_COMM')</div>
+          <div class="diff-line added">    || hasStatus('PEC_DEVISION_COMM')</div>
+          <div class="diff-line added">    || hasStatus('PEC_DEP_COMM')</div>
+          <div class="diff-line added">    || hasStatus('VALID_CENTRALE_COMM')</div>
+          <div class="diff-line added">    || hasStatus('DEC_FINAL_PRISE_ACCORD')</div>
+          <div class="diff-line added">    || hasStatus('DEC_FINAL_PRISE_REJET');</div>
+          <div class="diff-line added">const step3done = drValidated && sentToCentral;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filepath" style="margin-top:16px">📄 frontend-app1/src/app/_components/pages/canvas.agricole/snapshot-history/snapshot-history.component.ts · ligne 117</div>
+
+    <pre><code><span class="cm">// ── AVANT (bugué) ──────────────────────────────────────────────────────</span>
+<span class="kw">const</span> step3done = has(<span class="st">'VALIDER'</span>) || hasStatus(<span class="st">'VALIDER_DR'</span>) || <span class="hl-red">hasStatus('PEC_AVIS_DEC')</span>;
+
+
+<span class="cm">// ── APRÈS (corrigé) ────────────────────────────────────────────────────</span>
+
+<span class="cm">// Condition 1 : P4 a émis son avis (VALIDER_DR enregistré)</span>
+<span class="kw">const</span> drValidated  = has(<span class="st">'VALIDER'</span>) || hasStatus(<span class="st">'VALIDER_DR'</span>);
+
+<span class="cm">// Condition 2 : le canvas a quitté la DR et est arrivé au centrale</span>
+<span class="kw">const</span> sentToCentral =
+    hasStatus(<span class="st">'PEC_CHARGEE_COMM'</span>)       <span class="cm">// commission chargée (page 6)</span>
+    || hasStatus(<span class="st">'PEC_DEVISION_COMM'</span>)    <span class="cm">// commission division (page 7)</span>
+    || hasStatus(<span class="st">'PEC_DEP_COMM'</span>)         <span class="cm">// commission département (page 8)</span>
+    || hasStatus(<span class="st">'VALID_CENTRALE_COMM'</span>)   <span class="cm">// commission centrale (page 9)</span>
+    || hasStatus(<span class="st">'DEC_FINAL_PRISE_ACCORD'</span>)<span class="cm">// décision finale accord</span>
+    || hasStatus(<span class="st">'DEC_FINAL_PRISE_REJET'</span>);<span class="cm">// décision finale rejet</span>
+
+<span class="cm">// DR terminée = P4 a validé ET canvas transmis au centrale</span>
+<span class="kw">const</span> step3done = <span class="hl-green">drValidated && sentToCentral</span>;</code></pre>
+
+    <div class="alert alert-success" style="margin-top:16px">
+      <span class="alert-icon">✅</span>
+      <div>
+        <strong>Résultat après correction :</strong>
+        <ul style="margin-top:8px;padding-left:18px">
+          <li>P3 agit (PEC_AVIS_DEC) → <code>step3done = false</code> → boule DR reste <strong style="color:#82b4ff">BLEUE</strong> ✓</li>
+          <li>P4 valide (VALIDER_DR) mais canvas pas encore au centrale → <code>step3done = false</code> → boule DR reste <strong style="color:#82b4ff">BLEUE</strong> ✓</li>
+          <li>P4 validé + canvas affecté au centrale (PEC_CHARGEE_COMM) → <code>step3done = true</code> → boule DR passe au <strong style="color:#69f0ae">VERT</strong> ✓</li>
+          <li>Commission en cours ou terminée → <code>step3done = true</code> → boule DR <strong style="color:#69f0ae">VERTE</strong> ✓</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 7 — VÉRIFICATION MAPPING ACTIONS/COULEURS ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(156,89,182,.15)">🗺️</span>7. Vérification complète du mapping actions → couleurs dans le journal</h2>
+
+    <h3>actionSeverity() — Couleur des actions dans la timeline (ligne 559–569)</h3>
+    <div class="filepath">📄 snapshot-history.component.ts · lignes 559–568</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Action (log)</th><th>Severity</th><th>Couleur rendue</th><th>Émis par</th><th>Correct ?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>PRENDRE_EN_CHARGE</code></td><td>secondary</td><td><span class="tag tag-grey">Gris</span></td><td>P3 (PEC Avis)</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>VALIDER</code></td><td>success</td><td><span class="tag tag-green">Vert</span></td><td>P4 (Validation DR)</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>PRE_VALIDER</code></td><td>info</td><td><span class="tag tag-blue">Bleu</span></td><td>Chef Agence</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>REFOULER</code></td><td>danger</td><td><span class="tag tag-red">Rouge</span></td><td>Tout niveau</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>CORRIGER</code></td><td>warning</td><td><span class="tag tag-orange">Orange</span></td><td>Tout niveau</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>DECISION_FINALE</code></td><td>success</td><td><span class="tag tag-green">Vert</span></td><td>Commission centrale</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:20px">statusSeverity() — Couleur des statuts dans les snapshots (ligne 571–582)</h3>
+    <div class="filepath">📄 snapshot-history.component.ts · lignes 571–581</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Status (snapshot)</th><th>Severity</th><th>Couleur</th><th>Phase</th><th>Correct ?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>PEC_DONNEE</code></td><td>info</td><td><span class="tag tag-blue">Bleu</span></td><td>Chef Agence — en cours</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>VALID_DONNEE</code></td><td>success</td><td><span class="tag tag-green">Vert</span></td><td>Chef Agence — validé</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>CORRIGE_DONNEE</code></td><td>danger</td><td><span class="tag tag-red">Rouge</span></td><td>Correction demandée</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr style="background:rgba(198,40,40,.05)">
+            <td><code>PEC_AVIS_DEC</code></td>
+            <td>warning</td>
+            <td><span class="tag tag-orange">Orange</span></td>
+            <td>P3 — en cours</td>
+            <td><span class="tag tag-orange">⚠️ Discutable</span></td>
+          </tr>
+          <tr><td><code>VALIDER_DR</code></td><td>success</td><td><span class="tag tag-green">Vert</span></td><td>P4 — validé</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>CORRIGE_AVIS_DEC</code></td><td>danger</td><td><span class="tag tag-red">Rouge</span></td><td>Correction avis</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>PEC_CHARGEE_COMM</code></td><td>info</td><td><span class="tag tag-blue">Bleu</span></td><td>Commission — en cours</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+          <tr><td><code>VALID_CENTRALE_COMM</code></td><td>success</td><td><span class="tag tag-green">Vert</span></td><td>Commission — validée</td><td><span class="tag tag-green">✓ OK</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-warn" style="margin-top:8px">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>Note sur PEC_AVIS_DEC → 'warning' (orange) :</strong> Dans <code>statusSeverity()</code>, le statut
+        <code>PEC_AVIS_DEC</code> est mappé à <strong>warning (orange)</strong>. C'est cohérent pour l'affichage du badge
+        de statut du snapshot individuel (indique "en attente/en cours de décision"). Ce mapping
+        <em>ne concerne pas directement le stepper</em> — c'est le <code>step3done</code> qui contrôle la couleur de la boule.
+        Ce mapping est donc acceptable, mais la <code>progressSeverity()</code> globale (ligne 198) ne distingue pas
+        PEC_AVIS_DEC des autres statuts "info" — elle retourne uniformément 'info' (bleu) pour les phases non-terminées.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 8 — ÉTAT VALIDE_AVIS_DEC INUTILISÉ ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(243,156,18,.15)">🚨</span>8. Anomalie supplémentaire — VALID_AVIS_DEC non utilisé</h2>
+
+    <div class="card card-orange">
+      <h4>Stade VALID_AVIS_DEC défini mais jamais assigné</h4>
+      <p>L'enum <code>Stade.java</code> déclare la valeur <code>VALID_AVIS_DEC</code> (ligne 18) mais <strong>aucun service backend ne l'assigne jamais</strong>. Le code de P4 (AvisService.java) utilise <code>VALIDER_DR</code> à la place :</p>
+    </div>
+
+    <div class="diff-wrap">
+      <div class="diff-box">
+        <div class="diff-header bad">❌ Stade déclaré mais orphelin</div>
+        <div class="diff-body">
+          <div class="diff-line ctx">// Stade.java — enum</div>
+          <div class="diff-line removed">VALID_AVIS_DEC,  // ← déclaré...</div>
+          <div class="diff-line ctx"></div>
+          <div class="diff-line ctx">// AvisService.java — jamais utilisé :</div>
+          <div class="diff-line removed">// caneva.setStade(Stade.VALID_AVIS_DEC);</div>
+          <div class="diff-line ctx">// ← cette ligne n'existe nulle part</div>
+        </div>
+      </div>
+      <div class="diff-box">
+        <div class="diff-header bad">❌ Ce qui est réellement utilisé par P4</div>
+        <div class="diff-body">
+          <div class="diff-line ctx">// AvisService.java · ligne 166</div>
+          <div class="diff-line added">caneva.setStade(Stade.VALIDER_DR);</div>
+          <div class="diff-line ctx">// ^ P4 assigne VALIDER_DR, pas VALID_AVIS_DEC</div>
+          <div class="diff-line ctx"></div>
+          <div class="diff-line ctx">// WorkflowLog action créée :</div>
+          <div class="diff-line added">action = "VALIDER"</div>
+          <div class="diff-line added">statusAtSnapshot = "VALIDER_DR"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>Impact :</strong> Le frontend utilise bien <code>hasStatus('VALIDER_DR')</code> dans <code>step3done</code>
+        pour détecter la validation P4 — ce qui correspond correctement à ce que le backend assigne. La confusion vient du
+        nom <code>VALID_AVIS_DEC</code> mentionné dans la documentation mais qui n'est jamais assigné.
+        À terme : soit supprimer <code>VALID_AVIS_DEC</code> de l'enum (deadcode), soit unifier les noms.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 9 — RÉSUMÉ COMPLET ═══ -->
+  <section>
+    <h2><span class="icon" style="background:rgba(21,101,192,.15)">📌</span>9. Résumé de la vérification</h2>
+
+    <div class="summary">
+      <h4>Réponse à la question : "La boule DR reste-t-elle bleue jusqu'à ce que P4 valide ET que le canvas passe au centrale ?"</h4>
+      <ol>
+        <li>
+          <strong>Non — il y a un bug.</strong> La boule DR passe au VERT dès que P3 agit (PEC_AVIS_DEC), bien avant que P4 n'émette son avis.
+          → Fichier : <code>snapshot-history.component.ts</code> · ligne 117
+        </li>
+        <li>
+          <strong>La cause :</strong> <code>hasStatus('PEC_AVIS_DEC')</code> est inclus dans <code>step3done</code>.
+          Ce stade signifie "en cours" (P3 a pris en charge) mais est interprété comme "terminé" par le stepper.
+        </li>
+        <li>
+          <strong>Double condition manquante :</strong> Le code actuel ne vérifie pas que le canvas a été transmis au centrale avant de marquer DR comme terminée.
+          Il suffit que <code>VALIDER_DR</code> soit présent — pas besoin que <code>PEC_CHARGEE_COMM</code> soit aussi présent.
+        </li>
+        <li>
+          <strong>La correction :</strong> Remplacer ligne 117 par <code>const step3done = drValidated &amp;&amp; sentToCentral</code> où <code>drValidated</code> = VALIDER_DR et <code>sentToCentral</code> = un stade de commission est présent.
+        </li>
+        <li>
+          <strong>Anomalie secondaire :</strong> <code>VALID_AVIS_DEC</code> est déclaré dans l'enum Stade mais jamais assigné par le backend. Nettoyage recommandé.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  PGCANVAS · Vérification workflow DR — Analyse snapshot-history.component.ts · 2026
+</footer>
+
+</body>
+</html>

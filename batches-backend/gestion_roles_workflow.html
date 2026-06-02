@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGCANVAS — Gestion des Rôles & Workflow Complet</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2d3148;
+      --accent: #4f8ef7;
+      --accent2: #7c5cbf;
+      --green: #2ecc71;
+      --orange: #f39c12;
+      --red: #e74c3c;
+      --yellow: #f1c40f;
+      --purple: #9b59b6;
+      --teal: #1abc9c;
+      --text: #e8eaf6;
+      --text-muted: #7b8099;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 60%, #1a0a2e 100%);
+      border-bottom: 2px solid var(--accent);
+      padding: 32px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(79,142,247,.18) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .5px;
+    }
+    header h1 span { color: var(--accent); }
+    header p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .header-badges {
+      display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .4px;
+    }
+    .badge-blue   { background: rgba(79,142,247,.15); color: var(--accent); border: 1px solid rgba(79,142,247,.3); }
+    .badge-green  { background: rgba(46,204,113,.12); color: var(--green);  border: 1px solid rgba(46,204,113,.3); }
+    .badge-purple { background: rgba(156,89,182,.12); color: var(--purple); border: 1px solid rgba(156,89,182,.3); }
+    .badge-orange { background: rgba(243,156,18,.12); color: var(--orange); border: 1px solid rgba(243,156,18,.3); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 32px 60px; }
+
+    /* ── NAV (TABLE OF CONTENTS) ── */
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 28px 0;
+    }
+    nav.toc h3 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    nav.toc ol { padding-left: 18px; }
+    nav.toc li { margin: 5px 0; }
+    nav.toc a { color: var(--accent); text-decoration: none; font-size: 13px; }
+    nav.toc a:hover { text-decoration: underline; }
+
+    /* ── SECTION ── */
+    section { margin: 36px 0; }
+    section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    section h2 .icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    section h3 {
+      font-size: 15px; font-weight: 600; color: #c5cae9;
+      margin: 22px 0 10px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .card-accent-blue  { border-left: 4px solid var(--accent); }
+    .card-accent-green { border-left: 4px solid var(--green); }
+    .card-accent-orange{ border-left: 4px solid var(--orange); }
+    .card-accent-red   { border-left: 4px solid var(--red); }
+    .card-accent-purple{ border-left: 4px solid var(--purple); }
+    .card-accent-teal  { border-left: 4px solid var(--teal); }
+    .card-accent-yellow{ border-left: 4px solid var(--yellow); }
+    .card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .card p  { font-size: 13px; color: var(--text-muted); }
+    .card ul { padding-left: 18px; font-size: 13px; color: var(--text-muted); }
+    .card ul li { margin: 3px 0; }
+
+    /* ── ROLE PILLS ── */
+    .role-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin: 2px 2px;
+    }
+    .role-cca    { background: rgba(79,142,247,.2);  color: #82b4ff; border: 1px solid rgba(79,142,247,.4); }
+    .role-chef   { background: rgba(46,204,113,.15); color: #69f0ae; border: 1px solid rgba(46,204,113,.35); }
+    .role-dir    { background: rgba(243,156,18,.15); color: #ffcc02; border: 1px solid rgba(243,156,18,.35); }
+    .role-admin  { background: rgba(156,89,182,.15); color: #ce93d8; border: 1px solid rgba(156,89,182,.35); }
+    .role-comm   { background: rgba(231,76,60,.15);  color: #ff8a80; border: 1px solid rgba(231,76,60,.35); }
+
+    /* ── STATE PILL ── */
+    .state-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+    .s-init   { background: rgba(79,142,247,.2); color: var(--accent); }
+    .s-pec    { background: rgba(243,156,18,.2); color: var(--orange); }
+    .s-valid  { background: rgba(46,204,113,.2); color: var(--green); }
+    .s-corr   { background: rgba(231,76,60,.2);  color: var(--red); }
+    .s-comm   { background: rgba(156,89,182,.2); color: var(--purple); }
+    .s-final  { background: rgba(26,188,156,.2); color: var(--teal); }
+
+    /* ── WORKFLOW DIAGRAM ── */
+    .workflow-wrap {
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    .workflow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 820px;
+    }
+    .wf-step {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .wf-lane-label {
+      width: 160px;
+      min-width: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: right;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .wf-connector-col {
+      width: 40px;
+      min-width: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wf-dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 3px solid;
+      background: var(--bg);
+      flex-shrink: 0;
+      margin-top: 22px;
+    }
+    .wf-line {
+      width: 3px;
+      flex: 1;
+      min-height: 20px;
+    }
+    .wf-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 8px 0 8px 0;
+      padding: 14px 18px;
+      position: relative;
+    }
+    .wf-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .wf-box .wf-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .wf-box p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .wf-box .wf-actions { margin-top: 10px; }
+    .wf-box .wf-actions span {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 2px 2px;
+      font-family: monospace;
+    }
+
+    /* colors per step */
+    .step-cca    { border-left: 4px solid var(--accent); }
+    .step-chef   { border-left: 4px solid var(--green); }
+    .step-dir3   { border-left: 4px solid var(--orange); }
+    .step-dir4   { border-left: 4px solid var(--yellow); }
+    .step-affect { border-left: 4px solid var(--purple); }
+    .step-comm1  { border-left: 4px solid #e91e63; }
+    .step-comm2  { border-left: 4px solid #ff5722; }
+    .step-comm3  { border-left: 4px solid #ff9800; }
+    .step-final  { border-left: 4px solid var(--teal); }
+
+    .dot-cca    { border-color: var(--accent); }
+    .dot-chef   { border-color: var(--green); }
+    .dot-dir3   { border-color: var(--orange); }
+    .dot-dir4   { border-color: var(--yellow); }
+    .dot-affect { border-color: var(--purple); }
+    .dot-comm1  { border-color: #e91e63; }
+    .dot-comm2  { border-color: #ff5722; }
+    .dot-comm3  { border-color: #ff9800; }
+    .dot-final  { border-color: var(--teal); }
+
+    .line-cca    { background: var(--accent); opacity: .35; }
+    .line-chef   { background: var(--green);  opacity: .35; }
+    .line-dir3   { background: var(--orange); opacity: .35; }
+    .line-dir4   { background: var(--yellow); opacity: .35; }
+    .line-affect { background: var(--purple); opacity: .35; }
+    .line-comm1  { background: #e91e63;       opacity: .35; }
+    .line-comm2  { background: #ff5722;       opacity: .35; }
+    .line-comm3  { background: #ff9800;       opacity: .35; }
+    .line-final  { background: var(--teal);   opacity: .35; }
+
+    /* ── TABLES ── */
+    .tbl-wrap { overflow-x: auto; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--surface2); }
+    th { padding: 10px 14px; text-align: left; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: .6px; border-bottom: 2px solid var(--border); }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    /* ── CODE BLOCKS ── */
+    pre {
+      background: #0a0c14;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #cdd3f0;
+      margin: 12px 0;
+    }
+    code { font-family: 'Consolas', 'Fira Code', monospace; }
+    .kw { color: #82aaff; }
+    .ty { color: #ffcb6b; }
+    .st { color: #c3e88d; }
+    .cm { color: #546e7a; font-style: italic; }
+    .an { color: #bb86fc; }
+
+    /* ── ENTITY DIAGRAM ── */
+    .entity-diagram {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 24px;
+      background: #0a0c14;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .entity-box {
+      background: var(--surface);
+      border: 1px solid;
+      border-radius: 8px;
+      padding: 14px 16px;
+      min-width: 170px;
+    }
+    .entity-box .entity-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid;
+      margin-bottom: 8px;
+    }
+    .entity-box .entity-field {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 2px 0;
+      font-family: monospace;
+    }
+    .entity-box .entity-field.pk { color: var(--yellow); }
+    .entity-box .entity-field.fk { color: var(--accent); }
+    .entity-box .entity-field.en { color: var(--orange); }
+
+    .ent-caneva   { border-color: rgba(79,142,247,.5);  }
+    .ent-caneva   .entity-title { color: var(--accent);  border-color: rgba(79,142,247,.3); }
+    .ent-user     { border-color: rgba(46,204,113,.5);  }
+    .ent-user     .entity-title { color: var(--green);   border-color: rgba(46,204,113,.3); }
+    .ent-affect   { border-color: rgba(156,89,182,.5);  }
+    .ent-affect   .entity-title { color: var(--purple);  border-color: rgba(156,89,182,.3); }
+    .ent-snapshot { border-color: rgba(243,156,18,.5);  }
+    .ent-snapshot .entity-title { color: var(--orange);  border-color: rgba(243,156,18,.3); }
+    .ent-wflog    { border-color: rgba(231,76,60,.5);   }
+    .ent-wflog    .entity-title { color: var(--red);     border-color: rgba(231,76,60,.3); }
+    .ent-avis     { border-color: rgba(26,188,156,.5);  }
+    .ent-avis     .entity-title { color: var(--teal);    border-color: rgba(26,188,156,.3); }
+
+    .entity-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 20px;
+    }
+
+    /* ── ALERT BOXES ── */
+    .alert {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: 13px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .alert-info   { background: rgba(79,142,247,.1); border: 1px solid rgba(79,142,247,.3); }
+    .alert-warn   { background: rgba(243,156,18,.1); border: 1px solid rgba(243,156,18,.3); }
+    .alert-success{ background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.3); }
+    .alert-danger { background: rgba(231,76,60,.1);  border: 1px solid rgba(231,76,60,.3); }
+
+    /* ── API ENDPOINTS ── */
+    .api-list { list-style: none; padding: 0; }
+    .api-list li {
+      display: flex; gap: 12px; align-items: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin: 4px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .api-method {
+      display: inline-block;
+      width: 52px;
+      text-align: center;
+      padding: 2px 0;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .m-get   { background: rgba(46,204,113,.2); color: var(--green); }
+    .m-post  { background: rgba(79,142,247,.2); color: var(--accent); }
+    .m-put   { background: rgba(243,156,18,.2); color: var(--orange); }
+    .m-patch { background: rgba(156,89,182,.2); color: var(--purple); }
+    .api-list code { font-family: monospace; font-size: 12px; color: #cdd3f0; }
+    .api-list span.desc { color: var(--text-muted); font-size: 12px; margin-left: auto; }
+
+    /* ── DECISION TREE ── */
+    .dtree {
+      background: #0a0c14;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      font-size: 13px;
+    }
+    .dtree-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .dtree-box {
+      background: var(--surface);
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-align: center;
+      font-weight: 600;
+      min-width: 180px;
+    }
+    .dtree-row {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .dtree-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .dtree-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 0 4px;
+    }
+    .dtree-vline {
+      width: 2px;
+      height: 30px;
+      background: var(--border);
+    }
+    .dtree-hline {
+      height: 2px;
+      width: 160px;
+      background: var(--border);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: var(--text-muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      header { padding: 20px 20px; }
+      .container { padding: 0 16px 40px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .wf-lane-label { width: 90px; min-width: 90px; font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════ -->
+<header>
+  <h1><span>PGCANVAS</span> — Gestion des Rôles & Workflow Complet</h1>
+  <p class="subtitle">Canvas de Prise en Charge en Agence · De la Création à la Décision Finale & l'Affectation</p>
+  <div class="header-badges">
+    <span class="badge badge-blue">Spring Boot 3.2 · Java 21</span>
+    <span class="badge badge-green">Angular 17</span>
+    <span class="badge badge-purple">Oracle DB · JPA/Hibernate</span>
+    <span class="badge badge-orange">Keycloak OAuth2 / JWT</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- TABLE OF CONTENTS -->
+  <nav class="toc">
+    <h3>Sommaire</h3>
+    <ol>
+      <li><a href="#s1">Vue d'ensemble de l'architecture</a></li>
+      <li><a href="#s2">Modèle de données — Entités clés</a></li>
+      <li><a href="#s3">Hiérarchie des rôles et profils</a></li>
+      <li><a href="#s4">États du workflow (Stade & EtatAffectation)</a></li>
+      <li><a href="#s5">Workflow complet étape par étape</a></li>
+      <li><a href="#s6">Logique d'affectation (Affectation)</a></li>
+      <li><a href="#s7">Système d'avis et décision</a></li>
+      <li><a href="#s8">Snapshots & traçabilité</a></li>
+      <li><a href="#s9">Contrôle d'accès basé sur les rôles (RBAC)</a></li>
+      <li><a href="#s10">API REST — Endpoints</a></li>
+      <li><a href="#s11">Sécurité & Authentification</a></li>
+      <li><a href="#s12">Synthèse — Règles métier clés</a></li>
+    </ol>
+  </nav>
+
+  <!-- ═══ SECTION 1 ═══ -->
+  <section id="s1">
+    <h2>
+      <span class="icon" style="background:rgba(79,142,247,.15)">🏗️</span>
+      1. Vue d'ensemble de l'architecture
+    </h2>
+
+    <div class="card card-accent-blue">
+      <h4>Qu'est-ce que PGCANVAS ?</h4>
+      <p>PGCANVAS est un système de gestion de <strong>canvas agricoles</strong> (dossiers de demande de crédit agricole). Une agence bancaire reçoit une demande client, crée un "canvas", puis ce dossier passe par une chaîne de validation multi-niveaux — de l'agent de terrain jusqu'à la commission centrale — avant d'obtenir une décision finale (favorable ou défavorable).</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card card-accent-blue">
+        <h4>Backend — Spring Boot</h4>
+        <ul>
+          <li>Framework : Spring Boot 3.2.2, Java 21</li>
+          <li>Base de données : Oracle (multi-datasource)</li>
+          <li>Sécurité : OAuth2 + JWT via Keycloak</li>
+          <li>Port : <code>8081</code></li>
+          <li>Mapping : MapStruct + Spring Data JPA</li>
+          <li>Cache : Caffeine (données BNA/BCT)</li>
+        </ul>
+      </div>
+      <div class="card card-accent-green">
+        <h4>Frontend — Angular</h4>
+        <ul>
+          <li>Framework : Angular (PrimeNG UI)</li>
+          <li>9 pages/profils distincts</li>
+          <li>Routing par profil (CCA, CHAGCE, PROFILE3…)</li>
+          <li>Services HTTP pour chaque domaine</li>
+          <li>Gestion des rôles côté menu</li>
+        </ul>
+      </div>
+      <div class="card card-accent-purple">
+        <h4>Entités principales</h4>
+        <ul>
+          <li><strong>Caneva</strong> — Le dossier central</li>
+          <li><strong>CanevasUser</strong> — Utilisateurs & rôles</li>
+          <li><strong>Affectation</strong> — Assignation de dossier</li>
+          <li><strong>CanevasStructureSnapshot</strong> — Versionnement</li>
+          <li><strong>CanevasWorkflowLog</strong> — Audit trail</li>
+          <li><strong>Avis</strong> — Décisions/opinions</li>
+        </ul>
+      </div>
+      <div class="card card-accent-orange">
+        <h4>Niveaux organisationnels</h4>
+        <ul>
+          <li><strong>AGC</strong> — Agence (Type 1)</li>
+          <li><strong>DR</strong> — Direction Régionale (Type 2)</li>
+          <li><strong>DC</strong> — Direction Centrale (Type 5)</li>
+          <li>Postes commission : 00, 76, 06, 04, 07</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 2 ═══ -->
+  <section id="s2">
+    <h2>
+      <span class="icon" style="background:rgba(243,156,18,.15)">🗄️</span>
+      2. Modèle de données — Entités clés
+    </h2>
+
+    <div class="entity-diagram">
+      <!-- Caneva -->
+      <div class="entity-box ent-caneva">
+        <div class="entity-title">CANEVAS_AGRICOLE<br/><small style="font-size:10px;color:var(--text-muted)">Caneva.java</small></div>
+        <div class="entity-field pk">🔑 id (PK)</div>
+        <div class="entity-field">numSeqpers</div>
+        <div class="entity-field">codeStrcDem</div>
+        <div class="entity-field">matrAffectCnv</div>
+        <div class="entity-field">matricule</div>
+        <div class="entity-field en">stade : Stade (enum)</div>
+        <div class="entity-field en">avis : Avis (enum)</div>
+        <div class="entity-field">currentStructure</div>
+        <div class="entity-field">currentVersion</div>
+        <div class="entity-field fk">→ lastSnapshotId</div>
+      </div>
+
+      <div class="entity-arrow">⇄</div>
+
+      <!-- Affectation -->
+      <div class="entity-box ent-affect">
+        <div class="entity-title">AFFECTATION<br/><small style="font-size:10px;color:var(--text-muted)">Affectation.java</small></div>
+        <div class="entity-field pk">🔑 id (PK)</div>
+        <div class="entity-field fk">→ caneva (FK)</div>
+        <div class="entity-field fk">→ canevaUser (FK)</div>
+        <div class="entity-field">matriculeRecepteur</div>
+        <div class="entity-field">codeStructureRecepteur</div>
+        <div class="entity-field">matriculeEmetteur</div>
+        <div class="entity-field">codeStructureEmetteur</div>
+        <div class="entity-field en">etatAffectation (enum)</div>
+        <div class="entity-field">dateAffectation</div>
+        <div class="entity-field">dateEcheance</div>
+      </div>
+
+      <div class="entity-arrow">⇄</div>
+
+      <!-- CanevasUser -->
+      <div class="entity-box ent-user">
+        <div class="entity-title">CANEVA_USER<br/><small style="font-size:10px;color:var(--text-muted)">CanevasUser.java</small></div>
+        <div class="entity-field pk">🔑 id (PK)</div>
+        <div class="entity-field">matricule</div>
+        <div class="entity-field">nomComplet</div>
+        <div class="entity-field">codeStructure</div>
+        <div class="entity-field">libelleStructure</div>
+        <div class="entity-field">email</div>
+        <div class="entity-field">actif</div>
+        <div class="entity-field fk">→ superviseur (Self FK)</div>
+        <div class="entity-field fk">→ subordonnes (Set)</div>
+      </div>
+    </div>
+
+    <div class="entity-diagram" style="margin-top: 12px;">
+      <!-- Snapshot -->
+      <div class="entity-box ent-snapshot">
+        <div class="entity-title">CANEVAS_STRUCTURE_SNAPSHOT<br/><small style="font-size:10px;color:var(--text-muted)">CanevasStructureSnapshot.java</small></div>
+        <div class="entity-field pk">🔑 snapshotId (PK)</div>
+        <div class="entity-field fk">→ canevasId (FK)</div>
+        <div class="entity-field">structureCode</div>
+        <div class="entity-field">versionNumber</div>
+        <div class="entity-field">statusAtSnapshot</div>
+        <div class="entity-field">createdBy (matricule)</div>
+        <div class="entity-field">observations</div>
+        <div class="entity-field">engagementBnaJson (LOB)</div>
+        <div class="entity-field">donneesCreditsJson (LOB)</div>
+        <div class="entity-field">donneesAvisJson (LOB)</div>
+      </div>
+
+      <div class="entity-arrow">⇄</div>
+
+      <!-- WorkflowLog -->
+      <div class="entity-box ent-wflog">
+        <div class="entity-title">CANEVAS_WORKFLOW_LOG<br/><small style="font-size:10px;color:var(--text-muted)">CanevasWorkflowLog.java</small></div>
+        <div class="entity-field pk">🔑 logId (PK)</div>
+        <div class="entity-field fk">→ canevasId (FK)</div>
+        <div class="entity-field">fromStructure</div>
+        <div class="entity-field">toStructure</div>
+        <div class="entity-field">action</div>
+        <div class="entity-field">performedBy</div>
+        <div class="entity-field">performedAt</div>
+        <div class="entity-field">structureMere</div>
+        <div class="entity-field">snapshotVersion</div>
+        <div class="entity-field">comments</div>
+      </div>
+
+      <div class="entity-arrow">⇄</div>
+
+      <!-- Avis -->
+      <div class="entity-box ent-avis">
+        <div class="entity-title">AVIS / DECISION<br/><small style="font-size:10px;color:var(--text-muted)">Avis entity + enum</small></div>
+        <div class="entity-field pk">🔑 id (PK)</div>
+        <div class="entity-field fk">→ canevasId (FK)</div>
+        <div class="entity-field en">valeur : FAVORABLE</div>
+        <div class="entity-field en">valeur : DEFAVORABLE</div>
+        <div class="entity-field en">valeur : SANS_AVIS</div>
+        <div class="entity-field">dateAvis</div>
+        <div class="entity-field">commentaires</div>
+        <div class="entity-field">structureCode</div>
+      </div>
+    </div>
+
+    <div class="alert alert-info" style="margin-top:16px">
+      <span class="alert-icon">ℹ️</span>
+      <div>La table <strong>CANEVAS_STRUCTURE_SNAPSHOT</strong> stocke un "gel" complet du dossier à chaque étape de validation. Les données sont sérialisées en JSON (LOB) : engagements BNA/BCT, crédits, garanties, avis. Cela permet une traçabilité totale et la consultation de l'historique version par version.</div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 3 ═══ -->
+  <section id="s3">
+    <h2>
+      <span class="icon" style="background:rgba(46,204,113,.15)">👥</span>
+      3. Hiérarchie des rôles et profils
+    </h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Profil (Frontend)</th>
+            <th>Rôle métier</th>
+            <th>Page</th>
+            <th>Niveau org.</th>
+            <th>Poste commission</th>
+            <th>Action principale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="role-tag role-cca">CCA</span></td>
+            <td>Chargé d'Affaires</td>
+            <td>page1</td>
+            <td>AGC (Agence)</td>
+            <td>—</td>
+            <td>PEC Canvas — Saisie des données initiales du dossier</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-chef">CHAGCE</span></td>
+            <td>Chef Agence</td>
+            <td>page2</td>
+            <td>AGC (Agence)</td>
+            <td>—</td>
+            <td>Validation des données du canvas (pré-validation agence)</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-dir">PROFILE3</span></td>
+            <td>Directeur — PEC Avis</td>
+            <td>page3</td>
+            <td>DR (Rég.)</td>
+            <td>—</td>
+            <td>Prise en charge de la phase d'opinion</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-dir">PROFILE4</span></td>
+            <td>Directeur — Validation Avis</td>
+            <td>page4</td>
+            <td>DR (Rég.)</td>
+            <td>—</td>
+            <td>Émission de l'avis (FAVORABLE / DÉFAVORABLE)</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-admin">PROFILE5</span></td>
+            <td>Admin / Central — Affectation</td>
+            <td>page5</td>
+            <td>DC (Centrale)</td>
+            <td>—</td>
+            <td>Affectation du canvas aux intervenants commission</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-comm">PROFILE5</span></td>
+            <td>Chargée Commission</td>
+            <td>page6</td>
+            <td>DC (Centrale)</td>
+            <td>00 / 76</td>
+            <td>PEC Avis Canevas — Niveau chargée</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-comm">PROFILE5</span></td>
+            <td>Division Commission</td>
+            <td>page7</td>
+            <td>DC (Centrale)</td>
+            <td>06</td>
+            <td>PEC Avis Canevas — Niveau division</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-comm">PROFILE5</span></td>
+            <td>Département Commission</td>
+            <td>page8</td>
+            <td>DC (Centrale)</td>
+            <td>04</td>
+            <td>PEC Avis Canevas — Niveau département</td>
+          </tr>
+          <tr>
+            <td><span class="role-tag role-comm">PROFILE5</span></td>
+            <td>Commission Centrale (finale)</td>
+            <td>page9</td>
+            <td>DC (Centrale)</td>
+            <td>07</td>
+            <td>Validation avis finale — DÉCISION DÉFINITIVE</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Hiérarchie organisationnelle & superviseur</h3>
+    <div class="card card-accent-teal">
+      <p>La table <strong>CANEVA_USER</strong> implémente une hiérarchie auto-référentielle via les champs <code>superviseur</code> (parent) et <code>subordonnes</code> (enfants). Cela permet :</p>
+      <ul style="margin-top:8px">
+        <li>Qu'un superviseur voit les canvas de tous ses subordonnés (récursivement)</li>
+        <li>La délégation de tâches dans l'arbre hiérarchique</li>
+        <li>Le filtrage des listes par périmètre de responsabilité</li>
+      </ul>
+    </div>
+
+    <pre><code><span class="cm">// CanevasUser.java — Hiérarchie auto-référentielle</span>
+<span class="an">@ManyToOne</span>
+<span class="an">@JoinColumn</span>(name = <span class="st">"superviseur_id"</span>)
+<span class="kw">private</span> CanevasUser superviseur;
+
+<span class="an">@OneToMany</span>(mappedBy = <span class="st">"superviseur"</span>, fetch = FetchType.LAZY)
+<span class="kw">private</span> Set&lt;CanevasUser&gt; subordonnes;
+
+<span class="cm">// Attribut discriminant pour les droits et l'affectation</span>
+<span class="kw">private</span> String libelleStructure;  <span class="cm">// ex: "CHARGÉ", "AGC", "DR", "DC"</span>
+<span class="kw">private</span> String codeStructure;     <span class="cm">// code organisationnel (AGC001, DR002...)</span></code></pre>
+  </section>
+
+  <!-- ═══ SECTION 4 ═══ -->
+  <section id="s4">
+    <h2>
+      <span class="icon" style="background:rgba(156,89,182,.15)">🔄</span>
+      4. États du workflow (Stade &amp; EtatAffectation)
+    </h2>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div>
+        <h3>Enum Stade — États du dossier</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Valeur</th><th>Phase</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="state-pill s-init">PRISE_EN_CHARGE</span></td><td>Création</td><td>Canvas créé, pris en charge par l'agence</td></tr>
+              <tr><td><span class="state-pill s-init">INIT_DONNEE</span></td><td>Agence</td><td>Données initiales en cours de saisie (CCA)</td></tr>
+              <tr><td><span class="state-pill s-pec">PEC_DONNEE</span></td><td>Agence</td><td>Données prises en charge par chef agence</td></tr>
+              <tr><td><span class="state-pill s-valid">VALID_DONNEE</span></td><td>Agence</td><td>Données validées par chef agence</td></tr>
+              <tr><td><span class="state-pill s-corr">CORRIGE_DONNEE</span></td><td>Agence</td><td>Données à corriger (renvoyé au CCA)</td></tr>
+              <tr><td><span class="state-pill s-pec">EN_COURS_ETUDE</span></td><td>DR</td><td>En cours d'étude au niveau DR</td></tr>
+              <tr><td><span class="state-pill s-pec">PEC_AVIS_DEC</span></td><td>DR</td><td>Phase d'opinion prise en charge (Directeur)</td></tr>
+              <tr><td><span class="state-pill s-corr">CORRIGE_AVIS_DEC</span></td><td>DR</td><td>Opinion corrigée / à retravailler</td></tr>
+              <tr><td><span class="state-pill s-valid">VALID_AVIS_DEC</span></td><td>DR</td><td>Opinion validée par directeur</td></tr>
+              <tr><td><span class="state-pill s-valid">VALIDER_DR</span></td><td>DR</td><td>Validation DR complète</td></tr>
+              <tr><td><span class="state-pill s-comm">PEC_CHARGEE_COMM</span></td><td>Commission</td><td>PEC niveau chargée commission (Poste 00/76)</td></tr>
+              <tr><td><span class="state-pill s-comm">PEC_DEVISION_COMM</span></td><td>Commission</td><td>PEC niveau division commission (Poste 06)</td></tr>
+              <tr><td><span class="state-pill s-comm">PEC_DEP_COMM</span></td><td>Commission</td><td>PEC niveau département commission (Poste 04)</td></tr>
+              <tr><td><span class="state-pill s-final">VALID_CENTRALE_COMM</span></td><td>Décision finale</td><td>Validation commission centrale — DÉCISION FINALE</td></tr>
+              <tr><td><span class="state-pill s-valid">VALIDE</span></td><td>Terminé</td><td>Canvas approuvé et clôturé</td></tr>
+              <tr><td><span class="state-pill s-corr">REJETE</span></td><td>Terminé</td><td>Canvas rejeté</td></tr>
+              <tr><td><span class="state-pill s-corr">ANNULE</span></td><td>Terminé</td><td>Canvas annulé</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3>Enum EtatAffectation — États de l'affectation</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Valeur</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="state-pill s-pec">EN_COURS_ETUDE</span></td><td>Affectation en cours d'étude (défaut)</td></tr>
+              <tr><td><span class="state-pill s-init">EN_ATTENTE</span></td><td>En attente de traitement</td></tr>
+              <tr><td><span class="state-pill s-valid">AFFECTE</span></td><td>Affecté à un CHARGÉ (état immédiat)</td></tr>
+              <tr><td><span class="state-pill s-valid">EN_COURS</span></td><td>En cours de traitement actif</td></tr>
+              <tr><td><span class="state-pill s-final">TERMINE</span></td><td>Affectation terminée</td></tr>
+              <tr><td><span class="state-pill s-corr">ANNULE</span></td><td>Affectation annulée</td></tr>
+              <tr><td><span class="state-pill s-comm">PEC_CHARGEE_COMM</span></td><td>Pris en charge — niveau chargée</td></tr>
+              <tr><td><span class="state-pill s-comm">PEC_DEVISION_COMM</span></td><td>Pris en charge — niveau division</td></tr>
+              <tr><td><span class="state-pill s-comm">PEC_DEP_COMM</span></td><td>Pris en charge — niveau département</td></tr>
+              <tr><td><span class="state-pill s-final">VALID_CENTRALE_COMM</span></td><td>Validé commission centrale</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-top:20px">Enum Avis — Décision</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Valeur</th><th>Signification</th></tr></thead>
+            <tbody>
+              <tr><td><span class="state-pill s-valid">FAVORABLE</span></td><td>Décision positive — crédit accordé</td></tr>
+              <tr><td><span class="state-pill s-corr">DEFAVORABLE</span></td><td>Décision négative — crédit refusé</td></tr>
+              <tr><td><span class="state-pill s-init">SANS_AVIS</span></td><td>Pas encore de décision émise</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 5 ═══ -->
+  <section id="s5">
+    <h2>
+      <span class="icon" style="background:rgba(26,188,156,.15)">⚡</span>
+      5. Workflow complet étape par étape
+    </h2>
+
+    <div class="workflow-wrap">
+      <div class="workflow">
+
+        <!-- ÉTAPE 1 : CCA -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-cca">CCA</span><br/>Agence</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-cca"></div>
+            <div class="wf-line line-cca"></div>
+          </div>
+          <div class="wf-box step-cca">
+            <h4>Étape 1 — Prise en charge initiale (CHARGÉ D'AFFAIRES)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-init">PRISE_EN_CHARGE → INIT_DONNEE</span>
+              <span class="badge badge-blue">Page 1 · Profil CCA</span>
+              <span class="badge badge-blue">Snapshot v1</span>
+            </div>
+            <p>Le Chargé d'Affaires (CCA) de l'agence reçoit la demande client. Il recherche le client par <code>numSeqpers</code>, crée le canvas et saisit toutes les données initiales : sites agricoles sélectionnés, types de crédits demandés (terrain, investissement, court terme), documents justificatifs. Le stade passe à <strong>INIT_DONNEE</strong> et un <strong>Snapshot v1</strong> est créé.</p>
+            <div class="wf-actions">
+              Actions : <span>CRÉER CANVAS</span> <span>SAISIR DONNÉES</span> <span>JOINDRE DOCUMENTS</span> <span>SOUMETTRE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 2 : CHEF AGENCE -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-chef">CHAGCE</span><br/>Chef Agence</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-chef"></div>
+            <div class="wf-line line-chef"></div>
+          </div>
+          <div class="wf-box step-chef">
+            <h4>Étape 2 — Validation données (CHEF AGENCE)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-pec">PEC_DONNEE → VALID_DONNEE</span>
+              <span class="badge badge-green">Page 2 · Profil CHAGCE</span>
+              <span class="badge badge-green">Snapshot v2</span>
+            </div>
+            <p>Le Chef d'Agence reçoit le canvas dans sa file de travail (liste filtrée par <code>codeStructure</code> + stade). Il consulte toutes les données saisies, peut les enrichir, et émet sa décision : <strong>VALIDER</strong> (passe à VALID_DONNEE) ou <strong>CORRIGER</strong> (retourne au CCA avec état CORRIGE_DONNEE). En cas de validation, un <strong>Snapshot v2</strong> est créé et le canvas remonte à la Direction Régionale.</p>
+            <div class="wf-actions">
+              Actions : <span>PRE_VALIDER</span> <span>CORRIGER</span> <span>VALIDER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 3 : DIRECTEUR PEC AVIS -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-dir">DIR P3</span><br/>Direction Rég.</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-dir3"></div>
+            <div class="wf-line line-dir3"></div>
+          </div>
+          <div class="wf-box step-dir3">
+            <h4>Étape 3 — Prise en charge avis (DIRECTEUR — PEC AVIS)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-pec">EN_COURS_ETUDE → PEC_AVIS_DEC</span>
+              <span class="badge badge-orange">Page 3 · Profil PROFILE3</span>
+            </div>
+            <p>Le Directeur Régional — profil PROFILE3 — reçoit les canvas validés par les agences de sa région. Il prend en charge la phase d'opinion : le canvas passe de <strong>EN_COURS_ETUDE</strong> à <strong>PEC_AVIS_DEC</strong>. Cette étape matérialise la prise de connaissance formelle avant l'émission de la décision. Une <strong>affectation</strong> est créée vers le directeur PROFILE4.</p>
+            <div class="wf-actions">
+              Actions : <span>PRENDRE_EN_CHARGE</span> <span>CONSULTER_DONNÉES</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 4 : DIRECTEUR VALIDATION AVIS -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-dir">DIR P4</span><br/>Direction Rég.</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-dir4"></div>
+            <div class="wf-line line-dir4"></div>
+          </div>
+          <div class="wf-box step-dir4">
+            <h4>Étape 4 — Validation avis / opinion (DIRECTEUR — VALIDATION AVIS)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-pec">PEC_AVIS_DEC → VALID_AVIS_DEC</span>
+              <span class="badge badge-orange">Page 4 · Profil PROFILE4</span>
+              <span class="badge badge-orange">Snapshot v3</span>
+            </div>
+            <p>Le Directeur — profil PROFILE4 — émet l'avis formel de la Direction Régionale. Il saisit les <strong>données d'avis</strong> (montants proposés, conditions, observations) et choisit : <span class="state-pill s-valid" style="font-size:11px">FAVORABLE</span> ou <span class="state-pill s-corr" style="font-size:11px">DÉFAVORABLE</span>. En cas de correction, l'état passe à CORRIGE_AVIS_DEC. Un <strong>Snapshot v3</strong> est créé avec la valeur d'avis. Le canvas est ensuite transmis à la Direction Centrale.</p>
+            <div class="wf-actions">
+              Actions : <span>VALIDER</span> <span>CORRIGER</span> <span>REFOULER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 5 : AFFECTATION CENTRALE -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-admin">ADMIN P5</span><br/>Dir. Centrale</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-affect"></div>
+            <div class="wf-line line-affect"></div>
+          </div>
+          <div class="wf-box step-affect">
+            <h4>Étape 5 — Affectation vers la commission (ADMIN / CENTRALE)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-comm">VALID_AVIS_DEC → PEC_CHARGEE_COMM</span>
+              <span class="badge badge-purple">Page 5 · Profil PROFILE5</span>
+            </div>
+            <p>L'administrateur central (PROFILE5 — Page 5) reçoit les canvas validés par les DR. Il <strong>affecte</strong> le canvas à un intervenant de la commission centrale. La logique d'affectation est déterminée par le <code>libelleStructure</code> du destinataire :</p>
+            <ul style="font-size:12px; color:var(--text-muted); padding-left:16px; margin-top:8px;">
+              <li>Si destinataire = <strong>"CHARGÉ"</strong> → <code>etatAffectation = AFFECTE</code> (immédiat)</li>
+              <li>Sinon → <code>etatAffectation = EN_COURS_ETUDE</code> (en attente)</li>
+            </ul>
+            <p style="margin-top:8px">Une notification email est envoyée au destinataire. Le canvas prend l'état <strong>PEC_CHARGEE_COMM</strong>.</p>
+            <div class="wf-actions">
+              Actions : <span>CRÉER_AFFECTATION</span> <span>CHOISIR_INTERVENANT</span> <span>ENVOYER_EMAIL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 6 : CHARGÉE COMMISSION -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-comm">COMM P6</span><br/>Poste 00/76</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-comm1"></div>
+            <div class="wf-line line-comm1"></div>
+          </div>
+          <div class="wf-box step-comm1">
+            <h4>Étape 6 — Chargée Commission (Poste 00 / 76)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-comm">PEC_CHARGEE_COMM</span>
+              <span class="badge badge-purple">Page 6 · Profil PROFILE5</span>
+              <span class="badge badge-purple">Snapshot v4</span>
+            </div>
+            <p>L'agent affecté au Poste 00 ou 76 prend en charge le canvas au niveau "Chargée Commission". Il analyse le dossier complet (données, engagements BNA/BCT, classes, crédits, garanties) et formule un avis. Un Snapshot v4 est créé avec ses observations. Le dossier remonte ensuite au niveau Division.</p>
+            <div class="wf-actions">
+              Actions : <span>ANALYSER</span> <span>SAISIR_AVIS</span> <span>VALIDER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 7 : DIVISION COMMISSION -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-comm">COMM P7</span><br/>Poste 06</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-comm2"></div>
+            <div class="wf-line line-comm2"></div>
+          </div>
+          <div class="wf-box step-comm2">
+            <h4>Étape 7 — Division Commission (Poste 06)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-comm">PEC_DEVISION_COMM</span>
+              <span class="badge badge-purple">Page 7 · Profil PROFILE5</span>
+              <span class="badge badge-purple">Snapshot v5</span>
+            </div>
+            <p>Le chef de Division (Poste 06) examine à son tour le canvas et les avis accumulés (chargée + directeur). Il produit sa propre analyse et valide ou renvoie. Snapshot v5 créé. Transmission au niveau Département.</p>
+            <div class="wf-actions">
+              Actions : <span>ANALYSER</span> <span>SAISIR_AVIS</span> <span>VALIDER</span> <span>REFOULER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 8 : DÉPARTEMENT COMMISSION -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-comm">COMM P8</span><br/>Poste 04</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-comm3"></div>
+            <div class="wf-line line-comm3"></div>
+          </div>
+          <div class="wf-box step-comm3">
+            <h4>Étape 8 — Département Commission (Poste 04)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-comm">PEC_DEP_COMM</span>
+              <span class="badge badge-purple">Page 8 · Profil PROFILE5</span>
+              <span class="badge badge-purple">Snapshot v6</span>
+            </div>
+            <p>Le Département (Poste 04) constitue le troisième niveau d'examen à la commission. Il synthétise les avis précédents et donne sa recommandation. Snapshot v6. Transmission finale à la Commission Centrale.</p>
+            <div class="wf-actions">
+              Actions : <span>SYNTHÉTISER</span> <span>SAISIR_AVIS</span> <span>VALIDER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 9 : COMMISSION CENTRALE — DÉCISION FINALE -->
+        <div class="wf-step">
+          <div class="wf-lane-label"><span class="role-tag role-comm">COMM P9</span><br/>Poste 07</div>
+          <div class="wf-connector-col">
+            <div class="wf-dot dot-final"></div>
+          </div>
+          <div class="wf-box step-final">
+            <h4>Étape 9 — Commission Centrale — DÉCISION FINALE (Poste 07)</h4>
+            <div class="wf-meta">
+              <span class="state-pill s-final">VALID_CENTRALE_COMM</span>
+              <span class="badge badge-green">Page 9 · Profil PROFILE5</span>
+              <span class="badge badge-green">Snapshot v7 (FINAL)</span>
+            </div>
+            <p>La Commission Centrale (Poste 07) est <strong>l'instance décisionnaire finale</strong>. Elle examine l'ensemble du dossier (7 versions de snapshot, tous les avis des niveaux précédents) et émet la <strong>décision définitive</strong> : <span class="state-pill s-valid" style="font-size:11px">FAVORABLE</span> ou <span class="state-pill s-corr" style="font-size:11px">DÉFAVORABLE</span>. Le Snapshot v7 est créé avec le statut <strong>VALID_CENTRALE_COMM</strong> et la valeur d'avis finale. Le canvas est clôturé.</p>
+            <div class="wf-actions">
+              Actions : <span>DÉCISION_FINALE</span> <span>AVIS=FAVORABLE</span> <span>AVIS=DEFAVORABLE</span> <span>CLÔTURER</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RETOURS EN ARRIÈRE -->
+    <div class="alert alert-warn" style="margin-top:24px">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>Retours en arrière (CORRIGER / REFOULER) :</strong> À chaque étape, l'intervenant peut renvoyer le dossier à l'étape précédente via l'action <strong>CORRIGER</strong> (pour demande de complément/correction) ou <strong>REFOULER</strong> (pour refus formel). Ces transitions inversent le stade (ex: CORRIGE_DONNEE, CORRIGE_AVIS_DEC) et une entrée <code>CanevasWorkflowLog</code> est créée avec l'action correspondante et les commentaires.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 6 ═══ -->
+  <section id="s6">
+    <h2>
+      <span class="icon" style="background:rgba(156,89,182,.15)">📋</span>
+      6. Logique d'affectation (Affectation)
+    </h2>
+
+    <div class="card-grid">
+      <div class="card card-accent-purple">
+        <h4>Création d'une affectation</h4>
+        <p>Lorsqu'un intervenant affecte un canvas à un autre :</p>
+        <ol style="font-size:13px; color:var(--text-muted); padding-left:16px; margin-top:8px;">
+          <li>Le système récupère le <code>libelleStructure</code> du destinataire</li>
+          <li>Si <code>"CHARGÉ"</code> → <code>etatAffectation = AFFECTE</code></li>
+          <li>Sinon → <code>etatAffectation = EN_COURS_ETUDE</code></li>
+          <li>L'émetteur (<code>matriculeEmetteur</code>) et le récepteur (<code>matriculeRecepteur</code>) sont enregistrés</li>
+          <li>Une notification email est envoyée</li>
+        </ol>
+      </div>
+      <div class="card card-accent-blue">
+        <h4>Affectation la plus récente = intervenant courant</h4>
+        <p>Pour déterminer qui traite actuellement le canvas, le système lit la <strong>dernière affectation active</strong> en base. Le <code>matriculeRecepteur</code> de cette affectation est l'intervenant courant. Les recherches par structure utilisent <code>codeStructureRecepteur</code>.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h4>Vue superviseur — Cascade hiérarchique</h4>
+        <p>La méthode <code>getCanevasBySuperviseurAndSubordonnes(superviseurId)</code> :</p>
+        <ol style="font-size:13px; color:var(--text-muted); padding-left:16px; margin-top:8px;">
+          <li>Récupère tous les subordonnés récursivement</li>
+          <li>Filtre les affectations actives pour chaque subordonné</li>
+          <li>Retourne uniquement la dernière affectation par canvas</li>
+          <li>Permet au superviseur de voir tout son périmètre</li>
+        </ol>
+      </div>
+    </div>
+
+    <pre><code><span class="cm">// AffectationServiceImpl.java — Logique de détermination de l'état</span>
+<span class="kw">public</span> Affectation createAffectation(AffectationDto dto) &#123;
+    CanevasUser recepteur = userRepo.findById(dto.getCanevaUserId()).orElseThrow();
+    String libelleStructure = recepteur.getLibelleStructure();
+
+    <span class="cm">// Détermination automatique de l'état selon le rôle du destinataire</span>
+    <span class="kw">if</span> (<span class="st">"CHARGÉ"</span>.equals(libelleStructure)) &#123;
+        affectation.setEtatAffectation(EtatAffectation.<span class="ty">AFFECTE</span>);
+    &#125; <span class="kw">else</span> &#123;
+        affectation.setEtatAffectation(EtatAffectation.<span class="ty">EN_COURS_ETUDE</span>);
+    &#125;
+
+    <span class="cm">// Traçabilité émetteur / récepteur</span>
+    affectation.setMatriculeEmetteur(dto.getMatriculeEmetteur());
+    affectation.setCodeStructureEmetteur(dto.getCodeStructureEmetteur());
+    affectation.setMatriculeRecepteur(recepteur.getMatricule());
+    affectation.setCodeStructureRecepteur(recepteur.getCodeStructure());
+
+    <span class="cm">// Notification email</span>
+    sendEmailNotification(recepteur.getEmail(), caneva);
+
+    <span class="kw">return</span> affectationRepo.save(affectation);
+&#125;</code></pre>
+  </section>
+
+  <!-- ═══ SECTION 7 ═══ -->
+  <section id="s7">
+    <h2>
+      <span class="icon" style="background:rgba(26,188,156,.15)">⚖️</span>
+      7. Système d'avis et décision
+    </h2>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ️</span>
+      <div>L'avis est différent de l'état (<code>Stade</code>). L'état décrit <em>où en est</em> le dossier dans le processus ; l'avis décrit <em>la décision</em> émise à une étape donnée. Plusieurs avis peuvent coexister (un par niveau), le dernier (commission centrale) étant définitif.</div>
+    </div>
+
+    <div class="tbl-wrap" style="margin-top:16px">
+      <table>
+        <thead>
+          <tr>
+            <th>Étape</th>
+            <th>Qui donne l'avis</th>
+            <th>Valeurs possibles</th>
+            <th>Stade résultant</th>
+            <th>Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Étape 2 — Chef Agence</td>
+            <td><span class="role-tag role-chef">CHAGCE</span></td>
+            <td>VALIDER / CORRIGER</td>
+            <td>VALID_DONNEE ou CORRIGE_DONNEE</td>
+            <td>Continue ou retour au CCA</td>
+          </tr>
+          <tr>
+            <td>Étape 4 — Directeur Validation</td>
+            <td><span class="role-tag role-dir">PROFILE4</span></td>
+            <td><span class="state-pill s-valid">FAVORABLE</span> <span class="state-pill s-corr">DEFAVORABLE</span></td>
+            <td>VALID_AVIS_DEC</td>
+            <td>Premier avis formel. DEFAVORABLE peut stopper</td>
+          </tr>
+          <tr>
+            <td>Étape 6 — Chargée Commission</td>
+            <td><span class="role-tag role-comm">COMM P6</span></td>
+            <td><span class="state-pill s-valid">FAVORABLE</span> <span class="state-pill s-corr">DEFAVORABLE</span></td>
+            <td>PEC_CHARGEE_COMM</td>
+            <td>Avis commission niveau 1</td>
+          </tr>
+          <tr>
+            <td>Étape 7 — Division</td>
+            <td><span class="role-tag role-comm">COMM P7</span></td>
+            <td><span class="state-pill s-valid">FAVORABLE</span> <span class="state-pill s-corr">DEFAVORABLE</span></td>
+            <td>PEC_DEVISION_COMM</td>
+            <td>Avis commission niveau 2</td>
+          </tr>
+          <tr>
+            <td>Étape 8 — Département</td>
+            <td><span class="role-tag role-comm">COMM P8</span></td>
+            <td><span class="state-pill s-valid">FAVORABLE</span> <span class="state-pill s-corr">DEFAVORABLE</span></td>
+            <td>PEC_DEP_COMM</td>
+            <td>Avis commission niveau 3</td>
+          </tr>
+          <tr style="background: rgba(26,188,156,.05)">
+            <td><strong>Étape 9 — Commission Centrale</strong></td>
+            <td><span class="role-tag role-comm">COMM P9</span></td>
+            <td><span class="state-pill s-valid">FAVORABLE</span> <span class="state-pill s-corr">DEFAVORABLE</span></td>
+            <td><strong>VALID_CENTRALE_COMM</strong></td>
+            <td><strong>DÉCISION DÉFINITIVE — Canvas clôturé</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Arbre de décision simplifié -->
+    <h3 style="margin-top:24px">Arbre de décision simplifié</h3>
+    <div class="dtree">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0">
+        <div class="dtree-box" style="border-color:var(--orange); color:var(--orange)">VALID_AVIS_DEC (DR)</div>
+        <div class="dtree-vline"></div>
+        <div style="display:flex; gap:80px; align-items:flex-start">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0">
+            <div class="dtree-label" style="color:var(--green)">FAVORABLE ↓</div>
+            <div class="dtree-box" style="border-color:var(--purple); color:var(--purple); font-size:12px">AFFECTATION CENTRALE<br/>(PROFILE5 Page 5)</div>
+            <div class="dtree-vline"></div>
+            <div class="dtree-box" style="border-color:#e91e63; color:#e91e63; font-size:12px">PEC_CHARGEE_COMM<br/>(Page 6 — Poste 00/76)</div>
+            <div class="dtree-vline"></div>
+            <div class="dtree-box" style="border-color:#ff5722; color:#ff5722; font-size:12px">PEC_DEVISION_COMM<br/>(Page 7 — Poste 06)</div>
+            <div class="dtree-vline"></div>
+            <div class="dtree-box" style="border-color:#ff9800; color:#ff9800; font-size:12px">PEC_DEP_COMM<br/>(Page 8 — Poste 04)</div>
+            <div class="dtree-vline"></div>
+            <div class="dtree-box" style="border-color:var(--teal); color:var(--teal); font-size:12px; min-width:200px">VALID_CENTRALE_COMM<br/>(Page 9 — Poste 07)</div>
+            <div class="dtree-vline"></div>
+            <div style="display:flex; gap:40px">
+              <div style="display:flex; flex-direction:column; align-items:center;">
+                <div class="dtree-label" style="color:var(--green)">FAVORABLE</div>
+                <div class="dtree-box" style="border-color:var(--green); color:var(--green); font-size:12px">CRÉDIT ACCORDÉ ✓</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center;">
+                <div class="dtree-label" style="color:var(--red)">DÉFAVORABLE</div>
+                <div class="dtree-box" style="border-color:var(--red); color:var(--red); font-size:12px">CRÉDIT REFUSÉ ✗</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0">
+            <div class="dtree-label" style="color:var(--red)">DÉFAVORABLE ↓</div>
+            <div class="dtree-box" style="border-color:var(--red); color:var(--red); font-size:12px">CORRIGE_AVIS_DEC<br/>ou REJET</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 8 ═══ -->
+  <section id="s8">
+    <h2>
+      <span class="icon" style="background:rgba(243,156,18,.15)">📸</span>
+      8. Snapshots &amp; traçabilité
+    </h2>
+
+    <div class="card card-accent-orange">
+      <h4>Principe du versionnement par snapshot</h4>
+      <p>À chaque transition significative du workflow, le système crée un <strong>snapshot immuable</strong> de l'état complet du canvas. Ce snapshot contient :</p>
+      <ul style="margin-top:8px">
+        <li>L'état (<code>statusAtSnapshot</code>) au moment de la capture</li>
+        <li>Le code et libellé de la structure qui a créé le snapshot</li>
+        <li>La matricule de l'opérateur</li>
+        <li>Les observations/commentaires</li>
+        <li>L'ensemble des données JSON (engagements, crédits, garanties, avis) — champs LOB</li>
+        <li>Un numéro de version incrémental (<code>versionNumber</code>)</li>
+      </ul>
+    </div>
+
+    <div class="tbl-wrap" style="margin-top:16px">
+      <table>
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Créé par</th>
+            <th>Étape</th>
+            <th>statusAtSnapshot</th>
+            <th>Données JSON incluses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>v1</td><td>CCA</td><td>Saisie initiale</td><td>INIT_DONNEE</td><td>Sites, crédits, documents</td></tr>
+          <tr><td>v2</td><td>Chef Agence</td><td>Validation données</td><td>VALID_DONNEE</td><td>v1 + données enrichies + engagements BNA/BCT</td></tr>
+          <tr><td>v3</td><td>Directeur PROFILE4</td><td>Validation avis DR</td><td>VALID_AVIS_DEC</td><td>v2 + donneesAvisJson (avis DR)</td></tr>
+          <tr><td>v4</td><td>Chargée Commission</td><td>PEC commission</td><td>PEC_CHARGEE_COMM</td><td>v3 + avis chargée</td></tr>
+          <tr><td>v5</td><td>Division</td><td>Avis division</td><td>PEC_DEVISION_COMM</td><td>v4 + avis division</td></tr>
+          <tr><td>v6</td><td>Département</td><td>Avis département</td><td>PEC_DEP_COMM</td><td>v5 + avis département</td></tr>
+          <tr style="background:rgba(26,188,156,.05)"><td><strong>v7</strong></td><td>Commission Centrale</td><td>Décision finale</td><td><strong>VALID_CENTRALE_COMM</strong></td><td>v6 + décision finale (FAVORABLE/DÉFAVORABLE)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>CanevasWorkflowLog — Journal d'audit</h3>
+    <pre><code><span class="cm">// WorkflowLogService.java — Enregistrement de chaque transition</span>
+<span class="kw">public void</span> log(Long canevasId, String fromStructure, String toStructure,
+                String action, String performedBy, String comments,
+                Integer snapshotVersion, String structureMere) &#123;
+    CanevasWorkflowLog entry = <span class="kw">new</span> CanevasWorkflowLog();
+    entry.setCanevasId(canevasId);
+    entry.setFromStructure(fromStructure);     <span class="cm">// Structure source</span>
+    entry.setToStructure(toStructure);         <span class="cm">// Structure destination</span>
+    entry.setAction(action);                   <span class="cm">// VALIDER, PRE_VALIDER, REFOULER, CORRIGER, ANNULER</span>
+    entry.setPerformedBy(performedBy);         <span class="cm">// Matricule de l'opérateur</span>
+    entry.setPerformedAt(LocalDateTime.now());
+    entry.setComments(comments);
+    entry.setSnapshotVersion(snapshotVersion);
+    entry.setStructureMere(structureMere);     <span class="cm">// Hiérarchie parente (pour filtrage)</span>
+    workflowLogRepo.save(entry);
+&#125;</code></pre>
+
+    <h3 style="margin-top:20px">Filtrage de l'historique selon le rôle</h3>
+    <div class="card card-accent-blue">
+      <p>La méthode <code>getHistoryFiltered(canevasId, typeStructure, codeStructure)</code> adapte la visibilité selon le niveau organisationnel :</p>
+      <ul style="margin-top:8px">
+        <li><strong>Type "1" (AGC — Agence)</strong> : voit uniquement ses propres logs (<code>fromStructure = codeStructure</code>)</li>
+        <li><strong>Type "2" (DR — Rég.)</strong> : voit ses logs + tous les logs des agences enfants (<code>structureMere = codeStructure</code>)</li>
+        <li><strong>Type "5" (DC — Centrale)</strong> : voit tous les logs sans restriction</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 9 ═══ -->
+  <section id="s9">
+    <h2>
+      <span class="icon" style="background:rgba(46,204,113,.15)">🔐</span>
+      9. Contrôle d'accès basé sur les rôles (RBAC)
+    </h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Opération</th>
+            <th>Profil requis</th>
+            <th>Condition supplémentaire</th>
+            <th>Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Créer un canvas</td><td><span class="role-tag role-cca">CCA</span></td><td>Appartenir à l'agence concernée</td><td>Page 1</td></tr>
+          <tr><td>Valider les données agence</td><td><span class="role-tag role-chef">CHAGCE</span></td><td><code>codeStructure</code> = agence du canvas</td><td>Page 2</td></tr>
+          <tr><td>Prendre en charge l'avis DR</td><td><span class="role-tag role-dir">PROFILE3</span></td><td>Canvas dans sa région (<code>codeStructure</code> DR)</td><td>Page 3</td></tr>
+          <tr><td>Émettre l'avis DR (FAVORABLE/DÉFAVORABLE)</td><td><span class="role-tag role-dir">PROFILE4</span></td><td>Canvas en état PEC_AVIS_DEC</td><td>Page 4</td></tr>
+          <tr><td>Affecter à la commission</td><td><span class="role-tag role-admin">PROFILE5</span></td><td>Canvas en état VALID_AVIS_DEC</td><td>Page 5</td></tr>
+          <tr><td>PEC commission chargée</td><td><span class="role-tag role-comm">PROFILE5</span></td><td>Poste = 00 ou 76</td><td>Page 6</td></tr>
+          <tr><td>PEC commission division</td><td><span class="role-tag role-comm">PROFILE5</span></td><td>Poste = 06</td><td>Page 7</td></tr>
+          <tr><td>PEC commission département</td><td><span class="role-tag role-comm">PROFILE5</span></td><td>Poste = 04</td><td>Page 8</td></tr>
+          <tr><td>Décision finale commission centrale</td><td><span class="role-tag role-comm">PROFILE5</span></td><td>Poste = 07</td><td>Page 9</td></tr>
+          <tr><td>Voir l'historique complet</td><td><span class="role-tag role-admin">PROFILE5</span> / Type DC</td><td>Type structure = "5"</td><td>Toutes</td></tr>
+          <tr><td>Voir uniquement ses canvas</td><td><span class="role-tag role-cca">CCA</span></td><td>Type structure = "1"</td><td>Page 1</td></tr>
+          <tr><td>Voir canvas de sa région</td><td><span class="role-tag role-chef">CHAGCE</span> / DR</td><td>Type structure = "2"</td><td>Pages 2-4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:20px">Vérification d'accès au canvas — canAccessCanvas()</h3>
+    <pre><code><span class="cm">// CanevasSnapshotService.java — Contrôle d'accès basé sur la structure</span>
+<span class="kw">public boolean</span> canAccessCanvas(String matricule, String codeStructure,
+                               String typeStructure, Long canevasId) &#123;
+    <span class="kw">switch</span> (typeStructure) &#123;
+        <span class="kw">case</span> <span class="st">"1"</span>:  <span class="cm">// AGC — voit uniquement ses propres canvas</span>
+            <span class="kw">return</span> canevasRepo.existsByIdAndCodeStructure(canevasId, codeStructure);
+        <span class="kw">case</span> <span class="st">"2"</span>:  <span class="cm">// DR — voit les canvas de toutes ses agences enfants</span>
+            <span class="kw">return</span> canevasRepo.existsByIdAndStructureMere(canevasId, codeStructure);
+        <span class="kw">case</span> <span class="st">"5"</span>:  <span class="cm">// DC — accès total</span>
+            <span class="kw">return</span> <span class="ty">true</span>;
+        <span class="kw">default</span>:
+            <span class="kw">return</span> <span class="ty">false</span>;
+    &#125;
+&#125;</code></pre>
+  </section>
+
+  <!-- ═══ SECTION 10 ═══ -->
+  <section id="s10">
+    <h2>
+      <span class="icon" style="background:rgba(79,142,247,.15)">🔌</span>
+      10. API REST — Endpoints
+    </h2>
+
+    <h3>Canvas</h3>
+    <ul class="api-list">
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas/numseqpers/{numSeqPers}</code> <span class="desc">Liste tous les canvas d'un client</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas/{id}</code> <span class="desc">Détail d'un canvas</span></li>
+      <li><span class="api-method m-post">POST</span> <code>/api/canevas/{canevaId}</code> <span class="desc">Sauvegarde les crédits d'un canvas</span></li>
+      <li><span class="api-method m-patch">PATCH</span> <code>/api/canevas/{id}/update</code> <span class="desc">Met à jour le canvas via affectation</span></li>
+      <li><span class="api-method m-post">POST</span> <code>/api/canevas/{id}/valider</code> <span class="desc">Valide le canvas (crée snapshot + log)</span></li>
+      <li><span class="api-method m-post">POST</span> <code>/api/canevas/{id}/refouler</code> <span class="desc">Renvoie le canvas avec motif</span></li>
+    </ul>
+
+    <h3 style="margin-top:20px">Affectation</h3>
+    <ul class="api-list">
+      <li><span class="api-method m-post">POST</span> <code>/api/affectations</code> <span class="desc">Crée une affectation</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/affectations/caneva/{canevaId}</code> <span class="desc">Liste les affectations d'un canvas</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/affectations/structure/{codeStructure}/status/{status}</code> <span class="desc">Canvas par structure et état</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/affectations/receiver/matricule/{mat}/codeStructure/{code}</code> <span class="desc">Canvas du récepteur courant</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/affectations/superviseur/{superviseurId}/subordonnes</code> <span class="desc">Canvas du superviseur + toute la cascade</span></li>
+      <li><span class="api-method m-post">POST</span> <code>/api/affectations/send-email</code> <span class="desc">Envoie notification email</span></li>
+    </ul>
+
+    <h3 style="margin-top:20px">Utilisateurs canvas</h3>
+    <ul class="api-list">
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas-users</code> <span class="desc">Liste tous les utilisateurs</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas-users/matricule/{matricule}</code> <span class="desc">Utilisateur par matricule</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas-users/structure/{codeStructure}</code> <span class="desc">Utilisateurs d'une structure</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas-users/superviseur/{superviseurId}/recursif</code> <span class="desc">Tous les subordonnés (arbre complet)</span></li>
+      <li><span class="api-method m-post">POST</span> <code>/api/canevas-users</code> <span class="desc">Crée un utilisateur</span></li>
+      <li><span class="api-method m-put">PUT</span> <code>/api/canevas-users/{id}</code> <span class="desc">Modifie un utilisateur</span></li>
+    </ul>
+
+    <h3 style="margin-top:20px">Snapshots &amp; workflow</h3>
+    <ul class="api-list">
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas/{id}/snapshots</code> <span class="desc">Historique de versions</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas/{id}/snapshots/{snapshotId}/detail</code> <span class="desc">Détail d'une version</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/canevas/{id}/snapshots/workflow-log</code> <span class="desc">Journal d'audit complet</span></li>
+    </ul>
+
+    <h3 style="margin-top:20px">Avis / Décision</h3>
+    <ul class="api-list">
+      <li><span class="api-method m-post">POST</span> <code>/api/avis</code> <span class="desc">Enregistre un avis</span></li>
+      <li><span class="api-method m-get">GET</span> <code>/api/avis/{canevaId}</code> <span class="desc">Consulte l'avis d'un canvas</span></li>
+      <li><span class="api-method m-put">PUT</span> <code>/api/avis/{id}</code> <span class="desc">Met à jour un avis</span></li>
+    </ul>
+  </section>
+
+  <!-- ═══ SECTION 11 ═══ -->
+  <section id="s11">
+    <h2>
+      <span class="icon" style="background:rgba(231,76,60,.15)">🔒</span>
+      11. Sécurité &amp; Authentification
+    </h2>
+
+    <div class="card-grid">
+      <div class="card card-accent-red">
+        <h4>Keycloak OAuth2 / JWT (principal)</h4>
+        <ul>
+          <li>Issuer : <code>http://localhost:8080/realms/canvaAgricole</code></li>
+          <li>JWK Set : <code>.../openid-connect/certs</code></li>
+          <li>Realm : <code>canvaAgricole</code></li>
+          <li>Chaque requête API porte un Bearer token JWT</li>
+          <li>Spring valide signature + expiration + issuer</li>
+        </ul>
+      </div>
+      <div class="card card-accent-orange">
+        <h4>Filtre alternatif — Habilitation2</h4>
+        <ul>
+          <li>JwtAuthenticationFilter custom</li>
+          <li>Utilisé en parallèle / fallback du Keycloak</li>
+          <li>Lit le token depuis le header <code>Authorization: Bearer</code></li>
+          <li>Extrait matricule + profil du payload JWT</li>
+        </ul>
+      </div>
+      <div class="card card-accent-blue">
+        <h4>Endpoints publics</h4>
+        <ul>
+          <li><code>/health</code></li>
+          <li><code>/actuator/**</code></li>
+          <li><code>/swagger-ui.html</code></li>
+          <li><code>/v3/api-docs/**</code></li>
+          <li>Tout le reste → <strong>authentification requise</strong></li>
+        </ul>
+      </div>
+      <div class="card card-accent-green">
+        <h4>Autorisation méthode — @PreAuthorize</h4>
+        <ul>
+          <li><code>@EnableMethodSecurity(prePostEnabled = true)</code></li>
+          <li>Possibilité de sécuriser chaque méthode service</li>
+          <li>Le profil (<code>libelleStructure</code>) détermine les accès applicatifs</li>
+          <li>La hiérarchie organisationnelle filtre les données visibles</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 12 ═══ -->
+  <section id="s12">
+    <h2>
+      <span class="icon" style="background:rgba(79,142,247,.15)">📌</span>
+      12. Synthèse — Règles métier clés
+    </h2>
+
+    <div class="card-grid">
+      <div class="card card-accent-blue">
+        <h4>Règle 1 — Avancement séquentiel obligatoire</h4>
+        <p>Le canvas ne peut pas sauter une étape. Chaque stade débloque le suivant uniquement si l'action est accomplie par le bon profil dans la bonne structure. La machine d'état est vérifiée côté backend.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h4>Règle 2 — Traçabilité totale</h4>
+        <p>Chaque action crée simultanément : un <code>CanevasWorkflowLog</code> + un <code>Snapshot</code> (gel des données). Aucune modification n'est perdue. L'historique est accessible par version et filtré selon le rôle.</p>
+      </div>
+      <div class="card card-accent-orange">
+        <h4>Règle 3 — Affectation = propriété courante</h4>
+        <p>L'affectation la plus récente détermine qui détient actuellement le canvas. Le système interroge toujours la dernière affectation active pour afficher les listes de travail.</p>
+      </div>
+      <div class="card card-accent-purple">
+        <h4>Règle 4 — libelleStructure = déterminant de l'état</h4>
+        <p>Si <code>libelleStructure == "CHARGÉ"</code> → affectation immédiate avec état <code>AFFECTE</code>. Sinon l'état est <code>EN_COURS_ETUDE</code>. Ce champ est le pivot de la logique d'affectation.</p>
+      </div>
+      <div class="card card-accent-teal">
+        <h4>Règle 5 — Visibilité hiérarchique des données</h4>
+        <p>AGC (Type 1) ne voit que ses canvas. DR (Type 2) voit les canvas de toutes ses agences via <code>structureMere</code>. DC (Type 5) voit tout. Ce filtrage s'applique aux listes ET à l'historique.</p>
+      </div>
+      <div class="card card-accent-red">
+        <h4>Règle 6 — Décision finale = commission centrale</h4>
+        <p>Seule la Commission Centrale (Poste 07, Page 9) émet la décision définitive enregistrée comme <code>VALID_CENTRALE_COMM</code>. Tous les avis précédents sont consultatifs. Le canvas est clôturé après cette étape.</p>
+      </div>
+    </div>
+
+    <div class="alert alert-success" style="margin-top:24px">
+      <span class="alert-icon">✅</span>
+      <div>
+        <strong>Résumé du flux complet :</strong><br/>
+        <strong>Client</strong> → <strong>CCA</strong> (saisie, Stade: INIT_DONNEE) → <strong>Chef Agence</strong> (validation, Stade: VALID_DONNEE) → <strong>Directeur P3</strong> (PEC avis, Stade: PEC_AVIS_DEC) → <strong>Directeur P4</strong> (avis DR, Stade: VALID_AVIS_DEC) → <strong>Admin Central P5</strong> (affectation commission) → <strong>Chargée P6</strong> (avis niveau 1) → <strong>Division P7</strong> (avis niveau 2) → <strong>Département P8</strong> (avis niveau 3) → <strong>Commission Centrale P9</strong> (DÉCISION FINALE — VALID_CENTRALE_COMM) → <strong>Canvas clôturé</strong> ✓
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  PGCANVAS · Documentation technique générée automatiquement à partir de l'analyse du code source back-end (Spring Boot) et front-end (Angular) · 2026
+</footer>
+
+</body>
+</html>
