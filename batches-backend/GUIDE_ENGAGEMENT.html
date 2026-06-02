@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PGCANVAS — Guide Engagement (Technique + Fonctionnel)</title>
+<style>
+:root{
+  --blue:#1a3c6e; --blue2:#2a5298; --blue-light:#ebf3fb;
+  --green:#1e7e48; --green-light:#eafaf1;
+  --orange:#c47a0a; --orange-light:#fef9e7;
+  --red:#b03030; --red-light:#fdedec;
+  --purple:#6d3bb5; --purple-light:#f4ecf7;
+  --teal:#0e7070; --teal-light:#e8f8f5;
+  --grey:#f0f3f7; --border:#dee2e6;
+  --text:#1e2a38; --muted:#6c757d;
+  --code-bg:#1e2a38; --code-fg:#abb2bf;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#e8edf4;color:var(--text);line-height:1.7}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:var(--blue);color:#fff;
+  display:flex;align-items:center;gap:.5rem;
+  padding:0 1.5rem;height:52px;
+  box-shadow:0 2px 10px rgba(0,0,0,.3);
+  overflow-x:auto;white-space:nowrap;
+}
+nav .logo{font-weight:800;font-size:1.1rem;margin-right:1rem;color:#fff}
+nav a{color:rgba(255,255,255,.78);text-decoration:none;font-size:.82rem;padding:4px 10px;border-radius:5px;transition:background .2s}
+nav a:hover{background:rgba(255,255,255,.15);color:#fff}
+
+/* PAGE */
+.page{max-width:1120px;margin:0 auto;padding:2rem 1.2rem 5rem}
+
+/* HERO */
+.hero{
+  background:linear-gradient(135deg,var(--blue) 0%,#2a5298 60%,#1a6e6e 100%);
+  color:#fff;border-radius:14px;padding:2.5rem 2rem;
+  margin-bottom:2rem;box-shadow:0 6px 24px rgba(26,60,110,.35);
+}
+.hero h1{font-size:2rem;margin-bottom:.4rem}
+.hero p{opacity:.88;font-size:1rem;max-width:720px}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.chip{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:600}
+
+/* SECTION */
+section{background:#fff;border-radius:12px;padding:2rem;margin-bottom:1.8rem;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+section>h2{font-size:1.35rem;color:var(--blue);border-left:4px solid #e9a825;padding-left:.75rem;margin-bottom:1.5rem}
+h3{font-size:1.05rem;color:var(--blue);margin:1.4rem 0 .6rem}
+h4{font-size:.92rem;color:var(--muted);margin:.9rem 0 .4rem;font-weight:600}
+p{margin-bottom:.75rem}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.9rem;margin:.8rem 0}
+.card{border-radius:10px;padding:1.1rem 1.2rem;border:2px solid transparent;cursor:default}
+.card-icon{font-size:1.8rem;margin-bottom:.4rem}
+.card h4{font-size:.9rem;color:var(--text);margin:.3rem 0}
+.card p{font-size:.82rem;color:var(--muted);margin:0}
+.cb{background:var(--blue-light);border-color:#aed6f1}
+.cg{background:var(--green-light);border-color:#a9dfbf}
+.co{background:var(--orange-light);border-color:#f9e79f}
+.cr{background:var(--red-light);border-color:#f5b7b1}
+.cp{background:var(--purple-light);border-color:#d7bde2}
+.ct{background:var(--teal-light);border-color:#a2d9ce}
+
+/* CODE */
+code{background:#f0f3f7;border-radius:4px;padding:2px 6px;font-size:.82em;font-family:'Consolas','Courier New',monospace;color:#b03030}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:1.2rem;overflow-x:auto;font-size:.8rem;line-height:1.65;margin:.7rem 0;font-family:'Consolas','Courier New',monospace}
+pre .kw{color:#c678dd}
+pre .str{color:#98c379}
+pre .cmt{color:#5c6370;font-style:italic}
+pre .fn{color:#61afef}
+pre .num{color:#d19a66}
+pre .cls{color:#e5c07b}
+pre .dec{color:#e06c75}
+
+/* BOX */
+.box{border-radius:8px;padding:.9rem 1.1rem;margin:.7rem 0;border-left:4px solid}
+.box strong{display:block;margin-bottom:.25rem;font-size:.9rem}
+.box p{margin:0;font-size:.88rem}
+.bi{background:var(--blue-light);border-color:var(--blue2)}
+.bg{background:var(--green-light);border-color:var(--green)}
+.bo{background:var(--orange-light);border-color:var(--orange)}
+.br{background:var(--red-light);border-color:var(--red)}
+
+/* TABS VISUAL */
+.tabs-visual{display:flex;flex-wrap:wrap;gap:0;margin:1rem 0;border-radius:10px;overflow:hidden;border:2px solid var(--border);background:#f8f9fa}
+.tv{
+  flex:1;min-width:130px;padding:.65rem .8rem;
+  text-align:center;font-size:.82rem;font-weight:600;
+  border-right:1px solid var(--border);
+  background:#f8f9fa;color:var(--muted);
+  cursor:default;
+}
+.tv:last-child{border-right:none}
+.tv.active{background:var(--blue);color:#fff}
+.tv .tv-num{font-size:.72rem;opacity:.7;display:block}
+
+/* FLOW */
+.flow{margin:1rem 0}
+.fstep{display:flex;gap:.75rem;margin-bottom:.1rem}
+.fleft{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.fdot{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+.fline{width:2px;background:#d0d6de;flex:1;min-height:16px;margin:2px auto 2px}
+.fcontent{background:var(--grey);border:1px solid var(--border);border-radius:8px;padding:.6rem .9rem;margin-bottom:.5rem;flex:1}
+.fcontent strong{color:var(--blue);display:block;font-size:.88rem}
+.fcontent span,.fcontent p{font-size:.82rem;color:var(--muted);margin:0}
+.fcontent code{font-size:.78rem}
+
+/* TABLE */
+.tw{overflow-x:auto;margin:.6rem 0;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th{background:var(--blue);color:#fff;padding:.55rem .85rem;text-align:left;font-weight:600;font-size:.82rem}
+td{padding:.5rem .85rem;border-bottom:1px solid #eaecf0}
+tr:nth-child(even) td{background:#f8f9fa}
+.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-size:.74rem;font-weight:700}
+.tag-get{background:#27ae60;color:#fff}
+.tag-post{background:#2980b9;color:#fff}
+.tag-put{background:#e67e22;color:#fff}
+
+/* ENDPOINT */
+.ep{display:flex;align-items:baseline;gap:.6rem;padding:.4rem .7rem;border-radius:6px;margin:.25rem 0;background:#f8f9fa;border:1px solid #e9ecef}
+.epm{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;color:#fff;flex-shrink:0}
+.get{background:#27ae60}.post{background:#2980b9}.put{background:#e67e22}
+.epu{font-family:monospace;font-size:.8rem;color:#1a5c9e;flex:1}
+.epd{font-size:.78rem;color:var(--muted)}
+
+/* SIGNAL DIAGRAM */
+.signal-box{
+  background:#f8f9fa;border:2px dashed #aed6f1;
+  border-radius:10px;padding:1.2rem;margin:.8rem 0;
+}
+.signal-box .title{font-weight:700;color:var(--blue);margin-bottom:.6rem;font-size:.92rem}
+.srow{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;font-size:.82rem}
+.sarr{color:#999;font-size:1.1rem}
+.sval{background:var(--blue);color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:.75rem}
+.sval2{background:var(--green);color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:.75rem}
+.sval3{background:var(--purple);color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:.75rem}
+
+/* MODAL PREVIEW */
+.modal-preview{
+  background:#1e2a38;border-radius:12px;padding:1.2rem;
+  color:#abb2bf;font-size:.78rem;overflow-x:auto;margin:.8rem 0;
+}
+.modal-preview .mp-header{
+  background:#263447;border-radius:7px 7px 0 0;
+  padding:.6rem 1rem;color:#e5c07b;font-weight:700;
+  margin-bottom:.5rem;font-size:.85rem;
+}
+.col-pill{
+  display:inline-block;background:#263447;
+  border:1px solid #3d5068;color:#98c379;
+  border-radius:4px;padding:1px 7px;margin:2px;
+  font-size:.75rem;font-family:monospace;
+}
+
+/* BADGE */
+.badge-row{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
+.badge{display:inline-block;border-radius:5px;padding:2px 9px;font-size:.75rem;font-weight:700}
+.badge-blue{background:#dbeafe;color:var(--blue2)}
+.badge-green{background:#dcfce7;color:var(--green)}
+.badge-orange{background:#fef3c7;color:var(--orange)}
+.badge-red{background:#fee2e2;color:var(--red)}
+.badge-purple{background:#ede9fe;color:var(--purple)}
+.badge-grey{background:#f3f4f6;color:#374151}
+
+/* SEPARATOR */
+.sep{height:1px;background:var(--border);margin:1.2rem 0}
+
+/* ARCHITECTURE DIAGRAM */
+.arch{
+  background:#f0f3f7;border-radius:10px;
+  padding:1.4rem;overflow-x:auto;
+  font-family:'Consolas',monospace;font-size:.78rem;
+  line-height:1.9;color:#2c3e50;white-space:pre;
+}
+.arch .node{color:var(--blue);font-weight:700}
+.arch .arrow{color:#888}
+.arch .label{color:var(--green)}
+
+/* ACCORDION STYLE */
+.acc-item{border:1px solid var(--border);border-radius:10px;margin:.5rem 0;overflow:hidden}
+.acc-header{
+  background:var(--grey);padding:.85rem 1.1rem;
+  font-weight:700;font-size:.9rem;color:var(--blue);
+  cursor:pointer;display:flex;align-items:center;gap:.6rem;
+  user-select:none;
+}
+.acc-header:hover{background:#e2e8f0}
+.acc-body{padding:1rem 1.2rem;display:none}
+.acc-item.open .acc-body{display:block}
+.acc-item.open .acc-header{background:var(--blue);color:#fff}
+.tab-num{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.85rem;flex-shrink:0;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="logo">PGCANVAS</span>
+  <a href="#intro">Introduction</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#tab0">Tab 0 – Relation</a>
+  <a href="#tab1">Tab 1 – Actionnaire</a>
+  <a href="#tab2">Tab 2 – 1er Responsable</a>
+  <a href="#tab3">Tab 3 – Groupes</a>
+  <a href="#tab4">Tab 4 – Vendeurs</a>
+  <a href="#modal">Modal Détails</a>
+  <a href="#signals">Signals & Effets</a>
+  <a href="#backend">Backend</a>
+  <a href="#recapglobal">Récap global</a>
+</nav>
+
+<div class="page">
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <h1>La section Engagement — Guide complet</h1>
+  <p>Ce guide explique <strong>exactement</strong> ce qui se passe techniquement et fonctionnellement
+     quand on clique sur « Engagement » dans PGCANVAS. Chaque onglet, chaque champ affiché,
+     chaque appel HTTP, chaque Signal Angular — tout est détaillé pour un développeur débutant.</p>
+  <div class="chips">
+    <span class="chip">Angular 17 Signals</span>
+    <span class="chip">Spring Boot 3</span>
+    <span class="chip">Oracle Multi-Schéma</span>
+    <span class="chip">PrimeNG p-tabView</span>
+    <span class="chip">5 onglets</span>
+    <span class="chip">Caffeine Cache</span>
+  </div>
+</div>
+
+<!-- ═══════════════ INTRO ═══════════════ -->
+<section id="intro">
+  <h2>1. Vue d'ensemble — Qu'est-ce que la section Engagement ?</h2>
+
+  <p>
+    La section <strong>Engagement</strong> est une <strong>page complète à 5 onglets</strong>
+    dans le canvas agricole. Elle affiche les <em>obligations financières</em> (crédits, découverts,
+    escomptes…) d'un client et de toutes les personnes liées à lui.
+  </p>
+
+  <div class="box bi">
+    <strong>Pourquoi 5 onglets ?</strong>
+    <p>
+      Un client bancaire peut avoir des engagements à son nom, mais aussi des associés,
+      un gérant (1er responsable), des entreprises partenaires (groupe) et même un vendeur
+      de terrain (dans un crédit achat terrain). Chaque onglet affiche les engagements d'une
+      entité <em>différente</em> liée au même dossier.
+    </p>
+  </div>
+
+  <!-- Représentation visuelle des onglets -->
+  <div class="tabs-visual">
+    <div class="tv active">
+      <span class="tv-num">Onglet 0</span>
+      RELATION
+    </div>
+    <div class="tv">
+      <span class="tv-num">Onglet 1</span>
+      ACTIONNAIRE
+    </div>
+    <div class="tv">
+      <span class="tv-num">Onglet 2</span>
+      1er RESPONSABLE
+    </div>
+    <div class="tv">
+      <span class="tv-num">Onglet 3</span>
+      GROUPES
+    </div>
+    <div class="tv">
+      <span class="tv-num">Onglet 4</span>
+      VENDEURS
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card cb">
+      <div class="card-icon">👤</div>
+      <h4>Onglet 0 — Relation</h4>
+      <p>Engagements du client principal lui-même (BNA + BCT + placements)</p>
+    </div>
+    <div class="card cg">
+      <div class="card-icon">🤝</div>
+      <h4>Onglet 1 — Actionnaire</h4>
+      <p>Engagements d'un associé/actionnaire sélectionné dans la liste</p>
+    </div>
+    <div class="card co">
+      <div class="card-icon">🏢</div>
+      <h4>Onglet 2 — 1er Responsable</h4>
+      <p>Engagements du gérant ou directeur responsable du compte</p>
+    </div>
+    <div class="card cr">
+      <div class="card-icon">🏗️</div>
+      <h4>Onglet 3 — Groupes</h4>
+      <p>Engagements d'un membre sélectionné dans le groupe d'entreprises</p>
+    </div>
+    <div class="card cp">
+      <div class="card-icon">📦</div>
+      <h4>Onglet 4 — Vendeurs</h4>
+      <p>Engagements du vendeur du terrain (crédit achat terrain)</p>
+    </div>
+  </div>
+
+  <h3>Les fichiers principaux concernés</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Fichier</th><th>Rôle</th><th>Chemin</th></tr></thead>
+      <tbody>
+        <tr><td><code>engagements.component.ts</code></td><td>Composant principal (logique des 5 onglets)</td><td>_components/pages/canvas.agricole/engagements/</td></tr>
+        <tr><td><code>engagements.component.html</code></td><td>Template HTML (p-tabView PrimeNG)</td><td>_components/pages/canvas.agricole/engagements/</td></tr>
+        <tr><td><code>engagement-bct-bna.component.ts/html</code></td><td>Composant réutilisable (tableau BCT + BNA)</td><td>_components/pages/canvas.agricole/engagement-bct-bna/</td></tr>
+        <tr><td><code>engagement.service.ts</code></td><td>Service Angular (Signals + appels HTTP)</td><td>_services/</td></tr>
+        <tr><td><code>canevas-agr.service.ts</code></td><td>Service partagé (numSeqPers, activeTabEng)</td><td>_services/</td></tr>
+        <tr><td><code>Engagement.ts</code>, <code>EngagementBNA.ts</code>, etc.</td><td>Interfaces TypeScript (structure des données)</td><td>_models/</td></tr>
+        <tr><td><code>EngagementsController.java</code></td><td>Contrôleur REST (endpoints /api/engagement/…)</td><td>backend-saeb/web/</td></tr>
+        <tr><td><code>EngagementServiceImpl.java</code></td><td>Logique métier (8 requêtes BNA + BCT)</td><td>backend-saeb/service/</td></tr>
+        <tr><td><code>engagement-queries.properties</code></td><td>Toutes les requêtes SQL des engagements</td><td>resources/sql/engagements/</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ ARCHITECTURE ═══════════════ -->
+<section id="architecture">
+  <h2>2. Architecture technique — Du clic à l'affichage</h2>
+
+  <p>Voici le chemin complet d'une donnée, depuis le clic de l'utilisateur jusqu'à l'affichage dans le tableau :</p>
+
+  <div class="flow">
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">1</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Utilisateur clique sur un onglet (p-tabView)</strong>
+        <p>PrimeNG déclenche l'event <code>(onChange)="switchHeaders($event)"</code> dans le template HTML.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">2</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>switchHeaders() — Méthode TypeScript</strong>
+        <p>Met à jour le Signal Angular <code>canevasAgrService.activeTabEng.set(indexOnglet)</code>.<br>
+        Pour l'onglet 1 : charge aussi les associés. Pour l'onglet 2 : résout le CIN du responsable.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">3</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Angular Effect (EngagementService)</strong>
+        <p>L'<code>effect()</code> réagit automatiquement au changement de <code>activeTabEng</code>.
+        Il identifie quel <code>numSeqPers</code> utiliser selon l'onglet actif.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">4</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>HTTP GET vers le backend</strong>
+        <p>Appel <code>GET /api/engagement/all/{numSeqPers}</code> via <code>HttpClient</code>.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">5</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Spring Boot — EngagementsController</strong>
+        <p>Reçoit la requête et appelle <code>EngagementServiceImpl.getListeEngagementClient()</code>.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">6</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>8 requêtes SQL BNA + 1 BCT (Oracle)</strong>
+        <p>JdbcClient exécute les requêtes du fichier <code>engagement-queries.properties</code> sur les schémas SAEB, SAEBAGR, BI_USER, GEN.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">7</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Cache Caffeine (24h)</strong>
+        <p>Si le même <code>numSeqPers</code> a déjà été chargé aujourd'hui, le résultat vient du cache — aucune requête SQL n'est relancée.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">8</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>JSON → Signal Angular → Template</strong>
+        <p>La réponse JSON met à jour le Signal <code>engagement</code>. Angular détecte le changement et re-rend le tableau automatiquement.</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">9</div></div>
+      <div class="fcontent">
+        <strong>Affichage dans le composant <code>app-engagement-bct-bna</code></strong>
+        <p>Le composant réutilisable reçoit l'objet <code>engagement</code> en <code>@Input</code> Signal et affiche les tableaux BCT + BNA.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Les interfaces de données TypeScript</h3>
+  <pre><span class="cmt">// _models/Engagement.ts — l'objet racine renvoyé par l'API</span>
+<span class="kw">interface</span> <span class="cls">Engagement</span> {
+  numSeqPers:         <span class="cls">string</span>;           <span class="cmt">// Numéro séquentiel du client</span>
+  listeEngagementBNA: <span class="cls">EngagementBNA</span>[]; <span class="cmt">// 8 lignes max (une par type de risque)</span>
+  listeEngagementBCT: <span class="cls">EngagementBct</span>[]; <span class="cmt">// Historique BCT (par mois/année)</span>
+  classeBNA:          <span class="cls">Classe</span>[];        <span class="cmt">// Classification BNA sur 3 ans</span>
+  classeBCT:          <span class="cls">Classe</span>[];        <span class="cmt">// Classification BCT sur 3 ans</span>
+  erroMessage?:       <span class="cls">string</span>;          <span class="cmt">// Message d'erreur si pas de données</span>
+}
+
+<span class="cmt">// Une ligne de synthèse BNA (ex: "Engagements DP+FC")</span>
+<span class="kw">interface</span> <span class="cls">EngagementBNA</span> {
+  typeRisque: <span class="cls">string</span>;                 <span class="cmt">// Nom du type (FCDP, CME, EPS…)</span>
+  autorise:   <span class="cls">string</span>;                 <span class="cmt">// Montant total autorisé</span>
+  encours:    <span class="cls">string</span>;                 <span class="cmt">// Montant en cours</span>
+  impaye:     <span class="cls">string</span>;                 <span class="cmt">// Montant impayé</span>
+  utilise:    <span class="cls">string</span>;                 <span class="cmt">// Montant utilisé (surtout AGR)</span>
+  engagements: <span class="cls">DetailsEngagementBNA</span>[];<span class="cmt">// Détails (s'ouvrent dans une modal)</span>
+}
+
+<span class="cmt">// Une ligne BCT (Banque Centrale de Tunisie)</span>
+<span class="kw">interface</span> <span class="cls">EngagementBct</span> {
+  codFormBct:        <span class="cls">string</span>;  <span class="cmt">// Code forme</span>
+  libFormBct:        <span class="cls">string</span>;  <span class="cmt">// Libellé forme (affiché dans la colonne)</span>
+  annee:             <span class="cls">string</span>;  <span class="cmt">// Année</span>
+  mois:              <span class="cls">string</span>;  <span class="cmt">// Mois</span>
+  montantBCT:        <span class="cls">string</span>;  <span class="cmt">// Montant déclaré à la BCT</span>
+  montantBNA:        <span class="cls">string</span>;  <span class="cmt">// Montant dans les livres BNA</span>
+  pourceBCTBNA:      <span class="cls">string</span>;  <span class="cmt">// % BCT/BNA</span>
+  pourceVariationBNA:<span class="cls">string</span>;  <span class="cmt">// % variation BNA</span>
+}</pre>
+</section>
+
+<!-- ═══════════════ TAB 0 ═══════════════ -->
+<section id="tab0">
+  <h2>3. Onglet 0 — RELATION (Client principal)</h2>
+
+  <div class="box bg">
+    <strong>Fonctionnel : Qu'est-ce qu'on voit ?</strong>
+    <p>C'est l'onglet par défaut. Il affiche <strong>tout ce qu'on sait financièrement</strong>
+       sur le client principal : ses engagements BNA (8 types de crédit),
+       ses engagements BCT (données banque centrale), ses placements, son solde algébrique,
+       et ses mouvements confiés.</p>
+  </div>
+
+  <h3>Sections affichées dans cet onglet (de haut en bas)</h3>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#1e7e48;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">A</span>
+      Classe SNI / Classe du client
+    </div>
+    <div class="acc-body">
+      <p>Affiche la <strong>classe de risque</strong> du client sous forme de badge coloré :</p>
+      <div class="badge-row">
+        <span class="badge" style="background:#d4edda;color:#155724">VERT — Classe 1 ou 2 (bon)</span>
+        <span class="badge" style="background:#fff3cd;color:#856404">ORANGE — Classe 3 (surveillance)</span>
+        <span class="badge" style="background:#f8d7da;color:#721c24">ROUGE — Classe 4 ou 5 (problématique)</span>
+      </div>
+      <p>Cette classe vient du champ <code>classe</code> dans le <code>ClientDTO</code> chargé via
+         <code>GET /api/client/getClientByPiece</code>. Ce n'est pas rechargé à chaque changement d'onglet.</p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#2980b9;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">B</span>
+      Tableau Engagement BCT
+    </div>
+    <div class="acc-body">
+      <p>Tableau <strong>Banque Centrale de Tunisie</strong>. Données issues du système BI (Business Intelligence).</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ TypeScript</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Forme</td><td><code>libFormBct</code></td><td>Libellé de la forme de crédit BCT</td></tr>
+            <tr><td>Année</td><td><code>annee</code></td><td>Année de la déclaration</td></tr>
+            <tr><td>Mois</td><td><code>mois</code></td><td>Mois de la déclaration</td></tr>
+            <tr><td>Montant BCT</td><td><code>montantBCT</code></td><td>Montant déclaré à la BCT (en millimes/1000)</td></tr>
+            <tr><td>Montant BNA</td><td><code>montantBNA</code></td><td>Montant dans les livres internes BNA</td></tr>
+            <tr><td>% BCT/BNA</td><td><code>pourceBCTBNA</code></td><td>Ratio entre les deux montants</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Source : <code>BI_USER.RETOUR_ENGAGEMENT_BCT</code> — récupéré sur la datasource secondaire (BI Oracle).</p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#8e44ad;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">C</span>
+      Tableau Engagement BNA (synthèse par type de risque)
+    </div>
+    <div class="acc-body">
+      <p>Tableau de <strong>synthèse</strong> des engagements internes BNA. Chaque ligne correspond à un type de crédit.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ TypeScript</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Type Risque</td><td><code>typeRisque</code></td><td>Nom complet du type (ex: "Engagements DP + FC")</td></tr>
+            <tr><td>Autorisé</td><td><code>autorise</code></td><td>Montant total autorisé pour ce type</td></tr>
+            <tr><td>Encours</td><td><code>encours</code></td><td>Montant actuellement en cours</td></tr>
+            <tr><td>Utilisé</td><td><code>utilise</code></td><td>Montant effectivement utilisé</td></tr>
+            <tr><td>Impayé</td><td><code>impaye</code></td><td>Montant non encore remboursé</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Les 8 types possibles (lignes du tableau)</h4>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Code</th><th>Nom affiché</th><th>Source SQL (Schéma)</th></tr></thead>
+          <tbody>
+            <tr><td><code>FCDP</code></td><td>Engagements DP + FC</td><td>SAEB.ENGAG_COTE + SAEB.CREDIT_CGEPS</td></tr>
+            <tr><td><code>CME</code></td><td>Engagements C.M.E</td><td>SAEB.ENGAG_COTE + SAEB.CREDITS_CME</td></tr>
+            <tr><td><code>EPS</code></td><td>Engagements E.P.S</td><td>SAEB.ENGAG_COTE + SAEB.CREDIT_CGEPS</td></tr>
+            <tr><td><code>ESC</code></td><td>Engagements ESCOMPTE</td><td>SAEB.CREDIT_ESC</td></tr>
+            <tr><td><code>INV</code></td><td>Engagements CMT</td><td>SAEB.CREDITS_INV</td></tr>
+            <tr><td><code>BPN</code></td><td>Engagements BPN</td><td>SAEB.CREDITCCI</td></tr>
+            <tr><td><code>AGR</code></td><td>Engagements AGRICOLE</td><td>SAEBAGR.CREDIT_AGRI</td></tr>
+            <tr><td><code>SBE</code></td><td>Engagements SBE</td><td>GEN.SBE_TOT_ENCOURS_CDI_PERS</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box bo">
+        <strong>Ligne footer (totaux calculés)</strong>
+        <p>En bas du tableau, Angular calcule automatiquement les totaux via un <strong>computed Signal</strong> :</p>
+      </div>
+      <pre><span class="cmt">// engagement-bct-bna.component.ts</span>
+<span class="kw">readonly</span> totals = <span class="fn">computed</span>(() => {
+  <span class="kw">const</span> bna = <span class="kw">this</span>.engagement()?.listeEngagementBNA ?? [];
+  <span class="kw">return</span> {
+    autoriseTotal: bna.<span class="fn">reduce</span>((sum, e) => sum + +e.autorise, <span class="num">0</span>),
+    encoursTotal:  bna.<span class="fn">reduce</span>((sum, e) => sum + +e.encours,  <span class="num">0</span>),
+    utiliseTotal:  bna.<span class="fn">reduce</span>((sum, e) => sum + +e.utilise,  <span class="num">0</span>),
+    impayTotal:    bna.<span class="fn">reduce</span>((sum, e) => sum + +e.impaye,   <span class="num">0</span>),
+  };
+});</pre>
+
+      <div class="box bi">
+        <strong>Clic sur une ligne → Ouvre une Modal de détail</strong>
+        <p>Quand l'utilisateur clique sur le nom d'un type de risque (bouton), une modal PrimeNG
+        <code>p-dialog</code> s'ouvre et affiche le tableau détaillé de tous les crédits individuels
+        de ce type. Voir <a href="#modal">la section Modal</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#0e7070;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">D</span>
+      Solde Algébrique par type de compte
+    </div>
+    <div class="acc-body">
+      <p>Tableau des soldes par type de compte bancaire.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Type Compte</td><td><code>client.sommeAlgebriques[].typeCompte</code></td></tr>
+            <tr><td>Solde Algébrique</td><td><code>client.sommeAlgebriques[].soldeAlgebrique</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Chargé lors de la recherche initiale du client (<code>ClientDTO.sommeAlgebriques</code>). Pas de nouvel appel HTTP ici.</p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#c47a0a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">E</span>
+      Mouvement Confié
+    </div>
+    <div class="acc-body">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Année</td><td><code>client.mouvementsConfie[].annee</code></td></tr>
+            <tr><td>Total Mouvement</td><td><code>client.mouvementsConfie[].totalMouvement</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#b03030;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">F</span>
+      PLACEMENTS
+    </div>
+    <div class="acc-body">
+      <p>Tableau des dépôts et placements bancaires du client.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ</th></tr></thead>
+          <tbody>
+            <tr><td>Numéro</td><td><code>placements[].numero</code></td></tr>
+            <tr><td>Montant</td><td><code>placements[].montant</code></td></tr>
+            <tr><td>Date Valeur</td><td><code>placements[].dateValeur</code></td></tr>
+            <tr><td>Date Échéance</td><td><code>placements[].dateEcheance</code></td></tr>
+            <tr><td>Paiement Int.</td><td><code>placements[].paiementInterets</code></td></tr>
+            <tr><td>Numéro Compte</td><td><code>placements[].numeroCompte</code></td></tr>
+            <tr><td>Taux</td><td><code>placements[].taux</code></td></tr>
+            <tr><td>Durée</td><td><code>placements[].duree</code></td></tr>
+            <tr><td>Produit</td><td><code>placements[].produit</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h3>Appel HTTP pour cet onglet</h3>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/all/{numSeqPers}</span><span class="epd">Retourne BNA + BCT + classeBNA + classeBCT</span></div>
+
+  <h3>Code TypeScript — switchHeaders pour l'onglet 0</h3>
+  <pre><span class="cmt">// engagements.component.ts</span>
+<span class="fn">switchHeaders</span>(event: <span class="cls">any</span>) {
+  <span class="kw">const</span> index = event.index; <span class="cmt">// PrimeNG fournit l'index de l'onglet cliqué</span>
+
+  <span class="kw">switch</span> (index) {
+    <span class="kw">case</span> <span class="num">0</span>: <span class="cmt">// Onglet RELATION</span>
+      <span class="kw">this</span>.canevasAgrService.activeTabEng.<span class="fn">set</span>(<span class="num">0</span>);
+      <span class="cmt">// L'effect dans EngagementService va détecter activeTabEng=0</span>
+      <span class="cmt">// et appeler getEngagementsClientByNumSeqPers(client.numSeqPers)</span>
+      <span class="kw">break</span>;
+    <span class="cmt">// ... autres onglets</span>
+  }
+}</pre>
+</section>
+
+<!-- ═══════════════ TAB 1 ═══════════════ -->
+<section id="tab1">
+  <h2>4. Onglet 1 — ACTIONNAIRE</h2>
+
+  <div class="box bg">
+    <strong>Fonctionnel : Qu'est-ce qu'on voit ?</strong>
+    <p>Liste tous les <strong>associés / actionnaires</strong> du client (sa société).
+       En sélectionnant un associé dans le tableau, on voit ses engagements bancaires personnels.
+       Utile pour évaluer le risque global d'une entreprise en tenant compte de ses propriétaires.</p>
+  </div>
+
+  <h3>Sections affichées</h3>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#1a3c6e;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">A</span>
+      Tableau des Associés
+    </div>
+    <div class="acc-body">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ TypeScript</th><th>Remarque</th></tr></thead>
+          <tbody>
+            <tr><td>Associés</td><td><code>associe.name</code></td><td>Nom complet de l'associé</td></tr>
+            <tr><td>Part en %</td><td><code>associe.partPercentage</code></td><td>% de participation dans le capital</td></tr>
+            <tr><td>Type Pièce</td><td><code>associe.pieceType</code></td><td>CIN ou IU (Identifiant Unique)</td></tr>
+            <tr><td>Numéro Pièce</td><td><code>associe.pieceNumber</code></td><td>Numéro de la pièce d'identité</td></tr>
+            <tr><td>Date naiss./création</td><td><code>associe.dateNaissanceOuCreation</code></td><td>Pour personne physique ou morale</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Sélection unique (<code>selectionMode="single"</code>). Un clic déclenche <code>(selectionChange)</code>.</p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#1a3c6e;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">B</span>
+      Historique Classe BCT (app-historical-bct-class)
+    </div>
+    <div class="acc-body">
+      <p>Composant réutilisable qui affiche la <strong>classification BCT</strong> de l'associé sélectionné sur les dernières années. Reçoit en input : <code>[selectedAssocie]="selectedAssocie"</code>.</p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#1a3c6e;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">C</span>
+      Engagements BCT + BNA (app-engagement-bct-bna)
+    </div>
+    <div class="acc-body">
+      <p>Composant réutilisable d'engagements. Reçoit : <code>[engagement]="engagementAssocie()"</code>.</p>
+      <p>Affiche exactement les mêmes tableaux BCT et BNA que l'onglet 0, mais pour l'associé sélectionné.</p>
+    </div>
+  </div>
+
+  <h3>Flux technique détaillé à la sélection d'un associé</h3>
+  <div class="flow">
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">1</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Chargement des associés au clic sur l'onglet 1</strong>
+        <p>Appel HTTP : <code>GET /api/associe/{numSeqPers}</code> → remplit la liste <code>associes[]</code></p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">2</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Clic sur un associé → onSelectionChange(associe)</strong>
+        <p>TypeScript lit <code>associe.pieceType</code> pour déterminer le code : CIN = "2", IU = "14"</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">3</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Résolution du numSeqPers de l'associé</strong>
+        <p>Appel HTTP : <code>GET /api/client/getClientByPiece/{codTpce}/{numPiece}</code><br>
+        Retourne le <code>ClientDTO</code> de l'associé → on extrait son <code>personne.numSeqPers</code></p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">4</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Mise à jour du Signal</strong>
+        <p><code>engagementService.setNumSeqPersAssocieEngagement(client.personne.numSeqPers)</code></p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">5</div></div>
+      <div class="fcontent">
+        <strong>Effect → Chargement engagements associé</strong>
+        <p>L'effet réagit au nouveau signal → <code>GET /api/engagement/all/{associeNumSeqPers}</code><br>
+        Le résultat est mis dans <code>engagementAssocie</code> Signal → template se met à jour</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><span class="cmt">// engagements.component.ts — Sélection d'un associé</span>
+<span class="fn">onSelectionChange</span>(selectedAssocie: <span class="cls">Associe</span>) {
+  <span class="kw">const</span> codTpce = selectedAssocie.pieceType === <span class="cls">PieceType</span>.IU ? <span class="str">"14"</span> : <span class="str">"2"</span>;
+
+  <span class="kw">this</span>.canevasAgrService
+    .<span class="fn">getClientByContratCpt</span>(codTpce, selectedAssocie.pieceNumber)
+    .<span class="fn">subscribe</span>(client => {
+      <span class="kw">this</span>.engagementService
+        .<span class="fn">setNumSeqPersAssocieEngagement</span>(client.personne?.numSeqPers);
+      <span class="cmt">// → L'effect va lancer GET /api/engagement/all/{numSeqPers}</span>
+    });
+}</pre>
+
+  <h3>Appels HTTP pour cet onglet</h3>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/associe/{numSeqPers}</span><span class="epd">Récupère la liste des associés du client</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/client/getClientByPiece/{codTpce}/{numPiece}</span><span class="epd">Résout le numSeqPers de l'associé sélectionné</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/all/{associeNumSeqPers}</span><span class="epd">Engagements de l'associé</span></div>
+</section>
+
+<!-- ═══════════════ TAB 2 ═══════════════ -->
+<section id="tab2">
+  <h2>5. Onglet 2 — 1er RESPONSABLE</h2>
+
+  <div class="box bg">
+    <strong>Fonctionnel : Qu'est-ce qu'on voit ?</strong>
+    <p>Affiche directement les engagements du <strong>gérant / président / directeur</strong>
+       lié au compte client. Il n'y a pas de tableau de sélection : le responsable est déjà
+       connu (récupéré lors de la recherche initiale du client via son CIN). On affiche
+       directement son historique de classification et ses engagements.</p>
+  </div>
+
+  <h3>Sections affichées</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Bloc</th><th>Composant</th><th>Input reçu</th></tr></thead>
+      <tbody>
+        <tr><td>Historique Classe BCT</td><td><code>app-historical-bct-class</code></td><td><code>[numSeqPersPremierResponsable]="numSeqPersPremierRespensable"</code></td></tr>
+        <tr><td>Engagements BCT + BNA</td><td><code>app-engagement-bct-bna</code></td><td><code>[engagement]="engagementPreResp()"</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Flux technique — Résolution du responsable</h3>
+  <div class="flow">
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">1</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Au clic sur l'onglet 2</strong>
+        <p><code>canevasAgrService.activeTabEng.set(2)</code> + lecture de <code>premierResponsable.cin</code> (déjà chargé)</p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">2</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Résolution du numSeqPers via CIN</strong>
+        <p>Si CIN est présent → <code>GET /api/client/getClientByContratCpt/2/{cinResponsable}</code></p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">3</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Mise à jour du Signal</strong>
+        <p><code>numSeqPersPremierRespensable = client.personne?.numSeqPers ?? '000'</code><br>
+        Si trouvé → <code>engagementService.setNumSeqPersPremierResponsableEngagement(numSeqPers)</code></p>
+      </div>
+    </div>
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">4</div></div>
+      <div class="fcontent">
+        <strong>Effect → Chargement des engagements</strong>
+        <p><code>GET /api/engagement/all/{numSeqPersResponsable}</code> → <code>engagementPreResp</code> Signal</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><span class="cmt">// engagements.component.ts — Onglet 1er Responsable</span>
+<span class="kw">case</span> <span class="num">2</span>:
+  <span class="kw">this</span>.canevasAgrService.activeTabEng.<span class="fn">set</span>(<span class="num">2</span>);
+
+  <span class="kw">if</span> (<span class="kw">this</span>.premierResponsable?.cin) {
+    <span class="kw">this</span>.canevasAgrService
+      .<span class="fn">getClientByContratCpt</span>(<span class="str">"2"</span>, <span class="kw">this</span>.premierResponsable.cin)
+      .<span class="fn">subscribe</span>(client => {
+        <span class="kw">this</span>.numSeqPersPremierRespensable = client.personne?.numSeqPers ?? <span class="str">'000'</span>;
+
+        <span class="kw">if</span> (<span class="kw">this</span>.numSeqPersPremierRespensable !== <span class="str">'000'</span>) {
+          <span class="kw">this</span>.engagementService
+            .<span class="fn">setNumSeqPersPremierResponsableEngagement</span>(client.personne?.numSeqPers);
+        }
+      });
+  }
+  <span class="kw">break</span>;</pre>
+
+  <h3>Appels HTTP pour cet onglet</h3>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/client/getClientByContratCpt/2/{cinResponsable}</span><span class="epd">Résout le numSeqPers du responsable via son CIN</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/all/{numSeqPersResponsable}</span><span class="epd">Engagements du responsable</span></div>
+</section>
+
+<!-- ═══════════════ TAB 3 ═══════════════ -->
+<section id="tab3">
+  <h2>6. Onglet 3 — GROUPES</h2>
+
+  <div class="box bg">
+    <strong>Fonctionnel : Qu'est-ce qu'on voit ?</strong>
+    <p>Si le client appartient à un <strong>groupe d'entreprises</strong> (holding, groupe familial),
+       cet onglet liste tous les membres du groupe. En sélectionnant un membre, on voit ses
+       engagements individuels ET ses placements.</p>
+  </div>
+
+  <h3>Sections affichées</h3>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#6d3bb5;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">A</span>
+      Tableau des membres du groupe
+    </div>
+    <div class="acc-body">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ TypeScript</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Relation</td><td><code>groupe.relation</code></td><td>Raison sociale ou nom complet</td></tr>
+            <tr><td>Forme Juridique</td><td><code>groupe.formeJuridique</code></td><td>SARL, EIRL, SA…</td></tr>
+            <tr><td>Activité</td><td><code>groupe.activite</code></td><td>Secteur d'activité</td></tr>
+            <tr><td>Identifiant</td><td><code>groupe.identifiant</code></td><td>Matricule fiscal</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Les données viennent de <code>client.groupes[]</code> déjà chargé dans le ClientDTO. Pas de nouvel appel HTTP pour remplir ce tableau.</p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#6d3bb5;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">B</span>
+      Historique Classe BCT + Engagements BCT/BNA
+    </div>
+    <div class="acc-body">
+      <p>Composant <code>app-historical-bct-class</code> avec <code>[selectedGroupe]="selectedGroupe"</code></p>
+      <p>Composant <code>app-engagement-bct-bna</code> avec <code>[engagement]="engagementGroupe()"</code></p>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#6d3bb5;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">C</span>
+      PLACEMENTS du membre sélectionné
+    </div>
+    <div class="acc-body">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ</th></tr></thead>
+          <tbody>
+            <tr><td>Numéro, Montant, Date Valeur</td><td><code>placements[].numero/montant/dateValeur</code></td></tr>
+            <tr><td>Date Échéance, Taux, Durée</td><td><code>placements[].dateEcheance/taux/duree</code></td></tr>
+            <tr><td>Produit, Numéro Compte</td><td><code>placements[].produit/numeroCompte</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Chargé via <code>GET /api/client/placements/{groupeNumSeqPers}</code> à chaque sélection.</p>
+    </div>
+  </div>
+
+  <h3>Flux technique — Sélection d'un membre du groupe</h3>
+  <pre><span class="cmt">// engagements.component.ts</span>
+<span class="fn">onSelectionGroupeChange</span>(selectedGroupe: <span class="cls">Groupe</span>) {
+  <span class="cmt">// 1. Mettre à jour le Signal d'engagement pour le groupe</span>
+  <span class="kw">this</span>.engagementService
+    .<span class="fn">setNumSeqPersGroupeEngagement</span>(selectedGroupe.numSeqPers);
+
+  <span class="cmt">// 2. Charger les placements de ce membre</span>
+  <span class="kw">this</span>.http
+    .<span class="fn">get</span>&lt;<span class="cls">Placement</span>&gt;(
+      <span class="str">`http://localhost:8081/api/client/placements/<span class="kw">${</span>selectedGroupe.numSeqPers<span class="kw">}</span>`</span>
+    )
+    .<span class="fn">subscribe</span>(response => {
+      <span class="kw">this</span>.placements = response;
+    });
+}</pre>
+
+  <h3>Appels HTTP pour cet onglet</h3>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/all/{groupeNumSeqPers}</span><span class="epd">Engagements du membre du groupe sélectionné</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/client/placements/{groupeNumSeqPers}</span><span class="epd">Placements du membre du groupe</span></div>
+</section>
+
+<!-- ═══════════════ TAB 4 ═══════════════ -->
+<section id="tab4">
+  <h2>7. Onglet 4 — VENDEURS</h2>
+
+  <div class="box bg">
+    <strong>Fonctionnel : Qu'est-ce qu'on voit ?</strong>
+    <p>Affiche les <strong>vendeurs de terrain</strong> liés au dossier de crédit
+       « Achat Terrain » (Nature 1). Un vendeur peut lui-même être un client BNA
+       (il a un <code>numseqpers</code>). Dans ce cas, on peut consulter ses engagements.
+       Utile pour vérifier que le vendeur n'est pas lui-même en difficulté financière.</p>
+  </div>
+
+  <h3>Sections affichées</h3>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#c47a0a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">A</span>
+      Tableau des vendeurs (filtrés)
+    </div>
+    <div class="acc-body">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Colonne UI</th><th>Champ TypeScript</th><th>Remarque</th></tr></thead>
+          <tbody>
+            <tr><td>ID</td><td><code>vendeur.id</code></td><td>Identifiant interne</td></tr>
+            <tr><td>Nom & Prénom</td><td><code>vendeur.nomPrenom</code></td><td>Nom complet du vendeur</td></tr>
+            <tr><td>Type Pièce</td><td><code>vendeur.typePiece</code></td><td>CIN, IU…</td></tr>
+            <tr><td>Num Pièce</td><td><code>vendeur.numPiece</code></td><td>Numéro d'identité</td></tr>
+            <tr><td>Num Séquence</td><td><code>vendeur.numseqpers</code></td><td>Lien vers REFCLI.PERSONNE (nullable)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box bo">
+        <strong>Filtre important : computed Signal</strong>
+        <p>La liste n'affiche <strong>que les vendeurs avec un <code>numseqpers</code> non null</strong>.
+           Si un vendeur n'est pas un client BNA, il est exclu car on ne peut pas charger ses engagements.</p>
+      </div>
+
+      <pre><span class="cmt">// engagements.component.ts — Signal calculé</span>
+<span class="kw">readonly</span> filteredVendeurs = <span class="fn">computed</span>(() => {
+  <span class="kw">const</span> credits = <span class="kw">this</span>.creditNature1(); <span class="cmt">// crédits achat terrain</span>
+  <span class="kw">if</span> (!credits) <span class="kw">return</span> [];
+
+  <span class="kw">return</span> credits
+    .<span class="fn">flatMap</span>(c => c.vendeurs ?? [])    <span class="cmt">// extrait tous les vendeurs</span>
+    .<span class="fn">filter</span>(v =>                          <span class="cmt">// garde seulement ceux avec numseqpers</span>
+      v.numseqpers !== <span class="kw">null</span> &&
+      v.numseqpers !== <span class="kw">undefined</span>
+    );
+});</pre>
+    </div>
+  </div>
+
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">
+      <span style="background:#c47a0a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem">B</span>
+      Classe SNI Vendeur + Historique + Engagements
+    </div>
+    <div class="acc-body">
+      <ul style="font-size:.88rem;padding-left:1.2rem">
+        <li>Classe SNI du vendeur (badge VERT/ORANGE/ROUGE)</li>
+        <li><code>app-historical-bct-class</code> avec <code>[selectedVendeur]="selectedVendeur"</code></li>
+        <li><code>app-engagement-bct-bna</code> avec <code>[engagement]="engagementVendeur()"</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Flux technique — Sélection d'un vendeur</h3>
+  <pre><span class="cmt">// engagements.component.ts</span>
+<span class="fn">onSelectionVendeurChange</span>(selectedVendeur: <span class="cls">Vendeur</span>) {
+  <span class="cmt">// 1. Mettre à jour le Signal engagement vendeur</span>
+  <span class="kw">this</span>.engagementService
+    .<span class="fn">setNumSeqPersVendeurEngagement</span>(<span class="cls">String</span>(selectedVendeur.numseqpers));
+
+  <span class="cmt">// 2. Mettre à jour le Signal bilan vendeur (utilisé ailleurs dans le canvas)</span>
+  <span class="kw">this</span>.trucService
+    .<span class="fn">setNumSeqPersBilanofVendeur</span>(<span class="cls">String</span>(selectedVendeur.numseqpers));
+}</pre>
+
+  <h3>Appel HTTP pour cet onglet</h3>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/all/{vendeurNumSeqPers}</span><span class="epd">Engagements du vendeur sélectionné</span></div>
+</section>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<section id="modal">
+  <h2>8. Modal de détail — Les 8 tableaux de détail BNA</h2>
+
+  <div class="box bi">
+    <strong>Comment accéder à la modal ?</strong>
+    <p>Dans le tableau BNA (onglet 0, 1, 2, 3 ou 4), cliquer sur le <strong>bouton du nom du type de risque</strong>
+       (ex: "Engagements DP + FC") ouvre une <code>p-dialog</code> PrimeNG avec le détail de
+       <strong>chaque crédit individuel</strong> de ce type.</p>
+  </div>
+
+  <p>Il y a <strong>8 variantes de tableau</strong> selon le type de risque cliqué :</p>
+
+  <!-- FCDP -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">1. Engagements DP + FC (FCDP)</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements DP + FC — Colonnes</div>
+        <span class="col-pill">Numero Engagement</span>
+        <span class="col-pill">Compte</span>
+        <span class="col-pill">Type Engagement</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant Solde</span>
+        <span class="col-pill">GRP</span>
+        <span class="col-pill">Produit</span>
+        <span class="col-pill">Date Echéance</span>
+      </div>
+      <div class="tw"><table><thead><tr><th>Colonne</th><th>Champ DetailsEngagementBNA</th></tr></thead><tbody>
+        <tr><td>Numero Engagement</td><td><code>numId</code></td></tr>
+        <tr><td>Compte</td><td><code>compte</code></td></tr>
+        <tr><td>Type Engagement</td><td><code>typeEngag</code></td></tr>
+        <tr><td>Montant Autorisé</td><td><code>montantAuto</code></td></tr>
+        <tr><td>Montant Solde</td><td><code>montSoldCcpt</code></td></tr>
+        <tr><td>GRP</td><td><code>grp</code></td></tr>
+        <tr><td>Produit</td><td><code>libPrdPrd</code></td></tr>
+        <tr><td>Date Echéance</td><td><code>dateEch</code></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- CME -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">2. Engagements C.M.E</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements C.M.E — Colonnes</div>
+        <span class="col-pill">Numero Engagement</span>
+        <span class="col-pill">Compte</span>
+        <span class="col-pill">Type Engagement</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant A Echoir PR</span>
+        <span class="col-pill">Montant Impayé PR</span>
+        <span class="col-pill">Montant Utilisé PR</span>
+        <span class="col-pill">Produit</span>
+        <span class="col-pill">Date Echéance</span>
+      </div>
+      <div class="tw"><table><thead><tr><th>Colonne</th><th>Champ</th></tr></thead><tbody>
+        <tr><td>Montant A Echoir PR</td><td><code>montAEchPRCred</code></td></tr>
+        <tr><td>Montant Impayé PR</td><td><code>montImpPRCred</code></td></tr>
+        <tr><td>Montant Utilisé PR</td><td><code>montUtilise</code></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- EPS -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">3. Engagements E.P.S</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements E.P.S — Colonnes</div>
+        <span class="col-pill">Numero Engagement</span>
+        <span class="col-pill">Compte</span>
+        <span class="col-pill">Type Engagement</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant Encours</span>
+        <span class="col-pill">Produit</span>
+        <span class="col-pill">Date Echéance</span>
+      </div>
+      <div class="tw"><table><thead><tr><th>Colonne</th><th>Champ</th></tr></thead><tbody>
+        <tr><td>Montant Encours</td><td><code>montEncours</code></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- ESC -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">4. Engagements ESCOMPTE</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements ESCOMPTE — Colonnes</div>
+        <span class="col-pill">Numero Engagement</span>
+        <span class="col-pill">Compte</span>
+        <span class="col-pill">Type Engagement</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant A Echoir PR</span>
+        <span class="col-pill">Montant Impayé PR</span>
+        <span class="col-pill">Montant Utilisé PR</span>
+        <span class="col-pill">Produit</span>
+        <span class="col-pill">Date Echéance</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INV -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">5. Engagements CMT (Investissement)</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements CMT — Colonnes</div>
+        <span class="col-pill">Numero Décision</span>
+        <span class="col-pill">Numero Crédit</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant A Echoir PR</span>
+        <span class="col-pill">Montant A Echoir INT</span>
+        <span class="col-pill">Montant Impayé PR</span>
+        <span class="col-pill">Montant Impayé INT</span>
+        <span class="col-pill">Date Echéance</span>
+      </div>
+      <div class="tw"><table><thead><tr><th>Colonne</th><th>Champ</th></tr></thead><tbody>
+        <tr><td>Numero Décision</td><td><code>numDec</code></td></tr>
+        <tr><td>Numero Crédit</td><td><code>numCred</code></td></tr>
+        <tr><td>Montant A Echoir INT</td><td><code>montAEchIntCred</code></td></tr>
+        <tr><td>Montant Impayé INT</td><td><code>montImpIntCred</code></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- BPN -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">6. Engagements BPN</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements BPN — Colonnes</div>
+        <span class="col-pill">Numero Décision</span>
+        <span class="col-pill">Numero Crédit</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant Reste</span>
+        <span class="col-pill">Produit</span>
+        <span class="col-pill">Montant A Echoir PR</span>
+        <span class="col-pill">Montant A Echoir INT</span>
+        <span class="col-pill">Montant Impayé PR</span>
+        <span class="col-pill">Montant Impayé INT</span>
+        <span class="col-pill">Date Echéance</span>
+      </div>
+      <div class="tw"><table><thead><tr><th>Colonne</th><th>Champ</th></tr></thead><tbody>
+        <tr><td>Montant Reste</td><td><code>montRestCred</code></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- AGR -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">7. Engagements AGRICOLE (le plus riche)</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements AGRICOLE — Colonnes</div>
+        <span class="col-pill">Terme</span>
+        <span class="col-pill">Produit</span>
+        <span class="col-pill">Num Décision</span>
+        <span class="col-pill">Num Pret</span>
+        <span class="col-pill">Date 1ère Echéance</span>
+        <span class="col-pill">Date Dern. Echéance</span>
+        <span class="col-pill">Montant Autorisé</span>
+        <span class="col-pill">Montant A Echoir PR</span>
+        <span class="col-pill">Montant Impayé PR</span>
+        <span class="col-pill">Montant Impayé INT</span>
+        <span class="col-pill">Comm Eng (comm_203)</span>
+        <span class="col-pill">Comm Rech MEP (comm_83)</span>
+      </div>
+      <div class="tw"><table><thead><tr><th>Colonne</th><th>Champ</th><th>Particularité</th></tr></thead><tbody>
+        <tr><td>Terme</td><td><code>terme</code></td><td>Court terme / Moyen terme</td></tr>
+        <tr><td>Num Pret</td><td><code>numPret</code></td><td>Numéro de prêt agricole</td></tr>
+        <tr><td>Date 1ère Echéance</td><td><code>datePremEch</code></td><td>Date du premier remboursement</td></tr>
+        <tr><td>Date Dern. Echéance</td><td><code>dateDerEch</code></td><td>Date du dernier remboursement</td></tr>
+        <tr><td>Comm Eng</td><td><code>comm_203</code></td><td>Commission engagement (code 203)</td></tr>
+        <tr><td>Comm Rech MEP</td><td><code>comm_83</code></td><td>Commission rech. MEP (code 83)</td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- SBE -->
+  <div class="acc-item open">
+    <div class="acc-header" onclick="toggle(this)">8. Engagements SBE</div>
+    <div class="acc-body">
+      <div class="modal-preview">
+        <div class="mp-header">Modal : Engagements SBE — Colonnes</div>
+        <span class="col-pill">Montant A Echoir PR</span>
+        <span class="col-pill">Montant Impayé PR</span>
+      </div>
+      <p style="font-size:.85rem;color:var(--muted);margin-top:.5rem">
+        SBE = Engagements hors bilan. Données issues de <code>GEN.SBE_TOT_ENCOURS_CDI_PERS</code>.
+        Tableau simplifié avec seulement 2 colonnes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SIGNALS ═══════════════ -->
+<section id="signals">
+  <h2>9. Angular Signals & Effets — Le cœur de la réactivité</h2>
+
+  <div class="box bi">
+    <strong>C'est quoi un Signal ?</strong>
+    <p>Un Signal Angular est une variable réactive. Quand sa valeur change, tout composant ou
+       <code>effect()</code> qui l'utilise se recalcule automatiquement. C'est la façon moderne
+       de gérer l'état dans Angular 17+. Pas besoin de <code>Subject</code> ou d'<code>Observable</code>.</p>
+  </div>
+
+  <h3>Tous les Signals du service EngagementService</h3>
+
+  <div class="signal-box">
+    <div class="title">EngagementService — Signals</div>
+    <div class="srow"><span class="sval">numSeqPers</span><span class="sarr">→</span> numSeqPers du client en cours de consultation</div>
+    <div class="srow"><span class="sval">selectedNumSeqPers</span><span class="sarr">→</span> Signal activé pour l'onglet 0 (Relation)</div>
+    <div class="srow"><span class="sval2">selectedNumSeqPersAssocie</span><span class="sarr">→</span> Signal activé pour l'onglet 1 (Actionnaire)</div>
+    <div class="srow"><span class="sval3">selectedNumSeqPersPremResp</span><span class="sarr">→</span> Signal activé pour l'onglet 2 (1er Responsable)</div>
+    <div class="srow"><span class="sval">selectedNumSeqPersGroupe</span><span class="sarr">→</span> Signal activé pour l'onglet 3 (Groupe)</div>
+    <div class="srow"><span class="sval2">selectedNumSeqPersVendeur</span><span class="sarr">→</span> Signal activé pour l'onglet 4 (Vendeur)</div>
+    <div style="height:.6rem"></div>
+    <div class="srow"><span class="sval">engagement</span><span class="sarr">→</span> Données engagement pour l'onglet 0</div>
+    <div class="srow"><span class="sval2">engagementAssocie</span><span class="sarr">→</span> Données engagement pour l'onglet 1</div>
+    <div class="srow"><span class="sval3">engagementPreResp</span><span class="sarr">→</span> Données engagement pour l'onglet 2</div>
+    <div class="srow"><span class="sval">engagementGroupe</span><span class="sarr">→</span> Données engagement pour l'onglet 3</div>
+    <div class="srow"><span class="sval2">engagementVendeur</span><span class="sarr">→</span> Données engagement pour l'onglet 4</div>
+  </div>
+
+  <div class="signal-box" style="margin-top:.8rem">
+    <div class="title">CanevasAgrService — Signal partagé</div>
+    <div class="srow"><span class="sval">activeTabEng</span><span class="sarr">= 0, 1, 2, 3 ou 4</span> → onglet actuellement affiché dans la section Engagement</div>
+    <div class="srow"><span class="sval">numSeqPers</span><span class="sarr">→</span> numSeqPers global du client (partagé entre toutes les pages du canvas)</div>
+  </div>
+
+  <h3>L'Effect central — Le chef d'orchestre</h3>
+  <pre><span class="cmt">// engagement.service.ts — l'effect réagit à TOUT changement de signal</span>
+eff = <span class="fn">effect</span>(() => {
+  <span class="kw">const</span> tab = <span class="kw">this</span>.canevasAgrService.activeTabEng(); <span class="cmt">// lit le signal → crée une dépendance</span>
+
+  <span class="kw">switch</span> (tab) {
+    <span class="kw">case</span> <span class="num">0</span>:
+      <span class="kw">const</span> seq0 = <span class="kw">this</span>.selectedNumSeqPers(); <span class="cmt">// lit → dépendance</span>
+      <span class="kw">if</span> (seq0) {
+        <span class="kw">this</span>.<span class="fn">getEngagementsClientByNumSeqPers</span>(seq0)
+          .<span class="fn">subscribe</span>(data => <span class="kw">this</span>.engagement.<span class="fn">set</span>(data)); <span class="cmt">// met à jour Signal</span>
+      }
+      <span class="kw">break</span>;
+
+    <span class="kw">case</span> <span class="num">1</span>:
+      <span class="kw">const</span> seq1 = <span class="kw">this</span>.selectedNumSeqPersAssocie();
+      <span class="kw">if</span> (seq1) {
+        <span class="kw">this</span>.<span class="fn">getEngagementsClientByNumSeqPers</span>(seq1)
+          .<span class="fn">subscribe</span>(data => <span class="kw">this</span>.engagementAssocie.<span class="fn">set</span>(data));
+      }
+      <span class="kw">break</span>;
+
+    <span class="kw">case</span> <span class="num">2</span>: <span class="cmt">/* → engagementPreResp */</span>   <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="num">3</span>: <span class="cmt">/* → engagementGroupe  */</span>   <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="num">4</span>: <span class="cmt">/* → engagementVendeur */</span>   <span class="kw">break</span>;
+  }
+});</pre>
+
+  <div class="box bg">
+    <strong>Pourquoi ce design est puissant ?</strong>
+    <p>L'effect <strong>crée automatiquement des dépendances</strong> aux signals qu'il lit.
+       Si <code>activeTabEng</code> change → l'effect se ré-exécute.
+       Si <code>selectedNumSeqPersAssocie</code> change (nouvelle sélection) → l'effect se ré-exécute.
+       Zéro abonnement manuel, zéro gestion de cycle de vie.</p>
+  </div>
+
+  <h3>Schéma de flux complet des Signals</h3>
+  <div class="arch">
+  ┌─────────────────┐     set(2)      ┌──────────────────────────────────┐
+  │  switchHeaders()│ ──────────────► │  CanevasAgrService               │
+  │  (composant)    │                 │  activeTabEng = signal(0)         │
+  └─────────────────┘                 └─────────────────┬────────────────┘
+                                                        │ lu par effect()
+                                                        ▼
+                                       ┌────────────────────────────────────┐
+                                       │         EngagementService          │
+                                       │         effect() s'exécute         │
+                                       │                                    │
+                                       │  lit: selectedNumSeqPersPremResp() │
+                                       │  → si non vide:                    │
+                                       │    GET /api/engagement/all/{seq}   │
+                                       │    .subscribe(data =>              │
+                                       │      engagementPreResp.set(data))  │
+                                       └────────────────┬───────────────────┘
+                                                        │ signal mis à jour
+                                                        ▼
+                                       ┌────────────────────────────────────┐
+                                       │   app-engagement-bct-bna           │
+                                       │   [engagement]="engagementPreResp()"│
+                                       │   → re-render automatique          │
+                                       └────────────────────────────────────┘
+  </div>
+</section>
+
+<!-- ═══════════════ BACKEND ═══════════════ -->
+<section id="backend">
+  <h2>10. Backend — Ce qui se passe dans Spring Boot</h2>
+
+  <h3>EngagementsController.java — Tous les endpoints</h3>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/all/{numSeqPers}</span><span class="epd">Point d'entrée principal → retourne EngagementDTO complet</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/bna/{numSeqPers}</span><span class="epd">Seulement les BNA</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/bct/{numSeqPers}</span><span class="epd">Seulement les BCT</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/classeBNA/{numSeqPers}</span><span class="epd">Historique classification BNA (3 ans)</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/classeBCT/{numSeqPers}</span><span class="epd">Historique classification BCT (3 ans)</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/classeRetourBCT/{numSeqPers}</span><span class="epd">Classification retour BCT</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/classeRetourBCT/{codTpce}/{numPce}</span><span class="epd">Classification retour BCT par pièce d'identité</span></div>
+  <div class="ep"><span class="epm get">GET</span><span class="epu">/api/engagement/effort/{numSeqPers}</span><span class="epd">Montants des termes (calendrier de remboursement)</span></div>
+
+  <h3>EngagementServiceImpl — Les 9 requêtes lancées</h3>
+  <pre><span class="cmt">// EngagementServiceImpl.java — méthode principale</span>
+<span class="kw">public</span> <span class="cls">EngagementDTO</span> <span class="fn">getListeEngagementClient</span>(<span class="cls">String</span> numSeqPers) {
+    <span class="cls">List</span>&lt;<span class="cls">EngagementBNADTO</span>&gt; bnaList = <span class="fn">getListeEngagementsBNAByClient</span>(numSeqPers);
+    <span class="cls">List</span>&lt;<span class="cls">EngagementBCTDTO</span>&gt; bctList = <span class="fn">getListeEngagementsBCTByClient</span>(numSeqPers);
+
+    <span class="kw">return new</span> <span class="cls">EngagementDTO</span>(numSeqPers, bnaList, bctList);
+}
+
+<span class="kw">private</span> <span class="cls">List</span>&lt;<span class="cls">EngagementBNADTO</span>&gt; <span class="fn">getListeEngagementsBNAByClient</span>(<span class="cls">String</span> numSeqPers) {
+    <span class="cls">List</span>&lt;<span class="cls">EngagementBNADTO</span>&gt; result = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+
+    <span class="cmt">// 8 appels séquentiels, chacun ajoute une ligne au résultat</span>
+    <span class="fn">addEngagementFCDP</span>(result, numSeqPers); <span class="cmt">// SAEB.ENGAG_COTE + CREDIT_CGEPS</span>
+    <span class="fn">addEngagementCME</span>(result, numSeqPers);  <span class="cmt">// SAEB.CREDITS_CME</span>
+    <span class="fn">addEngagementEPS</span>(result, numSeqPers);  <span class="cmt">// SAEB.CREDIT_CGEPS (EPS)</span>
+    <span class="fn">addEngagementESC</span>(result, numSeqPers);  <span class="cmt">// SAEB.CREDIT_ESC</span>
+    <span class="fn">addEngagementINV</span>(result, numSeqPers);  <span class="cmt">// SAEB.CREDITS_INV</span>
+    <span class="fn">addEngagementBPN</span>(result, numSeqPers);  <span class="cmt">// SAEB.CREDITCCI</span>
+    <span class="fn">addEngagementAGR</span>(result, numSeqPers);  <span class="cmt">// SAEBAGR.CREDIT_AGRI</span>
+    <span class="fn">addEngagementSBE</span>(result, numSeqPers);  <span class="cmt">// GEN.SBE_TOT_ENCOURS_CDI_PERS</span>
+
+    <span class="kw">return</span> result;
+}
+
+<span class="cmt">// Exemple : addEngagementAGR</span>
+<span class="kw">private void</span> <span class="fn">addEngagementAGR</span>(<span class="cls">List</span>&lt;<span class="cls">EngagementBNADTO</span>&gt; result, <span class="cls">String</span> numSeqPers) {
+    <span class="cls">List</span>&lt;<span class="cls">DetailsEngagementBNADTO</span>&gt; details = jdbcClient
+        .<span class="fn">sql</span>(queryConfig.<span class="fn">getQuery</span>(<span class="str">"getEngAGR"</span>))   <span class="cmt">// lu depuis .properties</span>
+        .<span class="fn">param</span>(<span class="str">"numSeqPers"</span>, numSeqPers)
+        .<span class="fn">query</span>(<span class="cls">DetailsEngagementBNARowMapper</span>::<span class="fn">mapRow</span>)
+        .<span class="fn">list</span>();
+
+    <span class="kw">if</span> (!details.isEmpty()) {
+        <span class="kw">double</span> autorise = details.stream().<span class="fn">mapToDouble</span>(d -> <span class="cls">Double</span>.<span class="fn">parseDouble</span>(d.getMontantAuto())).sum();
+        <span class="kw">double</span> encours  = details.stream().<span class="fn">mapToDouble</span>(d -> <span class="cls">Double</span>.<span class="fn">parseDouble</span>(d.getMontAEchPRCred())).sum();
+        <span class="kw">double</span> impaye   = details.stream().<span class="fn">mapToDouble</span>(d -> <span class="cls">Double</span>.<span class="fn">parseDouble</span>(d.getMontImpPRCred())).sum();
+
+        result.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">EngagementBNADTO</span>(
+            <span class="str">"Engagements AGRICOLE"</span>,
+            <span class="cls">String</span>.<span class="fn">valueOf</span>(autorise),
+            <span class="cls">String</span>.<span class="fn">valueOf</span>(encours),
+            <span class="cls">String</span>.<span class="fn">valueOf</span>(impaye),
+            <span class="str">"0"</span>,
+            details
+        ));
+    }
+}</pre>
+
+  <h3>Le fichier engagement-queries.properties</h3>
+  <div class="box bo">
+    <strong>Pourquoi des fichiers .properties pour les SQL ?</strong>
+    <p>Cela permet de modifier les requêtes SQL sans recompiler l'application Java.
+       Les requêtes sont chargées au démarrage par <code>QueryConfig.java</code> et stockées
+       en mémoire. Chaque clé correspond à un nom de requête.</p>
+  </div>
+  <pre><span class="cmt"># engagement-queries.properties</span>
+<span class="cmt"># Clé = nom de requête, Valeur = SQL complet</span>
+
+<span class="fn">getEngFCDP</span>=<span class="kw">SELECT</span> e.NUM_ENG_COTCG AS numId, e.NUM_CCPT_CCPT AS compte, \
+    e.MONT_AUT_ECOTCG / <span class="num">1000</span> AS montantAuto, ... \
+    <span class="kw">FROM</span> SAEB.ENGAG_COTE e \
+    <span class="kw">JOIN</span> SAEB.ENGCOT_PRODUIT ep <span class="kw">ON</span> e.NUM_ENG_COTCG = ep.NUM_ENG_COTCG \
+    <span class="kw">WHERE</span> e.NUM_SEQ_PERS = :numSeqPers \
+    <span class="kw">AND</span> ep.GP_PRODUIT_CTCG <span class="kw">IN</span> (<span class="str">'FC'</span>, <span class="str">'DP'</span>)
+
+<span class="fn">getEngAGR</span>=<span class="kw">SELECT</span> c.NUM_CRED_DETAGR AS numId, c.COD_PRD_PRD AS codPrdPrd, \
+    c.MNT_AUTO_CRDAGR / <span class="num">1000</span> AS montantAuto, \
+    c.ECHOIR_CRED_AGRI / <span class="num">1000</span> AS montAEchPRCred, \
+    c.IMPAYE_CRED_AGRI / <span class="num">1000</span> AS montImpPRCred, ... \
+    <span class="kw">FROM</span> SAEBAGR.CREDIT_AGRI c \
+    <span class="kw">WHERE</span> c.NUM_SEQ_PERS = :numSeqPers
+
+<span class="fn">getEngBCT</span>=<span class="kw">SELECT</span> b.COD_FORM_BCT, b.MONTANT_MILLIME / <span class="num">1000</span> AS montantBCT, ... \
+    <span class="kw">FROM</span> BI_USER.RETOUR_ENGAGEMENT_BCT b \
+    <span class="kw">WHERE</span> (b.ID_BCT_CLT = :numPcePers <span class="kw">OR</span> b.ID_BCT_CLT = :codTpcePers)</pre>
+
+  <h3>Le cache Caffeine</h3>
+  <pre><span class="cmt">// EngagementServiceImpl.java — annotations de cache</span>
+<span class="fn">@Cacheable</span>(value = <span class="str">"engagementBNA"</span>, key = <span class="str">"#numSeqPers"</span>)
+<span class="kw">public</span> <span class="cls">List</span>&lt;<span class="cls">EngagementBNADTO</span>&gt; <span class="fn">getListeEngagementsBNAByClient</span>(<span class="cls">String</span> numSeqPers) { ... }
+
+<span class="fn">@Cacheable</span>(value = <span class="str">"engagementBCT"</span>, key = <span class="str">"#numSeqPers"</span>)
+<span class="kw">public</span> <span class="cls">List</span>&lt;<span class="cls">EngagementBCTDTO</span>&gt; <span class="fn">getListeEngagementsBCTByClient</span>(<span class="cls">String</span> numSeqPers) { ... }
+
+<span class="cmt">// application.properties</span>
+<span class="fn">spring.cache.caffeine.spec</span>=<span class="str">maximumSize=500,expireAfterWrite=24h</span>
+<span class="cmt">// → Même client = aucune requête SQL pendant 24h</span></pre>
+</section>
+
+<!-- ═══════════════ RECAP GLOBAL ═══════════════ -->
+<section id="recapglobal">
+  <h2>11. Récapitulatif global — Tout en un tableau</h2>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr>
+          <th>Onglet</th>
+          <th>Entité affichée</th>
+          <th>Comment le numSeqPers est obtenu</th>
+          <th>Appels HTTP</th>
+          <th>Signal mis à jour</th>
+          <th>Composant final</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>0 — Relation</strong></td>
+          <td>Client principal</td>
+          <td>Déjà connu depuis la recherche initiale</td>
+          <td><code>GET /engagement/all/{numSeqPers}</code></td>
+          <td><code>engagement</code></td>
+          <td><code>app-engagement-bct-bna</code></td>
+        </tr>
+        <tr>
+          <td><strong>1 — Actionnaire</strong></td>
+          <td>Associé sélectionné</td>
+          <td>Résolu via pièce d'identité → <code>getClientByPiece</code></td>
+          <td><code>GET /associe/{numSeqPers}</code><br><code>GET /client/getClientByPiece/…</code><br><code>GET /engagement/all/{…}</code></td>
+          <td><code>engagementAssocie</code></td>
+          <td><code>app-engagement-bct-bna</code></td>
+        </tr>
+        <tr>
+          <td><strong>2 — 1er Responsable</strong></td>
+          <td>Gérant / Directeur</td>
+          <td>Résolu via CIN du responsable → <code>getClientByContratCpt</code></td>
+          <td><code>GET /client/getClientByContratCpt/2/{CIN}</code><br><code>GET /engagement/all/{…}</code></td>
+          <td><code>engagementPreResp</code></td>
+          <td><code>app-engagement-bct-bna</code></td>
+        </tr>
+        <tr>
+          <td><strong>3 — Groupes</strong></td>
+          <td>Membre du groupe sélectionné</td>
+          <td>Directement dans <code>groupe.numSeqPers</code> (ClientDTO)</td>
+          <td><code>GET /engagement/all/{groupeNumSeqPers}</code><br><code>GET /client/placements/{…}</code></td>
+          <td><code>engagementGroupe</code></td>
+          <td><code>app-engagement-bct-bna</code></td>
+        </tr>
+        <tr>
+          <td><strong>4 — Vendeurs</strong></td>
+          <td>Vendeur du terrain</td>
+          <td>Directement dans <code>vendeur.numseqpers</code> (déjà dans le canvas)</td>
+          <td><code>GET /engagement/all/{vendeurNumSeqPers}</code></td>
+          <td><code>engagementVendeur</code></td>
+          <td><code>app-engagement-bct-bna</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+
+  <h3>Résumé des données affichées dans app-engagement-bct-bna</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Section</th><th>Données affichées</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Tableau BCT</td><td>Forme, Année, Mois, Montant BCT, Montant BNA, %</td><td><code>BI_USER.RETOUR_ENGAGEMENT_BCT</code></td></tr>
+        <tr><td>Tableau BNA</td><td>Type Risque, Autorisé, Encours, Utilisé, Impayé + Totaux</td><td>SAEB, SAEBAGR, GEN (8 schémas)</td></tr>
+        <tr><td>Modal FCDP</td><td>Numéro, Compte, Type, Autorisé, Solde, GRP, Produit, Échéance</td><td>SAEB.ENGAG_COTE + CREDIT_CGEPS</td></tr>
+        <tr><td>Modal CME</td><td>+ A Echoir PR, Impayé PR, Utilisé PR</td><td>SAEB.CREDITS_CME</td></tr>
+        <tr><td>Modal EPS</td><td>+ Encours</td><td>SAEB.CREDIT_CGEPS (EPS)</td></tr>
+        <tr><td>Modal ESC</td><td>+ A Echoir PR, Impayé PR, Utilisé PR</td><td>SAEB.CREDIT_ESC</td></tr>
+        <tr><td>Modal CMT</td><td>N° Décision, N° Crédit, Autorisé, A Echoir PR+INT, Impayé PR+INT, Échéance</td><td>SAEB.CREDITS_INV</td></tr>
+        <tr><td>Modal BPN</td><td>+ Reste, Produit, A Echoir INT, Impayé INT</td><td>SAEB.CREDITCCI</td></tr>
+        <tr><td>Modal AGR</td><td>Terme, Produit, N° Décision, N° Prêt, Date 1ère/Dern. Éch., Comm 203, Comm 83</td><td>SAEBAGR.CREDIT_AGRI</td></tr>
+        <tr><td>Modal SBE</td><td>A Echoir PR, Impayé PR</td><td>GEN.SBE_TOT_ENCOURS_CDI_PERS</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box bg" style="margin-top:1.5rem">
+    <strong>Pour un développeur débutant — les 3 points clés à retenir</strong>
+    <p>
+      <strong>1.</strong> Tout passe par le <strong>Signal <code>numSeqPers</code></strong>.
+      Changer ce signal (via sélection d'un onglet, d'un associé, d'un groupe…) déclenche
+      automatiquement l'appel HTTP via l'<code>effect()</code>.<br><br>
+      <strong>2.</strong> Le composant <code>app-engagement-bct-bna</code> est
+      <strong>réutilisé 5 fois</strong> (un par onglet). La seule différence : le Signal
+      <code>engagement</code> qu'il reçoit en <code>@Input</code>.<br><br>
+      <strong>3.</strong> Le backend lance <strong>8 requêtes SQL</strong> par appel
+      (une par type BNA) et les <strong>agrège</strong> en une seule liste. Les résultats
+      sont <strong>mis en cache 24h</strong> pour éviter de surcharger Oracle.
+    </p>
+  </div>
+</section>
+
+</div><!-- .page -->
+
+<footer style="text-align:center;color:#6c757d;font-size:.8rem;padding:2rem 1rem">
+  PGCANVAS — Guide Engagement technique &amp; fonctionnel · Pour développeurs débutants
+</footer>
+
+<script>
+function toggle(header) {
+  const item = header.parentElement;
+  item.classList.toggle('open');
+}
+// Ouvre tous les acc-item au chargement sauf ceux volontairement fermés
+document.querySelectorAll('.acc-item').forEach(el => el.classList.add('open'));
+</script>
+
+</body>
+</html>

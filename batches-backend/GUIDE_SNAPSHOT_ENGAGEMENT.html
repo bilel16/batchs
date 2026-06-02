@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PGCANVAS — Guide Snapshot & EngagementDetaillé</title>
+<style>
+:root{
+  --blue:#1a3c6e;--blue2:#2a5298;--blue-l:#ebf3fb;
+  --green:#1e7e48;--green-l:#eafaf1;
+  --orange:#b86a00;--orange-l:#fff8e7;
+  --red:#b03030;--red-l:#fdedec;
+  --purple:#6d3bb5;--purple-l:#f4ecf7;
+  --teal:#0a6e6e;--teal-l:#e8f8f5;
+  --yellow:#c8920a;--yellow-l:#fffce8;
+  --border:#dee2e6;--grey:#f0f3f7;
+  --text:#1e2a38;--muted:#6c757d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#e8edf4;color:var(--text);line-height:1.7}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:var(--blue);
+  display:flex;align-items:center;gap:.4rem;padding:0 1.2rem;
+  height:50px;box-shadow:0 2px 10px rgba(0,0,0,.3);overflow-x:auto;white-space:nowrap}
+nav .logo{font-weight:800;font-size:1rem;color:#fff;margin-right:.8rem;flex-shrink:0}
+nav a{color:rgba(255,255,255,.78);text-decoration:none;font-size:.78rem;padding:3px 9px;border-radius:4px;transition:background .2s;flex-shrink:0}
+nav a:hover{background:rgba(255,255,255,.15);color:#fff}
+
+/* PAGE */
+.page{max-width:1120px;margin:0 auto;padding:1.8rem 1.2rem 5rem}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--blue) 0%,#1a5c9e 55%,var(--teal) 100%);
+  color:#fff;border-radius:14px;padding:2.5rem 2rem;margin-bottom:2rem;
+  box-shadow:0 6px 24px rgba(26,60,110,.35)}
+.hero h1{font-size:1.9rem;margin-bottom:.4rem}
+.hero p{opacity:.88;max-width:740px;font-size:.97rem}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem}
+.chip{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:.75rem;font-weight:600}
+
+/* SECTION */
+section{background:#fff;border-radius:12px;padding:1.8rem 1.8rem;margin-bottom:1.6rem;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+section>h2{font-size:1.3rem;color:var(--blue);border-left:4px solid #e9a825;padding-left:.75rem;margin-bottom:1.4rem}
+h3{font-size:1rem;color:var(--blue);margin:1.3rem 0 .55rem}
+h4{font-size:.88rem;color:var(--muted);margin:.8rem 0 .35rem;font-weight:700}
+p{margin-bottom:.7rem;font-size:.91rem}
+
+/* CODE */
+code{background:#f0f3f7;border-radius:4px;padding:2px 5px;font-size:.8em;font-family:'Consolas','Courier New',monospace;color:#b03030}
+pre{background:#1e2a38;color:#abb2bf;border-radius:10px;padding:1.1rem;overflow-x:auto;
+  font-size:.78rem;line-height:1.65;margin:.6rem 0;font-family:'Consolas','Courier New',monospace}
+pre .kw{color:#c678dd} pre .str{color:#98c379} pre .cmt{color:#5c6370;font-style:italic}
+pre .fn{color:#61afef} pre .num{color:#d19a66} pre .cls{color:#e5c07b} pre .ann{color:#e06c75}
+
+/* BOX */
+.box{border-radius:8px;padding:.85rem 1.1rem;margin:.65rem 0;border-left:4px solid}
+.box p{margin:0;font-size:.87rem}
+.box strong{display:block;margin-bottom:.2rem;font-size:.88rem}
+.bi{background:var(--blue-l);border-color:var(--blue2)}
+.bg{background:var(--green-l);border-color:var(--green)}
+.bo{background:var(--orange-l);border-color:var(--orange)}
+.br{background:var(--red-l);border-color:var(--red)}
+.by{background:var(--yellow-l);border-color:var(--yellow)}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:.85rem;margin:.7rem 0}
+.card{border-radius:10px;padding:1rem 1.1rem;border:2px solid transparent}
+.card .ci{font-size:1.6rem;margin-bottom:.3rem}
+.card h4{font-size:.88rem;color:var(--text);margin:.25rem 0}
+.card p{font-size:.8rem;color:var(--muted);margin:0}
+.cb{background:var(--blue-l);border-color:#aed6f1}
+.cg{background:var(--green-l);border-color:#a9dfbf}
+.co{background:var(--orange-l);border-color:#ffd898}
+.cr{background:var(--red-l);border-color:#f5b7b1}
+.cp{background:var(--purple-l);border-color:#d7bde2}
+.ct{background:var(--teal-l);border-color:#a2d9ce}
+.cy{background:var(--yellow-l);border-color:#f0d070}
+
+/* TABLES */
+.tw{overflow-x:auto;margin:.55rem 0;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{background:var(--blue);color:#fff;padding:.5rem .8rem;text-align:left;font-weight:600;font-size:.8rem}
+td{padding:.48rem .8rem;border-bottom:1px solid #eaecf0;vertical-align:top}
+tr:nth-child(even) td{background:#f8f9fa}
+
+/* FLOW */
+.flow{margin:.8rem 0}
+.fstep{display:flex;gap:.7rem;margin-bottom:.05rem}
+.fleft{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.fdot{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex-shrink:0}
+.fdot.green{background:var(--green)} .fdot.orange{background:var(--orange)}
+.fdot.red{background:var(--red)} .fdot.purple{background:var(--purple)}
+.fline{width:2px;background:#ccd3db;flex:1;min-height:14px;margin:2px auto}
+.fcontent{background:var(--grey);border:1px solid var(--border);border-radius:8px;
+  padding:.55rem .85rem;margin-bottom:.45rem;flex:1}
+.fcontent strong{color:var(--blue);display:block;font-size:.87rem}
+.fcontent span,.fcontent p{font-size:.8rem;color:var(--muted);margin:0}
+.fcontent code{font-size:.76rem}
+
+/* ENDPOINT */
+.ep{display:flex;align-items:baseline;gap:.55rem;padding:.38rem .7rem;border-radius:6px;
+  margin:.22rem 0;background:#f8f9fa;border:1px solid #e9ecef}
+.epm{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;color:#fff;flex-shrink:0}
+.get{background:#27ae60}.post{background:#2980b9}.put{background:#e67e22}.del{background:#e74c3c}
+.epu{font-family:monospace;font-size:.79rem;color:#1a5c9e;flex:1}
+.epd{font-size:.76rem;color:var(--muted)}
+
+/* BADGE */
+.badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:.73rem;font-weight:700}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+.badge-grey{background:#f3f4f6;color:#374151}
+.badge-yellow{background:#fef3c7;color:#92400e}
+
+/* SEPARATOR */
+.sep{height:1px;background:var(--border);margin:1.1rem 0}
+
+/* DTO BLOCK */
+.dto{background:#1e2a38;border-radius:10px;overflow:hidden;margin:.6rem 0}
+.dto-head{background:#263447;padding:.5rem 1rem;color:#e5c07b;font-weight:700;font-size:.82rem;
+  display:flex;align-items:center;gap:.5rem}
+.dto-body{padding:1rem;font-family:'Consolas',monospace;font-size:.78rem;color:#abb2bf;line-height:1.7}
+.dto-field{display:flex;gap:.6rem;margin:.12rem 0}
+.dto-type{color:#c678dd;flex-shrink:0}
+.dto-name{color:#e5c07b}
+.dto-comment{color:#5c6370;font-style:italic}
+
+/* ARCH */
+.arch{background:var(--grey);border-radius:10px;padding:1.3rem;overflow-x:auto;
+  font-family:'Consolas',monospace;font-size:.76rem;line-height:1.9;color:var(--text);white-space:pre}
+
+/* STEP NUMBER */
+.step-label{display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;font-weight:800;font-size:.78rem;
+  flex-shrink:0;margin-right:.4rem}
+
+/* STATUS PILL */
+.pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.74rem;font-weight:600;margin:1px}
+.pill-init{background:#e0e7ff;color:#3730a3}
+.pill-pec{background:#fef3c7;color:#92400e}
+.pill-valid{background:#d1fae5;color:#065f46}
+.pill-corr{background:#fee2e2;color:#991b1b}
+.pill-dec{background:#f3e8ff;color:#6d28d9}
+.pill-final-ok{background:#d1fae5;color:#065f46}
+.pill-final-ko{background:#fee2e2;color:#991b1b}
+
+/* IMPL STEP */
+.impl-step{background:#f8f9fa;border:1px solid var(--border);border-radius:10px;
+  padding:1rem 1.2rem;margin:.5rem 0}
+.impl-step .impl-title{font-weight:700;color:var(--blue);font-size:.92rem;margin-bottom:.5rem;
+  display:flex;align-items:center;gap:.5rem}
+.impl-step .impl-file{font-size:.77rem;color:var(--muted);font-family:monospace;
+  background:#e8edf4;padding:2px 7px;border-radius:4px;margin-bottom:.6rem;display:inline-block}
+
+/* MISSING */
+.missing{background:#fff8e7;border:2px dashed var(--yellow);border-radius:10px;padding:1rem 1.2rem;margin:.6rem 0}
+.missing .missing-title{font-weight:700;color:var(--orange);margin-bottom:.4rem;font-size:.9rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">PGCANVAS</span>
+  <a href="#overview">Vue d'ensemble</a>
+  <a href="#avis">Avis</a>
+  <a href="#engdetaille">EngagementDetaillé</a>
+  <a href="#snapshot">Snapshot</a>
+  <a href="#flow">Flux complet</a>
+  <a href="#bdd">Base de données</a>
+  <a href="#backend">Backend</a>
+  <a href="#frontend">Frontend</a>
+  <a href="#implementer">Implémenter</a>
+  <a href="#manquant">Ce qui manque</a>
+</nav>
+
+<div class="page">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Sauvegarder l'Avis → charger EngagementDetaillé → créer un Snapshot</h1>
+  <p>Ce guide explique <strong>exactement</strong> comment, lors de la sauvegarde d'un avis,
+     toutes les données d'engagement (client principal + actionnaires + responsable + groupe + vendeurs)
+     sont chargées dans <code>EngagementDetailleDto</code> et figées dans un <strong>snapshot historique</strong>.
+     Chaque fichier, chaque ligne de code, chaque champ de BDD — tout est détaillé pour un développeur débutant.</p>
+  <div class="chips">
+    <span class="chip">AvisController.java</span>
+    <span class="chip">CanevasSnapshotService.java</span>
+    <span class="chip">EngagementDetailleDto</span>
+    <span class="chip">CanevasStructureSnapshot</span>
+    <span class="chip">Angular avis.component.ts</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     1. VUE D'ENSEMBLE
+══════════════════════════════════════════════════════ -->
+<section id="overview">
+  <h2>1. Vue d'ensemble — Qu'est-ce qu'on veut faire ?</h2>
+
+  <div class="box bi">
+    <strong>Le besoin</strong>
+    <p>Quand un agent bancaire clique <strong>« Sauvegarder »</strong> sur la page Avis,
+       on veut :<br>
+       <strong>①</strong> Enregistrer l'avis (opinion favorable/défavorable).<br>
+       <strong>②</strong> Prendre une <em>photo</em> (snapshot) de <strong>tous</strong> les engagements
+       du client + toutes les parties liées (actionnaires, 1er responsable, membres du groupe, vendeurs).<br>
+       <strong>③</strong> Stocker cette photo en base pour qu'on puisse la relire plus tard comme historique.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card cb">
+      <div class="ci">📋</div>
+      <h4>Avis</h4>
+      <p>Opinion formelle (Favorable / Défavorable) + données crédit + commentaire. Table : <code>AVIS_AGRICOLE</code></p>
+    </div>
+    <div class="card cg">
+      <div class="ci">🧩</div>
+      <h4>EngagementDetaillé</h4>
+      <p>Conteneur de tous les engagements des parties liées (actionnaires, responsable, groupe, vendeurs)</p>
+    </div>
+    <div class="card co">
+      <div class="ci">📸</div>
+      <h4>Snapshot</h4>
+      <p>Photo complète du dossier à un instant T. Table : <code>CANEVAS_STRUCTURE_SNAPSHOT</code></p>
+    </div>
+    <div class="card cr">
+      <div class="ci">🕐</div>
+      <h4>Historique</h4>
+      <p>Chaque sauvegarde d'avis crée une nouvelle version du snapshot (v1, v2, v3…)</p>
+    </div>
+  </div>
+
+  <h3>Les trois entités clés</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Entité</th><th>Fichier Java</th><th>Table BDD</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Avis</strong></td><td><code>Avis.java</code> / <code>AvisService.java</code></td><td><code>AVIS_AGRICOLE</code></td><td>Stocke l'opinion + données crédit</td></tr>
+        <tr><td><strong>EngagementDetailleDto</strong></td><td><code>EngagementDetailleDto.java</code> / <code>EngagementPartieDto.java</code></td><td>(sérialisé JSON dans snapshot)</td><td>Regroupe les engagements des parties liées</td></tr>
+        <tr><td><strong>CanevasStructureSnapshot</strong></td><td><code>CanevasStructureSnapshot.java</code> / <code>CanevasSnapshotService.java</code></td><td><code>CANEVAS_STRUCTURE_SNAPSHOT</code></td><td>Photo complète du dossier à un instant T</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     2. AVIS
+══════════════════════════════════════════════════════ -->
+<section id="avis">
+  <h2>2. L'Avis — Structure et sauvegarde</h2>
+
+  <h3>2.1 Structure de l'entité Avis (Java)</h3>
+
+  <div class="dto">
+    <div class="dto-head">📄 Avis.java — Entité JPA (table AVIS_AGRICOLE)</div>
+    <div class="dto-body">
+<div class="dto-field"><span class="dto-type">Long</span>    <span class="dto-name">id</span>                          <span class="dto-comment">// PK — généré par SEQ_AVIS</span></div>
+<div class="dto-field"><span class="dto-type">Long</span>    <span class="dto-name">numCaneva</span>                   <span class="dto-comment">// FK vers CANEVAS_AGRICOLE</span></div>
+<div class="dto-field"><span class="dto-type">Long</span>    <span class="dto-name">numSeqpers</span>                  <span class="dto-comment">// Numéro séquentiel du client</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">statusAvis</span>                  <span class="dto-comment">// "PEC_CCA", "PRES_VALIDER", "VALIDER", "Décision Finale"…</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">structure</span>                   <span class="dto-comment">// Code structure émettrice (ex: "AGC_001")</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">matricule</span>                   <span class="dto-comment">// Matricule de l'agent</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">avisValue</span>                   <span class="dto-comment">// "1"=FAVORABLE, "2"=DEFAVORABLE</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">codeStructureReceptrice</span>     <span class="dto-comment">// Structure qui reçoit le dossier</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">commentaire</span>                 <span class="dto-comment">// CLOB — commentaire libre</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">dataAchatTerrain</span>            <span class="dto-comment">// CLOB JSON — List&lt;AvisCreditAchatTerrainDTO&gt;</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">dataCreditInvestissement</span>    <span class="dto-comment">// CLOB JSON — List&lt;AvisCreditInvestissementDTO&gt;</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">dataCreditCourtTerme</span>        <span class="dto-comment">// CLOB JSON — AvisCreditCourtTermeDTO</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">dataGaranties</span>               <span class="dto-comment">// CLOB JSON — List&lt;AvisGarantiesDTO&gt;</span></div>
+    </div>
+  </div>
+
+  <h3>2.2 Les statuts possibles de l'Avis</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>statusAvis</th><th>Stade Canvas résultant</th><th>Signification</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-pec">PEC_CCA</span></td><td><code>PEC_DONNEE</code></td><td>Prise en charge par le CCA (agent de saisie)</td></tr>
+        <tr><td><span class="pill pill-pec">PRES_VALIDER</span></td><td><code>VALID_DONNEE</code></td><td>Données présentées pour validation</td></tr>
+        <tr><td><span class="pill pill-corr">CORRIGER</span></td><td><code>CORRIGE_DONNEE</code></td><td>Renvoyé pour correction des données</td></tr>
+        <tr><td><span class="pill pill-pec">PEC_AVIS_DEC</span></td><td><code>PEC_AVIS_DEC</code></td><td>Prise en charge pour avis de décision</td></tr>
+        <tr><td><span class="pill pill-valid">VALIDER</span></td><td><code>VALIDER_DR</code></td><td>Validé par la Direction Régionale</td></tr>
+        <tr><td><span class="pill pill-init">Envoyer</span></td><td><code>EN_COURS_ETUDE</code></td><td>Dossier envoyé pour étude</td></tr>
+        <tr><td><span class="pill pill-final-ok">Décision Finale + avisValue="1"</span></td><td><code>DEC_FINAL_PRISE_ACCORD</code></td><td>Décision finale FAVORABLE</td></tr>
+        <tr><td><span class="pill pill-final-ko">Décision Finale + avisValue="2"</span></td><td><code>DEC_FINAL_PRISE_REJET</code></td><td>Décision finale DÉFAVORABLE</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>2.3 Sauvegarde côté Frontend (Angular)</h3>
+  <p>Fichier : <code>frontend-app1/src/app/_components/pages/canvas.agricole/avis/avis.component.ts</code></p>
+  <pre><span class="cmt">// avis.component.ts — méthode saveAvis() (ligne ~375)</span>
+<span class="fn">saveAvis</span>() {
+  <span class="cmt">// 1. Construction du DTO à envoyer</span>
+  <span class="kw">const</span> avisDto: <span class="cls">AvisDTO</span> = {
+    numCaneva:               <span class="kw">this</span>.canevasId,
+    numSeqpers:              <span class="kw">this</span>.numSeqPers,
+    statusAvis:              <span class="kw">this</span>.statusAvis,
+    structure:               <span class="kw">this</span>.codeStructure,
+    structureLabel:          <span class="kw">this</span>.libelleStructure,
+    matricule:               <span class="kw">this</span>.matricule,
+    avisValue:               <span class="kw">this</span>.avisValue,       <span class="cmt">// "1" ou "2"</span>
+    commentaire:             <span class="kw">this</span>.commentaire,
+    codeStructureReceptrice: <span class="kw">this</span>.codeStructureReceptrice,
+
+    <span class="cmt">// Données des crédits (saisies dans les sous-composants)</span>
+    dataAchatTerrain:        <span class="kw">this</span>.dataAchatTerrain,
+    dataCreditInvestissement:<span class="kw">this</span>.dataCreditInvestissement,
+    dataCreditCourtTerme:    <span class="kw">this</span>.dataCreditCourtTerme,
+    dataGaranties:           <span class="kw">this</span>.dataGaranties,
+  };
+
+  <span class="cmt">// 2. Envoi HTTP POST</span>
+  <span class="kw">this</span>.avisService.<span class="fn">saveAvis</span>(avisDto).<span class="fn">subscribe</span>({
+    next: (response) => {
+      <span class="cmt">// response contient: { snapshotId, versionNumber, structureCode }</span>
+      <span class="kw">this</span>.<span class="fn">showSuccess</span>(<span class="str">'Avis sauvegardé avec succès'</span>);
+    },
+    error: (err) => <span class="kw">this</span>.<span class="fn">showError</span>(err)
+  });
+}</pre>
+
+  <h3>2.4 Endpoint HTTP</h3>
+  <div class="ep"><span class="epm post">POST</span><span class="epu">/api/avis</span><span class="epd">Sauvegarde l'avis ET déclenche la création du snapshot</span></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     3. ENGAGEMENT DETAILLE
+══════════════════════════════════════════════════════ -->
+<section id="engdetaille">
+  <h2>3. EngagementDetaillé — Structure et chargement</h2>
+
+  <div class="box bi">
+    <strong>C'est quoi EngagementDetailleDto ?</strong>
+    <p>C'est un objet Java qui regroupe les engagements de <strong>toutes les parties liées</strong>
+       au client principal. Il contient 4 listes : actionnaires, 1er responsable, groupe, vendeurs.
+       Chaque partie contient ses propres données BNA + BCT + classifications.</p>
+  </div>
+
+  <h3>3.1 Structure EngagementDetailleDto</h3>
+  <div class="dto">
+    <div class="dto-head">📄 EngagementDetailleDto.java — Conteneur principal</div>
+    <div class="dto-body">
+<div class="dto-field"><span class="dto-type">List&lt;EngagementPartieDto&gt;</span> <span class="dto-name">actionnaires</span>       <span class="dto-comment">// Onglet 1 — associés/actionnaires</span></div>
+<div class="dto-field"><span class="dto-type">EngagementPartieDto</span>        <span class="dto-name">premierResponsable</span>  <span class="dto-comment">// Onglet 2 — gérant/directeur</span></div>
+<div class="dto-field"><span class="dto-type">List&lt;EngagementPartieDto&gt;</span> <span class="dto-name">groupe</span>              <span class="dto-comment">// Onglet 3 — membres du groupe</span></div>
+<div class="dto-field"><span class="dto-type">List&lt;EngagementPartieDto&gt;</span> <span class="dto-name">vendeurs</span>            <span class="dto-comment">// Onglet 4 — vendeurs terrain</span></div>
+    </div>
+  </div>
+
+  <h3>3.2 Structure EngagementPartieDto (une seule partie)</h3>
+  <div class="dto">
+    <div class="dto-head">📄 EngagementPartieDto.java — Données d'une partie liée</div>
+    <div class="dto-body">
+<div class="dto-field"><span class="dto-type">String</span>                     <span class="dto-name">typePartie</span>          <span class="dto-comment">// "ACTIONNAIRE" | "PREMIER_RESPONSABLE" | "GROUPE" | "VENDEUR"</span></div>
+<div class="dto-field"><span class="dto-type">String</span>                     <span class="dto-name">nom</span>                 <span class="dto-comment">// Nom + prénom</span></div>
+<div class="dto-field"><span class="dto-type">String</span>                     <span class="dto-name">cin</span>                 <span class="dto-comment">// Numéro de pièce d'identité</span></div>
+<div class="dto-field"><span class="dto-type">Long</span>                       <span class="dto-name">numSeqPers</span>          <span class="dto-comment">// Lien vers REFCLI.PERSONNE</span></div>
+<div class="dto-field"><span class="dto-type">String</span>                     <span class="dto-name">partCapital</span>         <span class="dto-comment">// % de participation (pour actionnaires)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>                     <span class="dto-name">formeJuridique</span>      <span class="dto-comment">// Forme juridique (pour groupe)</span></div>
+<div class="dto-field"><span class="dto-type">List&lt;EngagementBNADTO&gt;</span>   <span class="dto-name">engagementsBNA</span>      <span class="dto-comment">// 8 types BNA (FCDP, CME, AGR…)</span></div>
+<div class="dto-field"><span class="dto-type">List&lt;EngagementBCTDTO&gt;</span>   <span class="dto-name">engagementsBCT</span>      <span class="dto-comment">// Engagements BCT</span></div>
+<div class="dto-field"><span class="dto-type">List&lt;ClasseDTO&gt;</span>           <span class="dto-name">classeBNA</span>           <span class="dto-comment">// Historique classification BNA (3 ans)</span></div>
+<div class="dto-field"><span class="dto-type">List&lt;ClasseDTO&gt;</span>           <span class="dto-name">classeBCT</span>           <span class="dto-comment">// Historique classification BCT (3 ans)</span></div>
+    </div>
+  </div>
+
+  <h3>3.3 Comment EngagementDetaillé est chargé — Logique Java</h3>
+  <p>Fichier : <code>backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java</code></p>
+
+  <pre><span class="cmt">// CanevasSnapshotService.java — méthode buildEngagementDetaille() (ligne ~156)</span>
+<span class="kw">private</span> <span class="cls">EngagementDetailleDto</span> <span class="fn">buildEngagementDetaille</span>(<span class="cls">Caneva</span> caneva) {
+    <span class="kw">Long</span> numSeqPers = caneva.<span class="fn">getNumSeqpers</span>().longValue();
+
+    <span class="cmt">// ── ACTIONNAIRES (Onglet 1) ────────────────────────</span>
+    <span class="cls">List</span>&lt;<span class="cls">Associe</span>&gt; associes = associeRepository.<span class="fn">findAssociesByNumSeqPers</span>(numSeqPers);
+
+    <span class="cls">List</span>&lt;<span class="cls">EngagementPartieDto</span>&gt; actionnaires = associes.stream()
+        .<span class="fn">filter</span>(a -> a.<span class="fn">getNumSeqPers</span>() != <span class="kw">null</span>)  <span class="cmt">// seulement ceux avec numSeqPers</span>
+        .<span class="fn">map</span>(a -> {
+            <span class="cls">EngagementDTO</span> eng = <span class="fn">loadEngagementSafe</span>(<span class="cls">String</span>.<span class="fn">valueOf</span>(a.<span class="fn">getNumSeqPers</span>()));
+            <span class="cls">List</span>&lt;<span class="cls">ClasseDTO</span>&gt; classeBNA = <span class="fn">loadClasseBNASafe</span>(<span class="cls">String</span>.<span class="fn">valueOf</span>(a.<span class="fn">getNumSeqPers</span>()));
+            <span class="kw">return</span> <span class="cls">EngagementPartieDto</span>.builder()
+                .typePartie(<span class="str">"ACTIONNAIRE"</span>)
+                .nom(a.<span class="fn">getName</span>())
+                .cin(a.<span class="fn">getPieceNumber</span>())
+                .numSeqPers(a.<span class="fn">getNumSeqPers</span>())
+                .partCapital(<span class="cls">String</span>.<span class="fn">valueOf</span>(a.<span class="fn">getPartPercentage</span>()))
+                .engagementsBNA(eng.<span class="fn">getListeEngagementBNA</span>())
+                .engagementsBCT(eng.<span class="fn">getListeEngagementBCT</span>())
+                .classeBNA(classeBNA)
+                .<span class="fn">build</span>();
+        })
+        .<span class="fn">collect</span>(<span class="cls">Collectors</span>.toList());
+
+    <span class="cmt">// ── 1ER RESPONSABLE (Onglet 2) ────────────────────</span>
+    <span class="cls">EngagementPartieDto</span> premierResponsable = clientCanvasRepository
+        .<span class="fn">findByNumSeqpers</span>(numSeqPers)
+        .<span class="fn">map</span>(cc -> {
+            <span class="cls">EngagementDTO</span> eng = <span class="fn">loadEngagementSafe</span>(<span class="cls">String</span>.<span class="fn">valueOf</span>(numSeqPers));
+            <span class="kw">return</span> <span class="cls">EngagementPartieDto</span>.builder()
+                .typePartie(<span class="str">"PREMIER_RESPONSABLE"</span>)
+                .nom(cc.<span class="fn">getNomResponsable</span>() + <span class="str">" "</span> + cc.<span class="fn">getPrenomResponsable</span>())
+                .cin(cc.<span class="fn">getCinResponsable</span>())
+                .numSeqPers(numSeqPers)
+                .engagementsBNA(eng.<span class="fn">getListeEngagementBNA</span>())
+                .engagementsBCT(eng.<span class="fn">getListeEngagementBCT</span>())
+                .<span class="fn">build</span>();
+        })
+        .<span class="fn">orElse</span>(<span class="kw">null</span>);
+
+    <span class="cmt">// ── VENDEURS (Onglet 4) ───────────────────────────</span>
+    <span class="cls">List</span>&lt;<span class="cls">EngagementPartieDto</span>&gt; vendeurs = caneva.<span class="fn">getCreditAchatTerrains</span>().stream()
+        .<span class="fn">flatMap</span>(c -> c.<span class="fn">getVendeurs</span>().stream())
+        .<span class="fn">filter</span>(v -> v.<span class="fn">getNumseqpers</span>() != <span class="kw">null</span>)
+        .<span class="fn">map</span>(v -> {
+            <span class="cls">EngagementDTO</span> eng = <span class="fn">loadEngagementSafe</span>(<span class="cls">String</span>.<span class="fn">valueOf</span>(v.<span class="fn">getNumseqpers</span>()));
+            <span class="kw">return</span> <span class="cls">EngagementPartieDto</span>.builder()
+                .typePartie(<span class="str">"VENDEUR"</span>)
+                .nom(v.<span class="fn">getNomPrenom</span>())
+                .cin(v.<span class="fn">getNumPiece</span>())
+                .numSeqPers(v.<span class="fn">getNumseqpers</span>().longValue())
+                .engagementsBNA(eng.<span class="fn">getListeEngagementBNA</span>())
+                .engagementsBCT(eng.<span class="fn">getListeEngagementBCT</span>())
+                .<span class="fn">build</span>();
+        })
+        .<span class="fn">collect</span>(<span class="cls">Collectors</span>.toList());
+
+    <span class="cmt">// ── GROUPE (Onglet 3) — ⚠️ PAS ENCORE IMPLÉMENTÉ ─</span>
+    <span class="kw">return</span> <span class="cls">EngagementDetailleDto</span>.builder()
+        .actionnaires(actionnaires)
+        .premierResponsable(premierResponsable)
+        .groupe(<span class="cls">List</span>.of())        <span class="cmt">// ← VIDE — voir section "Ce qui manque"</span>
+        .vendeurs(vendeurs)
+        .<span class="fn">build</span>();
+}</pre>
+
+  <div class="missing">
+    <div class="missing-title">⚠️ Point important : le GROUPE n'est pas encore chargé</div>
+    <p style="font-size:.87rem">La méthode <code>buildEngagementDetaille()</code> retourne <code>groupe: List.of()</code> (liste vide).
+    Les membres du groupe ne sont pas encore inclus dans le snapshot.
+    Voir la <a href="#manquant">section 9 — Ce qui manque</a> pour savoir comment l'implémenter.</p>
+  </div>
+
+  <h3>3.4 Méthodes de chargement des engagements (safe)</h3>
+  <pre><span class="cmt">// Ces méthodes protègent contre les erreurs (try/catch) lors du chargement</span>
+<span class="kw">private</span> <span class="cls">EngagementDTO</span> <span class="fn">loadEngagementSafe</span>(<span class="cls">String</span> numSeqPers) {
+    <span class="kw">try</span> {
+        <span class="kw">return</span> engagementService.<span class="fn">getListeEngagementClient</span>(numSeqPers);
+        <span class="cmt">// Appelle : getListeEngagementsBNAByClient() + getListeEngagementsBCTByClient()</span>
+    } <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+        log.<span class="fn">warn</span>(<span class="str">"Engagement non trouvé pour numSeqPers={}"</span>, numSeqPers);
+        <span class="kw">return new</span> <span class="cls">EngagementDTO</span>(); <span class="cmt">// objet vide si erreur</span>
+    }
+}
+
+<span class="kw">private</span> <span class="cls">List</span>&lt;<span class="cls">ClasseDTO</span>&gt; <span class="fn">loadClasseBNASafe</span>(<span class="cls">String</span> numSeqPers) {
+    <span class="kw">try</span> {
+        <span class="kw">return</span> engagementService.<span class="fn">getHistoriqueClasseBNA</span>(numSeqPers);
+    } <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+        <span class="kw">return</span> <span class="cls">List</span>.of();
+    }
+}</pre>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     4. SNAPSHOT
+══════════════════════════════════════════════════════ -->
+<section id="snapshot">
+  <h2>4. Le Snapshot — Structure complète</h2>
+
+  <div class="box bi">
+    <strong>C'est quoi un snapshot ?</strong>
+    <p>C'est une <strong>photo figée</strong> du dossier complet à un instant précis.
+       Chaque sauvegarde d'avis crée une nouvelle version numérotée (v1, v2, v3…).
+       Toutes les données sont sérialisées en JSON dans des colonnes CLOB.
+       On peut ainsi relire n'importe quelle version passée du dossier.</p>
+  </div>
+
+  <h3>4.1 Structure complète de l'entité CanevasStructureSnapshot</h3>
+
+  <div class="dto">
+    <div class="dto-head">📄 CanevasStructureSnapshot.java — Table CANEVAS_STRUCTURE_SNAPSHOT</div>
+    <div class="dto-body">
+<div style="color:#5c6370;font-style:italic;margin-bottom:.4rem">/* ── Métadonnées ── */</div>
+<div class="dto-field"><span class="dto-type">Long</span>    <span class="dto-name">snapshotId</span>              <span class="dto-comment">// PK — auto-généré (IDENTITY)</span></div>
+<div class="dto-field"><span class="dto-type">Long</span>    <span class="dto-name">canevasId</span>               <span class="dto-comment">// FK vers CANEVAS_AGRICOLE</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">structureCode</span>           <span class="dto-comment">// "AGC", "DR", "DC" (Agence / Dir. Régionale / Dir. Centrale)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">structureLabel</span>          <span class="dto-comment">// Libellé humain (ex: "Agence Tunis Centre")</span></div>
+<div class="dto-field"><span class="dto-type">Integer</span> <span class="dto-name">versionNumber</span>           <span class="dto-comment">// N° version séquentiel (1, 2, 3…)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">statusAtSnapshot</span>        <span class="dto-comment">// Stade canvas au moment du snapshot</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">createdBy</span>               <span class="dto-comment">// Nom d'utilisateur</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">matricule</span>               <span class="dto-comment">// Matricule agent</span></div>
+<div class="dto-field"><span class="dto-type">LocalDateTime</span> <span class="dto-name">createdAt</span>          <span class="dto-comment">// Horodatage (auto SYSTIMESTAMP)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">observations</span>            <span class="dto-comment">// CLOB — commentaires libres</span></div>
+<div style="color:#5c6370;font-style:italic;margin:.5rem 0 .2rem">/* ── Engagements du client principal (Onglet 0) ── */</div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">engagementBnaJson</span>       <span class="dto-comment">// CLOB JSON → List&lt;EngagementBNADTO&gt;</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">engagementBctJson</span>       <span class="dto-comment">// CLOB JSON → List&lt;EngagementBCTDTO&gt;</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">classeBnaJson</span>           <span class="dto-comment">// CLOB JSON → List&lt;ClasseDTO&gt; (3 ans)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">classeBctJson</span>           <span class="dto-comment">// CLOB JSON → List&lt;ClasseDTO&gt; (3 ans)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">classeRetourJson</span>        <span class="dto-comment">// CLOB JSON → List&lt;ClasseBctDTO&gt;</span></div>
+<div style="color:#5c6370;font-style:italic;margin:.5rem 0 .2rem">/* ── EngagementDetaille (Onglets 1-4) ── */</div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">engagementDetailleJson</span>  <span class="dto-comment">// CLOB JSON → EngagementDetailleDto { actionnaires, premierResponsable, groupe, vendeurs }</span></div>
+<div style="color:#5c6370;font-style:italic;margin:.5rem 0 .2rem">/* ── Données métier ── */</div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">donneesCreditsJson</span>      <span class="dto-comment">// CLOB JSON → crédits (CT + INV + Achat Terrain)</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">donneesExploitationJson</span> <span class="dto-comment">// CLOB JSON → sites d'exploitation</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">donneesGarantiesJson</span>    <span class="dto-comment">// CLOB JSON → garanties</span></div>
+<div class="dto-field"><span class="dto-type">String</span>  <span class="dto-name">donneesAvisJson</span>         <span class="dto-comment">// CLOB JSON → données de l'avis (statusAvis, avisValue, dataCredits…)</span></div>
+    </div>
+  </div>
+
+  <h3>4.2 Les deux systèmes de snapshot (Legacy + Nouveau)</h3>
+  <div class="grid">
+    <div class="card cr">
+      <div class="ci">📦</div>
+      <h4>Legacy — table SNAPSHOT</h4>
+      <p>Ancien système. Contient juste <code>engagements</code> en JSON.
+         Utilisé comme fallback si un ancien snapshot existe déjà.</p>
+    </div>
+    <div class="card cg">
+      <div class="ci">📸</div>
+      <h4>Nouveau — CANEVAS_STRUCTURE_SNAPSHOT</h4>
+      <p>Système actuel. Contient toutes les données (engagements + credits + garanties + avis). Version numérotée.</p>
+    </div>
+  </div>
+
+  <h3>4.3 Logique de fallback (legacy vs nouveau)</h3>
+  <pre><span class="cmt">// CanevasSnapshotService.java — dans createSnapshot()</span>
+<span class="cls">String</span> engDetailleJson;
+
+<span class="cmt">// Essai 1 : Lire depuis l'ancienne table SNAPSHOT (legacy)</span>
+engDetailleJson = <span class="fn">buildEngagementDetailleFromLegacy</span>(numSeqPers);
+
+<span class="kw">if</span> (engDetailleJson == <span class="kw">null</span>) {
+    <span class="cmt">// Essai 2 : Construire depuis les données JPA courantes</span>
+    engDetailleJson = <span class="fn">toJson</span>(<span class="fn">buildEngagementDetaille</span>(caneva));
+}</pre>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     5. FLUX COMPLET
+══════════════════════════════════════════════════════ -->
+<section id="flow">
+  <h2>5. Flux complet — Du clic « Sauvegarder » à l'historique</h2>
+
+  <div class="flow">
+    <!-- FRONTEND -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">F1</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Frontend — L'utilisateur clique « Sauvegarder l'Avis »</strong>
+        <p>Fichier : <code>avis.component.ts</code> → méthode <code>saveAvis()</code><br>
+        Construit l'objet <code>AvisDTO</code> avec tous les champs et envoie :</p>
+        <code>POST /api/avis</code>
+      </div>
+    </div>
+
+    <!-- CONTROLLER -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">B1</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Backend — AvisController.saveAvis() reçoit la requête</strong>
+        <p>Fichier : <code>AvisController.java</code> <code>@PostMapping</code><br>
+        Lance en séquence : <strong>①</strong> Save avis → <strong>②</strong> Create snapshot → <strong>③</strong> Log workflow</p>
+      </div>
+    </div>
+
+    <!-- AVIS SERVICE -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot green">B2</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>AvisService.saveAvis() — Étape 1</strong>
+        <p>① Crée ou met à jour l'entité <code>Avis</code> en base (<code>AVIS_AGRICOLE</code>)<br>
+        ② Sérialise les données crédit en JSON CLOB (<code>dataAchatTerrain</code>, <code>dataCreditInvestissement</code>…)<br>
+        ③ Met à jour le <code>stade</code> du canvas selon le <code>statusAvis</code></p>
+      </div>
+    </div>
+
+    <!-- SNAPSHOT SERVICE -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>CanevasSnapshotService.createSnapshot() — Étape 2</strong>
+        <p>C'est ici que tout le chargement d'engagements se fait. Voir détail ci-dessous.</p>
+      </div>
+    </div>
+
+    <!-- VERSION -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3a</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Calcul du numéro de version</strong>
+        <p>Récupère <code>MAX(versionNumber)</code> pour ce canevasId → <code>nextVersion = max + 1</code> (ou 1 si premier snapshot)</p>
+      </div>
+    </div>
+
+    <!-- ENGAGEMENT PRINCIPAL -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3b</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Chargement engagements client PRINCIPAL (Onglet 0)</strong>
+        <p>Appel : <code>engagementService.getListeEngagementClient(numSeqPers)</code><br>
+        → <code>engagementBnaJson</code> ← 8 types BNA<br>
+        → <code>engagementBctJson</code> ← BCT<br>
+        → <code>classeBnaJson</code>, <code>classeBctJson</code>, <code>classeRetourJson</code></p>
+      </div>
+    </div>
+
+    <!-- ENGAGEMENT DETAILLE -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3c</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Chargement EngagementDetaillé (Onglets 1-4)</strong>
+        <p>Appel : <code>buildEngagementDetaille(caneva)</code><br>
+        → Actionnaires : lit <code>ASSOCIE</code> → pour chacun, appel Oracle BNA/BCT<br>
+        → Responsable : lit <code>CLIENT_CANVAS</code> → appel Oracle BNA/BCT<br>
+        → Vendeurs : lit <code>caneva.getCreditAchatTerrains().getVendeurs()</code> → appel Oracle BNA/BCT<br>
+        → Groupe : ⚠️ liste vide pour l'instant<br>
+        → Sérialisé en JSON → <code>engagementDetailleJson</code></p>
+      </div>
+    </div>
+
+    <!-- CREDITS/EXPLOITATION -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3d</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Chargement données métier</strong>
+        <p><code>buildCreditsJson(caneva)</code> → crédits CT + investissement + achat terrain<br>
+        <code>buildExploitationJson(caneva)</code> → sites<br>
+        <code>buildGarantiesJson(caneva)</code> → garanties</p>
+      </div>
+    </div>
+
+    <!-- PERSIST -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3e</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Persistance du Snapshot</strong>
+        <p>Crée l'entité <code>CanevasStructureSnapshot</code> via <code>@Builder</code> et sauvegarde en base via <code>snapshotRepository.save()</code></p>
+      </div>
+    </div>
+
+    <!-- MAJ CANVAS -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot orange">B3f</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>Mise à jour du Canvas</strong>
+        <p><code>caneva.setCurrentVersion(nextVersion)</code><br>
+        <code>caneva.setCurrentStructure(structureCode)</code><br>
+        <code>caneva.setLastSnapshotId(saved.getSnapshotId())</code></p>
+      </div>
+    </div>
+
+    <!-- WORKFLOW LOG -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot red">B4</div><div class="fline"></div></div>
+      <div class="fcontent">
+        <strong>WorkflowLog — Étape 3</strong>
+        <p>Crée une entrée dans <code>CANEVAS_WORKFLOW_LOG</code> pour tracer la transition.</p>
+      </div>
+    </div>
+
+    <!-- RETOUR FRONTEND -->
+    <div class="fstep">
+      <div class="fleft"><div class="fdot">F2</div></div>
+      <div class="fcontent">
+        <strong>Retour au Frontend</strong>
+        <p>Retourne <code>SnapshotResponseDto { snapshotId, versionNumber, structureCode }</code><br>
+        Le frontend affiche un message de succès.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     6. BASE DE DONNÉES
+══════════════════════════════════════════════════════ -->
+<section id="bdd">
+  <h2>6. Base de données — Toutes les tables impliquées</h2>
+
+  <h3>6.1 Table principale : CANEVAS_STRUCTURE_SNAPSHOT</h3>
+  <pre><span class="cmt">-- Table créée par migration Flyway</span>
+<span class="kw">CREATE TABLE</span> <span class="cls">CANEVAS_STRUCTURE_SNAPSHOT</span> (
+    snapshot_id               <span class="cls">NUMBER</span>        <span class="kw">GENERATED ALWAYS AS IDENTITY</span> <span class="kw">PRIMARY KEY</span>,
+    canevas_id                <span class="cls">NUMBER</span>        <span class="kw">NOT NULL</span>,     <span class="cmt">-- FK → CANEVAS_AGRICOLE</span>
+    structure_code            <span class="cls">VARCHAR2</span>(<span class="num">20</span>),              <span class="cmt">-- "AGC", "DR", "DC"</span>
+    structure_label           <span class="cls">VARCHAR2</span>(<span class="num">255</span>),
+    version_number            <span class="cls">NUMBER</span>,                   <span class="cmt">-- 1, 2, 3, 4…</span>
+    status_at_snapshot        <span class="cls">VARCHAR2</span>(<span class="num">50</span>),              <span class="cmt">-- Stade au moment du snapshot</span>
+    created_by                <span class="cls">VARCHAR2</span>(<span class="num">100</span>),
+    matricule                 <span class="cls">VARCHAR2</span>(<span class="num">20</span>),
+    created_at                <span class="cls">TIMESTAMP</span>     <span class="kw">DEFAULT</span> <span class="fn">SYSTIMESTAMP</span>,
+    observations              <span class="cls">CLOB</span>,
+
+    <span class="cmt">-- Onglet 0 : Client principal</span>
+    engagement_bna_json       <span class="cls">CLOB</span>,         <span class="cmt">-- List&lt;EngagementBNADTO&gt; en JSON</span>
+    engagement_bct_json       <span class="cls">CLOB</span>,         <span class="cmt">-- List&lt;EngagementBCTDTO&gt; en JSON</span>
+    classe_bna_json           <span class="cls">CLOB</span>,         <span class="cmt">-- List&lt;ClasseDTO&gt; en JSON</span>
+    classe_bct_json           <span class="cls">CLOB</span>,         <span class="cmt">-- List&lt;ClasseDTO&gt; en JSON</span>
+    classe_retour_json        <span class="cls">CLOB</span>,         <span class="cmt">-- List&lt;ClasseBctDTO&gt; en JSON</span>
+
+    <span class="cmt">-- Onglets 1-4 : Parties liées</span>
+    engagement_detaille_json  <span class="cls">CLOB</span>,         <span class="cmt">-- EngagementDetailleDto en JSON</span>
+
+    <span class="cmt">-- Données métier</span>
+    donnees_credits_json      <span class="cls">CLOB</span>,         <span class="cmt">-- Crédits résumés</span>
+    donnees_exploitation_json <span class="cls">CLOB</span>,         <span class="cmt">-- Sites d'exploitation</span>
+    donnees_garanties_json    <span class="cls">CLOB</span>,         <span class="cmt">-- Garanties</span>
+    donnees_avis_json         <span class="cls">CLOB</span>          <span class="cmt">-- Données avis complet</span>
+);
+<span class="kw">CREATE INDEX</span> IX_CANEVAS_SNAP <span class="kw">ON</span> <span class="cls">CANEVAS_STRUCTURE_SNAPSHOT</span>(canevas_id, version_number);</pre>
+
+  <h3>6.2 Toutes les tables lues lors de la création d'un snapshot</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Table</th><th>Schéma</th><th>Données récupérées</th><th>Champ snapshot</th></tr></thead>
+      <tbody>
+        <tr><td><code>AVIS_AGRICOLE</code></td><td>Local</td><td>L'avis sauvegardé</td><td><code>donneesAvisJson</code></td></tr>
+        <tr><td><code>CANEVAS_AGRICOLE</code></td><td>Local</td><td>Le canvas, numSeqPers, crédits liés</td><td>Métadonnées</td></tr>
+        <tr><td><code>ASSOCIE</code></td><td>Local</td><td>Liste des actionnaires (numSeqPers, cin, %)</td><td><code>engagementDetailleJson.actionnaires</code></td></tr>
+        <tr><td><code>CLIENT_CANVAS</code></td><td>Local</td><td>Données 1er responsable (nom, cin)</td><td><code>engagementDetailleJson.premierResponsable</code></td></tr>
+        <tr><td><code>CREDIT_ACHAT_TERRAIN</code></td><td>Local</td><td>Crédits terrain → vendeurs</td><td><code>engagementDetailleJson.vendeurs</code></td></tr>
+        <tr><td><code>VENDEUR</code></td><td>Local</td><td>Vendeurs avec numseqpers</td><td><code>engagementDetailleJson.vendeurs</code></td></tr>
+        <tr><td><code>SAEB.ENGAG_COTE</code> etc.</td><td>SAEB</td><td>Engagements BNA (8 types)</td><td><code>engagementBnaJson</code> + dans <code>engagementDetailleJson</code></td></tr>
+        <tr><td><code>BI_USER.RETOUR_ENGAGEMENT_BCT</code></td><td>BI</td><td>Engagements BCT</td><td><code>engagementBctJson</code></td></tr>
+        <tr><td><code>SAEB.HIST_CLASS_BNA</code></td><td>SAEB</td><td>Classifications BNA 3 ans</td><td><code>classeBnaJson</code></td></tr>
+        <tr><td><code>BI_USER.RETOUR_CLASSE_BCT</code></td><td>BI</td><td>Classifications BCT 3 ans</td><td><code>classeBctJson</code></td></tr>
+        <tr><td><code>SITES</code></td><td>Local</td><td>Sites d'exploitation</td><td><code>donneesExploitationJson</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     7. BACKEND EN DÉTAIL
+══════════════════════════════════════════════════════ -->
+<section id="backend">
+  <h2>7. Backend — Tous les fichiers et leur rôle exact</h2>
+
+  <div class="impl-step">
+    <div class="impl-title">① AvisController.java</div>
+    <span class="impl-file">backend-saeb/src/main/java/net/kachout/saeb/web/AvisController.java</span>
+    <p>Point d'entrée HTTP. Orchestre la séquence : avis → snapshot → log.</p>
+    <pre><span class="ann">@PostMapping</span>
+<span class="kw">public</span> <span class="cls">ResponseEntity</span>&lt;<span class="cls">AvisDTO</span>&gt; <span class="fn">saveAvis</span>(<span class="ann">@RequestBody</span> <span class="cls">AvisDTO</span> avisDTO) {
+    <span class="cmt">// Étape 1 : Sauvegarder l'avis</span>
+    <span class="cls">AvisDTO</span> savedAvis = avisService.<span class="fn">saveAvis</span>(avisDTO);
+
+    <span class="cmt">// Étape 2 : Résoudre le statut snapshot</span>
+    <span class="cls">String</span> statusAtSnapshot = <span class="fn">resolveStatusAtSnapshot</span>(
+        avisDTO.<span class="fn">getStatusAvis</span>(),
+        avisDTO.<span class="fn">getAvisValue</span>()
+    );
+
+    <span class="cmt">// Étape 3 : Créer le snapshot</span>
+    <span class="cls">SnapshotResponseDto</span> snap = snapshotService.<span class="fn">createSnapshot</span>(
+        avisDTO.<span class="fn">getNumCaneva</span>(),        <span class="cmt">// ID du canvas</span>
+        avisDTO.<span class="fn">getStructure</span>(),         <span class="cmt">// Code structure émettrice</span>
+        avisDTO.<span class="fn">getStructureLabel</span>(),    <span class="cmt">// Libellé structure</span>
+        avisDTO.<span class="fn">getMatricule</span>(),         <span class="cmt">// Matricule agent</span>
+        <span class="fn">getCurrentUsername</span>(),            <span class="cmt">// Nom utilisateur Spring Security</span>
+        avisDTO.<span class="fn">getCommentaire</span>(),       <span class="cmt">// Observations</span>
+        statusAtSnapshot,                <span class="cmt">// Stade résolu</span>
+        objectMapper.<span class="fn">writeValueAsString</span>(avisDTO) <span class="cmt">// Avis complet en JSON</span>
+    );
+
+    <span class="cmt">// Étape 4 : Logger le workflow</span>
+    workflowLogService.<span class="fn">log</span>(avisDTO.<span class="fn">getNumCaneva</span>(), statusAtSnapshot, snap.<span class="fn">getSnapshotId</span>());
+
+    <span class="kw">return</span> <span class="cls">ResponseEntity</span>.<span class="fn">ok</span>(savedAvis);
+}
+
+<span class="cmt">// Mapping statusAvis → statusAtSnapshot</span>
+<span class="kw">private</span> <span class="cls">String</span> <span class="fn">resolveStatusAtSnapshot</span>(<span class="cls">String</span> statusAvis, <span class="cls">String</span> avisValue) {
+    <span class="kw">return switch</span> (statusAvis) {
+        <span class="kw">case</span> <span class="str">"PEC_CCA"</span>        -> <span class="str">"PEC_DONNEE"</span>;
+        <span class="kw">case</span> <span class="str">"PRES_VALIDER"</span>  -> <span class="str">"VALID_DONNEE"</span>;
+        <span class="kw">case</span> <span class="str">"CORRIGER"</span>      -> <span class="str">"CORRIGE_DONNEE"</span>;
+        <span class="kw">case</span> <span class="str">"PEC_AVIS_DEC"</span>  -> <span class="str">"PEC_AVIS_DEC"</span>;
+        <span class="kw">case</span> <span class="str">"VALIDER"</span>       -> <span class="str">"VALIDER_DR"</span>;
+        <span class="kw">case</span> <span class="str">"Envoyer"</span>       -> <span class="str">"EN_COURS_ETUDE"</span>;
+        <span class="kw">case</span> <span class="str">"Décision Finale"</span> ->
+            <span class="str">"1"</span>.equals(avisValue) ? <span class="str">"DEC_FINAL_PRISE_ACCORD"</span> : <span class="str">"DEC_FINAL_PRISE_REJET"</span>;
+        <span class="kw">default</span> -> statusAvis;
+    };
+}</pre>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">② CanevasSnapshotService.java — Méthode createSnapshot()</div>
+    <span class="impl-file">backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java</span>
+    <pre><span class="ann">@Transactional</span>
+<span class="kw">public</span> <span class="cls">SnapshotResponseDto</span> <span class="fn">createSnapshot</span>(
+        <span class="cls">Long</span> canevasId, <span class="cls">String</span> structureCode, <span class="cls">String</span> structureLabel,
+        <span class="cls">String</span> matricule, <span class="cls">String</span> createdBy, <span class="cls">String</span> observations,
+        <span class="cls">String</span> statusAtSnapshot, <span class="cls">String</span> avisJson) {
+
+    <span class="cmt">// 1. Numéro de version</span>
+    <span class="cls">Integer</span> nextVersion = snapshotRepo
+        .<span class="fn">findMaxVersionByCanevasId</span>(canevasId)
+        .<span class="fn">map</span>(v -> v + <span class="num">1</span>)
+        .<span class="fn">orElse</span>(<span class="num">1</span>);
+
+    <span class="cmt">// 2. Charger le canvas</span>
+    <span class="cls">Caneva</span> caneva = canevaRepository.<span class="fn">findById</span>(canevasId)
+        .<span class="fn">orElseThrow</span>(() -> <span class="kw">new</span> <span class="cls">RuntimeException</span>(<span class="str">"Canvas non trouvé"</span>));
+    <span class="cls">String</span> numSeqPersStr = <span class="cls">String</span>.<span class="fn">valueOf</span>(caneva.<span class="fn">getNumSeqpers</span>());
+
+    <span class="cmt">// 3. Engagements client principal</span>
+    <span class="cls">EngagementDTO</span> engagement    = <span class="fn">loadEngagementSafe</span>(numSeqPersStr);
+    <span class="cls">List</span>&lt;<span class="cls">ClasseDTO</span>&gt; classeBNA  = <span class="fn">loadClasseBNASafe</span>(numSeqPersStr);
+    <span class="cls">List</span>&lt;<span class="cls">ClasseDTO</span>&gt; classeBCT  = <span class="fn">loadClasseBCTSafe</span>(numSeqPersStr);
+    <span class="cls">List</span>&lt;<span class="cls">ClasseBctDTO</span>&gt; classeRetour = <span class="fn">loadClasseRetourBCTSafe</span>(numSeqPersStr);
+
+    <span class="cmt">// 4. EngagementDetaillé (actionnaires + responsable + vendeurs + groupe)</span>
+    <span class="cls">String</span> engDetailleJson = <span class="fn">buildEngagementDetailleFromLegacy</span>(caneva.<span class="fn">getNumSeqpers</span>().longValue());
+    <span class="kw">if</span> (engDetailleJson == <span class="kw">null</span>) {
+        engDetailleJson = <span class="fn">toJson</span>(<span class="fn">buildEngagementDetaille</span>(caneva));
+    }
+
+    <span class="cmt">// 5. Données métier</span>
+    <span class="cls">String</span> creditsJson    = <span class="fn">buildCreditsJson</span>(caneva);
+    <span class="cls">String</span> exploitJson    = <span class="fn">buildExploitationJson</span>(caneva);
+    <span class="cls">String</span> garantiesJson  = <span class="fn">buildGarantiesJson</span>(caneva);
+
+    <span class="cmt">// 6. Construction et persistance du snapshot</span>
+    <span class="cls">CanevasStructureSnapshot</span> snapshot = <span class="cls">CanevasStructureSnapshot</span>.builder()
+        .canevasId(canevasId)
+        .structureCode(structureCode)
+        .structureLabel(structureLabel)
+        .versionNumber(nextVersion)
+        .statusAtSnapshot(statusAtSnapshot)
+        .matricule(matricule)
+        .createdBy(createdBy)
+        .observations(observations)
+        .engagementBnaJson(<span class="fn">toJson</span>(engagement.<span class="fn">getListeEngagementBNA</span>()))
+        .engagementBctJson(<span class="fn">toJson</span>(engagement.<span class="fn">getListeEngagementBCT</span>()))
+        .classeBnaJson(<span class="fn">toJson</span>(classeBNA))
+        .classeBctJson(<span class="fn">toJson</span>(classeBCT))
+        .classeRetourJson(<span class="fn">toJson</span>(classeRetour))
+        .engagementDetailleJson(engDetailleJson)
+        .donneesCreditsJson(creditsJson)
+        .donneesExploitationJson(exploitJson)
+        .donneesGarantiesJson(garantiesJson)
+        .donneesAvisJson(avisJson)
+        .<span class="fn">build</span>();
+
+    <span class="cls">CanevasStructureSnapshot</span> saved = snapshotRepo.<span class="fn">save</span>(snapshot);
+
+    <span class="cmt">// 7. Mise à jour du canvas</span>
+    caneva.<span class="fn">setCurrentVersion</span>(nextVersion);
+    caneva.<span class="fn">setCurrentStructure</span>(structureCode);
+    caneva.<span class="fn">setLastSnapshotId</span>(saved.<span class="fn">getSnapshotId</span>());
+    canevaRepository.<span class="fn">save</span>(caneva);
+
+    <span class="kw">return new</span> <span class="cls">SnapshotResponseDto</span>(saved.<span class="fn">getSnapshotId</span>(), nextVersion, structureCode);
+}</pre>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">③ Endpoints de lecture du snapshot (historique)</div>
+    <span class="impl-file">backend-saeb/.../web/SnapshotController.java</span>
+    <div class="ep"><span class="epm get">GET</span><span class="epu">/api/snapshots/{canevasId}/history</span><span class="epd">Liste légère de toutes les versions (SnapshotSummaryDto)</span></div>
+    <div class="ep"><span class="epm get">GET</span><span class="epu">/api/snapshots/{canevasId}/{snapshotId}</span><span class="epd">Snapshot complet avec tous les CLOB désérialisés (SnapshotDetailDto)</span></div>
+    <div class="ep"><span class="epm get">GET</span><span class="epu">/api/snapshots/{canevasId}/workflow-log</span><span class="epd">Historique du workflow (audit trail)</span></div>
+    <div class="ep"><span class="epm get">GET</span><span class="epu">/api/snapshots/{canevasId}/latest</span><span class="epd">Dernier snapshot créé</span></div>
+
+    <pre><span class="cmt">// SnapshotDetailDto — objet retourné par GET /api/snapshots/{canevasId}/{snapshotId}</span>
+{
+    snapshotId:          <span class="num">42</span>,
+    versionNumber:       <span class="num">3</span>,
+    structureCode:       <span class="str">"AGC_001"</span>,
+    statusAtSnapshot:    <span class="str">"VALID_DONNEE"</span>,
+    createdAt:           <span class="str">"2025-11-14T10:30:00"</span>,
+
+    <span class="cmt">// Engagements onglet 0 — désérialisés depuis JSON</span>
+    engagementsBNA:      [...],   <span class="cmt">// List&lt;EngagementBNADTO&gt;</span>
+    engagementsBCT:      [...],   <span class="cmt">// List&lt;EngagementBCTDTO&gt;</span>
+    classeBNA:           [...],
+    classeBCT:           [...],
+
+    <span class="cmt">// Engagements onglets 1-4</span>
+    engagementDetaille: {
+        actionnaires:      [...],  <span class="cmt">// List&lt;EngagementPartieDto&gt;</span>
+        premierResponsable:{...},  <span class="cmt">// EngagementPartieDto</span>
+        groupe:            [],     <span class="cmt">// ⚠️ vide pour l'instant</span>
+        vendeurs:          [...]   <span class="cmt">// List&lt;EngagementPartieDto&gt;</span>
+    },
+
+    <span class="cmt">// Données métier</span>
+    creditsData:         {...},
+    exploitationData:    {...},
+    garantiesData:       {...},
+    avisData:            {...}
+}</pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     8. FRONTEND EN DÉTAIL
+══════════════════════════════════════════════════════ -->
+<section id="frontend">
+  <h2>8. Frontend — Lecture de l'historique des snapshots</h2>
+
+  <h3>8.1 Composant snapshot-history</h3>
+  <p>Fichier : <code>frontend-app1/src/app/_components/pages/canvas.agricole/snapshot-history/snapshot-history.component.ts</code></p>
+  <pre><span class="cmt">// ngOnInit() — Chargement au démarrage</span>
+<span class="fn">ngOnInit</span>() {
+    <span class="kw">const</span> canevasId = <span class="kw">this</span>.canevasAgrService.currentCanevasId();
+
+    <span class="cmt">// 1. Charger la liste légère (versions + dates)</span>
+    <span class="kw">this</span>.snapshotService.<span class="fn">getHistory</span>(canevasId)
+        .<span class="fn">subscribe</span>(history => {
+            <span class="kw">this</span>.snapshots = history; <span class="cmt">// SnapshotSummaryDto[]</span>
+        });
+
+    <span class="cmt">// 2. Charger le log workflow</span>
+    <span class="kw">this</span>.snapshotService
+        .<span class="fn">getWorkflowLog</span>(canevasId, <span class="kw">this</span>.typeStructure, <span class="kw">this</span>.codeStructure)
+        .<span class="fn">subscribe</span>(logs => {
+            <span class="kw">this</span>.workflowLogs = logs;
+        });
+}
+
+<span class="cmt">// Ouvrir un snapshot spécifique (clic sur une version)</span>
+<span class="fn">openSnapshot</span>(snap: <span class="cls">SnapshotSummaryDto</span>) {
+    <span class="kw">this</span>.snapshotService
+        .<span class="fn">getBySnapshotId</span>(canevasId, snap.snapshotId)
+        .<span class="fn">subscribe</span>(detail => {
+            <span class="kw">this</span>.selectedSnapshot = detail; <span class="cmt">// SnapshotDetailDto complet</span>
+            <span class="cmt">// On peut maintenant afficher:</span>
+            <span class="cmt">// detail.engagementsBNA → tableau engagements onglet 0</span>
+            <span class="cmt">// detail.engagementDetaille.actionnaires → onglet 1</span>
+            <span class="cmt">// detail.engagementDetaille.premierResponsable → onglet 2</span>
+            <span class="cmt">// detail.engagementDetaille.vendeurs → onglet 4</span>
+        });
+}
+
+<span class="cmt">// Mode comparaison (comparer deux versions)</span>
+<span class="fn">openCompare</span>(snap: <span class="cls">SnapshotSummaryDto</span>) {
+    <span class="kw">this</span>.snapshotService
+        .<span class="fn">getBySnapshotId</span>(canevasId, snap.snapshotId)
+        .<span class="fn">subscribe</span>(oldSnap => {
+            <span class="kw">this</span>.leftSnapshot  = oldSnap;
+            <span class="kw">this</span>.rightSnapshot = <span class="kw">this</span>.latestSnapshot;
+            <span class="cmt">// Afficher les différences côte à côte</span>
+        });
+}</pre>
+
+  <h3>8.2 Affichage de l'historique (template)</h3>
+  <pre><span class="cmt">&lt;!-- snapshot-history.component.html — Liste des versions --&gt;</span>
+&lt;<span class="fn">p-timeline</span> [value]="snapshots"&gt;
+  &lt;<span class="fn">ng-template</span> pTemplate="content" <span class="kw">let-snap</span>&gt;
+    &lt;<span class="fn">div</span> class="snap-card"&gt;
+      &lt;<span class="fn">span</span>&gt;Version {{ snap.versionNumber }}&lt;/<span class="fn">span</span>&gt;
+      &lt;<span class="fn">span</span>&gt;{{ snap.statusAtSnapshot }}&lt;/<span class="fn">span</span>&gt;
+      &lt;<span class="fn">span</span>&gt;{{ snap.createdAt | date:'dd/MM/yyyy HH:mm' }}&lt;/<span class="fn">span</span>&gt;
+      &lt;<span class="fn">button</span> (click)="openSnapshot(snap)"&gt;Voir&lt;/<span class="fn">button</span>&gt;
+      &lt;<span class="fn">button</span> (click)="openCompare(snap)"&gt;Comparer&lt;/<span class="fn">button</span>&gt;
+    &lt;/<span class="fn">div</span>&gt;
+  &lt;/<span class="fn">ng-template</span>&gt;
+&lt;/<span class="fn">p-timeline</span>&gt;
+
+<span class="cmt">&lt;!-- Affichage du snapshot sélectionné --&gt;</span>
+&lt;<span class="fn">div</span> *ngIf="selectedSnapshot"&gt;
+  <span class="cmt">&lt;!-- Onglet 0 : Engagements client principal --&gt;</span>
+  &lt;<span class="fn">app-engagement-bct-bna</span>
+    [engagement]="{
+      listeEngagementBNA: selectedSnapshot.engagementsBNA,
+      listeEngagementBCT: selectedSnapshot.engagementsBCT,
+      classeBNA: selectedSnapshot.classeBNA
+    }"&gt;
+  &lt;/<span class="fn">app-engagement-bct-bna</span>&gt;
+
+  <span class="cmt">&lt;!-- Onglets 1-4 : Parties liées --&gt;</span>
+  &lt;<span class="fn">div</span> *ngFor="let actionnaire of selectedSnapshot.engagementDetaille.actionnaires"&gt;
+    &lt;<span class="fn">h4</span>&gt;{{ actionnaire.nom }} ({{ actionnaire.partCapital }}%)&lt;/<span class="fn">h4</span>&gt;
+    &lt;<span class="fn">app-engagement-bct-bna</span>
+      [engagement]="{
+        listeEngagementBNA: actionnaire.engagementsBNA,
+        listeEngagementBCT: actionnaire.engagementsBCT
+      }"&gt;
+    &lt;/<span class="fn">app-engagement-bct-bna</span>&gt;
+  &lt;/<span class="fn">div</span>&gt;
+&lt;/<span class="fn">div</span>&gt;</pre>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     9. IMPLEMENTER
+══════════════════════════════════════════════════════ -->
+<section id="implementer">
+  <h2>9. Comment implémenter — Étapes concrètes pour un débutant</h2>
+
+  <p>Voici les étapes dans l'ordre pour comprendre et implémenter le système complet :</p>
+
+  <div class="impl-step">
+    <div class="impl-title">
+      <span class="step-label" style="background:var(--blue);color:#fff">1</span>
+      Vérifier que le backend crée bien le snapshot à chaque sauvegarde d'avis
+    </div>
+    <span class="impl-file">AvisController.java — @PostMapping</span>
+    <p>S'assurer que l'appel <code>snapshotService.createSnapshot(...)</code> est bien présent
+       après <code>avisService.saveAvis(avisDTO)</code>. Si ce n'est pas le cas, ajouter l'appel.
+       Vérifier aussi que <code>avisJson</code> contient bien le JSON complet de l'avis.</p>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">
+      <span class="step-label" style="background:var(--green);color:#fff">2</span>
+      Vérifier le chargement des actionnaires dans buildEngagementDetaille()
+    </div>
+    <span class="impl-file">CanevasSnapshotService.java — buildEngagementDetaille()</span>
+    <p>S'assurer que <code>associeRepository.findAssociesByNumSeqPers(numSeqPers)</code> retourne
+       bien les associés du canvas. Chaque associé avec un <code>numSeqPers</code> non-null doit
+       avoir ses engagements BNA + BCT chargés via <code>loadEngagementSafe()</code>.</p>
+    <pre><span class="cmt">// Vérifier que ce code existe et fonctionne</span>
+<span class="cls">List</span>&lt;<span class="cls">Associe</span>&gt; associes = associeRepository.<span class="fn">findAssociesByNumSeqPers</span>(numSeqPers);
+<span class="cmt">// Si vide → vérifier que les associés sont bien en base pour ce numSeqPers</span></pre>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">
+      <span class="step-label" style="background:var(--green);color:#fff">3</span>
+      Vérifier le chargement du 1er Responsable
+    </div>
+    <span class="impl-file">CanevasSnapshotService.java + ClientCanvasRepository.java</span>
+    <p>Le responsable est chargé via <code>clientCanvasRepository.findByNumSeqpers(numSeqPers)</code>.
+       Il faut que <code>ClientCanvas</code> ait bien les champs <code>nomResponsable</code>,
+       <code>prenomResponsable</code>, <code>cinResponsable</code> remplis pour ce client.</p>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">
+      <span class="step-label" style="background:var(--green);color:#fff">4</span>
+      Vérifier le chargement des vendeurs
+    </div>
+    <span class="impl-file">CanevasSnapshotService.java — caneva.getCreditAchatTerrains()</span>
+    <p>Les vendeurs sont récupérés depuis les crédits achat terrain du canvas.
+       Vérifier que la relation JPA est bien chargée (<code>@OneToMany</code> avec <code>FetchType.EAGER</code>
+       ou dans une <code>@Transactional</code>).</p>
+    <pre><span class="cmt">// Vérifier les relations JPA dans Caneva.java</span>
+<span class="ann">@OneToMany</span>(mappedBy = <span class="str">"caneva"</span>, fetch = <span class="cls">FetchType</span>.LAZY, cascade = <span class="cls">CascadeType</span>.ALL)
+<span class="kw">private</span> <span class="cls">List</span>&lt;<span class="cls">CreditAchatTerrain</span>&gt; creditAchatTerrains;
+
+<span class="cmt">// Et dans CreditAchatTerrain.java :</span>
+<span class="ann">@OneToMany</span>(mappedBy = <span class="str">"credit"</span>, fetch = <span class="cls">FetchType</span>.LAZY)
+<span class="kw">private</span> <span class="cls">List</span>&lt;<span class="cls">Vendeur</span>&gt; vendeurs;
+
+<span class="cmt">// ⚠️ Si LAZY, il faut être dans une @Transactional pour charger les vendeurs</span></pre>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">
+      <span class="step-label" style="background:var(--orange);color:#fff">5</span>
+      Tester la création du snapshot
+    </div>
+    <p>Depuis Postman ou le frontend, sauvegarder un avis et vérifier en base :</p>
+    <pre><span class="cmt">-- Vérifier qu'un snapshot a été créé</span>
+<span class="kw">SELECT</span> snapshot_id, canevas_id, version_number, status_at_snapshot, created_at
+<span class="kw">FROM</span> CANEVAS_STRUCTURE_SNAPSHOT
+<span class="kw">WHERE</span> canevas_id = <span class="num">:votreCanevasId</span>
+<span class="kw">ORDER BY</span> version_number <span class="kw">DESC</span>;
+
+<span class="cmt">-- Vérifier que engagement_detaille_json n'est pas null</span>
+<span class="kw">SELECT</span> engagement_detaille_json
+<span class="kw">FROM</span> CANEVAS_STRUCTURE_SNAPSHOT
+<span class="kw">WHERE</span> snapshot_id = <span class="num">:votreDernierSnapshotId</span>;</pre>
+  </div>
+
+  <div class="impl-step">
+    <div class="impl-title">
+      <span class="step-label" style="background:var(--orange);color:#fff">6</span>
+      Vérifier la lecture côté Frontend
+    </div>
+    <span class="impl-file">snapshot-history.component.ts</span>
+    <p>Appeler <code>GET /api/snapshots/{canevasId}/history</code> pour voir la liste des versions.
+       Cliquer sur une version pour appeler <code>GET /api/snapshots/{canevasId}/{snapshotId}</code>
+       et vérifier que <code>engagementDetaille</code> dans la réponse contient bien les actionnaires,
+       le responsable, et les vendeurs.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     10. CE QUI MANQUE
+══════════════════════════════════════════════════════ -->
+<section id="manquant">
+  <h2>10. Ce qui manque — Gaps à implémenter</h2>
+
+  <!-- GAP 1 : GROUPE -->
+  <div class="missing">
+    <div class="missing-title">⚠️ GAP 1 — Les membres du Groupe ne sont pas chargés dans le snapshot</div>
+
+    <p><strong>Problème :</strong> Dans <code>buildEngagementDetaille()</code>, la liste <code>groupe</code>
+       est toujours vide :</p>
+    <pre>.groupe(<span class="cls">List</span>.of()) <span class="cmt">// ← NON IMPLÉMENTÉ</span></pre>
+
+    <p><strong>Solution :</strong> Ajouter le chargement des membres du groupe via REFCLI :</p>
+    <pre><span class="cmt">// CanevasSnapshotService.java — dans buildEngagementDetaille()</span>
+
+<span class="cmt">// ── GROUPE (Onglet 3) — À IMPLÉMENTER ───────────────</span>
+<span class="cls">List</span>&lt;<span class="cls">EngagementPartieDto</span>&gt; groupeMembers = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+
+<span class="cmt">// Étape 1 : Récupérer le code groupe du client</span>
+<span class="cls">String</span> codGrpGrp = clientRepository.<span class="fn">findCodGrpByNumSeqPers</span>(numSeqPers);
+
+<span class="kw">if</span> (codGrpGrp != <span class="kw">null</span>) {
+    <span class="cmt">// Étape 2 : Récupérer tous les membres du groupe</span>
+    <span class="cls">List</span>&lt;<span class="cls">GroupeDTO</span>&gt; membres = clientService.<span class="fn">getListeGroupesByNumGRP</span>(codGrpGrp);
+
+    <span class="cmt">// Étape 3 : Pour chaque membre, charger ses engagements</span>
+    groupeMembers = membres.stream()
+        .<span class="fn">filter</span>(m -> m.<span class="fn">getNumSeqPers</span>() != <span class="kw">null</span>)
+        .<span class="fn">map</span>(m -> {
+            <span class="cls">EngagementDTO</span> eng = <span class="fn">loadEngagementSafe</span>(m.<span class="fn">getNumSeqPers</span>());
+            <span class="cls">List</span>&lt;<span class="cls">ClasseDTO</span>&gt; bna = <span class="fn">loadClasseBNASafe</span>(m.<span class="fn">getNumSeqPers</span>());
+            <span class="kw">return</span> <span class="cls">EngagementPartieDto</span>.builder()
+                .typePartie(<span class="str">"GROUPE"</span>)
+                .nom(m.<span class="fn">getRelation</span>())
+                .cin(m.<span class="fn">getIdentifiant</span>())
+                .numSeqPers(<span class="cls">Long</span>.<span class="fn">valueOf</span>(m.<span class="fn">getNumSeqPers</span>()))
+                .formeJuridique(m.<span class="fn">getFormeJuridique</span>())
+                .engagementsBNA(eng.<span class="fn">getListeEngagementBNA</span>())
+                .engagementsBCT(eng.<span class="fn">getListeEngagementBCT</span>())
+                .classeBNA(bna)
+                .<span class="fn">build</span>();
+        })
+        .<span class="fn">collect</span>(<span class="cls">Collectors</span>.toList());
+}
+
+<span class="cmt">// Puis dans le return :</span>
+<span class="kw">return</span> <span class="cls">EngagementDetailleDto</span>.builder()
+    .actionnaires(actionnaires)
+    .premierResponsable(premierResponsable)
+    .groupe(groupeMembers)  <span class="cmt">// ← maintenant rempli</span>
+    .vendeurs(vendeurs)
+    .<span class="fn">build</span>();</pre>
+  </div>
+
+  <!-- GAP 2 : CLASSES BCT dans détaillé -->
+  <div class="missing">
+    <div class="missing-title">⚠️ GAP 2 — Les classifications BCT manquent dans EngagementPartieDto des actionnaires</div>
+
+    <p><strong>Problème :</strong> Dans <code>buildEngagementDetaille()</code> pour les actionnaires,
+       seule la <code>classeBNA</code> est chargée. La <code>classeBCT</code> n'est pas ajoutée :</p>
+    <pre>.classeBNA(classeBNA)
+<span class="cmt">// .classeBCT() ← MANQUANT</span></pre>
+
+    <p><strong>Solution :</strong></p>
+    <pre><span class="cls">List</span>&lt;<span class="cls">ClasseDTO</span>&gt; classeBCTActionnaire = <span class="fn">loadClasseBCTSafe</span>(<span class="cls">String</span>.<span class="fn">valueOf</span>(a.<span class="fn">getNumSeqPers</span>()));
+
+<span class="kw">return</span> <span class="cls">EngagementPartieDto</span>.builder()
+    <span class="cmt">// ... autres champs ...</span>
+    .classeBNA(classeBNA)
+    .classeBCT(classeBCTActionnaire)  <span class="cmt">// ← Ajouter cette ligne</span>
+    .<span class="fn">build</span>();</pre>
+  </div>
+
+  <!-- GAP 3 : FRONTEND affichage engagementDetaille depuis snapshot -->
+  <div class="missing">
+    <div class="missing-title">⚠️ GAP 3 — Le Frontend n'affiche pas encore engagementDetaille depuis le snapshot</div>
+
+    <p><strong>Problème :</strong> Le composant <code>snapshot-history.component.html</code> affiche
+       l'engagement du client principal (onglet 0), mais ne montre pas encore les onglets 1-4
+       (actionnaires, responsable, groupe, vendeurs) depuis le snapshot.</p>
+
+    <p><strong>Solution — ajouter dans snapshot-history.component.html :</strong></p>
+    <pre><span class="cmt">&lt;!-- Onglet 1 — Actionnaires depuis le snapshot --&gt;</span>
+&lt;<span class="fn">p-fieldset</span> legend="Actionnaires"&gt;
+  &lt;<span class="fn">div</span> *ngFor="let a of selectedSnapshot?.engagementDetaille?.actionnaires"&gt;
+    &lt;<span class="fn">h4</span>&gt;{{ a.nom }} — Part: {{ a.partCapital }}%&lt;/<span class="fn">h4</span>&gt;
+    &lt;<span class="fn">app-engagement-bct-bna</span>
+      [engagement]="{
+        numSeqPers: a.numSeqPers?.toString(),
+        listeEngagementBNA: a.engagementsBNA,
+        listeEngagementBCT: a.engagementsBCT,
+        classeBNA: a.classeBNA,
+        classeBCT: a.classeBCT
+      }"&gt;
+    &lt;/<span class="fn">app-engagement-bct-bna</span>&gt;
+  &lt;/<span class="fn">div</span>&gt;
+&lt;/<span class="fn">p-fieldset</span>&gt;
+
+<span class="cmt">&lt;!-- Onglet 2 — 1er Responsable depuis le snapshot --&gt;</span>
+&lt;<span class="fn">p-fieldset</span>
+  *ngIf="selectedSnapshot?.engagementDetaille?.premierResponsable"
+  legend="1er Responsable"&gt;
+  &lt;<span class="fn">h4</span>&gt;{{ selectedSnapshot.engagementDetaille.premierResponsable.nom }}&lt;/<span class="fn">h4</span>&gt;
+  &lt;<span class="fn">app-engagement-bct-bna</span>
+    [engagement]="{
+      listeEngagementBNA: selectedSnapshot.engagementDetaille.premierResponsable.engagementsBNA,
+      listeEngagementBCT: selectedSnapshot.engagementDetaille.premierResponsable.engagementsBCT
+    }"&gt;
+  &lt;/<span class="fn">app-engagement-bct-bna</span>&gt;
+&lt;/<span class="fn">p-fieldset</span>&gt;
+
+<span class="cmt">&lt;!-- Onglet 4 — Vendeurs depuis le snapshot --&gt;</span>
+&lt;<span class="fn">p-fieldset</span> legend="Vendeurs"&gt;
+  &lt;<span class="fn">div</span> *ngFor="let v of selectedSnapshot?.engagementDetaille?.vendeurs"&gt;
+    &lt;<span class="fn">h4</span>&gt;{{ v.nom }}&lt;/<span class="fn">h4</span>&gt;
+    &lt;<span class="fn">app-engagement-bct-bna</span>
+      [engagement]="{
+        listeEngagementBNA: v.engagementsBNA,
+        listeEngagementBCT: v.engagementsBCT
+      }"&gt;
+    &lt;/<span class="fn">app-engagement-bct-bna</span>&gt;
+  &lt;/<span class="fn">div</span>&gt;
+&lt;/<span class="fn">p-fieldset</span>&gt;</pre>
+  </div>
+
+  <h3>Résumé des gaps à combler</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Gap</th><th>Fichier à modifier</th><th>Effort estimé</th><th>Priorité</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Groupe non chargé dans EngagementDetaille</td>
+          <td><code>CanevasSnapshotService.java</code> → <code>buildEngagementDetaille()</code></td>
+          <td>~2h</td>
+          <td><span class="badge badge-orange">Haute</span></td>
+        </tr>
+        <tr>
+          <td>classeBCT manquante pour actionnaires/vendeurs</td>
+          <td><code>CanevasSnapshotService.java</code> → <code>buildEngagementDetaille()</code></td>
+          <td>~30min</td>
+          <td><span class="badge badge-yellow">Moyenne</span></td>
+        </tr>
+        <tr>
+          <td>Frontend n'affiche pas engagementDetaille depuis snapshot</td>
+          <td><code>snapshot-history.component.html</code> + <code>.ts</code></td>
+          <td>~3h</td>
+          <td><span class="badge badge-orange">Haute</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     RECAP
+══════════════════════════════════════════════════════ -->
+<section>
+  <h2>11. Récapitulatif visuel — Tout en un schéma</h2>
+
+  <div class="arch">
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  FRONTEND — avis.component.ts                                           │
+  │  saveAvis() → POST /api/avis avec AvisDTO                               │
+  └───────────────────────────────┬─────────────────────────────────────────┘
+                                  │
+                                  ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  BACKEND — AvisController.java @PostMapping /api/avis                   │
+  │  ① avisService.saveAvis()         → AVIS_AGRICOLE (Oracle local)        │
+  │  ② snapshotService.createSnapshot() ←── C'est ici que tout se charge   │
+  │  ③ workflowLogService.log()        → CANEVAS_WORKFLOW_LOG               │
+  └───────────────────────────────┬─────────────────────────────────────────┘
+                                  │
+                                  ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  CanevasSnapshotService.createSnapshot()                                │
+  │                                                                         │
+  │  ① Version = MAX(versionNumber) + 1                                     │
+  │                                                                         │
+  │  ② Engagement client PRINCIPAL ──────────────────────────────────────── │
+  │     getListeEngagementClient(numSeqPers)    → SAEB + SAEBAGR + BI_USER  │
+  │     getHistoriqueClasseBNA(numSeqPers)      → SAEB.HIST_CLASS_BNA       │
+  │     getHistoriqueClasseBCT(numSeqPers)      → BI_USER.RETOUR_CLASSE_BCT │
+  │                                                                         │
+  │  ③ EngagementDetaillé (parties liées) ────────────────────────────────  │
+  │     buildEngagementDetaille(caneva):                                    │
+  │     ├─ ACTIONNAIRES  → ASSOCIE table → pour chacun: Oracle BNA/BCT     │
+  │     ├─ 1er RESP      → CLIENT_CANVAS table → Oracle BNA/BCT            │
+  │     ├─ GROUPE        → ⚠️ VIDE (à implémenter via REFCLI)              │
+  │     └─ VENDEURS      → VENDEUR table → pour chacun: Oracle BNA/BCT     │
+  │                                                                         │
+  │  ④ Données métier                                                       │
+  │     buildCreditsJson()       → CREDIT_ACHAT_TERRAIN + CREDIT_INV       │
+  │     buildExploitationJson()  → SITES                                    │
+  │     buildGarantiesJson()     → Garanties                                │
+  │                                                                         │
+  │  ⑤ PERSIST → CANEVAS_STRUCTURE_SNAPSHOT (versionNumber, tous les JSON) │
+  └───────────────────────────────┬─────────────────────────────────────────┘
+                                  │
+                                  ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  LECTURE DE L'HISTORIQUE                                                │
+  │  GET /api/snapshots/{canevasId}/history     → liste des versions        │
+  │  GET /api/snapshots/{canevasId}/{snapshotId} → snapshot complet         │
+  │                                                                         │
+  │  Frontend — snapshot-history.component.ts                               │
+  │  Affiche: onglet 0 BNA/BCT  |  actionnaires  |  responsable  |vendeurs │
+  └─────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <div class="box bg" style="margin-top:1.2rem">
+    <strong>Pour retenir les 4 points essentiels :</strong>
+    <p>
+      <strong>1.</strong> <code>POST /api/avis</code> → déclenche AUTOMATIQUEMENT la création d'un snapshot.<br>
+      <strong>2.</strong> Le snapshot charge les engagements en Oracle via <code>loadEngagementSafe()</code> pour chaque entité.<br>
+      <strong>3.</strong> Tout est sérialisé en <strong>JSON CLOB</strong> dans <code>CANEVAS_STRUCTURE_SNAPSHOT</code>.<br>
+      <strong>4.</strong> Le groupe (<strong>onglet 3</strong>) n'est pas encore chargé — c'est le principal gap à implémenter.
+    </p>
+  </div>
+</section>
+
+</div><!-- .page -->
+
+<footer style="text-align:center;color:#6c757d;font-size:.78rem;padding:2rem 1rem">
+  PGCANVAS — Guide Snapshot &amp; EngagementDetaillé · Pour développeurs débutants sur ce projet
+</footer>
+</body>
+</html>

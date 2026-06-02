@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Services Fiche d'Étude — Canvas Agricole — Guide Complet</title>
+<style>
+:root{
+  --be:#1B5E20;--be-l:#E8F5E9;--be-m:#A5D6A7;--be-b:#2E7D32;
+  --fe:#0D47A1;--fe-l:#E3F2FD;--fe-m:#90CAF9;--fe-b:#1565C0;
+  --ext:#4A148C;--ext-l:#F3E5F5;--ext-m:#CE93D8;
+  --avis:#E65100;--avis-l:#FFF3E0;--avis-m:#FFB74D;
+  --snap:#AD1457;--snap-l:#FCE4EC;--snap-m:#F48FB1;
+  --gray:#37474F;--border:#DDE3EA;--bg:#F4F6F9;--card:#fff;
+  --code:#0D1117;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1C2833;font-size:13.5px;line-height:1.65}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0D47A1,#1565C0 40%,#1B5E20 80%,#2E7D32);color:#fff;padding:44px 60px}
+.hdr h1{font-size:28px;font-weight:800;margin-bottom:8px}
+.hdr p{opacity:.85;font-size:15px;margin-bottom:14px}
+.tags{display:flex;gap:10px;flex-wrap:wrap}
+.tag{background:rgba(255,255,255,.15);padding:4px 14px;border-radius:20px;font-size:12px}
+
+/* LAYOUT */
+.wrap{max-width:1280px;margin:0 auto;padding:36px 22px}
+
+/* NAV TABS */
+.nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;margin-bottom:28px;flex-wrap:wrap}
+.nav-btn{padding:8px 20px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:transparent;color:var(--gray);transition:all .2s}
+.nav-btn:hover{background:#F4F6F9}
+.nav-btn.active{background:var(--fe-b);color:#fff}
+
+/* SECTIONS */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-bottom:28px}
+.sec-ttl{font-size:18px;font-weight:700;padding-bottom:10px;border-bottom:3px solid;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.sec-ttl.be{color:var(--be-b);border-color:var(--be-b)}
+.sec-ttl.fe{color:var(--fe-b);border-color:var(--fe-b)}
+.sec-ttl.full{color:var(--gray);border-color:var(--gray)}
+.sec-ttl.ext{color:var(--ext);border-color:var(--ext)}
+h3{font-size:14px;font-weight:700;color:var(--gray);margin:18px 0 8px}
+p{margin-bottom:8px;font-size:13px}
+
+/* SERVICE CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin-top:16px}
+.scard{border-radius:12px;overflow:hidden;border:1px solid var(--border);transition:box-shadow .2s}
+.scard:hover{box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.scard-hdr{padding:12px 16px;display:flex;align-items:flex-start;gap:10px}
+.scard-hdr.be{background:var(--be-l);border-bottom:2px solid var(--be-m)}
+.scard-hdr.fe{background:var(--fe-l);border-bottom:2px solid var(--fe-m)}
+.scard-hdr.ext{background:var(--ext-l);border-bottom:2px solid var(--ext-m)}
+.scard-hdr.avis{background:var(--avis-l);border-bottom:2px solid var(--avis-m)}
+.scard-hdr.snap{background:var(--snap-l);border-bottom:2px solid var(--snap-m)}
+.scard-icon{font-size:26px;flex-shrink:0}
+.scard-title{flex:1}
+.scard-title strong{display:block;font-size:14px;font-weight:700}
+.scard-title .file{font-size:11px;font-family:Consolas,monospace;opacity:.7;margin-top:2px}
+.scard-body{padding:14px 16px;font-size:12.5px}
+.scard-desc{color:#455A64;margin-bottom:10px;font-size:12.5px}
+.scard-section{margin-top:10px}
+.scard-section-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#78909C;margin-bottom:5px}
+
+/* Method pills */
+.methods{display:flex;flex-wrap:wrap;gap:4px}
+.method{background:#ECEFF1;border:1px solid #CFD8DC;color:#37474F;padding:2px 8px;border-radius:4px;font-size:11px;font-family:Consolas,monospace}
+
+/* Link badges */
+.links{display:flex;flex-wrap:wrap;gap:4px}
+.link{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.lnk-be{background:var(--be-l);color:var(--be-b);border:1px solid var(--be-m)}
+.lnk-fe{background:var(--fe-l);color:var(--fe-b);border:1px solid var(--fe-m)}
+.lnk-ext{background:var(--ext-l);color:var(--ext);border:1px solid var(--ext-m)}
+.lnk-avis{background:var(--avis-l);color:var(--avis);border:1px solid var(--avis-m)}
+.lnk-snap{background:var(--snap-l);color:var(--snap);border:1px solid var(--snap-m)}
+.lnk-db{background:#ECEFF1;color:#37474F;border:1px solid #B0BEC5}
+
+/* URL badges */
+.urls{display:flex;flex-direction:column;gap:3px}
+.url-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.v-post{background:#2E7D32;color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;font-family:Consolas;font-size:10px;flex-shrink:0}
+.v-get{background:#1565C0;color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;font-family:Consolas;font-size:10px;flex-shrink:0}
+.v-put{background:#E65100;color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;font-family:Consolas;font-size:10px;flex-shrink:0}
+.v-del{background:#C62828;color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;font-family:Consolas;font-size:10px;flex-shrink:0}
+.url-path{font-family:Consolas,monospace;color:#37474F;font-size:11px}
+
+/* ARCHITECTURE MAP */
+.arch-wrap{overflow-x:auto;padding:10px 0}
+.arch{min-width:900px;font-size:12px}
+.arch-layer{display:flex;align-items:stretch;margin-bottom:0}
+.arch-label{width:120px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;text-align:center;padding:8px;border-radius:8px;flex-shrink:0;margin-right:12px}
+.arch-boxes{display:flex;flex-wrap:wrap;gap:8px;flex:1;padding:10px 0}
+.arch-box{border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;text-align:center;min-width:110px}
+.arch-box.fe{background:var(--fe-l);color:var(--fe-b);border:2px solid var(--fe-m)}
+.arch-box.be{background:var(--be-l);color:var(--be-b);border:2px solid var(--be-m)}
+.arch-box.ext{background:var(--ext-l);color:var(--ext);border:2px solid var(--ext-m)}
+.arch-box.avis{background:var(--avis-l);color:var(--avis);border:2px solid var(--avis-m)}
+.arch-box.snap{background:var(--snap-l);color:var(--snap);border:2px solid var(--snap-m)}
+.arch-box.db{background:#ECEFF1;color:#37474F;border:2px solid #B0BEC5}
+.arch-conn{display:flex;justify-content:center;align-items:center;height:24px;margin:0 0 0 132px}
+.arch-conn::before{content:'▼';color:#90A4AE;font-size:18px}
+
+/* FLOW TABLE */
+.flow-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.flow-tbl th{background:#ECEFF1;padding:9px 14px;text-align:left;font-weight:700;color:var(--gray);border-bottom:2px solid var(--border);font-size:12px}
+.flow-tbl td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.flow-tbl tr:last-child td{border-bottom:none}
+.flow-tbl tr:hover td{background:#F8FAFC}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-be{background:var(--be-l);color:var(--be-b);border:1px solid var(--be-m)}
+.b-fe{background:var(--fe-l);color:var(--fe-b);border:1px solid var(--fe-m)}
+.b-ext{background:var(--ext-l);color:var(--ext);border:1px solid var(--ext-m)}
+.b-avis{background:var(--avis-l);color:var(--avis);border:1px solid var(--avis-m)}
+.b-snap{background:var(--snap-l);color:var(--snap);border:1px solid var(--snap-m)}
+.b-g{background:#ECEFF1;color:#37474F;border:1px solid #B0BEC5}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:12px 16px;margin:14px 0;border-left:4px solid;font-size:13px}
+.callout.fe{background:var(--fe-l);border-color:var(--fe-b);color:#0D47A1}
+.callout.be{background:var(--be-l);border-color:var(--be-b);color:#1B5E20}
+.callout.ext{background:var(--ext-l);border-color:var(--ext);color:var(--ext)}
+.callout.avis{background:var(--avis-l);border-color:var(--avis);color:var(--avis)}
+.callout strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+
+/* DIVIDER */
+.divider{border:none;border-top:2px dashed var(--border);margin:22px 0}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:12px;padding:14px 16px;background:#F8FAFC;border-radius:8px;border:1px solid var(--border);margin-bottom:22px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12px}
+.leg-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+
+/* SUMMARY NUMBERS */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-box{border-radius:10px;padding:16px;text-align:center;border:2px solid}
+.stat-box.fe{background:var(--fe-l);border-color:var(--fe-m);color:var(--fe-b)}
+.stat-box.be{background:var(--be-l);border-color:var(--be-m);color:var(--be-b)}
+.stat-box.ext{background:var(--ext-l);border-color:var(--ext-m);color:var(--ext)}
+.stat-box.db{background:#ECEFF1;border-color:#B0BEC5;color:#37474F}
+.stat-box .num{font-size:36px;font-weight:800;display:block}
+.stat-box .lbl{font-size:12px;font-weight:600;opacity:.8}
+
+footer{text-align:center;padding:24px;color:#78909C;font-size:11px;border-top:1px solid var(--border);margin-top:36px}
+@media(max-width:768px){.hdr{padding:22px}.wrap{padding:16px}.cards-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>📋 Services Fiche d'Étude — Canvas Agricole</h1>
+  <p>Cartographie complète de tous les services Backend (Java) et Frontend (Angular) utilisés dans la fiche d'étude agricole, leurs rôles, leurs méthodes et leurs interconnexions</p>
+  <div class="tags">
+    <span class="tag">🟢 20 Services Backend Java</span>
+    <span class="tag">🔵 20 Services Angular</span>
+    <span class="tag">🟣 4 Services Oracle SAEB External</span>
+    <span class="tag">🗄 15+ Tables DB</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════ CHIFFRES CLÉS ═══════════════════════════ -->
+<div class="stat-row">
+  <div class="stat-box fe"><span class="num">20</span><span class="lbl">Services Angular</span></div>
+  <div class="stat-box be"><span class="num">20</span><span class="lbl">Services Java Backend</span></div>
+  <div class="stat-box ext"><span class="num">4</span><span class="lbl">Services Oracle SAEB</span></div>
+  <div class="stat-box db"><span class="num">15+</span><span class="lbl">Tables Base de Données</span></div>
+</div>
+
+<!-- ═══════════════════════════ LÉGENDE ═══════════════════════════ -->
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--fe-b)"></div><strong>Bleu</strong> — Service Angular (Frontend)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--be-b)"></div><strong>Vert</strong> — Service Java (Backend Spring Boot)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--ext)"></div><strong>Violet</strong> — Service Externe (Oracle SAEB)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--avis)"></div><strong>Orange</strong> — Services Workflow / Avis</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--snap)"></div><strong>Rose</strong> — Services Snapshot / Versioning</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#607D8B"></div><strong>Gris</strong> — Services Utilitaires</div>
+</div>
+
+<!-- ═══════════════════════════ ARCHITECTURE ═══════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl full">🗺 Architecture Globale — Vue des Couches</div>
+
+<div class="arch-wrap">
+<div class="arch">
+  <!-- COUCHE COMPOSANTS ANGULAR -->
+  <div class="arch-layer">
+    <div class="arch-label" style="background:var(--fe-l);color:var(--fe-b)">🖥 Angular<br>Composants</div>
+    <div class="arch-boxes">
+      <div class="arch-box fe">canvas-agricole</div>
+      <div class="arch-box fe">exploitation</div>
+      <div class="arch-box fe">naturecredit-2<br><span style="font-size:9px">(CT)</span></div>
+      <div class="arch-box fe">naturecredit-3<br><span style="font-size:9px">(Invest.)</span></div>
+      <div class="arch-box fe">projet-achat-terrain</div>
+      <div class="arch-box avis">avis-CT / avis-AT<br>avis-invest.</div>
+      <div class="arch-box fe">engagement</div>
+      <div class="arch-box fe">analyse-financier</div>
+      <div class="arch-box fe">garanties</div>
+      <div class="arch-box snap">snapshot-history</div>
+      <div class="arch-box fe">affectation</div>
+      <div class="arch-box fe">document-upload</div>
+    </div>
+  </div>
+  <div class="arch-conn"></div>
+
+  <!-- COUCHE SERVICES ANGULAR -->
+  <div class="arch-layer">
+    <div class="arch-label" style="background:var(--fe-l);color:var(--fe-b)">🔵 Angular<br>Services</div>
+    <div class="arch-boxes">
+      <div class="arch-box fe">CanevasAgrService</div>
+      <div class="arch-box fe">CanevasService</div>
+      <div class="arch-box fe">SiteService</div>
+      <div class="arch-box fe">EngagementService</div>
+      <div class="arch-box avis">AvisService</div>
+      <div class="arch-box fe">AffectationService</div>
+      <div class="arch-box snap">SnapshotService</div>
+      <div class="arch-box fe">AnalyseFinancService</div>
+      <div class="arch-box fe">GarantieService</div>
+      <div class="arch-box fe">SchemaCreditService</div>
+      <div class="arch-box fe">ConditionBanqueService</div>
+      <div class="arch-box fe">ClientService</div>
+      <div class="arch-box fe">UserService</div>
+      <div class="arch-box fe">DocumentService</div>
+      <div class="arch-box fe">AssocieService</div>
+      <div class="arch-box fe">BilanService</div>
+    </div>
+  </div>
+  <div class="arch-conn"></div>
+
+  <!-- COUCHE API REST -->
+  <div class="arch-layer">
+    <div class="arch-label" style="background:#ECEFF1;color:#37474F">📡 API REST<br>HTTP</div>
+    <div class="arch-boxes">
+      <div class="arch-box db">POST /api/canevas</div>
+      <div class="arch-box db">GET /api/client</div>
+      <div class="arch-box db">POST /api/avis</div>
+      <div class="arch-box db">GET/POST /api/engagement</div>
+      <div class="arch-box db">GET /api/affectations</div>
+      <div class="arch-box db">POST /{id}/valider</div>
+      <div class="arch-box db">POST /{id}/refouler</div>
+      <div class="arch-box db">GET /api/garantie</div>
+      <div class="arch-box db">GET /api/schema-credit</div>
+      <div class="arch-box db">GET /api/analyse-financiere</div>
+    </div>
+  </div>
+  <div class="arch-conn"></div>
+
+  <!-- COUCHE SERVICES BACKEND -->
+  <div class="arch-layer">
+    <div class="arch-label" style="background:var(--be-l);color:var(--be-b)">🟢 Spring Boot<br>Services</div>
+    <div class="arch-boxes">
+      <div class="arch-box be">CanevaService</div>
+      <div class="arch-box be">AvisService</div>
+      <div class="arch-box snap">CanevasSnapshotService</div>
+      <div class="arch-box avis">WorkflowLogService</div>
+      <div class="arch-box be">AffectationService</div>
+      <div class="arch-box be">SiteService</div>
+      <div class="arch-box be">BaremeCourtTermeService</div>
+      <div class="arch-box be">CACourtTermeService</div>
+      <div class="arch-box be">CAPrevCourtTermeService</div>
+      <div class="arch-box be">MoisAchatService</div>
+      <div class="arch-box be">ClientCanvasService</div>
+      <div class="arch-box be">CanevasUserService</div>
+      <div class="arch-box be">FicheEtudeService</div>
+      <div class="arch-box be">ClientRequestService</div>
+      <div class="arch-box ext">IEngagementService</div>
+      <div class="arch-box ext">IClientService</div>
+      <div class="arch-box ext">IAnalyseFinanciereService</div>
+    </div>
+  </div>
+  <div class="arch-conn"></div>
+
+  <!-- COUCHE BASE DE DONNÉES -->
+  <div class="arch-layer">
+    <div class="arch-label" style="background:#ECEFF1;color:#37474F">🗄 Bases de<br>Données</div>
+    <div class="arch-boxes">
+      <div class="arch-box db">CANEVAS_AGRICOLE</div>
+      <div class="arch-box db">CANEVAS_STRUCTURE_SNAPSHOT</div>
+      <div class="arch-box db">CANEVAS_WORKFLOW_LOG</div>
+      <div class="arch-box db">AVIS</div>
+      <div class="arch-box db">AFFECTATION</div>
+      <div class="arch-box db">CREDIT_COURT_TERME</div>
+      <div class="arch-box db">CREDIT_INVESTISSEMENT</div>
+      <div class="arch-box db">CREDIT_ACHAT_TERRAIN</div>
+      <div class="arch-box db">SITE / ELEVAGE / BATIMENT</div>
+      <div class="arch-box db">ASSOCIE / VENDEUR</div>
+      <div class="arch-box db">CANEVAS_USER</div>
+      <div class="arch-box ext">Oracle SAEB<br><span style="font-size:9px">(Engagements, Bilans)</span></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--                SERVICES FRONTEND ANGULAR                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl fe">🔵 Services Angular — Frontend</div>
+
+<div class="callout fe">
+  <strong>Rôle des services Angular</strong>
+  Chaque service Angular est une classe injectable qui encapsule les appels HTTP vers le backend et gère l'état local via des Signals Angular 17. Ils sont injectés dans les composants via <code>inject()</code>.
+</div>
+
+<div class="cards-grid">
+
+  <!-- CANEVASAGRSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">🏗</div>
+      <div class="scard-title">
+        <strong>CanevasAgrService</strong>
+        <div class="file">canevas.agr.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Service principal du canvas agricole. Gère toutes les données métier : crédits, sites, exploitation, engagements, client, et coordonne le canvas courant via un signal <code>currentIdCaneva()</code>.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes principales</div>
+        <div class="methods">
+          <span class="method">getCurrentCaneva()</span><span class="method">saveCaneva()</span><span class="method">getClientByPiece()</span><span class="method">getSites()</span><span class="method">saveSite()</span><span class="method">getEngagements()</span><span class="method">saveCreditCT()</span><span class="method">saveInvestissement()</span><span class="method">downloadFile()</span><span class="method">deleteFile()</span><span class="method">getBaremeCourtTerme()</span><span class="method">getCACourtTerme()</span><span class="method">getCAPrevCourtTerme()</span><span class="method">getMoisAchat()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/client/piece/{type}/{num}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/engagement/all/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/canevas</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/site/canevas/{id}</span></div>
+          <div class="url-row"><span class="v-del">DEL</span><span class="url-path">/api/canevas/file/{fileId}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-fe">CanevasService</span>
+          <span class="link lnk-db">CANEVAS_AGRICOLE</span>
+          <span class="link lnk-ext">Oracle SAEB</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Signal clé</div>
+        <div class="methods"><span class="method">currentIdCaneva = signal&lt;number&gt;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANEVASSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">📁</div>
+      <div class="scard-title">
+        <strong>CanevasService</strong>
+        <div class="file">canevas.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Service généraliste pour la liste et la gestion des canvas. Gère les affectations, la liste globale des canvas d'un agent ou d'une structure.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getAllCanevas()</span><span class="method">getCanevaById(id)</span><span class="method">getCanevasByMatricule(m)</span><span class="method">getCanevaByNumSeqpers(n)</span><span class="method">createCaneva()</span><span class="method">updateCaneva()</span><span class="method">getAffectationsByCanevaId()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/all</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/numseqpers/{n}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/affectations/caneva/{id}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/canevas/create</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-fe">CanevasAgrService</span>
+          <span class="link lnk-db">CANEVAS_AGRICOLE</span>
+          <span class="link lnk-db">AFFECTATION</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVISSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr avis">
+      <div class="scard-icon">⚖</div>
+      <div class="scard-title">
+        <strong>AvisService</strong>
+        <div class="file">avis.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Service central du workflow. Gère la soumission des avis (CT, investissement, achat terrain, garanties) à chaque stade. Stocke les données localement via des Signals pour partage entre composants avis.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">saveAvis(avisDTO)</span><span class="method">getAvisById(id)</span><span class="method">getAvisByParams(numCaneva, numSeqpers)</span><span class="method">getAvisByParamss(numCaneva, numSeqpers, stade)</span><span class="method">getAvisByParamss2(numCaneva, numSeqpers, stade, matricule)</span><span class="method">getAvisByParamss3(...)</span><span class="method">getAvisByParams4(numCaneva, structure)</span><span class="method">getAvisListByNumCanevaAndStructure()</span><span class="method">getAvisByMaxId(numCaneva, numSeqpers)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/avis</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/avis/{id}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/avis/by-params?numCaneva=&numSeqpers=</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/avis/by-paramss?...&status=stade</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/{id}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Signaux internes</div>
+        <div class="methods">
+          <span class="method">avisCreditAchatTerrain = signal[]</span><span class="method">avisCreditCourtTermeData = signal</span><span class="method">avisCreditInves = signal[]</span><span class="method">avisGaranties = signal[]</span><span class="method">projetCourtTermeMajBool = signal</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-be">AvisService (BE)</span><span class="link lnk-snap">CanevasSnapshotService</span><span class="link lnk-avis">WorkflowLogService</span><span class="link lnk-db">AVIS</span><span class="link lnk-db">CANEVAS_AGRICOLE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SNAPSHOTSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr snap">
+      <div class="scard-icon">📸</div>
+      <div class="scard-title">
+        <strong>SnapshotService</strong>
+        <div class="file">snapshot.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère le versioning du canvas. Permet de valider/refouler le dossier (créant un snapshot), de consulter l'historique des versions et le journal des actions workflow.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">validerEtTransmettre(id, req)</span><span class="method">refouler(id, req)</span><span class="method">getHistory(id, typeStruct, codeStruct)</span><span class="method">getBySnapshotId(canevasId, snapId)</span><span class="method">getByStructure(id, code)</span><span class="method">getWorkflowLog(id, type, code)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/canevas/{id}/valider</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/canevas/{id}/refouler</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/{id}/snapshots</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/{id}/snapshots/{snapId}/detail</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/{id}/snapshots/workflow-log</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes statiques utilitaires</div>
+        <div class="methods">
+          <span class="method">static computeCreditsTotal()</span><span class="method">static computeEngagementsTotal()</span><span class="method">static computeSitesCount()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-snap">CanevasSnapshotService</span><span class="link lnk-avis">WorkflowLogService</span><span class="link lnk-db">CANEVAS_STRUCTURE_SNAPSHOT</span><span class="link lnk-db">CANEVAS_WORKFLOW_LOG</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFFECTATIONSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr avis">
+      <div class="scard-icon">📨</div>
+      <div class="scard-title">
+        <strong>AffectationService</strong>
+        <div class="file">affectation.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère l'affectation des dossiers entre structures (agence → DR → DC). Inclut la gestion des utilisateurs canvas et des assignations inter-structures.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getAllCanevasUsers()</span><span class="method">getCanevasUserByMatricule(m)</span><span class="method">createCanevasUser()</span><span class="method">getSubordonnesBySuperviseurId()</span><span class="method">createAffectation()</span><span class="method">getAffectationsByCanevaId()</span><span class="method">getAffectationsByUser()</span><span class="method">getCanevasByCodeStructureAndStatus()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas-users/matricule/{m}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/affectations</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/affectations/caneva/{id}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/structure/{code}/status/{s}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-be">AffectationService (BE)</span><span class="link lnk-be">CanevasUserService</span><span class="link lnk-db">AFFECTATION</span><span class="link lnk-db">CANEVAS_USER</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENGAGEMENTSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">🔗</div>
+      <div class="scard-title">
+        <strong>EngagementService</strong>
+        <div class="file">engagement.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Charge les engagements BNA et BCT du client et des parties liées (actionnaires, premier responsable, groupe, vendeurs). Utilise des Signals réactifs séparés par type de partie.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Signals gérés</div>
+        <div class="methods">
+          <span class="method">engagement = signal&lt;Engagement&gt;</span><span class="method">engagementAssocie</span><span class="method">engagementPreResp</span><span class="method">engagementGroupe</span><span class="method">engagementVendeur</span><span class="method">selectedNumSeqPers</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/engagement/all/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/engagement/classe-bna/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/engagement/classe-bct/{numSeqPers}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-ext">IEngagementService</span><span class="link lnk-ext">Oracle SAEB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSEFINANCIERESERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">📊</div>
+      <div class="scard-title">
+        <strong>AnalyseFinanciereService</strong>
+        <div class="file">analyseFinanciere.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Charge les données financières du client depuis Oracle SAEB : bilan, compte de résultat, ratios financiers, état de flux de trésorerie pour les 3 dernières années d'exercice.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getBilanByNumSeqPers()</span><span class="method">getMaxAnneeExercice()</span><span class="method">getRatioFinale()</span><span class="method">getEtatFluxTresorerie()</span><span class="method">getActiviteRentabilite()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/analyse-financiere/bilan/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/analyse-financiere/ratio/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/analyse-financiere/flux/{numSeqPers}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-ext">IAnalyseFinanciereService</span><span class="link lnk-ext">Oracle SAEB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GARANTIESERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">🏠</div>
+      <div class="scard-title">
+        <strong>GarantieService</strong>
+        <div class="file">garantie.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère les garanties proposées par le client : hypothèques, nantissements, cautions, gages. Récupère les listes de types et natures de garantie.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getGarantiesByNumSeqPers()</span><span class="method">saveGarantie()</span><span class="method">getTypesGarantie()</span><span class="method">getNaturesGarantie()</span><span class="method">deleteGarantie()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/garantie/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/garantie</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/type-garantie</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-be">IGarantieService</span><span class="link lnk-db">GARANTIE_PROPOSEE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEMACREDITSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">📐</div>
+      <div class="scard-title">
+        <strong>SchemaCreditService</strong>
+        <div class="file">schema-credit.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère le schéma de financement des crédits court terme : composants du financement (autofinancement, subvention, crédit BNA), montants et pourcentages.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getSchemaCreditByCanevaId()</span><span class="method">saveSchemaCredit()</span><span class="method">updateSchemaCredit()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/schema-credit/{canevaId}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/schema-credit</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-be">SchemaCreditService (BE)</span><span class="link lnk-db">SCHEMA_CREDIT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDITIONBANQUESERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">🏦</div>
+      <div class="scard-title">
+        <strong>ConditionBanqueService</strong>
+        <div class="file">conditionBanque.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Charge et enregistre les conditions bancaires proposées (taux d'intérêt, durée, franchise, période de remboursement) pour chaque type de crédit.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getConditionsByCanevaId()</span><span class="method">saveCondition()</span><span class="method">getConditionsParDefaut()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/condition-banque/{canevaId}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/condition-banque</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-ext">IConditionBanqueService</span><span class="link lnk-db">CONDITION_BANQUE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITESERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">🌍</div>
+      <div class="scard-title">
+        <strong>SiteService</strong>
+        <div class="file">site.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère les sites géographiques d'exploitation du client : création, récupération et association au canvas. Chaque site contient des données GPS et des projets agricoles.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getSitesByNumSeqPers()</span><span class="method">createSite()</span><span class="method">getSiteProjetsByCanevaId()</span><span class="method">assignSitesToCaneva()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/site/{numSeqPers}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/site</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/canevas/assign-sites</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-be">SiteService (BE)</span><span class="link lnk-db">SITE</span><span class="link lnk-db">SITE_PROJET</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">👤</div>
+      <div class="scard-title">
+        <strong>ClientService</strong>
+        <div class="file">client.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Recherche et récupère les informations du client depuis Oracle SAEB par numéro de pièce d'identité ou numéro séquentiel. Point d'entrée principal pour identifier un client.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getClientByPiece(typePiece, numPiece)</span><span class="method">getClientByNumSeqPers()</span><span class="method">getPersonneByNumSeqPers()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/client/piece/{type}/{num}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/client/{numSeqPers}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à (Backend)</div>
+        <div class="links">
+          <span class="link lnk-ext">IClientService</span><span class="link lnk-ext">Oracle SAEB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USERSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">👨‍💼</div>
+      <div class="scard-title">
+        <strong>UserService</strong>
+        <div class="file">user.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère le profil de l'utilisateur connecté via un signal. Fournit le matricule, le code structure, le type structure et les permissions. Utilisé par SnapshotHistoryComponent pour le filtrage.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Signal clé</div>
+        <div class="methods">
+          <span class="method">user = signal&lt;User | null&gt;</span><span class="method">user().typeStructure</span><span class="method">user().codeStructure</span><span class="method">user().matricule</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/user/me</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/user/{matricule}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-be">CanevasUserService</span><span class="link lnk-snap">SnapshotHistoryComponent</span><span class="link lnk-db">CANEVAS_USER</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILANSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">📈</div>
+      <div class="scard-title">
+        <strong>BilanService</strong>
+        <div class="file">bilan.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère le bilan fourrager et les données financières d'exploitation agricole. Calcule les stocks, les besoins et les ressources fourragères par site.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getBilanFourrager(siteId)</span><span class="method">saveBilanFourrager()</span><span class="method">updateBilan()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/bilan-fourrager/{siteId}</span></div>
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/bilan-fourrager</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-db">BILAN_FOURRAGERE</span><span class="link lnk-fe">SiteService</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSOCIESERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">🤝</div>
+      <div class="scard-title">
+        <strong>AssocieService</strong>
+        <div class="file">Associe.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère les actionnaires / associés du client. Permet d'ajouter, modifier et supprimer des associés avec leurs parts de capital et pièces d'identité.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getAssociesByNumSeqPers()</span><span class="method">saveAssocie()</span><span class="method">deleteAssocie(id)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-db">ASSOCIE</span><span class="link lnk-fe">EngagementService</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCUMENTSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr fe">
+      <div class="scard-icon">📄</div>
+      <div class="scard-title">
+        <strong>DocumentClientCanvaService</strong>
+        <div class="file">document.client.canva.service.ts</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère les pièces jointes du canvas : upload, téléchargement et suppression de documents (CIN, titres fonciers, plans…).</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">uploadDocument(file, canevaId)</span><span class="method">getDocuments(canevaId)</span><span class="method">downloadDocument(fileId)</span><span class="method">deleteDocument(fileId)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">API appelées</div>
+        <div class="urls">
+          <div class="url-row"><span class="v-post">POST</span><span class="url-path">/api/canevas/file/{canevaId}</span></div>
+          <div class="url-row"><span class="v-get">GET</span><span class="url-path">/api/canevas/file/{fileId}</span></div>
+          <div class="url-row"><span class="v-del">DEL</span><span class="url-path">/api/canevas/file/{fileId}</span></div>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Relié à</div>
+        <div class="links">
+          <span class="link lnk-be">ClientRequestService</span><span class="link lnk-db">DOCUMENT_CANEVA_FILE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /cards-grid FE -->
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--                SERVICES BACKEND JAVA                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl be">🟢 Services Java Backend — Spring Boot</div>
+
+<div class="callout be">
+  <strong>Architecture Spring Boot</strong>
+  Chaque service est annoté <code>@Service</code>, injecté via <code>@RequiredArgsConstructor</code> (Lombok). Les services transactionnels utilisent <code>@Transactional(propagation = REQUIRES_NEW)</code> pour garantir l'atomicité snapshot + log. Les interfaces (IEngagementService, IClientService, etc.) encapsulent les appels vers Oracle SAEB.
+</div>
+
+<div class="cards-grid">
+
+  <!-- CANEVASSNAPSHOTSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr snap">
+      <div class="scard-icon">📸</div>
+      <div class="scard-title">
+        <strong>CanevasSnapshotService</strong>
+        <div class="file">service/CanevasSnapshotService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Service central du versioning. Crée des snapshots complets (9 JSON CLOBs) à chaque transition. Charge les données depuis Oracle SAEB et les sérialise. Met à jour le canvas parent après chaque snapshot.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes publiques</div>
+        <div class="methods">
+          <span class="method">createSnapshot(canevasId, structureCode, ...)</span><span class="method">getHistory(canevasId)</span><span class="method">getByStructure(canevasId, structureCode)</span><span class="method">getBySnapshotId(snapshotId)</span><span class="method">canAccessCanvas(id, type, code)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes privées clés</div>
+        <div class="methods">
+          <span class="method">buildFullEngagementDetailleJson()</span><span class="method">buildCreditsJson()</span><span class="method">buildExploitationJson()</span><span class="method">buildGarantiesJson()</span><span class="method">buildActionnaire()</span><span class="method">buildGroupeMembers()</span><span class="method">snapshotBareme()</span><span class="method">snapshotCaRealise()</span><span class="method">loadEngagementSafe()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Dépendances (injectées)</div>
+        <div class="links">
+          <span class="link lnk-be">CanevasSnapshotRepository</span><span class="link lnk-be">CanevaRepository</span><span class="link lnk-ext">IEngagementService</span><span class="link lnk-ext">IClientService</span><span class="link lnk-be">BaremeCourtTermeService</span><span class="link lnk-be">CACourtTermeService</span><span class="link lnk-be">CAPrevCourtTermeService</span><span class="link lnk-be">MoisAchatCourtTermeService</span><span class="link lnk-be">AssocieRepository</span><span class="link lnk-be">ClientCanvasRepository</span><span class="link lnk-be">ObjectMapper</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Tables DB touchées</div>
+        <div class="links">
+          <span class="link lnk-db">CANEVAS_STRUCTURE_SNAPSHOT (INSERT)</span><span class="link lnk-db">CANEVAS_AGRICOLE (UPDATE)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKFLOWLOGSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr avis">
+      <div class="scard-icon">📋</div>
+      <div class="scard-title">
+        <strong>WorkflowLogService</strong>
+        <div class="file">service/WorkflowLogService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Enregistre chaque action workflow (VALIDER, REFOULER, etc.) dans CANEVAS_WORKFLOW_LOG. Fournit une lecture filtrée par rôle (Agence/DR/DC).</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">log(canevasId, from, to, action, version, snapId, comments, by)</span><span class="method">log(..., structureMere)</span><span class="method">getHistory(canevasId)</span><span class="method">getHistoryFiltered(canevasId, typeStructure, codeStructure)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Logique de filtrage</div>
+        <div class="methods">
+          <span class="method">type='1' → fromStructure = code</span><span class="method">type='2' → propres + agences (structureMere)</span><span class="method">autres → tout</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Dépendances</div>
+        <div class="links">
+          <span class="link lnk-be">CanevasWorkflowLogRepository</span><span class="link lnk-db">CANEVAS_WORKFLOW_LOG (INSERT)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVISSERVICE BE -->
+  <div class="scard">
+    <div class="scard-hdr avis">
+      <div class="scard-icon">⚖</div>
+      <div class="scard-title">
+        <strong>AvisService</strong>
+        <div class="file">service/AvisService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Orchestre le workflow complet lors d'un avis : sauvegarde l'avis, met à jour le stade du canvas, crée l'affectation vers la structure suivante, génère le snapshot et enregistre le log. Point d'entrée principal du workflow métier.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">saveAvis(avisDTO)</span><span class="method">getAvisById(id)</span><span class="method">getAvisByParams(numCaneva, numSeqpers)</span><span class="method">getAvisByParamss(numCaneva, numSeqpers, stade)</span><span class="method">getAvisListByNumCanevaAndStructure()</span><span class="method">getAvisByMaxId(numCaneva, numSeqpers)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Workflow interne de saveAvis()</div>
+        <div class="methods">
+          <span class="method">1. AvisRepository.save()</span><span class="method">2. CanevaRepository.update(stade)</span><span class="method">3. AffectationRepository.save()</span><span class="method">4. CanevasSnapshotService.createSnapshot()</span><span class="method">5. WorkflowLogService.log()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Tables DB touchées</div>
+        <div class="links">
+          <span class="link lnk-db">AVIS (INSERT)</span><span class="link lnk-db">CANEVAS_AGRICOLE (UPDATE stade)</span><span class="link lnk-db">AFFECTATION (INSERT)</span><span class="link lnk-db">CANEVAS_STRUCTURE_SNAPSHOT (INSERT via cascade)</span><span class="link lnk-db">CANEVAS_WORKFLOW_LOG (INSERT via cascade)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANEVASERVICE -->
+  <div class="scard">
+    <div class="scard-hdr be">
+      <div class="scard-icon">🏗</div>
+      <div class="scard-title">
+        <strong>CanevaService (Interface)</strong>
+        <div class="file">service/CanevaService.java + CanevaServiceImpl2.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">CRUD principal du canvas agricole. Gère la création, la mise à jour et la récupération des canvas avec leurs relations (crédits, sites).</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getAllCanevas()</span><span class="method">getCanevaById(id)</span><span class="method">createCaneva(CanevaDto)</span><span class="method">updateCaneva()</span><span class="method">saveCredits(canevaId, creditsDto)</span><span class="method">getCanevaByNumSeqpers(n)</span><span class="method">getCanevasByStructure(code, status)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Dépendances</div>
+        <div class="links">
+          <span class="link lnk-be">CanevaRepository</span><span class="link lnk-be">CreditCourtTermeRepository</span><span class="link lnk-be">CreditInvestissementRepository</span><span class="link lnk-be">CreditAchatTerrainRepository</span><span class="link lnk-db">CANEVAS_AGRICOLE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFFECTATIONSERVICE BE -->
+  <div class="scard">
+    <div class="scard-hdr be">
+      <div class="scard-icon">📨</div>
+      <div class="scard-title">
+        <strong>AffectationService (Interface)</strong>
+        <div class="file">service/AffectationService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Gère les affectations des canvas entre structures. Permet de retrouver tous les canvas d'une structure réceptrice et de suivre l'état de chaque transmission.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">createAffectation()</span><span class="method">getAffectationsByCanevaId()</span><span class="method">getAffectationsByCanevaUserId()</span><span class="method">getCanevasByCodeStructureAndStatus(code, status)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Dépendances</div>
+        <div class="links">
+          <span class="link lnk-be">AffectationRepository</span><span class="link lnk-db">AFFECTATION</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAREME + CA + CAPREV + MOISACHAT -->
+  <div class="scard">
+    <div class="scard-hdr be">
+      <div class="scard-icon">🧮</div>
+      <div class="scard-title">
+        <strong>Services Calcul Court Terme (×4)</strong>
+        <div class="file">BaremeCourtTermeService · CACourtTermeService · CAPrevCourtTermeService · MoisAchatCourtTermeService</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">4 services dédiés aux méthodes de calcul du crédit court terme. Chacun gère un type de calcul : barème agricole, CA réalisé, CA prévisionnel, ou 3 mois d'achat au comptant.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthode commune</div>
+        <div class="methods">
+          <span class="method">findByNumSeqpersAndNumCanva(numSeqPers, canevaId)</span><span class="method">save(dto)</span><span class="method">update(dto)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Appelés par</div>
+        <div class="links">
+          <span class="link lnk-snap">CanevasSnapshotService.buildExploitationJson()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Tables DB</div>
+        <div class="links">
+          <span class="link lnk-db">BAREME_COURT_TERME</span><span class="link lnk-db">CA_COURT_TERME</span><span class="link lnk-db">CA_PREV_COURT_TERME</span><span class="link lnk-db">MOIS_ACHAT_COURT_TERME</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITESERVICE BE -->
+  <div class="scard">
+    <div class="scard-hdr be">
+      <div class="scard-icon">🌍</div>
+      <div class="scard-title">
+        <strong>SiteService + Services Exploitation</strong>
+        <div class="file">SiteService · ElevageService · BatimentService · MaterielService</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">SiteService gère les sites géographiques avec leurs coordonnées GPS. Les services dérivés (Elevage, Batiment, Materiel) gèrent les ressources physiques de chaque site.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes SiteService</div>
+        <div class="methods">
+          <span class="method">createSite()</span><span class="method">getSitesByNumSeqPers()</span><span class="method">getSiteProjetsByCanevaId()</span><span class="method">assignSitesToCaneva(dto)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes communes Elevage/Batiment/Materiel</div>
+        <div class="methods">
+          <span class="method">create()</span><span class="method">getsBySiteIdAndItemId(siteId, itemId)</span><span class="method">update()</span><span class="method">delete(id)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Tables DB</div>
+        <div class="links">
+          <span class="link lnk-db">SITE</span><span class="link lnk-db">SITE_PROJET</span><span class="link lnk-db">ELEVAGE</span><span class="link lnk-db">BATIMENT</span><span class="link lnk-db">MATERIEL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANEVASUSERSERVICE + CLIENTCANVASSERVICE -->
+  <div class="scard">
+    <div class="scard-hdr be">
+      <div class="scard-icon">👥</div>
+      <div class="scard-title">
+        <strong>CanevasUserService + ClientCanvasService</strong>
+        <div class="file">CanevasUserService.java · ClientCanvasService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">CanevasUserService gère les utilisateurs BNA (avec hiérarchie superviseur/subordonné). ClientCanvasService gère le lien entre le client et le canvas (premier responsable, observation, numéro séquentiel).</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">CanevasUserService</div>
+        <div class="methods">
+          <span class="method">getCanevasUserByMatricule(m)</span><span class="method">getSubordonnesBySuperviseurId(id)</span><span class="method">createCanevasUser()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">ClientCanvasService</div>
+        <div class="methods">
+          <span class="method">saveClientCanvas()</span><span class="method">getByNumSeqpers(n)</span><span class="method">getClientCanvasById(id)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Tables DB</div>
+        <div class="links">
+          <span class="link lnk-db">CANEVAS_USER</span><span class="link lnk-db">CLIENT_CANVAS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FICHEETUDESERVICE -->
+  <div class="scard">
+    <div class="scard-hdr be">
+      <div class="scard-icon">📑</div>
+      <div class="scard-title">
+        <strong>FicheEtudeService</strong>
+        <div class="file">service/FicheEtudeService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Génère le document PDF de la fiche d'étude avec JasperReports. Agrège toutes les données du canvas : client, crédits, exploitation, engagements, analyse financière, garanties, avis.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">generateFiche(CanevaReportRequest)</span><span class="method">searchByCriteria(criteria)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Consomme (tout le système)</div>
+        <div class="links">
+          <span class="link lnk-be">CanevaRepository</span><span class="link lnk-snap">CanevasSnapshotService</span><span class="link lnk-ext">IEngagementService</span><span class="link lnk-ext">IClientService</span><span class="link lnk-ext">IAnalyseFinanciereService</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /cards-grid BE -->
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--                SERVICES EXTERNES (ORACLE SAEB)             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl ext">🟣 Services Externes — Oracle SAEB (Données Banque)</div>
+
+<div class="callout ext">
+  <strong>Architecture externe</strong>
+  Ces 4 interfaces Spring lisent les données depuis le système Oracle SAEB de la BNA (base historique). Chaque méthode est entourée d'un <code>try/catch</code> dans les services appelants — si Oracle SAEB est indisponible, le système continue avec des listes vides (pattern fail-safe).
+</div>
+
+<div class="cards-grid">
+  <div class="scard">
+    <div class="scard-hdr ext">
+      <div class="scard-icon">🔗</div>
+      <div class="scard-title">
+        <strong>IEngagementService</strong>
+        <div class="file">service/IEngagementService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Interface Oracle SAEB pour les engagements bancaires. Fournit les engagements BNA/BCT, l'historique de classification (3 ans) et le retour de classification BCT.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getListeEngagementClient(numSeqPers)</span><span class="method">getHistoriqueClasseBNA(numSeqPers)</span><span class="method">getHistoriqueClasseBCT(numSeqPers)</span><span class="method">getHistoriqueRetourClasseBctBNA(numSeqPers)</span><span class="method">getMontantTermeByNumSeqPers()</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Appelé par</div>
+        <div class="links">
+          <span class="link lnk-snap">CanevasSnapshotService</span><span class="link lnk-avis">AvisService</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="scard-hdr ext">
+      <div class="scard-icon">👤</div>
+      <div class="scard-title">
+        <strong>IClientService</strong>
+        <div class="file">service/IClientService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Interface Oracle SAEB pour les données client. Fournit les informations personnelles, le groupe économique, les soldes algébriques, les mouvements confiés et les placements.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getPersonneByPiece(typePiece, numPiece)</span><span class="method">getCodGrpByNumSeqPers(numSeqPers)</span><span class="method">getListeGroupesByNumGRP(codGrp)</span><span class="method">getSommeAlgebriqueClient(numSeqPers)</span><span class="method">getMouvementConfieClient(numSeqPers)</span><span class="method">getListePlacementByNumSeqPers(numSeqPers)</span>
+        </div>
+      </div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Appelé par</div>
+        <div class="links">
+          <span class="link lnk-snap">CanevasSnapshotService.buildGroupeMembers()</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="scard-hdr ext">
+      <div class="scard-icon">📊</div>
+      <div class="scard-title">
+        <strong>IAnalyseFinanciereService</strong>
+        <div class="file">service/IAnalyseFinanciereService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Interface Oracle SAEB pour les analyses financières. Fournit les bilans comptables, les ratios financiers, l'état des flux de trésorerie et les données d'activité/rentabilité.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getMaxAnneeExercice(numSeqPers)</span><span class="method">getBilanExerciceCLTByNumSeqPers()</span><span class="method">getRatioFinaleByNumSeqPers()</span><span class="method">getEtatFluxTresorerieByNumSeqPers()</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="scard-hdr ext">
+      <div class="scard-icon">🏦</div>
+      <div class="scard-title">
+        <strong>IConditionBanqueService</strong>
+        <div class="file">service/IConditionBanqueService.java</div>
+      </div>
+    </div>
+    <div class="scard-body">
+      <div class="scard-desc">Interface Oracle SAEB pour les conditions bancaires existantes. Récupère les taux, durées et marges applicables pour chaque produit de crédit.</div>
+      <div class="scard-section">
+        <div class="scard-section-ttl">Méthodes</div>
+        <div class="methods">
+          <span class="method">getConditionsByProduit(codeProduit)</span><span class="method">getTauxByProduit()</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--           MAP COMPOSANT → SERVICE → API → DB              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl full">🔗 Map Complète : Composant → Service → API → Backend → DB</div>
+
+<table class="flow-tbl">
+  <thead>
+    <tr>
+      <th>Section Fiche d'Étude</th>
+      <th>Composant Angular</th>
+      <th>Service Angular</th>
+      <th>Endpoint API</th>
+      <th>Service Backend</th>
+      <th>Table DB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Identification client</strong></td>
+      <td><span class="badge b-fe">search</span></td>
+      <td><span class="badge b-fe">ClientService</span></td>
+      <td><code>GET /api/client/piece/{type}/{num}</code></td>
+      <td><span class="badge b-ext">IClientService</span></td>
+      <td><span class="badge b-g">Oracle SAEB</span></td>
+    </tr>
+    <tr>
+      <td><strong>Création canvas</strong></td>
+      <td><span class="badge b-fe">canvas-agricole</span></td>
+      <td><span class="badge b-fe">CanevasAgrService</span></td>
+      <td><code>POST /api/canevas</code></td>
+      <td><span class="badge b-be">CanevaService</span></td>
+      <td><span class="badge b-g">CANEVAS_AGRICOLE</span></td>
+    </tr>
+    <tr>
+      <td><strong>Sites exploitation</strong></td>
+      <td><span class="badge b-fe">exploitation/site-projet</span></td>
+      <td><span class="badge b-fe">SiteService</span></td>
+      <td><code>GET/POST /api/site</code></td>
+      <td><span class="badge b-be">SiteService (BE)</span></td>
+      <td><span class="badge b-g">SITE · SITE_PROJET</span></td>
+    </tr>
+    <tr>
+      <td><strong>Élev./Bâtiment/Matériel</strong></td>
+      <td><span class="badge b-fe">elevage / batiment / materiel</span></td>
+      <td><span class="badge b-fe">CanevasAgrService</span></td>
+      <td><code>POST /api/elevage · /batiment</code></td>
+      <td><span class="badge b-be">ElevageService · BatimentService</span></td>
+      <td><span class="badge b-g">ELEVAGE · BATIMENT · MATERIEL</span></td>
+    </tr>
+    <tr>
+      <td><strong>Crédit CT (barème, CA…)</strong></td>
+      <td><span class="badge b-fe">naturecredit-2</span></td>
+      <td><span class="badge b-fe">CanevasAgrService</span></td>
+      <td><code>GET /api/bareme-ct · /ca-ct</code></td>
+      <td><span class="badge b-be">BaremeCourtTermeService · CACourtTermeService</span></td>
+      <td><span class="badge b-g">BAREME_COURT_TERME · CA_COURT_TERME</span></td>
+    </tr>
+    <tr>
+      <td><strong>Crédit Investissement</strong></td>
+      <td><span class="badge b-fe">naturecredit-3</span></td>
+      <td><span class="badge b-fe">CanevasAgrService</span></td>
+      <td><code>POST /api/canevas/{id}/investissement</code></td>
+      <td><span class="badge b-be">CreditInvestissementService</span></td>
+      <td><span class="badge b-g">CREDIT_INVESTISSEMENT</span></td>
+    </tr>
+    <tr>
+      <td><strong>Crédit Achat Terrain</strong></td>
+      <td><span class="badge b-fe">projet-achat-terrain</span></td>
+      <td><span class="badge b-fe">CanevasAgrService</span></td>
+      <td><code>POST /api/canevas/{id}/terrain</code></td>
+      <td><span class="badge b-be">CreditAchatTerrainService</span></td>
+      <td><span class="badge b-g">CREDIT_ACHAT_TERRAIN</span></td>
+    </tr>
+    <tr>
+      <td><strong>Schéma de financement CT</strong></td>
+      <td><span class="badge b-fe">schema-credit</span></td>
+      <td><span class="badge b-fe">SchemaCreditService</span></td>
+      <td><code>GET/POST /api/schema-credit</code></td>
+      <td><span class="badge b-be">SchemaCreditService (BE)</span></td>
+      <td><span class="badge b-g">SCHEMA_CREDIT</span></td>
+    </tr>
+    <tr>
+      <td><strong>Engagements BNA/BCT</strong></td>
+      <td><span class="badge b-fe">engagement</span></td>
+      <td><span class="badge b-fe">EngagementService</span></td>
+      <td><code>GET /api/engagement/all/{numSeqPers}</code></td>
+      <td><span class="badge b-ext">IEngagementService</span></td>
+      <td><span class="badge b-g">Oracle SAEB</span></td>
+    </tr>
+    <tr>
+      <td><strong>Analyse financière</strong></td>
+      <td><span class="badge b-fe">analyse-financier/bilan</span></td>
+      <td><span class="badge b-fe">AnalyseFinanciereService</span></td>
+      <td><code>GET /api/analyse-financiere/bilan/{n}</code></td>
+      <td><span class="badge b-ext">IAnalyseFinanciereService</span></td>
+      <td><span class="badge b-g">Oracle SAEB</span></td>
+    </tr>
+    <tr>
+      <td><strong>Bilan fourrager</strong></td>
+      <td><span class="badge b-fe">exploitation/bilan-fourrager</span></td>
+      <td><span class="badge b-fe">BilanService</span></td>
+      <td><code>GET/POST /api/bilan-fourrager/{siteId}</code></td>
+      <td><span class="badge b-be">BilanFourragereService</span></td>
+      <td><span class="badge b-g">BILAN_FOURRAGERE</span></td>
+    </tr>
+    <tr>
+      <td><strong>Garanties proposées</strong></td>
+      <td><span class="badge b-fe">garanties</span></td>
+      <td><span class="badge b-fe">GarantieService</span></td>
+      <td><code>GET/POST /api/garantie</code></td>
+      <td><span class="badge b-be">IGarantieService</span></td>
+      <td><span class="badge b-g">GARANTIE_PROPOSEE</span></td>
+    </tr>
+    <tr>
+      <td><strong>Conditions bancaires</strong></td>
+      <td><span class="badge b-fe">condition-banque</span></td>
+      <td><span class="badge b-fe">ConditionBanqueService</span></td>
+      <td><code>GET/POST /api/condition-banque</code></td>
+      <td><span class="badge b-ext">IConditionBanqueService</span></td>
+      <td><span class="badge b-g">Oracle SAEB</span></td>
+    </tr>
+    <tr>
+      <td><strong>Avis CT</strong></td>
+      <td><span class="badge b-avis">avis-credit-court-terme</span></td>
+      <td><span class="badge b-avis">AvisService</span></td>
+      <td><code>POST /api/avis</code></td>
+      <td><span class="badge b-avis">AvisService (BE)</span> → <span class="badge b-snap">Snapshot</span></td>
+      <td><span class="badge b-g">AVIS · SNAPSHOT · LOG</span></td>
+    </tr>
+    <tr>
+      <td><strong>Avis Investissement</strong></td>
+      <td><span class="badge b-avis">avis-credit-investissement</span></td>
+      <td><span class="badge b-avis">AvisService</span></td>
+      <td><code>POST /api/avis</code></td>
+      <td><span class="badge b-avis">AvisService (BE)</span> → <span class="badge b-snap">Snapshot</span></td>
+      <td><span class="badge b-g">AVIS · SNAPSHOT · LOG</span></td>
+    </tr>
+    <tr>
+      <td><strong>Avis Achat Terrain</strong></td>
+      <td><span class="badge b-avis">avis-achat-terrain</span></td>
+      <td><span class="badge b-avis">AvisService</span></td>
+      <td><code>POST /api/avis</code></td>
+      <td><span class="badge b-avis">AvisService (BE)</span> → <span class="badge b-snap">Snapshot</span></td>
+      <td><span class="badge b-g">AVIS · SNAPSHOT · LOG</span></td>
+    </tr>
+    <tr>
+      <td><strong>Affectation workflow</strong></td>
+      <td><span class="badge b-avis">affectation</span></td>
+      <td><span class="badge b-avis">AffectationService</span></td>
+      <td><code>POST /api/affectations</code></td>
+      <td><span class="badge b-be">AffectationService (BE)</span></td>
+      <td><span class="badge b-g">AFFECTATION</span></td>
+    </tr>
+    <tr>
+      <td><strong>Valider/Refouler</strong></td>
+      <td><span class="badge b-snap">snapshot-history</span></td>
+      <td><span class="badge b-snap">SnapshotService</span></td>
+      <td><code>POST /api/canevas/{id}/valider</code></td>
+      <td><span class="badge b-snap">CanevasSnapshotService</span> + <span class="badge b-avis">WorkflowLogService</span></td>
+      <td><span class="badge b-g">SNAPSHOT · WORKFLOW_LOG</span></td>
+    </tr>
+    <tr>
+      <td><strong>Historique snapshots</strong></td>
+      <td><span class="badge b-snap">snapshot-history</span></td>
+      <td><span class="badge b-snap">SnapshotService</span></td>
+      <td><code>GET /api/canevas/{id}/snapshots</code></td>
+      <td><span class="badge b-snap">CanevasSnapshotService.getHistory()</span></td>
+      <td><span class="badge b-g">CANEVAS_STRUCTURE_SNAPSHOT</span></td>
+    </tr>
+    <tr>
+      <td><strong>Documents / PJ</strong></td>
+      <td><span class="badge b-fe">document-upload</span></td>
+      <td><span class="badge b-fe">DocumentService</span></td>
+      <td><code>POST/GET /api/canevas/file/{id}</code></td>
+      <td><span class="badge b-be">ClientRequestService</span></td>
+      <td><span class="badge b-g">DOCUMENT_CANEVA_FILE</span></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</div><!-- /wrap -->
+<footer>
+  Cartographie des Services — Fiche d'Étude Canvas Agricole BNA — Backend Java Spring Boot + Frontend Angular 17<br>
+  Sources analysées : 20 services Angular · 20 services Java · 4 interfaces Oracle SAEB · 15+ tables DB
+</footer>
+</body>
+</html>

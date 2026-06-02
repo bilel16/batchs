@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AvisService — Documentation Détaillée</title>
+  <style>
+    :root {
+      --primary:   #1e3a5f;
+      --accent:    #2980b9;
+      --success:   #27ae60;
+      --warning:   #f39c12;
+      --danger:    #c0392b;
+      --light:     #ecf0f1;
+      --dark:      #2c3e50;
+      --code-bg:   #1e1e2e;
+      --code-fg:   #cdd6f4;
+      --border:    #bdc3c7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.7;
+    }
+
+    /* ── Navigation ─────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--primary);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+      overflow-x: auto;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 1rem 0.8rem;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: border-color .2s;
+    }
+    nav a:hover { border-bottom-color: var(--accent); }
+
+    /* ── Layout ──────────────────────────────────────────────────── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+      margin-bottom: 2rem;
+    }
+    .hero h1 { font-size: 2rem; margin-bottom: .5rem; }
+    .hero p  { opacity: .9; max-width: 700px; }
+
+    /* ── Sections ────────────────────────────────────────────────── */
+    section { margin-bottom: 3rem; }
+    h2 {
+      font-size: 1.45rem;
+      color: var(--primary);
+      border-left: 5px solid var(--accent);
+      padding-left: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    h3 {
+      font-size: 1.1rem;
+      color: var(--dark);
+      margin: 1.5rem 0 .6rem;
+    }
+    p { margin-bottom: .75rem; }
+
+    /* ── Cards ───────────────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.07);
+      border-left: 4px solid var(--accent);
+    }
+    .card.success { border-left-color: var(--success); }
+    .card.warning { border-left-color: var(--warning); }
+    .card.danger  { border-left-color: var(--danger);  }
+    .card.info    { border-left-color: #8e44ad;        }
+
+    .card-title {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: .4rem;
+      font-size: 1rem;
+    }
+
+    /* ── Code blocks ─────────────────────────────────────────────── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      overflow-x: auto;
+      font-size: .82rem;
+      line-height: 1.6;
+      margin: .75rem 0 1rem;
+    }
+    code { font-family: 'Cascadia Code', 'Fira Code', monospace; }
+    p code, li code {
+      background: #e8ecf0;
+      color: #c0392b;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: .88em;
+    }
+
+    /* ── Badges ──────────────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 99px;
+      font-size: .75rem;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .badge-blue   { background: #d6eaf8; color: #1a5276; }
+    .badge-green  { background: #d5f5e3; color: #1e8449; }
+    .badge-orange { background: #fef9e7; color: #d68910; border: 1px solid #f0c030; }
+    .badge-red    { background: #fadbd8; color: #922b21; }
+    .badge-purple { background: #e8daef; color: #6c3483; }
+
+    /* ── Workflow diagram ────────────────────────────────────────── */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: stretch;
+      margin: 1.5rem 0;
+    }
+    .flow-step {
+      flex: 1;
+      min-width: 130px;
+      text-align: center;
+    }
+    .flow-box {
+      background: var(--primary);
+      color: #fff;
+      padding: .7rem .5rem;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 600;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .flow-box.alt  { background: var(--accent); }
+    .flow-box.grn  { background: var(--success); }
+    .flow-box.org  { background: var(--warning); color: #333; }
+    .flow-box.red  { background: var(--danger); }
+    .flow-box.pur  { background: #8e44ad; }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      color: var(--accent);
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    /* ── Status table ────────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,.07);
+      margin-bottom: 1.5rem;
+    }
+    th {
+      background: var(--primary);
+      color: #fff;
+      padding: .7rem 1rem;
+      text-align: left;
+    }
+    td { padding: .65rem 1rem; border-bottom: 1px solid #eee; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6ff; }
+
+    /* ── Annotation box ──────────────────────────────────────────── */
+    .annotation {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      font-size: .9rem;
+    }
+    .annotation::before {
+      content: "💡 ";
+      font-size: 1.1rem;
+    }
+
+    /* ── Snapshot pipeline ───────────────────────────────────────── */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      margin: 1.2rem 0;
+    }
+    .pipe-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .pipe-num {
+      min-width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .9rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .pipe-content { flex: 1; }
+    .pipe-content strong { color: var(--primary); }
+
+    /* ── Entity grid ──────────────────────────────────────────────── */
+    .entity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .entity-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+      border-top: 4px solid var(--accent);
+    }
+    .entity-card h4 { color: var(--primary); margin-bottom: .5rem; }
+    .entity-card ul { padding-left: 1.2rem; font-size: .85rem; }
+    .entity-card li { margin-bottom: .25rem; }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #888;
+      font-size: .82rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<nav>
+  <a href="#intro">Introduction</a>
+  <a href="#structure">Structure du service</a>
+  <a href="#saveAvis">saveAvis()</a>
+  <a href="#workflow">Workflow complet</a>
+  <a href="#snapshot">Snapshot & Log</a>
+  <a href="#helpers">Méthodes utilitaires</a>
+  <a href="#queries">Méthodes de lecture</a>
+  <a href="#resume">Résumé visuel</a>
+</nav>
+
+<!-- ═══════════════════════════════ MAIN ══════════════════════════════ -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>AvisService.java — Documentation complète</h1>
+    <p>
+      Guide pour développeur débutant — Comprendre le service de gestion des avis
+      dans un système de workflow bancaire (SAEB).
+      Chaque section explique <em>quoi</em>, <em>pourquoi</em> et <em>comment</em>.
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       1. INTRODUCTION
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="intro">
+    <h2>1. Introduction — À quoi sert ce service ?</h2>
+
+    <div class="card">
+      <div class="card-title">Contexte métier</div>
+      <p>
+        Ce service fait partie d'une application bancaire qui gère les
+        <strong>dossiers de crédit</strong> (appelés <em>canevas</em>).
+        Chaque dossier doit passer par plusieurs niveaux d'approbation :
+        agence → direction régionale → centrale commerciale → décision finale.
+      </p>
+      <p>
+        Un <strong>Avis</strong> est l'opinion/action qu'un utilisateur (chargé de clientèle,
+        chef d'agence, directeur régional…) pose sur un dossier à un moment donné.
+      </p>
+    </div>
+
+    <div class="card success">
+      <div class="card-title">Annotations Spring Boot utilisées</div>
+      <ul style="padding-left:1.2rem">
+        <li><code>@Service</code> — Déclare cette classe comme un service Spring (composant métier).</li>
+        <li><code>@Transactional</code> — Toutes les méthodes s'exécutent dans une seule transaction base de données. Si une erreur survient, tout est annulé (rollback).</li>
+        <li><code>@Slf4j</code> — Injecte automatiquement un logger <code>log</code> pour écrire des messages de débogage.</li>
+      </ul>
+    </div>
+
+    <div class="annotation">
+      Une <strong>transaction</strong>, c'est comme un panier dans un supermarché :
+      soit tous les articles passent en caisse, soit rien ne passe si un problème survient.
+      Ici, sauvegarder l'avis ET mettre à jour le canevas se font ensemble.
+    </div>
+
+    <!-- Entités impliquées -->
+    <h3>Entités (tables base de données) manipulées</h3>
+    <div class="entity-grid">
+      <div class="entity-card">
+        <h4>Avis</h4>
+        <ul>
+          <li>L'avis posé par un utilisateur</li>
+          <li>Stocke le statut, la valeur, le commentaire</li>
+          <li>Données JSON (crédit, garanties…)</li>
+        </ul>
+      </div>
+      <div class="entity-card">
+        <h4>Caneva</h4>
+        <ul>
+          <li>Le dossier de crédit principal</li>
+          <li>Contient le <code>stade</code> actuel</li>
+          <li>Assigné à un agent (<code>matrAffectCnv</code>)</li>
+        </ul>
+      </div>
+      <div class="entity-card">
+        <h4>CanevasUser</h4>
+        <ul>
+          <li>Un utilisateur du système</li>
+          <li>A un matricule, une structure</li>
+          <li>Peut avoir un superviseur</li>
+        </ul>
+      </div>
+      <div class="entity-card">
+        <h4>Affectation</h4>
+        <ul>
+          <li>Historique des transferts</li>
+          <li>Émetteur → Récepteur</li>
+          <li>Contient l'état et les observations</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       2. STRUCTURE DU SERVICE
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="structure">
+    <h2>2. Structure du service — Les dépendances injectées</h2>
+
+    <p>
+      Le service reçoit toutes ses dépendances via le <strong>constructeur</strong>
+      (injection de dépendances). C'est la bonne pratique Spring Boot
+      (préférable à <code>@Autowired</code> sur les champs).
+    </p>
+
+    <pre><code>public AvisService(
+    AvisRepository           avisRepository,       // CRUD table Avis
+    CanevaRepository         canevaRepository,      // CRUD table Caneva
+    ObjectMapper             objectMapper,          // Conversion Java ↔ JSON
+    CanevasUserRepository    canevasUserRepository, // CRUD table CanevasUser
+    AffectationRepository    affectationRepository, // CRUD table Affectation
+    CanevasSnapshotService   snapshotService,       // Crée des snapshots
+    WorkflowLogService       workflowLogService     // Journalise les actions
+) { ... }</code></pre>
+
+    <div class="card warning">
+      <div class="card-title">Qu'est-ce qu'un Repository ?</div>
+      <p>
+        Un <strong>Repository</strong> est une interface Spring Data JPA qui génère
+        automatiquement les requêtes SQL. Par exemple,
+        <code>avisRepository.save(avis)</code> fait un INSERT ou UPDATE en base
+        sans écrire une seule ligne de SQL.
+      </p>
+    </div>
+
+    <div class="card info">
+      <div class="card-title">ObjectMapper — Le traducteur JSON</div>
+      <p>
+        L'<code>ObjectMapper</code> (Jackson) convertit des objets Java en chaîne JSON
+        et inversement. Dans ce service, les données complexes (crédit, garanties)
+        sont stockées en base sous forme de texte JSON, puis reconstruites à la lecture.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       3. saveAvis() — MÉTHODE PRINCIPALE
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="saveAvis">
+    <h2>3. La méthode principale — <code>saveAvis(AvisDTO dto)</code></h2>
+
+    <p>
+      C'est le cœur du service. Elle fait <strong>deux grandes choses</strong> :
+      (1) sauvegarder l'avis en base, et (2) faire avancer le workflow du dossier.
+    </p>
+
+    <!-- ÉTAPE 1 -->
+    <h3>Étape 1 — Créer ou mettre à jour l'entité Avis</h3>
+    <div class="card">
+      <p>
+        Le service vérifie si un avis existe déjà (via <code>id</code> + <code>matricule</code>).
+        Si oui → mise à jour de la date de modification.
+        Si non → création d'un nouvel avis avec la date de création.
+      </p>
+    </div>
+
+    <pre><code>// Si id ET matricule fournis → on cherche l'avis existant
+if (dto.getId() != null && dto.getMatricule() != null) {
+    Optional&lt;Avis&gt; optionalAvis =
+        avisRepository.findByIdAndMatricule(dto.getId(), dto.getMatricule());
+
+    if (optionalAvis.isPresent()) {
+        avis = optionalAvis.get();          // mise à jour
+        avis.setDateModification(LocalDateTime.now());
+    } else {
+        avis = new Avis();                  // création
+        avis.setDateCreation(LocalDateTime.now());
+    }
+} else {
+    avis = new Avis();                      // création (pas d'id)
+    avis.setDateCreation(LocalDateTime.now());
+}</code></pre>
+
+    <div class="annotation">
+      <code>Optional&lt;T&gt;</code> est un conteneur qui peut contenir ou non une valeur.
+      C'est la façon moderne Java d'éviter les <code>NullPointerException</code>.
+      <code>isPresent()</code> vérifie si la valeur existe, <code>get()</code> la récupère.
+    </div>
+
+    <!-- DONNÉES SÉRIALISÉES -->
+    <h3>Sérialisation des données complexes en JSON</h3>
+    <pre><code>avis.setDataAchatTerrain(
+    objectMapper.writeValueAsString(dto.getDataAchatTerrain())
+);
+// Résultat en base : "[{\"montant\":5000,\"duree\":12}, ...]"</code></pre>
+
+    <p>
+      Les champs <code>dataAchatTerrain</code>, <code>dataCreditInvestissement</code>,
+      etc. sont des listes d'objets Java. Plutôt que de créer des tables séparées,
+      elles sont converties en texte JSON et stockées dans une seule colonne.
+    </p>
+
+    <!-- ÉTAPE 2 -->
+    <h3>Étape 2 — Logique de workflow selon le <code>statusAvis</code></h3>
+    <p>
+      Après la sauvegarde, le service lit le champ <code>statusAvis</code> du DTO
+      et exécute l'action correspondante. C'est un <strong>if / else if</strong> en cascade.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>statusAvis</th>
+          <th>Qui l'envoie ?</th>
+          <th>Action effectuée</th>
+          <th>Nouveau stade du canevas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-blue">PEC_CCA</span></td>
+          <td>Chargée Clientèle Agence (P1)</td>
+          <td>Prise en charge du dossier</td>
+          <td><code>PEC_DONNEE</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">Envoyer</span></td>
+          <td>Tout utilisateur</td>
+          <td>Envoie au niveau supérieur (superviseur ou structure)</td>
+          <td><code>EN_COURS_ETUDE</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">PRES_VALIDER</span></td>
+          <td>Chef Agence (P2)</td>
+          <td>Pré-validation des données</td>
+          <td><code>VALID_DONNEE</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">CORRIGER</span></td>
+          <td>Chef Agence (P2)</td>
+          <td>Demande de correction</td>
+          <td><code>CORRIGE_DONNEE</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">PEC_AVIS_DEC</span></td>
+          <td>Chargée Clientèle DR (P3)</td>
+          <td>Prise en charge pour avis décision</td>
+          <td><code>PEC_AVIS_DEC</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">CORRIGER2</span></td>
+          <td>Chef Agence DR (P4)</td>
+          <td>Correction au niveau DR</td>
+          <td><code>CORRIGE_AVIS_DEC</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">VALIDER</span></td>
+          <td>Chef Agence DR (P4)</td>
+          <td>Validation + envoi à structure réceptrice</td>
+          <td><code>VALIDER_DR</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">PEC_CHARGEE_COMM</span></td>
+          <td>Chargée Commerciale (P5)</td>
+          <td>Prise en charge par chargée commerciale</td>
+          <td><code>PEC_CHARGEE_COMM</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">PEC_DEVISION_COMM</span></td>
+          <td>Division Commerciale (P5)</td>
+          <td>Prise en charge par division commerciale</td>
+          <td><code>PEC_DEVISION_COMM</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">PEC_DEP_COMM</span></td>
+          <td>Département Commerciale (P5)</td>
+          <td>Prise en charge par département commercial</td>
+          <td><code>PEC_DEP_COMM</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">VALID_CENTRALE_COMM</span></td>
+          <td>Centrale Commerciale (P5)</td>
+          <td>Validation centrale + création affectation</td>
+          <td><code>VALID_CENTRALE_COMM</code></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">Décision Finale</span></td>
+          <td>Décideur final</td>
+          <td>Accord (1) ou Rejet (2) du dossier</td>
+          <td><code>DEC_FINAL_PRISE_ACCORD</code> ou <code>DEC_FINAL_PRISE_REJET</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CAS ENVOYER EN DÉTAIL -->
+    <h3>Zoom sur le cas "Envoyer" — 3 sous-cas possibles</h3>
+
+    <div class="card">
+      <div class="card-title">Cas B — Chargé / Division (<code>isChargedOrDivision = true</code>)</div>
+      <p>
+        Le système cherche le <strong>superviseur</strong> de l'utilisateur courant.
+        Si le superviseur existe → on lui affecte le dossier.
+        Sinon → fallback vers <code>structureMere</code> ou <code>codeStructureReceptrice</code>.
+      </p>
+      <pre><code>CanevasUser currentUser = canevasUserRepository.findByMatricule(matricule)...;
+if (currentUser.getSuperviseur() != null) {
+    CanevasUser supervisor = canevasUserRepository.findById(superviseur.getId())...;
+    updateCaneva(numCaneva, supervisor.getMatricule(),
+                 supervisor.getCodeStructure(), "EN_COURS_ETUDE");
+    createAffectation(...);
+} else {
+    // Pas de superviseur → utiliser structureMere
+    String fallback = structureMere != null ? structureMere : codeStructureReceptrice;
+    updateCaneva(numCaneva, null, fallback, "EN_COURS_ETUDE");
+}</code></pre>
+    </div>
+
+    <div class="card success">
+      <div class="card-title">Cas C — Utilisateur normal (<code>isChargedOrDivision = false</code>)</div>
+      <p>
+        On cherche le "chef" de la structure réceptrice via
+        <code>findHeadMatricule(codeStructureReceptrice)</code>,
+        puis on affecte le dossier à ce chef.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       4. WORKFLOW COMPLET
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="workflow">
+    <h2>4. Le Workflow complet du dossier de crédit</h2>
+
+    <p>
+      Le dossier progresse à travers plusieurs profils. Chaque flèche représente
+      une action déclenchée par un <code>statusAvis</code>.
+    </p>
+
+    <!-- CHEMIN PRINCIPAL -->
+    <h3>Chemin principal (Agence → DR → Centrale)</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-box">
+          P1 — Chargée Clientèle<br/>Agence<br/>
+          <small>PEC_CCA → PEC_DONNEE</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box alt">
+          P2 — Chef Agence<br/>
+          <small>PRES_VALIDER → VALID_DONNEE</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box org">
+          Envoyer<br/>
+          <small>EN_COURS_ETUDE</small><br/>
+          <small>(vers DR)</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box pur">
+          P3 — Chargée DR<br/>
+          <small>PEC_AVIS_DEC</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box alt">
+          P4 — Chef Agence DR<br/>
+          <small>VALIDER → VALIDER_DR</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box grn">
+          Décision Finale<br/>
+          <small>ACCORD / REJET</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHEMIN CORRECTIONS -->
+    <h3>Chemin correction (retour arrière)</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-box red">
+          CORRIGER (P2)<br/>
+          <small>→ CORRIGE_DONNEE</small><br/>
+          <small>retour à P1</small>
+        </div>
+      </div>
+      <div class="flow-arrow">|</div>
+      <div class="flow-step">
+        <div class="flow-box red">
+          CORRIGER2 (P4)<br/>
+          <small>→ CORRIGE_AVIS_DEC</small><br/>
+          <small>retour à P3</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHEMIN COMMERCIAL -->
+    <h3>Chemin commercial (Page 5 — Pôle Commercial)</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-box pur">
+          PEC_CHARGEE_COMM<br/>
+          <small>Chargée → Superviseur</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box pur">
+          PEC_DEVISION_COMM<br/>
+          <small>Division → Superviseur</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box pur">
+          PEC_DEP_COMM<br/>
+          <small>Département → Superviseur</small>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-box grn">
+          VALID_CENTRALE_COMM<br/>
+          <small>→ Pôle Risque 381</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      Pour les étapes commerciales (P5), le pattern est identique :
+      on cherche le superviseur dans <code>CanevasUser</code>. S'il existe,
+      on lui transfère le dossier. Sinon, fallback vers <code>structureMere</code>.
+      Le code se répète 3 fois (PEC_CHARGEE, PEC_DEVISION, PEC_DEP) — même logique.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       5. SNAPSHOT & WORKFLOW LOG
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="snapshot">
+    <h2>5. Snapshot & WorkflowLog — Traçabilité du dossier</h2>
+
+    <p>
+      Après chaque action, deux mécanismes de traçabilité sont déclenchés :
+      un <strong>snapshot</strong> (photo de l'état) et un <strong>workflow log</strong>
+      (journal des actions). Ils sont optionnels : si l'un échoue,
+      la transaction principale n'est pas annulée (les exceptions sont attrapées).
+    </p>
+
+    <div class="pipeline">
+
+      <div class="pipe-step">
+        <div class="pipe-num">1</div>
+        <div class="pipe-content">
+          <strong>Résolution du statut snapshot</strong><br/>
+          <code>resolveStatusAtSnapshot(statusAvis, avisValue)</code>
+          traduit le <code>statusAvis</code> en libellé métier pour le snapshot.
+          Exemple : <code>"VALIDER"</code> devient <code>"VALIDER_DR"</code>.
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-num">2</div>
+        <div class="pipe-content">
+          <strong>Sérialisation de l'avis en JSON</strong><br/>
+          Un <code>Map</code> contenant les informations clés de l'avis
+          (statusAvis, avisValue, commentaire, structure, matricule, avisId)
+          est converti en chaîne JSON. C'est la "donnée" stockée dans le snapshot.
+          <pre><code>Map&lt;String, Object&gt; avisMap = new LinkedHashMap&lt;&gt;();
+avisMap.put("statusAvis",  dto.getStatusAvis());
+avisMap.put("avisValue",   dto.getAvisValue());
+// ...
+String avisJson = objectMapper.writeValueAsString(avisMap);
+// Résultat : {"statusAvis":"VALIDER","avisValue":"1","commentaire":"OK",...}</code></pre>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-num">3</div>
+        <div class="pipe-content">
+          <strong>Création du Snapshot</strong><br/>
+          <code>snapshotService.createSnapshot(...)</code> est appelé avec :
+          <ul style="margin:.5rem 0 .5rem 1.2rem; font-size:.88rem">
+            <li><code>numCaneva</code> — l'identifiant du dossier</li>
+            <li><code>structureCode / structureLabel</code> — la structure qui agit</li>
+            <li><code>matriculeLog</code> — l'agent qui agit</li>
+            <li><code>observations</code> — le commentaire</li>
+            <li><code>statusAtSnap</code> — le statut traduit</li>
+            <li><code>avisJson</code> — les données de l'avis en JSON</li>
+          </ul>
+          En retour, on récupère <code>snapshotId</code> et <code>versionNumber</code>
+          pour les passer au WorkflowLog.
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-num">4</div>
+        <div class="pipe-content">
+          <strong>Résolution de l'action workflow</strong><br/>
+          <code>resolveWorkflowAction(statusAvis)</code> traduit le statut en
+          action métier lisible pour le log.
+          <table style="margin:.5rem 0; font-size:.82rem">
+            <thead><tr><th>statusAvis</th><th>Action log</th></tr></thead>
+            <tbody>
+              <tr><td>PEC_CCA</td><td>PRENDRE_EN_CHARGE</td></tr>
+              <tr><td>Envoyer</td><td>ENVOYER</td></tr>
+              <tr><td>PRES_VALIDER</td><td>PRE_VALIDER</td></tr>
+              <tr><td>CORRIGER</td><td>REFOULER</td></tr>
+              <tr><td>VALIDER</td><td>VALIDER</td></tr>
+              <tr><td>Décision Finale</td><td>DECISION_FINALE</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-num">5</div>
+        <div class="pipe-content">
+          <strong>Enregistrement du WorkflowLog</strong><br/>
+          <code>workflowLogService.log(...)</code> crée une entrée dans le journal
+          avec : le canevas concerné, la structure émettrice, la structure réceptrice,
+          l'action effectuée, la version du snapshot, et le matricule de l'agent.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card warning">
+      <div class="card-title">Pourquoi les exceptions sont-elles attrapées ?</div>
+      <pre><code>try {
+    var snap = snapshotService.createSnapshot(...);
+    snapshotId = snap.getSnapshotId();
+} catch (Exception e) {
+    log.warn("Échec snapshot canevas={}", dto.getNumCaneva(), e);
+    // ↑ On log l'erreur MAIS on ne relance pas l'exception.
+    // Le reste de saveAvis() continue normalement.
+}</code></pre>
+      <p>
+        Le snapshot et le workflow log sont des fonctionnalités de <em>traçabilité</em>,
+        pas de fonctionnement essentiel. Si le service de snapshot est indisponible,
+        on ne veut pas bloquer la sauvegarde de l'avis. C'est une décision de conception :
+        tolérance aux pannes secondaires.
+      </p>
+    </div>
+
+    <!-- Schéma snapshot -->
+    <h3>Schéma de la pipeline snapshot</h3>
+    <pre><code>saveAvis()
+   │
+   ├─ [1] Sauvegarder Avis en BDD
+   │
+   ├─ [2] Exécuter la logique workflow (updateCaneva, createAffectation)
+   │
+   ├─ [3] resolveStatusAtSnapshot() ──► libellé d'état
+   │
+   ├─ [4] Sérialiser l'avis en JSON  ──► avisJson
+   │
+   ├─ [5] snapshotService.createSnapshot(...)
+   │         └─► retourne (snapshotId, versionNumber)
+   │
+   ├─ [6] resolveWorkflowAction()    ──► action (ex: "ENVOYER")
+   │
+   └─ [7] workflowLogService.log(numCaneva, from, to, action, version, snapshotId, ...)</code></pre>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       6. MÉTHODES UTILITAIRES PRIVÉES
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="helpers">
+    <h2>6. Méthodes utilitaires privées</h2>
+
+    <!-- updateCaneva -->
+    <div class="card">
+      <div class="card-title"><code>updateCaneva(Long canevaId, String matrAffect, String codeStructure, String stade)</code></div>
+      <p>
+        Met à jour trois champs du canevas en base :
+        l'agent affecté (<code>matrAffectCnv</code>), la structure courante (<code>codeStructure</code>),
+        et le stade (<code>Stade.valueOf(stade)</code>).
+        Si un paramètre est <code>null</code>, le champ correspondant n'est <strong>pas modifié</strong>.
+      </p>
+      <pre><code>private void updateCaneva(Long canevaId, String matrAffect,
+                          String codeStructure, String stade) {
+    Caneva caneva = canevaRepository.findById(canevaId)
+            .orElseThrow(() -> new EntityNotFoundException("Caneva not found: " + canevaId));
+
+    if (matrAffect   != null) caneva.setMatrAffectCnv(matrAffect);
+    if (codeStructure != null) caneva.setCodeStructure(codeStructure);
+    if (stade         != null) caneva.setStade(Stade.valueOf(stade));
+    // Stade.valueOf("EN_COURS_ETUDE") → convertit la String en enum Stade
+
+    canevaRepository.save(caneva);
+}</code></pre>
+    </div>
+
+    <!-- createAffectation -->
+    <div class="card success">
+      <div class="card-title"><code>createAffectation(...)</code></div>
+      <p>
+        Crée un enregistrement d'historique de transfert du dossier.
+        Selon le <code>typeStructure</code>, les observations sont différentes :
+      </p>
+      <ul style="padding-left:1.2rem; margin-bottom:.75rem">
+        <li><code>"1"</code> = Agence → DR : <em>"Envoi de l'agence à la direction régionale"</em></li>
+        <li><code>"2"</code> = DR → Centrale : <em>"Envoi de la direction régionale [code] vers 330"</em></li>
+        <li><code>"5"</code> = Commercial interne : message selon le contexte (hiérarchie ou structure)</li>
+      </ul>
+      <p>
+        Cas spécial : si le récepteur est un "CHARGÉ" (détecté dans son libellé de structure),
+        l'état de l'affectation passe à <code>AFFECTE</code> au lieu de l'état par défaut.
+      </p>
+    </div>
+
+    <!-- findHeadMatricule -->
+    <div class="card">
+      <div class="card-title"><code>findHeadMatricule(String codeStructure)</code></div>
+      <p>
+        Trouve le "responsable" d'une structure : l'utilisateur qui n'a
+        <strong>pas de superviseur</strong> dans cette structure (= le chef de la hiérarchie).
+      </p>
+      <pre><code>return users.stream()
+    .filter(u -> u.getSuperviseur() == null)  // pas de superviseur = c'est le chef
+    .map(CanevasUser::getMatricule)
+    .findFirst()
+    .orElse(null);                            // null si personne trouvé</code></pre>
+      <div class="annotation">
+        <code>stream()</code> permet de traiter une liste de façon fonctionnelle.
+        <code>filter()</code> garde seulement les éléments qui satisfont la condition.
+        <code>findFirst()</code> retourne le premier résultat ou <code>Optional.empty()</code>.
+      </div>
+    </div>
+
+    <!-- convertToDTO -->
+    <div class="card info">
+      <div class="card-title"><code>convertToDTO(Avis avis)</code></div>
+      <p>
+        Convertit l'entité base de données (<code>Avis</code>) en objet de transfert
+        (<code>AvisDTO</code>) pour l'API. La désérialisation JSON reconstruit
+        les objets complexes depuis le texte stocké en base.
+      </p>
+      <pre><code>// Désérialisation : JSON String → List&lt;AvisCreditAchatTerrainDTO&gt;
+if (avis.getDataAchatTerrain() != null) {
+    dto.setDataAchatTerrain(
+        objectMapper.readValue(
+            avis.getDataAchatTerrain(),
+            new TypeReference&lt;List&lt;AvisCreditAchatTerrainDTO&gt;&gt;() {}
+        )
+    );
+}</code></pre>
+      <p>
+        <code>TypeReference&lt;List&lt;AvisCreditAchatTerrainDTO&gt;&gt;</code> est nécessaire
+        car Java efface les types génériques à la compilation (type erasure).
+        Cette syntaxe préserve l'information pour Jackson.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       7. MÉTHODES DE LECTURE
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="queries">
+    <h2>7. Méthodes de lecture (getters)</h2>
+
+    <p>Le service expose de nombreuses méthodes de recherche. Toutes délèguent au repository.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Méthode</th>
+          <th>Critères de recherche</th>
+          <th>Retour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>getAvisById(id)</code></td>
+          <td>ID unique</td>
+          <td><code>AvisDTO</code> (exception si absent)</td>
+        </tr>
+        <tr>
+          <td><code>getAvisByParams(numCaneva, numSeqpers)</code></td>
+          <td>Numéro de canevas + séquence personne</td>
+          <td><code>AvisDTO</code> ou <code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>getAvisByParamss(numCaneva, numSeqpers, status)</code></td>
+          <td>+ filtre sur statut</td>
+          <td><code>AvisDTO</code> ou <code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>getAvisByParamss2(..., matricule)</code></td>
+          <td>+ filtre sur matricule</td>
+          <td><code>AvisDTO</code> ou <code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>getAvisByParamss4(numCaneva, structure)</code></td>
+          <td>Canevas + structure</td>
+          <td><code>AvisDTO</code> ou <code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>findByNumCanevaAndMaxId(numCaneva)</code></td>
+          <td>L'avis le plus récent du canevas</td>
+          <td><code>AvisDTO</code> ou <code>null</code></td>
+        </tr>
+        <tr>
+          <td><code>getAvisListByNumCanevaAndStructure(numCaneva, structure)</code></td>
+          <td>Tous les avis d'une structure pour un canevas</td>
+          <td><code>List&lt;AvisDTO&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>findMaxIdAvisByNumCanevaGroupedByStructure(numCaneva)</code></td>
+          <td>Dernier avis par structure pour un canevas</td>
+          <td><code>List&lt;AvisDTO&gt;</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card warning">
+      <div class="card-title">Convention de nommage — une remarque</div>
+      <p>
+        Les méthodes <code>getAvisByParamss</code>, <code>getAvisByParamss2</code>,
+        <code>getAvisByParamss3</code>, <code>getAvisByParamss4</code> ont été ajoutées
+        progressivement. Dans un projet mature, on les regrouperait avec des paramètres
+        optionnels ou une specification JPA, mais pour un projet en développement c'est
+        une approche courante.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       8. RÉSUMÉ VISUEL
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section id="resume">
+    <h2>8. Résumé visuel — Ce que fait <code>saveAvis()</code></h2>
+
+    <pre><code>
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  saveAvis(AvisDTO dto)                                              │
+  │                                                                     │
+  │  ① Trouver ou créer l'entité Avis                                  │
+  │     └─► avisRepository.save(avis)  ────────────────► BDD table AVIS│
+  │                                                                     │
+  │  ② Lire statusAvis et brancher selon le cas                        │
+  │     │                                                               │
+  │     ├─ "PEC_CCA"        → updateCaneva(stade: PEC_DONNEE)          │
+  │     ├─ "Envoyer"        → findSuperviseur/findHead + updateCaneva   │
+  │     │                   + createAffectation                        │
+  │     ├─ "PRES_VALIDER"   → updateCaneva(stade: VALID_DONNEE)        │
+  │     ├─ "CORRIGER"       → updateCaneva(stade: CORRIGE_DONNEE)      │
+  │     ├─ "VALIDER"        → findHead + updateCaneva + createAffect.  │
+  │     ├─ "PEC_*_COMM"     → findSuperviseur + updateCaneva + crAff.  │
+  │     └─ "Décision Finale"→ updateCaneva(DEC_FINAL_ACCORD/REJET)     │
+  │                                                                     │
+  │  ③ resolveStatusAtSnapshot() ─► libellé snapshot                   │
+  │                                                                     │
+  │  ④ Sérialiser avis en JSON ─► avisJson                             │
+  │                                                                     │
+  │  ⑤ snapshotService.createSnapshot(...)                             │
+  │     └─► retourne (snapshotId, versionNumber)                       │
+  │                                                                     │
+  │  ⑥ resolveWorkflowAction() ─► action métier                        │
+  │                                                                     │
+  │  ⑦ workflowLogService.log(...)                                     │
+  │                                                                     │
+  │  ⑧ retourner convertToDTO(savedAvis)  ─► AvisDTO au contrôleur    │
+  └─────────────────────────────────────────────────────────────────────┘
+    </code></pre>
+
+    <h3>Points clés à retenir</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.5rem">
+      <div class="card success">
+        <div class="card-title">Bonnes pratiques utilisées</div>
+        <ul style="padding-left:1.2rem; font-size:.88rem">
+          <li>Injection par constructeur (pas @Autowired sur champ)</li>
+          <li>@Transactional sur la classe entière</li>
+          <li>Optional pour éviter les NullPointerException</li>
+          <li>Snapshot/Log en try-catch : tolérance aux pannes</li>
+          <li>Méthodes privées avec responsabilité unique</li>
+        </ul>
+      </div>
+      <div class="card danger">
+        <div class="card-title">Points d'attention</div>
+        <ul style="padding-left:1.2rem; font-size:.88rem">
+          <li>La chaîne if/else dans saveAvis() est longue — à refactoriser avec Strategy pattern</li>
+          <li>Données JSON en colonne unique = pas de requêtes SQL sur ces champs</li>
+          <li>Méthodes de lecture très similaires — duplication de code</li>
+          <li>Encodage UTF-8 à vérifier (caractères accentués dans les strings)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Documentation générée pour <strong>AvisService.java</strong> —
+  Système SAEB — Usage pédagogique interne
+</footer>
+
+</body>
+</html>

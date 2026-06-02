@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyse Workflow Snapshot — Canvas Agricole BNA</title>
+  <style>
+    :root {
+      --primary: #1565C0;
+      --success: #2E7D32;
+      --warning: #F57F17;
+      --danger: #C62828;
+      --info: #0277BD;
+      --neutral: #37474F;
+      --bg: #F5F7FA;
+      --card: #FFFFFF;
+      --border: #E0E6ED;
+      --text: #263238;
+      --muted: #607D8B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    .page-header {
+      background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+      color: white;
+      padding: 40px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 300px; height: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .page-header p  { font-size: 15px; opacity: 0.85; }
+    .header-meta { margin-top: 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+    .header-meta span {
+      background: rgba(255,255,255,0.15);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+    /* ── TOC ────────────────────────────────────────────────── */
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 40px;
+    }
+    .toc h2 { font-size: 16px; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--primary); text-decoration: none; font-size: 13px; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── SECTION TITLE ──────────────────────────────────────── */
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 32px 36px;
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      padding-bottom: 12px;
+      border-bottom: 3px solid var(--primary);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title .icon { font-size: 22px; }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--neutral);
+      margin: 24px 0 12px;
+    }
+
+    /* ── WORKFLOW STEPPER ───────────────────────────────────── */
+    .workflow-stepper {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin: 32px 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .ws-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 160px;
+      position: relative;
+    }
+    .ws-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: calc(50% + 28px);
+      width: calc(100% - 56px);
+      height: 3px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .ws-step.done::after { background: var(--success); }
+    .ws-circle {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--border);
+      border: 3px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      position: relative; z-index: 1;
+    }
+    .ws-step.done   .ws-circle { background: var(--success); border-color: var(--success); }
+    .ws-step.active .ws-circle { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(21,101,192,0.2); }
+    .ws-label { margin-top: 10px; text-align: center; }
+    .ws-label strong { display: block; font-size: 13px; color: var(--text); }
+    .ws-label span   { display: block; font-size: 11px; color: var(--muted); }
+
+    /* ── STAGE CARDS ────────────────────────────────────────── */
+    .stage-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .stage-header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .stage-header.s1 { background: #E3F2FD; color: #1565C0; border-bottom: 2px solid #90CAF9; }
+    .stage-header.s2 { background: #E8F5E9; color: #2E7D32; border-bottom: 2px solid #A5D6A7; }
+    .stage-header.s3 { background: #FFF8E1; color: #F57F17; border-bottom: 2px solid #FFE082; }
+    .stage-header.s4 { background: #FCE4EC; color: #AD1457; border-bottom: 2px solid #F48FB1; }
+    .stage-header.s5 { background: #F3E5F5; color: #6A1B9A; border-bottom: 2px solid #CE93D8; }
+    .stage-body { padding: 20px; }
+
+    /* ── REAL CASE BOX ──────────────────────────────────────── */
+    .real-case {
+      background: #F8F9FA;
+      border-left: 4px solid var(--info);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 18px;
+      margin: 14px 0;
+    }
+    .real-case .case-title {
+      font-weight: 600;
+      color: var(--info);
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .real-case p { font-size: 13px; color: var(--text); }
+
+    /* ── ACTIONS TABLE ──────────────────────────────────────── */
+    .actions-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+    .actions-table th {
+      background: #ECEFF1;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--neutral);
+      border-bottom: 2px solid var(--border);
+    }
+    .actions-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .actions-table tr:last-child td { border-bottom: none; }
+    .actions-table tr:hover td { background: #F5F7FA; }
+
+    /* ── STATUS BADGES ──────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-success { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+    .badge-info    { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+    .badge-warning { background: #FFF8E1; color: #F57F17; border: 1px solid #FFE082; }
+    .badge-danger  { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+    .badge-purple  { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }
+    .badge-neutral { background: #ECEFF1; color: #37474F; border: 1px solid #B0BEC5; }
+
+    /* ── ISSUES ─────────────────────────────────────────────── */
+    .issue-card {
+      border-radius: 10px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .issue-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .issue-header.critical { background: #FFEBEE; color: #C62828; border-bottom: 2px solid #EF9A9A; }
+    .issue-header.major    { background: #FFF8E1; color: #E65100; border-bottom: 2px solid #FFB74D; }
+    .issue-header.minor    { background: #E3F2FD; color: #1565C0; border-bottom: 2px solid #90CAF9; }
+    .issue-header.perf     { background: #F3E5F5; color: #6A1B9A; border-bottom: 2px solid #CE93D8; }
+    .issue-body { padding: 16px 18px; }
+    .issue-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+    .issue-tag.critical { background: #C62828; color: white; }
+    .issue-tag.major    { background: #E65100; color: white; }
+    .issue-tag.minor    { background: #1565C0; color: white; }
+    .issue-tag.perf     { background: #6A1B9A; color: white; }
+
+    /* ── CODE BLOCKS ────────────────────────────────────────── */
+    .code-block {
+      background: #1E2736;
+      color: #CDD9E5;
+      border-radius: 8px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 12px 0;
+      position: relative;
+    }
+    .code-block .comment { color: #6B7F9A; font-style: italic; }
+    .code-block .keyword { color: #79B8FF; }
+    .code-block .string  { color: #9ECE6A; }
+    .code-block .danger-line { background: rgba(198,40,40,0.2); display: block; margin: 0 -18px; padding: 0 18px; border-left: 3px solid #C62828; }
+    .code-block .fix-line    { background: rgba(46,125,50,0.2); display: block; margin: 0 -18px; padding: 0 18px; border-left: 3px solid #2E7D32; }
+
+    /* ── FIX BLOCKS ─────────────────────────────────────────── */
+    .fix-section {
+      background: #F1F8F1;
+      border: 1px solid #A5D6A7;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-top: 12px;
+    }
+    .fix-section h4 {
+      color: var(--success);
+      font-size: 13px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ── ROLE TABLE ─────────────────────────────────────────── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .role-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .role-card .role-icon { font-size: 28px; margin-bottom: 8px; }
+    .role-card .role-name { font-weight: 600; font-size: 14px; color: var(--text); }
+    .role-card .role-code { font-size: 12px; color: var(--muted); margin: 4px 0; }
+    .role-card .role-perms { font-size: 11px; margin-top: 8px; }
+
+    /* ── DATA STRUCTURE ─────────────────────────────────────── */
+    .data-tree {
+      font-family: 'Consolas', monospace;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.8;
+      background: #F8F9FA;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+    .data-tree .key   { color: #1565C0; font-weight: 600; }
+    .data-tree .type  { color: #6A1B9A; font-style: italic; }
+    .data-tree .desc  { color: #607D8B; margin-left: 8px; }
+    .data-tree .indent-1 { padding-left: 20px; }
+    .data-tree .indent-2 { padding-left: 40px; }
+
+    /* ── TIMELINE MINI ──────────────────────────────────────── */
+    .mini-timeline { margin: 16px 0; }
+    .mt-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .mt-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 17px; top: 36px;
+      width: 2px; height: calc(100% + 8px);
+      background: var(--border);
+    }
+    .mt-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    .mt-dot.v  { background: #E8F5E9; }
+    .mt-dot.r  { background: #FFEBEE; }
+    .mt-dot.p  { background: #E3F2FD; }
+    .mt-dot.d  { background: #F3E5F5; }
+    .mt-content { flex: 1; }
+    .mt-content strong { font-size: 13px; display: block; }
+    .mt-content span   { font-size: 12px; color: var(--muted); }
+
+    /* ── SUMMARY TABLE ──────────────────────────────────────── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .summary-card {
+      border-radius: 10px;
+      padding: 18px 20px;
+      border: 1px solid;
+    }
+    .summary-card.critical { border-color: #EF9A9A; background: #FFEBEE; }
+    .summary-card.major    { border-color: #FFB74D; background: #FFF8E1; }
+    .summary-card.minor    { border-color: #90CAF9; background: #E3F2FD; }
+    .summary-card.perf     { border-color: #CE93D8; background: #F3E5F5; }
+    .summary-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .summary-card ul { padding-left: 18px; font-size: 12px; line-height: 1.8; }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    .page-footer {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .page-header { padding: 24px; }
+      .container { padding: 20px 16px; }
+      .section { padding: 20px; }
+      .workflow-stepper { flex-direction: column; }
+      .ws-step:not(:last-child)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- HEADER                                                          -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div class="page-header">
+  <h1>🏦 Analyse du Workflow Snapshot — Canvas Agricole</h1>
+  <p>Explication détaillée, cas réels, problèmes identifiés et corrections proposées</p>
+  <div class="header-meta">
+    <span>📁 SnapshotHistoryComponent</span>
+    <span>🛠 Angular 17+ Signals</span>
+    <span>🏛 Secteur Bancaire Agricole</span>
+    <span>📅 Analyse du 01/06/2026</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- TABLE DES MATIÈRES                                          -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="toc">
+    <h2>📋 Table des Matières</h2>
+    <ol>
+      <li><a href="#contexte">Contexte métier et architecture</a></li>
+      <li><a href="#roles">Rôles et acteurs du workflow</a></li>
+      <li><a href="#etapes">Les 4 étapes du workflow snapshot</a></li>
+      <li><a href="#donnees">Structure des données snapshot</a></li>
+      <li><a href="#actions">Dictionnaire des actions et statuts</a></li>
+      <li><a href="#comparaison">Fonctionnalité de comparaison (Diff)</a></li>
+      <li><a href="#cas-reels">Scénarios réels complets</a></li>
+      <li><a href="#problemes">Problèmes identifiés et corrections</a></li>
+      <li><a href="#resume">Résumé de priorité</a></li>
+    </ol>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 1. CONTEXTE                                                 -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="contexte">
+    <div class="section-title"><span class="icon">🏗</span> 1. Contexte Métier et Architecture</div>
+
+    <p>Le module <strong>Snapshot Workflow</strong> est le cœur du système de validation des dossiers de crédit agricole de la <strong>BNA (Banque Nationale Agricole, Tunisie)</strong>. Il permet de tracer chaque état d'un dossier (appelé <em>canvas</em>) tout au long de son circuit de validation, de l'agence locale jusqu'à la décision finale de la direction centrale.</p>
+
+    <h3>Qu'est-ce qu'un Snapshot ?</h3>
+    <p>Un <strong>snapshot</strong> est une photographie complète et immuable du dossier à un instant précis. Chaque fois qu'une action workflow est effectuée (validation, refoulement, prise en charge), un snapshot est créé. Cela permet de :</p>
+    <ul style="margin-top:10px; padding-left:20px; line-height:2">
+      <li>Conserver l'historique complet des modifications du dossier</li>
+      <li>Comparer l'état d'un dossier à différents moments</li>
+      <li>Assurer la traçabilité et la conformité bancaire (audit)</li>
+      <li>Permettre à chaque niveau hiérarchique de voir l'état du dossier à son arrivée</li>
+    </ul>
+
+    <h3>Architecture technique</h3>
+    <div class="data-tree">
+      <div><span class="key">SnapshotHistoryComponent</span> <span class="desc">— Composant principal UI (Angular Signals)</span></div>
+      <div class="indent-1"><span class="key">SnapshotService</span> <span class="desc">— Couche HTTP vers l'API REST backend</span></div>
+      <div class="indent-2"><span class="type">GET</span> <span class="key">/api/canevas/{id}/snapshots</span> <span class="desc">→ liste des versions</span></div>
+      <div class="indent-2"><span class="type">GET</span> <span class="key">/api/canevas/{id}/snapshots/{sid}/detail</span> <span class="desc">→ détail complet</span></div>
+      <div class="indent-2"><span class="type">GET</span> <span class="key">/api/canevas/{id}/snapshots/workflow-log</span> <span class="desc">→ journal des actions</span></div>
+      <div class="indent-2"><span class="type">POST</span> <span class="key">/api/canevas/{id}/valider</span> <span class="desc">→ valider + transmettre</span></div>
+      <div class="indent-2"><span class="type">POST</span> <span class="key">/api/canevas/{id}/refouler</span> <span class="desc">→ refouler le dossier</span></div>
+      <div class="indent-1"><span class="key">CanevasAgrService</span> <span class="desc">— Signal contenant l'ID du canvas courant</span></div>
+      <div class="indent-1"><span class="key">UserService</span> <span class="desc">— Signal contenant le profil utilisateur connecté</span></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 2. RÔLES                                                    -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="roles">
+    <div class="section-title"><span class="icon">👥</span> 2. Rôles et Acteurs du Workflow</div>
+
+    <p>Le workflow implique 5 types de structures identifiées par <code>typeStructure</code> dans le service utilisateur :</p>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-icon">🏢</div>
+        <div class="role-name">Agent Agence</div>
+        <div class="role-code">typeStructure = '1'</div>
+        <div class="role-perms">
+          <span class="badge badge-info">Saisie</span>&nbsp;
+          <span class="badge badge-danger">Correction</span>
+        </div>
+        <p style="font-size:11px;color:#607D8B;margin-top:8px">Crée et remplit le dossier de crédit. Peut corriger si refoulé.</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">👔</div>
+        <div class="role-name">Chef Agence</div>
+        <div class="role-code">typeStructure = '2'</div>
+        <div class="role-perms">
+          <span class="badge badge-success">PRE_VALIDER</span>&nbsp;
+          <span class="badge badge-danger">REFOULER</span>
+        </div>
+        <p style="font-size:11px;color:#607D8B;margin-top:8px">Valide et transmet à la Direction Régionale. Peut renvoyer à l'agence.</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">🏛</div>
+        <div class="role-name">Direction Régionale</div>
+        <div class="role-code">typeStructure = '3'</div>
+        <div class="role-perms">
+          <span class="badge badge-success">VALIDER</span>&nbsp;
+          <span class="badge badge-info">PEC</span>&nbsp;
+          <span class="badge badge-danger">REFOULER</span>
+        </div>
+        <p style="font-size:11px;color:#607D8B;margin-top:8px">Analyse le dossier. Peut le valider vers DC ou le refouler.</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">🏦</div>
+        <div class="role-name">Direction Centrale</div>
+        <div class="role-code">typeStructure = '5'</div>
+        <div class="role-perms">
+          <span class="badge badge-purple">DECISION_FINALE</span>&nbsp;
+          <span class="badge badge-info">ENVOYER</span>
+        </div>
+        <p style="font-size:11px;color:#607D8B;margin-top:8px">Prend la décision finale : accord ou rejet.</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">💼</div>
+        <div class="role-name">Pôle Commercial</div>
+        <div class="role-code">typeStructure = '4' (implicite)</div>
+        <div class="role-perms">
+          <span class="badge badge-info">PEC_COMM</span>&nbsp;
+          <span class="badge badge-success">VALID_CENTRALE</span>
+        </div>
+        <p style="font-size:11px;color:#607D8B;margin-top:8px">Analyse commerciale interne avant décision centrale.</p>
+      </div>
+    </div>
+
+    <div class="real-case" style="margin-top:20px">
+      <div class="case-title">📌 Cas Réel — Filtrage des logs par rôle</div>
+      <p>Mohamed (Agent, typeStructure='1', codeStructure='AGC-001') ouvre l'historique du canvas #285. Il ne voit que les logs où fromStructure='AGC-001' ou toStructure='AGC-001'. Il ne peut pas voir les échanges internes DR ↔ DC. Le directeur régional (typeStructure='2') voit aussi les logs de ses agences enfants (structureMere='DR-05').</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 3. LES 4 ÉTAPES DU WORKFLOW                                 -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="etapes">
+    <div class="section-title"><span class="icon">🔄</span> 3. Les 4 Étapes du Workflow Snapshot</div>
+
+    <!-- Stepper visuel -->
+    <div class="workflow-stepper">
+      <div class="ws-step done">
+        <div class="ws-circle">✏</div>
+        <div class="ws-label"><strong>Étape 1</strong><span>Saisie</span><span>Agence</span></div>
+      </div>
+      <div class="ws-step done">
+        <div class="ws-circle">✓</div>
+        <div class="ws-label"><strong>Étape 2</strong><span>Validation</span><span>Chef Agence</span></div>
+      </div>
+      <div class="ws-step active">
+        <div class="ws-circle">🔍</div>
+        <div class="ws-label"><strong>Étape 3</strong><span>Analyse</span><span>Dir. Régionale</span></div>
+      </div>
+      <div class="ws-step">
+        <div class="ws-circle">⭐</div>
+        <div class="ws-label"><strong>Étape 4</strong><span>Décision</span><span>Dir. Centrale</span></div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 1 -->
+    <div class="stage-card">
+      <div class="stage-header s1">
+        <span>✏</span>
+        <span>ÉTAPE 1 — Saisie à l'Agence</span>
+        <span class="badge badge-info" style="margin-left:auto">Condition : snapshots.length &gt; 0</span>
+      </div>
+      <div class="stage-body">
+        <p><strong>Acteur :</strong> Agent Agence (typeStructure = '1')</p>
+        <p style="margin-top:8px"><strong>Ce qui se passe :</strong> L'agent saisit toutes les informations du dossier agricole dans le canvas. Une fois les données complètes, il enregistre — ce qui déclenche la création du <em>premier snapshot</em> en base de données avec le statut initial.</p>
+
+        <h3>Données capturées dans le snapshot :</h3>
+        <ul style="padding-left:20px;line-height:2;font-size:13px">
+          <li><strong>creditsData</strong> : Crédits CT (court terme), investissement, achat terrain — avec montants par ligne de crédit</li>
+          <li><strong>engagementsBNA</strong> : Engagements en cours à la BNA (type risque, autorisé, encours, impayé)</li>
+          <li><strong>engagementsBCT</strong> : Engagements déclarés à la Banque Centrale de Tunisie</li>
+          <li><strong>exploitationData</strong> : Sites géographiques d'exploitation, projets CT (barème, CA réalisé, CA prévisionnel, 3 mois achat)</li>
+          <li><strong>garantiesData</strong> : Garanties proposées (hypothèques, nantissements, cautions)</li>
+          <li><strong>engagementDetaille</strong> : Actionnaires, premier responsable, groupe, vendeurs</li>
+        </ul>
+
+        <div class="real-case">
+          <div class="case-title">📌 Cas Réel — Dossier d'un agriculteur de Béja</div>
+          <p>Fatma Bouazizi, agricultrice à Testour (Béja), dépose une demande de crédit CT de 85 000 TND pour sa production d'olivier et un crédit d'investissement de 120 000 TND pour un tracteur. L'agent de l'agence AGC-059 saisit les données : 1 site d'exploitation (Délégation Testour, lat/long inclus), encours BNA existant de 15 000 TND, barème olive = 450 TND/ha × 50 ha = 22 500 TND. Le premier snapshot v1 est créé automatiquement avec statusAtSnapshot = 'SAISIE_INITIALE'.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 -->
+    <div class="stage-card">
+      <div class="stage-header s2">
+        <span>✓</span>
+        <span>ÉTAPE 2 — Validation Chef Agence</span>
+        <span class="badge badge-success" style="margin-left:auto">Condition : has('PRE_VALIDER') || hasStatus('VALID_DONNEE')</span>
+      </div>
+      <div class="stage-body">
+        <p><strong>Acteur :</strong> Chef Agence (typeStructure = '2')</p>
+        <p style="margin-top:8px"><strong>Ce qui se passe :</strong> Le chef agence examine le dossier soumis. Il peut le valider et le transmettre à la Direction Régionale, ou le refouler vers l'agence pour corrections.</p>
+
+        <h3>Actions possibles :</h3>
+        <table class="actions-table">
+          <thead><tr><th>Action</th><th>Statut résultant</th><th>Destination</th><th>Snapshot créé ?</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-success">PRE_VALIDER</span></td>
+              <td>VALID_DONNEE</td>
+              <td>Direction Régionale</td>
+              <td>✅ Oui (nouvelle version)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-danger">REFOULER</span></td>
+              <td>CORRIGE_DONNEE</td>
+              <td>Retour Agence</td>
+              <td>✅ Oui (motif obligatoire)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="real-case">
+          <div class="case-title">📌 Cas Réel — Refoulement pour montant incohérent</div>
+          <p>Le chef agence Kamel Nasri examine le dossier de Fatma. Il remarque que le barème calculé donne 22 500 TND mais le crédit sollicité est de 85 000 TND — un écart non justifié. Il clique sur <strong>Refouler</strong>, saisit le motif : "Montant CT sollicité dépasse le barème calculé de 62 500 TND. Veuillez justifier ou corriger." Le snapshot v2 est créé avec status=CORRIGE_DONNEE, fromStructure='AGC-059', toStructure='AGC-059'. L'agent reçoit la notification et corrige les données.</p>
+        </div>
+
+        <div class="real-case" style="border-left-color: var(--success)">
+          <div class="case-title" style="color:var(--success)">📌 Cas Réel — Validation et transmission DR</div>
+          <p>Après correction par l'agent, le chef agence re-examine le dossier. Les montants sont maintenant cohérents. Il saisit dans le formulaire "Valider & Transmettre" : toStructureCode='DR-05', avis='FAVORABLE', observations='Dossier complet, agriculteur sérieux avec 10 ans d'ancienneté'. Snapshot v3 créé avec status=VALID_DONNEE.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 -->
+    <div class="stage-card">
+      <div class="stage-header s3">
+        <span>🔍</span>
+        <span>ÉTAPE 3 — Analyse Direction Régionale</span>
+        <span class="badge badge-warning" style="margin-left:auto">Condition : has('VALIDER') || hasStatus('VALIDER_DR') || hasStatus('PEC_AVIS_DEC')</span>
+      </div>
+      <div class="stage-body">
+        <p><strong>Acteur :</strong> Direction Régionale (typeStructure = '3' ou '2' selon config)</p>
+        <p style="margin-top:8px"><strong>Ce qui se passe :</strong> Le gestionnaire régional analyse le dossier en profondeur : vérification des engagements BNA/BCT, viabilité du projet, cohérence des garanties, classification du client. Il peut émettre un avis (favorable/défavorable/sans avis) avant de transmettre à la Direction Centrale.</p>
+
+        <h3>Actions possibles :</h3>
+        <table class="actions-table">
+          <thead><tr><th>Action</th><th>Statut résultant</th><th>Destination</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-info">PRENDRE_EN_CHARGE</span></td>
+              <td>PEC_AVIS_DEC</td>
+              <td>(même structure)</td>
+              <td>Marque la prise en charge sans transmission</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-success">VALIDER</span></td>
+              <td>VALIDER_DR</td>
+              <td>Direction Centrale</td>
+              <td>Transmet avec avis</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-danger">REFOULER</span></td>
+              <td>CORRIGE_AVIS_DEC</td>
+              <td>Chef Agence / Agence</td>
+              <td>Retour pour complément d'information</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="real-case">
+          <div class="case-title">📌 Cas Réel — Analyse et avis défavorable partiel</div>
+          <p>Le directeur régional de DR-05 examine le dossier. Il consulte les engagements BCT : le client a un encours de 240 000 TND dans d'autres banques. La classeBNA indique "Classe 2" en 2024-03 (douteux). Il transmet à la Direction Centrale avec avis='DEFAVORABLE', observations='Encours BCT élevé + classe BNA dégradée en 2024. Recommande plafonnement CT à 40 000 TND maximum.' Snapshot v4 créé, status=VALIDER_DR.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 4 -->
+    <div class="stage-card">
+      <div class="stage-header s4">
+        <span>⭐</span>
+        <span>ÉTAPE 4 — Décision Direction Centrale (avec sous-étapes Commerciales)</span>
+        <span class="badge badge-purple" style="margin-left:auto">Condition : has('DECISION_FINALE') || hasStatus('DEC_FINAL_PRISE_ACCORD|REJET|VALID_CENTRALE_COMM')</span>
+      </div>
+      <div class="stage-body">
+        <p><strong>Acteurs :</strong> Direction Centrale (typeStructure = '5') + Pôle Commercial (circuit interne)</p>
+        <p style="margin-top:8px"><strong>Ce qui se passe :</strong> Le dossier entre dans la phase décisionnelle. Selon la complexité ou le montant, il peut passer par un circuit commercial interne avant la décision finale.</p>
+
+        <h3>Sous-étapes du circuit commercial (Step 4 actif) :</h3>
+        <div class="mini-timeline">
+          <div class="mt-item">
+            <div class="mt-dot p">📨</div>
+            <div class="mt-content">
+              <strong>ENVOYER / ENVOYER_SUPERVISEUR</strong>
+              <span>Transmission vers le pôle commercial. Le superviseur peut re-router.</span>
+            </div>
+          </div>
+          <div class="mt-item">
+            <div class="mt-dot p">👤</div>
+            <div class="mt-content">
+              <strong>PEC_CHARGEE_COMM → status: PEC_CHARGEE_COMM</strong>
+              <span>Un chargé commercial prend en charge le dossier pour analyse commerciale.</span>
+            </div>
+          </div>
+          <div class="mt-item">
+            <div class="mt-dot p">🏢</div>
+            <div class="mt-content">
+              <strong>PEC_DEVISION_COMM → status: PEC_DEVISION_COMM</strong>
+              <span>Validation par la division commerciale (niveau intermédiaire).</span>
+            </div>
+          </div>
+          <div class="mt-item">
+            <div class="mt-dot p">🏛</div>
+            <div class="mt-content">
+              <strong>PEC_DEP_COMM → status: PEC_DEP_COMM</strong>
+              <span>Validation par le département commercial (niveau supérieur).</span>
+            </div>
+          </div>
+          <div class="mt-item">
+            <div class="mt-dot v">✅</div>
+            <div class="mt-content">
+              <strong>VALID_CENTRALE_COMM → status: VALID_CENTRALE_COMM</strong>
+              <span>Validation finale par la centrale commerciale. Dossier prêt pour décision.</span>
+            </div>
+          </div>
+          <div class="mt-item">
+            <div class="mt-dot d">⭐</div>
+            <div class="mt-content">
+              <strong>DECISION_FINALE → status: DEC_FINAL_PRISE_ACCORD ou DEC_FINAL_PRISE_REJET</strong>
+              <span>La décision définitive est prise par la direction centrale. Le dossier est clôturé.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="real-case">
+          <div class="case-title">📌 Cas Réel — Accord avec plafonnement</div>
+          <p>La direction centrale reçoit le dossier de Fatma avec l'avis défavorable de la DR. Le chargé commercial analyse : "Malgré la classe 2 en mars 2024, classement stable sur 36 mois. Site exploitation vérifié sur terrain. Propose accord avec plafonnement CT à 50 000 TND." La division commerciale valide. Le département commercial approuve. La centrale commerciale émet VALID_CENTRALE_COMM. Décision finale : DECISION_FINALE avec status=DEC_FINAL_PRISE_ACCORD et observations='Accordé 50 000 TND CT — Investissement refusé.'</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 4. STRUCTURE DES DONNÉES                                    -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="donnees">
+    <div class="section-title"><span class="icon">🗄</span> 4. Structure des Données Snapshot</div>
+
+    <h3>SnapshotSummary (liste d'historique)</h3>
+    <div class="data-tree">
+      <div><span class="key">snapshotId</span>: <span class="type">number</span> <span class="desc">— identifiant unique du snapshot en base</span></div>
+      <div><span class="key">versionNumber</span>: <span class="type">number</span> <span class="desc">— numéro de version (1, 2, 3…) pour l'affichage</span></div>
+      <div><span class="key">statusAtSnapshot</span>: <span class="type">string</span> <span class="desc">— statut du workflow au moment du snapshot</span></div>
+      <div><span class="key">structureCode</span>: <span class="type">string</span> <span class="desc">— code de la structure qui a créé ce snapshot</span></div>
+      <div><span class="key">structureLabel</span>: <span class="type">string</span> <span class="desc">— libellé lisible (ex: "Agence Testour")</span></div>
+      <div><span class="key">createdBy</span>: <span class="type">string</span> <span class="desc">— nom/matricule de l'utilisateur créateur</span></div>
+      <div><span class="key">matricule</span>: <span class="type">string</span> <span class="desc">— matricule de l'utilisateur</span></div>
+      <div><span class="key">createdAt</span>: <span class="type">string (ISO date)</span> <span class="desc">— horodatage de création</span></div>
+      <div><span class="key">observations</span>: <span class="type">string</span> <span class="desc">— commentaire libre saisi lors de l'action</span></div>
+    </div>
+
+    <h3>SnapshotDetail (détail complet — charge unique)</h3>
+    <div class="data-tree">
+      <div><em>... (tout SnapshotSummary, plus :)</em></div>
+      <div><span class="key">engagementsBNA</span>: <span class="type">any[]</span> <span class="desc">— engagements directs du client à la BNA</span></div>
+      <div><span class="key">engagementsBCT</span>: <span class="type">any[]</span> <span class="desc">— engagements déclarés à la BCT (toutes banques)</span></div>
+      <div><span class="key">classeBNA</span>: <span class="type">any[]</span> <span class="desc">— historique de classification BNA sur 3 ans</span></div>
+      <div><span class="key">classeBCT</span>: <span class="type">any[]</span> <span class="desc">— classification BCT sur 3 ans</span></div>
+      <div><span class="key">engagementDetaille</span>: <span class="type">object</span></div>
+      <div class="indent-1"><span class="key">relation</span>: <span class="type">RelationEngagement</span> <span class="desc">— données de la relation principale</span></div>
+      <div class="indent-1"><span class="key">actionnaires</span>: <span class="type">EngagementPartie[]</span> <span class="desc">— actionnaires avec leurs propres engagements</span></div>
+      <div class="indent-1"><span class="key">premierResponsable</span>: <span class="type">EngagementPartie | null</span> <span class="desc">— gérant ou responsable</span></div>
+      <div class="indent-1"><span class="key">groupe</span>: <span class="type">EngagementPartie[]</span> <span class="desc">— membres du groupe économique</span></div>
+      <div class="indent-1"><span class="key">vendeurs</span>: <span class="type">EngagementPartie[]</span> <span class="desc">— vendeurs de terrain (crédit achat terrain)</span></div>
+      <div><span class="key">creditsData</span>: <span class="type">object</span></div>
+      <div class="indent-1"><span class="key">courtTerme</span>: <span class="type">array</span> <span class="desc">— lignes crédit CT avec produit, spéculation, montant</span></div>
+      <div class="indent-1"><span class="key">investissement</span>: <span class="type">array</span> <span class="desc">— lignes crédit investissement</span></div>
+      <div class="indent-1"><span class="key">achatTerrain</span>: <span class="type">array</span> <span class="desc">— lignes crédit achat terrain</span></div>
+      <div><span class="key">exploitationData</span>: <span class="type">object</span></div>
+      <div class="indent-1"><span class="key">sites</span>: <span class="type">array</span> <span class="desc">— sites géographiques (gouvernorat, délégation, coords GPS)</span></div>
+      <div class="indent-1"><span class="key">projetCourtTerme</span>: <span class="type">object</span> <span class="desc">— barème, caRealise, caPrevisionnel, moisAchat</span></div>
+      <div><span class="key">garantiesData</span>: <span class="type">any</span> <span class="desc">— données garanties (actuellement affiché en JSON brut)</span></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 5. DICTIONNAIRE DES ACTIONS ET STATUTS                      -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="actions">
+    <div class="section-title"><span class="icon">📖</span> 5. Dictionnaire des Actions et Statuts</div>
+
+    <h3>Actions Workflow (WorkflowLogEntry.action)</h3>
+    <table class="actions-table">
+      <thead><tr><th>Code Action</th><th>Libellé UI</th><th>Niveau</th><th>Couleur</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>PRE_VALIDER</code></td><td>Pré-Valider</td><td>Chef Agence</td><td><span class="badge badge-info">info</span></td><td>Première validation avant envoi DR</td></tr>
+        <tr><td><code>VALIDER</code></td><td>Valider</td><td>Direction Régionale</td><td><span class="badge badge-success">success</span></td><td>Validation DR avec avis pour DC</td></tr>
+        <tr><td><code>REFOULER</code></td><td>Refouler</td><td>Tous niveaux</td><td><span class="badge badge-danger">danger</span></td><td>Renvoi du dossier au niveau inférieur</td></tr>
+        <tr><td><code>CORRIGER</code></td><td>Corriger</td><td>Agence</td><td><span class="badge badge-warning">warning</span></td><td>Correction suite à refoulement</td></tr>
+        <tr><td><code>ANNULER</code></td><td>Annuler</td><td>Tous</td><td><span class="badge badge-danger">danger</span></td><td>Annulation du dossier</td></tr>
+        <tr><td><code>PRENDRE_EN_CHARGE</code></td><td>Prise en charge</td><td>DR / DC</td><td><span class="badge badge-neutral">secondary</span></td><td>Marquage de début d'analyse</td></tr>
+        <tr><td><code>ENVOYER</code></td><td>Envoyer</td><td>DC</td><td><span class="badge badge-info">info</span></td><td>Transmission au pôle commercial</td></tr>
+        <tr><td><code>ENVOYER_SUPERVISEUR</code></td><td>→ Superviseur</td><td>Commercial</td><td><span class="badge badge-info">info</span></td><td>Escalade vers superviseur commercial</td></tr>
+        <tr><td><code>PEC_CHARGEE_COMM</code></td><td>PEC Chargé Commercial</td><td>Commercial</td><td><span class="badge badge-info">info</span></td><td>Prise en charge chargé commercial</td></tr>
+        <tr><td><code>PEC_DEVISION_COMM</code></td><td>PEC Division Commercial</td><td>Commercial</td><td><span class="badge badge-info">info</span></td><td>Prise en charge division commerciale</td></tr>
+        <tr><td><code>PEC_DEP_COMM</code></td><td>PEC Département Commercial</td><td>Commercial</td><td><span class="badge badge-warning">warning</span></td><td>Prise en charge département commercial</td></tr>
+        <tr><td><code>VALID_CENTRALE_COMM</code></td><td>Validation Centrale</td><td>Centrale Comm.</td><td><span class="badge badge-success">success</span></td><td>Validation finale pôle commercial</td></tr>
+        <tr><td><code>DECISION_FINALE</code></td><td>Décision Finale</td><td>Direction Centrale</td><td><span class="badge badge-success">success</span></td><td>Décision définitive accord ou rejet</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px">Statuts du Canvas (SnapshotSummary.statusAtSnapshot)</h3>
+    <table class="actions-table">
+      <thead><tr><th>Code Statut</th><th>Couleur</th><th>Signification</th></tr></thead>
+      <tbody>
+        <tr><td><code>VALID_DONNEE</code></td><td><span class="badge badge-success">success</span></td><td>Données validées par le Chef Agence — dossier transmis DR</td></tr>
+        <tr><td><code>CORRIGE_DONNEE</code></td><td><span class="badge badge-danger">danger</span></td><td>Dossier refoulé — en attente de correction par l'agence</td></tr>
+        <tr><td><code>PEC_DONNEE</code></td><td><span class="badge badge-info">info</span></td><td>Données prises en charge par la DR</td></tr>
+        <tr><td><code>PEC_AVIS_DEC</code></td><td><span class="badge badge-warning">warning</span></td><td>Avis en cours de traitement à la DR</td></tr>
+        <tr><td><code>VALIDER_DR</code></td><td><span class="badge badge-success">success</span></td><td>Validé par la Direction Régionale — transmis DC</td></tr>
+        <tr><td><code>CORRIGE_AVIS_DEC</code></td><td><span class="badge badge-danger">danger</span></td><td>Avis refoulé — retour vers DR/Agence</td></tr>
+        <tr><td><code>PEC_CHARGEE_COMM</code></td><td><span class="badge badge-info">info</span></td><td>En cours chez un chargé commercial</td></tr>
+        <tr><td><code>PEC_DEVISION_COMM</code></td><td><span class="badge badge-info">info</span></td><td>En cours à la division commerciale</td></tr>
+        <tr><td><code>PEC_DEP_COMM</code></td><td><span class="badge badge-warning">warning</span></td><td>En cours au département commercial</td></tr>
+        <tr><td><code>VALID_CENTRALE_COMM</code></td><td><span class="badge badge-success">success</span></td><td>Validé par la centrale commerciale</td></tr>
+        <tr><td><code>DEC_FINAL_PRISE_ACCORD</code></td><td><span class="badge badge-success">success</span></td><td>DÉCISION FINALE — Dossier accordé ✅</td></tr>
+        <tr><td><code>DEC_FINAL_PRISE_REJET</code></td><td><span class="badge badge-danger">danger</span></td><td>DÉCISION FINALE — Dossier rejeté ❌</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 6. FONCTIONNALITÉ DE COMPARAISON                           -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="comparaison">
+    <div class="section-title"><span class="icon">⚖</span> 6. Fonctionnalité de Comparaison (Diff)</div>
+
+    <p>La comparaison permet à l'utilisateur de sélectionner un snapshot historique et de le comparer automatiquement avec la <strong>version la plus récente</strong> du même canvas. Elle est accessible via l'icône <strong>⊞</strong> dans la table des snapshots (masquée sur la dernière version).</p>
+
+    <h3>Indicateurs comparés (DiffRow)</h3>
+    <table class="actions-table">
+      <thead><tr><th>Indicateur</th><th>Unité</th><th>Logique de calcul</th></tr></thead>
+      <tbody>
+        <tr><td>Crédit CT total</td><td>TND</td><td>Somme de <code>creditsData.courtTerme[].montant</code></td></tr>
+        <tr><td>Crédit Investissement total</td><td>TND</td><td>Somme de <code>creditsData.investissement[].montant</code></td></tr>
+        <tr><td>Crédit Achat Terrain total</td><td>TND</td><td>Somme de <code>creditsData.achatTerrain[].montant</code></td></tr>
+        <tr><td>Total crédits sollicités</td><td>TND</td><td>Somme des 3 précédents</td></tr>
+        <tr><td>Lignes engagements BNA</td><td>lignes</td><td><code>engagementsBNA.length</code></td></tr>
+        <tr><td>Total encours BNA</td><td>TND</td><td>Somme de <code>engagementsBNA[].encours</code></td></tr>
+        <tr><td>Lignes engagements BCT</td><td>lignes</td><td><code>engagementsBCT.length</code></td></tr>
+        <tr><td>Sites d'exploitation</td><td>sites</td><td><code>exploitationData.sites.length</code></td></tr>
+        <tr><td>Statut canvas</td><td>—</td><td>Comparaison textuelle du <code>statusAtSnapshot</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Chargement des snapshots (séquence)</h3>
+    <div class="code-block">
+<span class="comment">// openCompare(snap: SnapshotSummary)</span>
+<span class="comment">// 1. Trouver le snapshot le plus récent</span>
+latestSum = allSnaps.reduce((a, b) => a.versionNumber > b.versionNumber ? a : b)
+
+<span class="comment">// 2. Appel API pour le snapshot HISTORIQUE (choisi par l'utilisateur)</span>
+getBySnapshotId(canvasId, snap.snapshotId)  <span class="comment">// → compareOldSnap</span>
+  <span class="comment">// Dans le callback :</span>
+  <span class="comment">// 3. Appel API pour le snapshot ACTUEL (latest)</span>
+  getBySnapshotId(canvasId, latestSum.snapshotId) <span class="comment">// → compareNewSnap</span>
+    </div>
+
+    <div class="real-case">
+      <div class="case-title">📌 Cas Réel — Comparaison v1 vs v5</div>
+      <p>Un responsable DR-05 veut voir comment le dossier de Fatma a évolué depuis sa soumission initiale. Il clique sur ⊞ à côté de v1. Le diff affiche : CT passe de 85 000 TND → 50 000 TND (↓ Réduit), Investissement 120 000 TND → 0 TND (↓ Réduit), sites toujours = 1, statut SAISIE_INITIALE → DEC_FINAL_PRISE_ACCORD. Immédiatement lisible en un coup d'œil.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 7. SCÉNARIOS RÉELS COMPLETS                                 -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="cas-reels">
+    <div class="section-title"><span class="icon">📚</span> 7. Scénarios Réels Complets</div>
+
+    <h3>Scénario A — Dossier accordé sans circuit commercial (parcours rapide)</h3>
+    <table class="actions-table">
+      <thead><tr><th>Snapshot</th><th>Action</th><th>Statut</th><th>Acteur</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-info">v1</span></td><td>Création initiale</td><td>SAISIE_INITIALE</td><td>Agent AGC-001</td><td>CT 30 000 TND, 1 site</td></tr>
+        <tr><td><span class="badge badge-info">v2</span></td><td>PRE_VALIDER</td><td>VALID_DONNEE</td><td>Chef Agence AGC-001</td><td>Avis favorable</td></tr>
+        <tr><td><span class="badge badge-info">v3</span></td><td>PRENDRE_EN_CHARGE</td><td>PEC_AVIS_DEC</td><td>DR-03</td><td>Prise en charge</td></tr>
+        <tr><td><span class="badge badge-info">v4</span></td><td>VALIDER</td><td>VALIDER_DR</td><td>DR-03</td><td>Avis favorable → DC</td></tr>
+        <tr><td><span class="badge badge-success">v5</span></td><td>DECISION_FINALE</td><td>DEC_FINAL_PRISE_ACCORD</td><td>Direction Centrale</td><td>Accordé 30 000 TND ✅</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px">Scénario B — Dossier avec refoulements multiples</h3>
+    <table class="actions-table">
+      <thead><tr><th>Snapshot</th><th>Action</th><th>Statut</th><th>Acteur</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-info">v1</span></td><td>Création</td><td>SAISIE</td><td>Agent</td><td>Barème incohérent</td></tr>
+        <tr><td><span class="badge badge-danger">v2</span></td><td>REFOULER</td><td>CORRIGE_DONNEE</td><td>Chef Agence</td><td>"Justifier l'écart"</td></tr>
+        <tr><td><span class="badge badge-warning">v3</span></td><td>CORRIGER</td><td>SAISIE_CORRIGEE</td><td>Agent</td><td>Correction effectuée</td></tr>
+        <tr><td><span class="badge badge-info">v4</span></td><td>PRE_VALIDER</td><td>VALID_DONNEE</td><td>Chef Agence</td><td>OK cette fois</td></tr>
+        <tr><td><span class="badge badge-info">v5</span></td><td>VALIDER</td><td>VALIDER_DR</td><td>DR</td><td>Avis défavorable partiel</td></tr>
+        <tr><td><span class="badge badge-danger">v6</span></td><td>REFOULER</td><td>CORRIGE_AVIS_DEC</td><td>DC</td><td>"Garanties insuffisantes"</td></tr>
+        <tr><td><span class="badge badge-info">v7</span></td><td>VALIDER</td><td>VALIDER_DR</td><td>DR</td><td>Garanties complémentaires ajoutées</td></tr>
+        <tr><td><span class="badge badge-success">v8</span></td><td>DECISION_FINALE</td><td>DEC_FINAL_PRISE_ACCORD</td><td>DC</td><td>Accordé ✅</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px">Scénario C — Circuit commercial complet</h3>
+    <table class="actions-table">
+      <thead><tr><th>Snapshot</th><th>Action</th><th>Statut</th><th>Acteur</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-info">v1→v4</span></td><td>(étapes 1-3)</td><td>VALIDER_DR</td><td>DR</td><td>Parcours normal</td></tr>
+        <tr><td><span class="badge badge-info">v5</span></td><td>ENVOYER</td><td>PEC_DONNEE</td><td>DC</td><td>Envoi au pôle commercial</td></tr>
+        <tr><td><span class="badge badge-info">v6</span></td><td>PEC_CHARGEE_COMM</td><td>PEC_CHARGEE_COMM</td><td>Chargé Comm.</td><td>Analyse de marché</td></tr>
+        <tr><td><span class="badge badge-info">v7</span></td><td>PEC_DEVISION_COMM</td><td>PEC_DEVISION_COMM</td><td>Division Comm.</td><td>Validation division</td></tr>
+        <tr><td><span class="badge badge-warning">v8</span></td><td>PEC_DEP_COMM</td><td>PEC_DEP_COMM</td><td>Dép. Comm.</td><td>Validation département</td></tr>
+        <tr><td><span class="badge badge-success">v9</span></td><td>VALID_CENTRALE_COMM</td><td>VALID_CENTRALE_COMM</td><td>Centrale Comm.</td><td>Validation finale comm.</td></tr>
+        <tr><td><span class="badge badge-danger">v10</span></td><td>DECISION_FINALE</td><td>DEC_FINAL_PRISE_REJET</td><td>DC</td><td>Rejeté ❌ (risque trop élevé)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 8. PROBLÈMES ET CORRECTIONS                                 -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="problemes">
+    <div class="section-title"><span class="icon">🐛</span> 8. Problèmes Identifiés et Corrections</div>
+
+    <!-- CRITIQUE 1 -->
+    <div class="issue-card">
+      <div class="issue-header critical">
+        <span>🚨</span>
+        <span>BUG CRITIQUE #1 — Boutons d'action accessibles à TOUS les utilisateurs</span>
+        <span class="issue-tag critical">Sécurité</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.html</code>, ligne 99–108</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Le bloc <code>@if (canAct())</code> qui contrôle l'accès aux boutons "Valider &amp; Transmettre" et "Refouler" est <strong>commenté de manière incorrecte</strong>. Résultat : n'importe quel utilisateur, même un simple agent agence, peut déclencher une validation ou un refoulement.</p>
+
+        <div class="code-block">
+<span class="comment"><!-- Code actuel — PROBLÈME : le guard canAct() est commenté --></span>
+<span class="danger-line">&lt;!-- @if (canAct()) { */     ← HTML invalide, ne ferme pas correctement</span>
+  &lt;div class="hist-actions"&gt;
+    &lt;button pButton label="Valider &amp; Transmettre" ...&gt;&lt;/button&gt;
+    &lt;button pButton label="Refouler" ...&gt;&lt;/button&gt;
+  &lt;/div&gt;
+<span class="danger-line">} --&gt;                        ← Le commentaire commenté = les boutons sont TOUJOURS visibles</span>
+        </div>
+
+        <div class="fix-section">
+          <h4>✅ Correction</h4>
+          <div class="code-block">
+<span class="comment">&lt;!-- Retirer les commentaires et restaurer le guard --&gt;</span>
+<span class="fix-line">@if (canAct()) {</span>
+  &lt;div class="hist-actions"&gt;
+    &lt;button pButton label="Valider &amp; Transmettre" icon="pi pi-check"
+            class="p-button-success p-button-sm"
+            (click)="showValidDlg.set(true)"&gt;&lt;/button&gt;
+    &lt;button pButton label="Refouler" icon="pi pi-reply"
+            class="p-button-danger p-button-sm"
+            (click)="showRefoulDlg.set(true)"&gt;&lt;/button&gt;
+  &lt;/div&gt;
+<span class="fix-line">}</span>
+          </div>
+          <p style="font-size:13px">Et vérifier que <code>canAct()</code> dans le composant couvre tous les rôles autorisés (actuellement seulement '2' et '5', vérifier si DR='3' doit aussi valider).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRITIQUE 2 -->
+    <div class="issue-card">
+      <div class="issue-header critical">
+        <span>🚨</span>
+        <span>BUG CRITIQUE #2 — Double chargement au démarrage (ngOnInit + effect)</span>
+        <span class="issue-tag critical">Logique</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichiers :</strong> <code>snapshot-history.component.ts</code>, lignes 63–68 (effect) et 324–328 (ngOnInit)</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Quand le canvas est déjà disponible au démarrage, <code>ngOnInit</code> appelle <code>loadAll(id)</code> ET <code>initEffect</code> tente aussi d'appeler <code>loadAll(id)</code> si <code>activeCanevasId() === 0</code>. Comme <code>ngOnInit</code> exécute <code>activeCanevasId.set(id)</code> avant l'effet, la condition <code>=== 0</code> peut ne pas protéger dans tous les cas d'exécution.</p>
+
+        <div class="code-block">
+<span class="comment">// ngOnInit — appelle loadAll si id > 0</span>
+ngOnInit(): void {
+  const id = this.canevasAgrService.currentIdCaneva() || 0;
+  this.activeCanevasId.set(id);
+<span class="danger-line">  if (id > 0) this.loadAll(id);  // ← charge ici</span>
+  ...
+}
+
+<span class="comment">// effect — peut aussi charger si la condition passe</span>
+private initEffect = effect(() => {
+  const id = this.canevasAgrService.currentIdCaneva();
+<span class="danger-line">  if (id && id > 0 && this.activeCanevasId() === 0) { // ← peut se déclencher avant ngOnInit</span>
+    this.activeCanevasId.set(id);
+    this.loadAll(id);  // ← double chargement potentiel
+  }
+});
+        </div>
+
+        <div class="fix-section">
+          <h4>✅ Correction — Supprimer l'effet, utiliser uniquement ngOnInit</h4>
+          <div class="code-block">
+<span class="comment">// Supprimer initEffect complètement</span>
+<span class="comment">// ngOnInit gère le chargement initial</span>
+ngOnInit(): void {
+  const id = this.canevasAgrService.currentIdCaneva() || 0;
+  this.activeCanevasId.set(id);
+  if (id > 0) this.loadAll(id);
+  const u = this.userService.user();
+  this.validForm.fromStructureCode  = u?.codeStructure ?? '';
+  ...
+}
+
+<span class="comment">// Si le canvas peut changer après init (navigation), utiliser takeUntilDestroyed :</span>
+toObservable(this.canevasAgrService.currentIdCaneva)
+  .pipe(
+    filter(id => !!id && id > 0),
+    distinctUntilChanged(),
+    takeUntilDestroyed(this.destroyRef)
+  )
+  .subscribe(id => { this.activeCanevasId.set(id); this.loadAll(id); });
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAJEUR 3 -->
+    <div class="issue-card">
+      <div class="issue-header major">
+        <span>⚠</span>
+        <span>BUG MAJEUR #3 — Subscriptions HTTP non nettoyées (memory leak)</span>
+        <span class="issue-tag major">Mémoire</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code> — toutes les méthodes <code>subscribe()</code></p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Aucune subscription n'est désabonnée lors de la destruction du composant. Si l'utilisateur navigue rapidement, des callbacks HTTP peuvent s'exécuter sur un composant détruit, modifiant des signaux orphelins et provoquant des fuites mémoire ou des erreurs "ExpressionChangedAfterItHasBeenCheckedError".</p>
+
+        <div class="fix-section">
+          <h4>✅ Correction — Utiliser takeUntilDestroyed</h4>
+          <div class="code-block">
+<span class="fix-line">import { takeUntilDestroyed, DestroyRef } from '@angular/core/rxjs-interop';</span>
+
+export class SnapshotHistoryComponent {
+<span class="fix-line">  private destroyRef = inject(DestroyRef);</span>
+
+  private loadAll(id: number): void {
+    this.loading.set(true);
+    this.snapshotService.getHistory(id)
+<span class="fix-line">      .pipe(takeUntilDestroyed(this.destroyRef))</span>
+      .subscribe({ next: d => { this.history.set(d); this.loading.set(false); }, ... });
+
+    this.snapshotService.getWorkflowLog(id)
+<span class="fix-line">      .pipe(takeUntilDestroyed(this.destroyRef))</span>
+      .subscribe({ next: d => this.workflowLog.set(d), ... });
+  }
+}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAJEUR 4 -->
+    <div class="issue-card">
+      <div class="issue-header major">
+        <span>⚠</span>
+        <span>BUG MAJEUR #4 — Callbacks HTTP imbriqués dans openCompare() et searchCanvas()</span>
+        <span class="issue-tag major">Architecture</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code>, lignes 492–508 (openCompare) et 397–422 (searchCanvas)</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Les deux snapshots de comparaison sont chargés en séquence via des callbacks imbriqués ("callback hell"). Si le premier appel réussit mais le second échoue, <code>compareLoading</code> reste bloqué sur <code>true</code> indéfiniment.</p>
+
+        <div class="code-block">
+<span class="comment">// PROBLÈME — appels imbriqués</span>
+<span class="danger-line">this.snapshotService.getBySnapshotId(id, snap.snapshotId).subscribe({</span>
+  next: old => {
+    this.compareOldSnap.set(old);
+<span class="danger-line">    this.snapshotService.getBySnapshotId(id, latestSum.snapshotId).subscribe({</span>
+      next: cur => { this.compareNewSnap.set(cur); this.compareLoading.set(false); },
+<span class="danger-line">      error: () => this.compareLoading.set(false)  // ← compareOldSnap reste défini, état incohérent</span>
+    });
+  },
+  error: () => this.compareLoading.set(false)
+});
+        </div>
+
+        <div class="fix-section">
+          <h4>✅ Correction — Utiliser forkJoin pour appels parallèles</h4>
+          <div class="code-block">
+<span class="fix-line">import { forkJoin } from 'rxjs';</span>
+
+openCompare(snap: SnapshotSummary): void {
+  ...
+  this.compareLoading.set(true);
+<span class="fix-line">  forkJoin({</span>
+<span class="fix-line">    old: this.snapshotService.getBySnapshotId(id, snap.snapshotId),</span>
+<span class="fix-line">    cur: this.snapshotService.getBySnapshotId(id, latestSum.snapshotId)</span>
+<span class="fix-line">  }).pipe(takeUntilDestroyed(this.destroyRef))</span>
+<span class="fix-line">  .subscribe({</span>
+<span class="fix-line">    next: ({ old, cur }) => {</span>
+      this.compareOldSnap.set(old);
+      this.compareNewSnap.set(cur);
+      this.compareOldLabel.set(`Snapshot v${snap.versionNumber} — ${this.fmtDate(snap.createdAt)}`);
+      this.compareNewLabel.set(`État actuel v${latestSum.versionNumber} — ${this.fmtDate(latestSum.createdAt)}`);
+      this.compareLoading.set(false);
+    },
+    error: () => {
+      this.compareLoading.set(false);
+      this.compareMode.set(false);
+      this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger la comparaison' });
+    }
+  });
+}
+          </div>
+          <p style="font-size:13px;margin-top:8px">Avantage supplémentaire : les deux appels sont parallèles — temps de réponse divisé par 2.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAJEUR 5 -->
+    <div class="issue-card">
+      <div class="issue-header major">
+        <span>⚠</span>
+        <span>BUG MAJEUR #5 — Duplication des méthodes de calcul entre Service et Composant</span>
+        <span class="issue-tag major">Architecture</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot.service.ts</code> lignes 139–156 et <code>snapshot-history.component.ts</code> lignes 634–649</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Les méthodes <code>computeCreditsTotal</code>, <code>computeEngagementsTotal</code>, <code>computeSitesCount</code> sont implémentées <strong>deux fois</strong> — en méthodes statiques du service ET en méthodes privées du composant. Tout changement doit être dupliqué, risque de divergence.</p>
+
+        <div class="fix-section">
+          <h4>✅ Correction — Utiliser uniquement les méthodes statiques du service</h4>
+          <div class="code-block">
+<span class="comment">// Dans le composant, remplacer :</span>
+<span class="danger-line">private computeCreditsTotal(creditsData: any) { ... }  // ← SUPPRIMER</span>
+<span class="danger-line">private computeEngagementsTotal(engagements: any[]) { ... }  // ← SUPPRIMER</span>
+<span class="danger-line">private computeSitesCount(exploitationData: any) { ... }  // ← SUPPRIMER</span>
+
+<span class="comment">// Et dans diffRows computed, utiliser les méthodes statiques :</span>
+<span class="fix-line">const oldCred = SnapshotService.computeCreditsTotal(oldSnap.creditsData);</span>
+<span class="fix-line">const newCred = SnapshotService.computeCreditsTotal(newSnap.creditsData);</span>
+<span class="fix-line">const oldBNA  = SnapshotService.computeEngagementsTotal(oldSnap.engagementsBNA);</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINEUR 6 -->
+    <div class="issue-card">
+      <div class="issue-header minor">
+        <span>🔵</span>
+        <span>BUG MINEUR #6 — Double parenthèse dans l'unité de la table diff</span>
+        <span class="issue-tag minor">UI</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.html</code>, ligne 782</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Le template affiche <code>(TND))</code> au lieu de <code>(TND)</code> — parenthèse fermante en double dans le template.</p>
+        <div class="code-block">
+<span class="comment">&lt;!-- AVANT (buggé) --&gt;</span>
+<span class="danger-line">&lt;span class="unit"&gt;({{ row.unit }})&lt;/span&gt;  ← double ) après }}</span>
+
+<span class="comment">&lt;!-- APRÈS (corrigé) --&gt;</span>
+<span class="fix-line">&lt;span class="unit"&gt;({{ row.unit }})&lt;/span&gt;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINEUR 7 -->
+    <div class="issue-card">
+      <div class="issue-header minor">
+        <span>🔵</span>
+        <span>BUG MINEUR #7 — searchCanvas() ne réinitialise pas workflowLog</span>
+        <span class="issue-tag minor">UX</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code>, ligne 386</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Quand l'utilisateur recherche un nouveau canvas par numéro, les anciens logs du canvas précédent restent affichés jusqu'à ce que les nouveaux chargent. L'utilisateur voit brièvement des données incorrectes.</p>
+        <div class="fix-section">
+          <h4>✅ Correction — Réinitialiser l'état avant le chargement</h4>
+          <div class="code-block">
+searchCanvas(): void {
+  const id = this.searchCanevasId();
+  if (!id || id &lt;= 0) { ... return; }
+  const u = this.userService.user();
+  this.loading.set(true);
+<span class="fix-line">  this.history.set([]);         // Vider l'historique immédiatement</span>
+<span class="fix-line">  this.workflowLog.set([]);     // Vider les logs immédiatement</span>
+<span class="fix-line">  this.selectedSnap.set(null);  // Fermer tout panneau ouvert</span>
+  this.snapshotService.getHistory(id, ...).subscribe({ ... });
+}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINEUR 8 -->
+    <div class="issue-card">
+      <div class="issue-header minor">
+        <span>🔵</span>
+        <span>BUG MINEUR #8 — Validation du formulaire "Valider & Transmettre" incomplète</span>
+        <span class="issue-tag minor">Validation</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code> méthode <code>valider()</code> et template HTML dialogue</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Le champ <code>toStructureCode</code> (structure destination) est marqué obligatoire dans l'interface mais n'est pas validé avant l'appel API. Un utilisateur peut soumettre une validation avec une destination vide.</p>
+        <div class="fix-section">
+          <h4>✅ Correction — Ajouter validation dans la méthode valider()</h4>
+          <div class="code-block">
+valider(): void {
+  const id = this.activeCanevasId() || this.canevasAgrService.currentIdCaneva();
+  if (!id || id &lt;= 0) return;
+
+<span class="fix-line">  if (!this.validForm.toStructureCode?.trim()) {</span>
+<span class="fix-line">    this.messageService.add({ severity: 'warn', summary: 'Attention',</span>
+<span class="fix-line">      detail: 'La structure destination est obligatoire' });</span>
+<span class="fix-line">    return;</span>
+<span class="fix-line">  }</span>
+
+  this.snapshotService.validerEtTransmettre(id, this.validForm).subscribe({ ... });
+}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERF 9 -->
+    <div class="issue-card">
+      <div class="issue-header perf">
+        <span>🟣</span>
+        <span>PERFORMANCE #9 — buildSynthese() appelé 3 fois par rendu dans le template</span>
+        <span class="issue-tag perf">Performance</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.html</code>, lignes 678–681</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Dans la section Exploitation, <code>buildSynthese(pct)</code> est appelé 3 fois dans la même boucle de rendu — une fois pour le <code>@if</code>, une pour le header, une pour le <code>[value]</code> du tableau. À chaque détection de changement Angular, la méthode recalcule les mêmes données 3 fois.</p>
+
+        <div class="code-block">
+<span class="comment">&lt;!-- PROBLÈME : 3 appels à buildSynthese(pct) dans le même bloc --&gt;</span>
+<span class="danger-line">@if (buildSynthese(pct).length) {</span>
+<span class="danger-line">  &lt;p-panel header="Synthèse ({{ buildSynthese(pct).length }})"&gt;</span>
+<span class="danger-line">    &lt;p-table [value]="buildSynthese(pct)"&gt;</span>
+        </div>
+
+        <div class="fix-section">
+          <h4>✅ Option A — Utiliser une variable de template</h4>
+          <div class="code-block">
+<span class="fix-line">@let synthese = buildSynthese(pct);</span>
+<span class="fix-line">@if (synthese.length) {</span>
+<span class="fix-line">  &lt;p-panel header="Synthèse ({{ synthese.length }})"&gt;</span>
+<span class="fix-line">    &lt;p-table [value]="synthese"&gt;</span>
+          </div>
+          <h4 style="margin-top:12px">✅ Option B — Utiliser un computed signal dans le composant</h4>
+          <div class="code-block">
+synthese = computed(() => {
+  const snap = this.selectedSnap();
+  const pct = snap?.exploitationData?.projetCourtTerme;
+  return this.buildSynthese(pct);
+});
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERF 10 -->
+    <div class="issue-card">
+      <div class="issue-header perf">
+        <span>🟣</span>
+        <span>AMÉLIORATION #10 — Onglet Garanties affiche du JSON brut (non-professionnel)</span>
+        <span class="issue-tag perf">UX</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.html</code>, ligne 712</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Le panneau Garanties affiche les données brutes avec <code>| json</code>. Dans un contexte bancaire professionnel, cela est inacceptable — les analystes crédit doivent lire des tableaux structurés.</p>
+        <div class="code-block">
+<span class="comment">&lt;!-- ACTUEL — JSON brut --&gt;</span>
+<span class="danger-line">&lt;pre class="snap-json"&gt;{{ selectedSnap()!.garantiesData | json }}&lt;/pre&gt;</span>
+        </div>
+        <div class="fix-section">
+          <h4>✅ Correction — Créer une interface GarantiesData et un template structuré</h4>
+          <p style="font-size:13px">Définir l'interface <code>GarantiesData</code> dans le service avec les champs attendus (type garantie, valeur estimée, date constitution, numéro inscription, bénéficiaire) et afficher un <code>p-table</code> comme pour les autres sections.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERF 11 -->
+    <div class="issue-card">
+      <div class="issue-header minor">
+        <span>🔵</span>
+        <span>AMÉLIORATION #11 — Marqueurs timeline manquants pour actions commerciales</span>
+        <span class="issue-tag minor">UI</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.html</code>, lignes 127–131</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> Les classes CSS des marqueurs de la timeline ne couvrent pas les actions commerciales (<code>PEC_CHARGEE_COMM</code>, <code>PEC_DEVISION_COMM</code>, <code>PEC_DEP_COMM</code>, <code>VALID_CENTRALE_COMM</code>) ni <code>ANNULER</code>. Ces entrées restent sans style visuel distinctif.</p>
+        <div class="fix-section">
+          <h4>✅ Correction</h4>
+          <div class="code-block">
+&lt;span class="tl-marker"
+  [class.tl-valider]="['VALIDER','PRE_VALIDER','DECISION_FINALE','VALID_CENTRALE_COMM'].includes(log.action)"
+  [class.tl-refouler]="['REFOULER','CORRIGER','ANNULER'].includes(log.action)"
+  [class.tl-pec]="['PRENDRE_EN_CHARGE','PEC_CHARGEE_COMM','PEC_DEVISION_COMM','PEC_DEP_COMM'].includes(log.action)"
+  [class.tl-envoyer]="['ENVOYER','ENVOYER_SUPERVISEUR'].includes(log.action)"&gt;
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMÉLIORATION 12 -->
+    <div class="issue-card">
+      <div class="issue-header minor">
+        <span>🔵</span>
+        <span>AMÉLIORATION #12 — progressSeverity : retour 'info' dupliqué inutile</span>
+        <span class="issue-tag minor">Code</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code>, lignes 198–207</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> La dernière ligne <code>return 'info'</code> est identique au retour de la condition précédente — le <code>if</code> sur les statuts commerciaux retourne déjà <code>'info'</code>, rendant le <code>return 'info'</code> final redondant et trompeur (on s'attendrait à <code>'secondary'</code> pour "statut non reconnu").</p>
+        <div class="fix-section">
+          <h4>✅ Correction</h4>
+          <div class="code-block">
+progressSeverity = computed((): '...' => {
+  const statuses = new Set(this.history().map(s => s.statusAtSnapshot));
+  if (statuses.has('DEC_FINAL_PRISE_ACCORD')) return 'success';
+  if (statuses.has('VALID_CENTRALE_COMM'))    return 'success';
+  if (statuses.has('DEC_FINAL_PRISE_REJET'))  return 'danger';
+  if (statuses.has('CORRIGE_DONNEE') || statuses.has('CORRIGE_AVIS_DEC')) return 'warning';
+  if (statuses.has('PEC_CHARGEE_COMM') || statuses.has('PEC_DEVISION_COMM') || statuses.has('PEC_DEP_COMM')) return 'info';
+<span class="fix-line">  return 'secondary';  // Statut non reconnu ou en attente</span>
+});
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMÉLIORATION 13 -->
+    <div class="issue-card">
+      <div class="issue-header minor">
+        <span>🔵</span>
+        <span>AMÉLIORATION #13 — diffArrow() fragile sur le format numérique fr-TN</span>
+        <span class="issue-tag minor">Robustesse</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code>, ligne 618</p>
+        <p style="margin-top:8px"><strong>Problème :</strong> La méthode parse les valeurs déjà formatées en fr-TN (séparateur milliers = espace insécable, séparateur décimal = virgule). Le <code>.replace(/\s/g, '')</code> supprime les espaces mais <code>parseFloat</code> ne comprend pas la virgule décimale — retournera <code>NaN</code> pour "1 234,56".</p>
+        <div class="fix-section">
+          <h4>✅ Correction — Parser robustement les nombres formatés</h4>
+          <div class="code-block">
+private parseFormattedNumber(s: string): number {
+  <span class="comment">// Supprimer espaces et espaces insécables (0xA0), remplacer virgule par point</span>
+<span class="fix-line">  const cleaned = s.replace(/[\s ]/g, '').replace(',', '.');</span>
+  return parseFloat(cleaned);
+}
+
+diffArrow(row: DiffRow): string {
+  if (!row.changed) return '=';
+<span class="fix-line">  const a = this.parseFormattedNumber(row.snapValue);</span>
+<span class="fix-line">  const b = this.parseFormattedNumber(row.currentValue);</span>
+  if (isNaN(a) || isNaN(b)) return '≠';
+  return b > a ? '↑' : '↓';
+}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 9. RÉSUMÉ DE PRIORITÉ                                       -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="resume">
+    <div class="section-title"><span class="icon">📊</span> 9. Résumé de Priorité</div>
+
+    <div class="summary-grid">
+      <div class="summary-card critical">
+        <h4>🚨 Critique — À corriger immédiatement</h4>
+        <ul>
+          <li>#1 — Boutons Valider/Refouler sans guard rôle</li>
+          <li>#2 — Double chargement ngOnInit + effect</li>
+        </ul>
+      </div>
+      <div class="summary-card major">
+        <h4>⚠ Majeur — À corriger avant mise en prod</h4>
+        <ul>
+          <li>#3 — Memory leaks (subscriptions non nettoyées)</li>
+          <li>#4 — forkJoin vs callbacks imbriqués</li>
+          <li>#5 — Duplication méthodes calcul</li>
+        </ul>
+      </div>
+      <div class="summary-card minor">
+        <h4>🔵 Mineur — À corriger en backlog</h4>
+        <ul>
+          <li>#6 — Double parenthèse unité</li>
+          <li>#7 — Reset workflowLog à la recherche</li>
+          <li>#8 — Validation toStructureCode vide</li>
+          <li>#11 — Classes CSS actions commerciales</li>
+          <li>#12 — progressSeverity default</li>
+          <li>#13 — Parsing fr-TN robuste</li>
+        </ul>
+      </div>
+      <div class="summary-card perf">
+        <h4>🟣 Amélioration — Pour qualité et UX</h4>
+        <ul>
+          <li>#9 — buildSynthese() calculé 3× par rendu</li>
+          <li>#10 — Garanties en JSON brut → tableau structuré</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px">Points positifs du code actuel</h3>
+    <ul style="padding-left:20px;line-height:2.2;font-size:13px;margin-top:8px">
+      <li>✅ Utilisation moderne d'Angular 17 Signals (signal, computed, effect) — excellente réactivité</li>
+      <li>✅ Filtrage des logs par rôle bien pensé (agence voit ses logs, DR voit ses agences enfants)</li>
+      <li>✅ Stepper de progression calculé dynamiquement depuis les logs — robuste</li>
+      <li>✅ Gestion du mode "consultation externe" vs canvas courant</li>
+      <li>✅ Comparaison diff avec flèches directionnelles (↑/↓) et compteur de différences</li>
+      <li>✅ Affichage en lecture seule clair avec mention "Lecture seule" dans le panneau détail</li>
+      <li>✅ Badge "Actuel" sur la dernière version dans le tableau des snapshots</li>
+      <li>✅ Gestion des erreurs HTTP 403/404 dans searchCanvas() avec messages appropriés</li>
+      <li>✅ Formatage des montants en fr-TN (Intl.NumberFormat) cohérent avec la localisation tunisienne</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- FOOTER                                                          -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div class="page-footer">
+  <p>Analyse générée le 01/06/2026 — SnapshotHistoryComponent (canvas.agricole) — BNA Canvas Agricole</p>
+  <p style="margin-top:4px">Fichiers analysés : <code>snapshot-history.component.ts</code> · <code>snapshot-history.component.html</code> · <code>snapshot.service.ts</code></p>
+</div>
+
+</body>
+</html>

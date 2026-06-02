@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workflow Snapshot — Backend + Frontend — Guide Fullstack</title>
+<style>
+:root{
+  --be:#1B5E20; --be-l:#E8F5E9; --be-m:#A5D6A7; --be-b:#2E7D32;
+  --fe:#0D47A1; --fe-l:#E3F2FD; --fe-m:#90CAF9; --fe-b:#1565C0;
+  --warn:#E65100; --warn-l:#FFF3E0; --danger:#C62828; --danger-l:#FFEBEE;
+  --purple:#6A1B9A; --purple-l:#F3E5F5;
+  --gray:#37474F; --border:#DDE3EA; --bg:#F4F6F9; --card:#fff;
+  --code:#0D1117;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1C2833;font-size:13.5px;line-height:1.65}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#0D47A1 0%,#1565C0 50%,#1B5E20 100%);color:#fff;padding:40px 60px}
+.hdr h1{font-size:26px;font-weight:700;margin-bottom:6px}
+.hdr p{opacity:.85;font-size:14px}
+.tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.tag{background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;font-size:11px}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1200px;margin:0 auto;padding:36px 22px}
+
+/* ── SECTION ── */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-bottom:28px}
+.sec-ttl{font-size:18px;font-weight:700;padding-bottom:10px;border-bottom:3px solid;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.sec-ttl.be{color:var(--be-b);border-color:var(--be-b)}
+.sec-ttl.fe{color:var(--fe-b);border-color:var(--fe-b)}
+.sec-ttl.full{color:var(--gray);border-color:var(--gray)}
+.sec-ttl.warn{color:var(--warn);border-color:var(--warn)}
+
+h3{font-size:14px;font-weight:700;color:var(--gray);margin:20px 0 8px}
+h4{font-size:13px;font-weight:600;color:var(--gray);margin:14px 0 6px}
+p{margin-bottom:8px;font-size:13px}
+
+/* ── DUAL COLUMNS ── */
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:14px 0}
+.dual-col{border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.dual-col-hdr{padding:10px 14px;font-weight:700;font-size:12px;display:flex;align-items:center;gap:8px}
+.dual-col-hdr.be{background:var(--be-l);color:var(--be-b);border-bottom:2px solid var(--be-m)}
+.dual-col-hdr.fe{background:var(--fe-l);color:var(--fe-b);border-bottom:2px solid var(--fe-m)}
+.dual-col-body{padding:14px}
+
+/* ── CODE BLOCK ── */
+.code-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:12px 0}
+.code-fn{background:#21262D;color:#8B949E;font-size:11px;padding:6px 14px;font-family:Consolas,monospace;display:flex;align-items:center;gap:8px}
+.code-fn .dot{width:8px;height:8px;border-radius:50%;background:#3D444D}
+.code-fn .dot.java{background:var(--be-b)}
+.code-fn .dot.ts{background:#3178C6}
+pre.c{background:var(--code);color:#CDD9E5;font-family:'Cascadia Code','Fira Code',Consolas,monospace;font-size:12px;line-height:1.75;padding:0;overflow-x:auto}
+.ln{display:block;padding:0 16px;min-height:1.75em;white-space:pre}
+.ln:hover{background:rgba(255,255,255,.03)}
+/* highlights */
+.hl-be  {background:rgba(27,94,32,.2)!important;border-left:3px solid var(--be-b)}
+.hl-fe  {background:rgba(13,71,161,.2)!important;border-left:3px solid var(--fe-b)}
+.hl-warn{background:rgba(230,81,0,.2)!important;border-left:3px solid var(--warn)}
+.hl-red {background:rgba(198,40,40,.2)!important;border-left:3px solid var(--danger)}
+.hl-pur {background:rgba(106,27,154,.2)!important;border-left:3px solid var(--purple)}
+/* tokens */
+.kw{color:#79B8FF}.str{color:#9ECE6A}.cmt{color:#6272A4;font-style:italic}
+.fn{color:#E2A663}.tp{color:#89DCEB}.an{color:#F78C6C}.num{color:#D3869B}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-be {background:var(--be-l);color:var(--be-b);border:1px solid var(--be-m)}
+.b-fe {background:var(--fe-l);color:var(--fe-b);border:1px solid var(--fe-m)}
+.b-w  {background:var(--warn-l);color:var(--warn);border:1px solid #FFB74D}
+.b-d  {background:var(--danger-l);color:var(--danger);border:1px solid #EF9A9A}
+.b-p  {background:var(--purple-l);color:var(--purple);border:1px solid #CE93D8}
+.b-g  {background:#ECEFF1;color:var(--gray);border:1px solid #B0BEC5}
+
+/* ── CALLOUT ── */
+.callout{border-radius:8px;padding:12px 14px;margin:12px 0;border-left:4px solid;font-size:13px}
+.callout.be{background:var(--be-l);border-color:var(--be-b);color:#1B5E20}
+.callout.fe{background:var(--fe-l);border-color:var(--fe-b);color:#0D47A1}
+.callout.warn{background:var(--warn-l);border-color:var(--warn);color:var(--warn)}
+.callout.red{background:var(--danger-l);border-color:var(--danger);color:var(--danger)}
+.callout strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+.tbl th{background:#ECEFF1;padding:8px 12px;text-align:left;font-weight:600;color:var(--gray);border-bottom:2px solid var(--border)}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#F8FAFC}
+
+/* ── FLOW DIAGRAM ── */
+.flow-h{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:16px 0}
+.fn-box{border-radius:8px;padding:12px 16px;min-width:150px;text-align:center;flex-shrink:0}
+.fn-box .role{font-size:10px;font-weight:700;text-transform:uppercase;opacity:.75}
+.fn-box .lbl{font-size:13px;font-weight:700;margin-top:3px}
+.fn-box .sub{font-size:10px;margin-top:4px;opacity:.8}
+.fn-agc{background:#E3F2FD;border:2px solid #90CAF9;color:#1565C0}
+.fn-chef{background:#E8F5E9;border:2px solid #A5D6A7;color:#2E7D32}
+.fn-dr{background:#FFF8E1;border:2px solid #FFE082;color:#E65100}
+.fn-dc{background:#FCE4EC;border:2px solid #F48FB1;color:#AD1457}
+.fn-comm{background:#F3E5F5;border:2px solid #CE93D8;color:#6A1B9A}
+.fn-ok{background:#E8F5E9;border:2px solid #66BB6A;color:#1B5E20}
+.fn-ko{background:#FFEBEE;border:2px solid #EF9A9A;color:#B71C1C}
+.arr{display:flex;align-items:center;justify-content:center;width:56px;flex-shrink:0;position:relative}
+.arr::before{content:'';position:absolute;top:50%;left:0;width:100%;height:2px;background:#90A4AE}
+.arr .albl{background:#fff;border:1px solid #B0BEC5;border-radius:4px;font-size:9px;padding:2px 4px;color:#546E7A;position:relative;z-index:1;white-space:nowrap}
+
+/* ── STEP LIST ── */
+.steps{counter-reset:s}
+.step{counter-increment:s;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.step::before{content:counter(s);min-width:26px;height:26px;border-radius:50%;background:var(--gray);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body strong{font-size:13px;display:block;margin-bottom:3px}
+.step-body p{font-size:12.5px;color:#455A64}
+
+/* ── HTTP CARD ── */
+.http-card{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin:14px 0}
+.http-hdr{padding:10px 16px;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600}
+.http-hdr.post{background:#E8F5E9;color:#2E7D32;border-bottom:2px solid #A5D6A7}
+.http-hdr.get {background:#E3F2FD;color:#1565C0;border-bottom:2px solid #90CAF9}
+.verb{font-family:Consolas,monospace;font-weight:700;font-size:12px;padding:2px 8px;border-radius:4px}
+.v-post{background:#2E7D32;color:#fff}
+.v-get {background:#1565C0;color:#fff}
+.url{font-family:Consolas,monospace;font-size:12px;color:var(--gray)}
+.http-body{padding:14px 16px;background:#FAFBFC}
+.http-row{display:flex;gap:16px;font-size:12px;margin-bottom:6px;align-items:flex-start}
+.http-row .lkey{color:var(--gray);font-weight:600;min-width:90px;flex-shrink:0}
+.http-row .lval{color:#455A64;flex:1}
+
+/* ── ISSUE CARD ── */
+.issue{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px}
+.issue-hdr{padding:11px 16px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px}
+.issue-hdr.crit{background:var(--danger-l);color:var(--danger);border-bottom:2px solid #EF9A9A}
+.issue-hdr.maj {background:var(--warn-l);color:var(--warn);border-bottom:2px solid #FFB74D}
+.issue-body{padding:14px 16px}
+.itag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:auto}
+.itag.crit{background:var(--danger);color:#fff}
+.itag.maj{background:var(--warn);color:#fff}
+
+/* ── DB TABLE DIAGRAM ── */
+.db-table{border:2px solid var(--border);border-radius:10px;overflow:hidden;margin:14px 0}
+.db-table-hdr{padding:10px 16px;font-weight:700;font-size:13px}
+.db-table-hdr.be{background:var(--be-l);color:var(--be-b);border-bottom:2px solid var(--be-m)}
+.db-field{display:flex;align-items:center;gap:8px;padding:7px 16px;border-bottom:1px solid var(--border);font-size:12px}
+.db-field:last-child{border-bottom:none}
+.db-field:hover{background:#F8FAFC}
+.ftype{color:#6A1B9A;font-family:Consolas,monospace;font-size:11px;min-width:70px}
+.fname{font-family:Consolas,monospace;font-weight:600;color:var(--gray);min-width:200px}
+.fdesc{color:#607D8B;font-size:11px;flex:1}
+.fkey{font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px}
+.fkey.pk{background:#1565C0;color:#fff}
+.fkey.lob{background:#6A1B9A;color:#fff}
+.fkey.fk{background:#2E7D32;color:#fff}
+
+/* ── SEQUENCE DIAGRAM ── */
+.seq{display:flex;flex-direction:column;gap:0;margin:16px 0;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seq-row{display:grid;grid-template-columns:100px 1fr 100px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px}
+.seq-row:last-child{border-bottom:none}
+.seq-row:hover{background:#FAFBFC}
+.seq-from{font-weight:700;font-size:11px;text-align:center;padding:3px 6px;border-radius:6px}
+.seq-to{font-weight:700;font-size:11px;text-align:center;padding:3px 6px;border-radius:6px}
+.seq-msg{text-align:center;color:var(--gray)}
+.seq-arrow{font-size:16px;color:#90A4AE}
+
+footer{text-align:center;padding:24px;color:#78909C;font-size:11px;border-top:1px solid var(--border);margin-top:36px}
+@media(max-width:768px){.hdr{padding:22px}.wrap{padding:16px}.dual{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🔄 Workflow Snapshot — Guide Fullstack Complet</h1>
+  <p>Comment le backend (Spring Boot / Java) et le frontend (Angular 17) gèrent ensemble chaque étape du workflow snapshot</p>
+  <div class="tags">
+    <span class="tag">🟢 Backend — Spring Boot 3 · Java 17</span>
+    <span class="tag">🔵 Frontend — Angular 17 Signals</span>
+    <span class="tag">🗄 Oracle + PostgreSQL</span>
+    <span class="tag">📡 REST API JSON</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 1. VUE D'ENSEMBLE                                             -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl full">🗺 1. Vue d'ensemble — Comment les deux côtés collaborent</div>
+
+<p>À chaque action workflow (valider, refouler…), le frontend envoie une requête HTTP au backend. Le backend fait 3 choses en une seule transaction : crée un snapshot, enregistre un log, met à jour le canvas. Puis le frontend recharge les données et met à jour l'affichage.</p>
+
+<div class="flow-h">
+  <div class="fn-box fn-agc"><div class="role">🖥 Angular</div><div class="lbl">Utilisateur clique</div><div class="sub">signal / dialog</div></div>
+  <div class="arr"><div class="albl">POST HTTP</div></div>
+  <div class="fn-box fn-chef"><div class="role">☕ Spring Boot</div><div class="lbl">Controller reçoit</div><div class="sub">@RestController</div></div>
+  <div class="arr"><div class="albl">appelle</div></div>
+  <div class="fn-box fn-dr"><div class="role">⚙ Service</div><div class="lbl">createSnapshot()</div><div class="sub">@Transactional</div></div>
+  <div class="arr"><div class="albl">persiste</div></div>
+  <div class="fn-box fn-dc"><div class="role">🗄 Oracle/Postgres</div><div class="lbl">2 tables INSERT</div><div class="sub">SNAPSHOT + LOG</div></div>
+  <div class="arr"><div class="albl">renvoie</div></div>
+  <div class="fn-box fn-ok"><div class="role">📨 Réponse JSON</div><div class="lbl">SnapshotResponseDto</div><div class="sub">snapshotId + version</div></div>
+  <div class="arr"><div class="albl">loadAll()</div></div>
+  <div class="fn-box fn-agc"><div class="role">🔄 Angular</div><div class="lbl">Rafraîchit UI</div><div class="sub">Signals recalculés</div></div>
+</div>
+
+<div class="callout full" style="border-color:var(--gray);background:#ECEFF1;color:var(--gray)">
+  <strong>📌 Principe clé</strong>
+  Un snapshot = une photographie complète du dossier à un instant T, stockée en JSON en base. Une action = un log dans CANEVAS_WORKFLOW_LOG lié au snapshot créé. Ces deux enregistrements sont créés dans la <strong>même transaction Spring</strong> avec <code>@Transactional(propagation = REQUIRES_NEW)</code>.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 2. BASE DE DONNÉES — LES 2 TABLES                            -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl be">🗄 2. Base de Données — Les 2 Tables Clés</div>
+
+<div class="dual">
+<div class="dual-col">
+<div class="dual-col-hdr be">🟢 Table CANEVAS_STRUCTURE_SNAPSHOT</div>
+<div class="dual-col-body">
+  <p style="font-size:12px;color:#455A64;margin-bottom:10px">Stocke <strong>la photo complète</strong> du dossier. Chaque ligne = une version immuable.</p>
+  <div class="db-table">
+    <div class="db-table-hdr be">CANEVAS_STRUCTURE_SNAPSHOT</div>
+    <div class="db-field"><span class="fkey pk">PK</span><span class="fname">snapshot_id</span><span class="ftype">BIGINT</span><span class="fdesc">Auto-incrémenté</span></div>
+    <div class="db-field"><span class="fkey fk">FK</span><span class="fname">canevas_id</span><span class="ftype">BIGINT</span><span class="fdesc">Référence au canvas</span></div>
+    <div class="db-field"><span></span><span class="fname">structure_code</span><span class="ftype">VARCHAR(20)</span><span class="fdesc">ex: AGC-059, DR-05</span></div>
+    <div class="db-field"><span></span><span class="fname">structure_label</span><span class="ftype">VARCHAR</span><span class="fdesc">Libellé lisible</span></div>
+    <div class="db-field"><span></span><span class="fname">version_number</span><span class="ftype">INTEGER</span><span class="fdesc">1, 2, 3… (MAX+1)</span></div>
+    <div class="db-field"><span></span><span class="fname">status_at_snapshot</span><span class="ftype">VARCHAR(50)</span><span class="fdesc">VALID_DONNEE, CORRIGE_DONNEE…</span></div>
+    <div class="db-field"><span></span><span class="fname">created_by</span><span class="ftype">VARCHAR</span><span class="fdesc">Nom utilisateur</span></div>
+    <div class="db-field"><span></span><span class="fname">matricule</span><span class="ftype">VARCHAR</span><span class="fdesc">Matricule banque</span></div>
+    <div class="db-field"><span></span><span class="fname">created_at</span><span class="ftype">TIMESTAMP</span><span class="fdesc">Auto (CreationTimestamp)</span></div>
+    <div class="db-field"><span></span><span class="fname">observations</span><span class="ftype">CLOB</span><span class="fdesc">Commentaire libre</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">engagement_bna_json</span><span class="ftype">CLOB</span><span class="fdesc">JSON liste engagements BNA</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">engagement_bct_json</span><span class="ftype">CLOB</span><span class="fdesc">JSON liste engagements BCT</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">classe_bna_json</span><span class="ftype">CLOB</span><span class="fdesc">Historique classification BNA</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">classe_bct_json</span><span class="ftype">CLOB</span><span class="fdesc">Historique classification BCT</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">classe_retour_json</span><span class="ftype">CLOB</span><span class="fdesc">Retour class BCT</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">engagement_detaille_json</span><span class="ftype">CLOB</span><span class="fdesc">5 onglets : relation, actionnaires, resp, groupe, vendeurs</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">donnees_credits_json</span><span class="ftype">CLOB</span><span class="fdesc">CT + investissement + terrain</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">donnees_exploitation_json</span><span class="ftype">CLOB</span><span class="fdesc">Sites + projetCourtTerme (4 types)</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">donnees_garanties_json</span><span class="ftype">CLOB</span><span class="fdesc">Garanties (partiellement)</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">donnees_avis_json</span><span class="ftype">CLOB</span><span class="fdesc">Avis (FAVORABLE…)</span></div>
+  </div>
+</div>
+</div>
+
+<div class="dual-col">
+<div class="dual-col-hdr be">🟢 Table CANEVAS_WORKFLOW_LOG</div>
+<div class="dual-col-body">
+  <p style="font-size:12px;color:#455A64;margin-bottom:10px">Enregistre <strong>chaque action</strong> effectuée. Journalisation complète du parcours.</p>
+  <div class="db-table">
+    <div class="db-table-hdr be">CANEVAS_WORKFLOW_LOG</div>
+    <div class="db-field"><span class="fkey pk">PK</span><span class="fname">log_id</span><span class="ftype">BIGINT</span><span class="fdesc">Auto-incrémenté</span></div>
+    <div class="db-field"><span class="fkey fk">FK</span><span class="fname">canevas_id</span><span class="ftype">BIGINT</span><span class="fdesc">Canvas concerné</span></div>
+    <div class="db-field"><span></span><span class="fname">from_structure</span><span class="ftype">VARCHAR(20)</span><span class="fdesc">Qui agit (ex: AGC-059)</span></div>
+    <div class="db-field"><span></span><span class="fname">to_structure</span><span class="ftype">VARCHAR(20)</span><span class="fdesc">Vers qui (ex: DR-05)</span></div>
+    <div class="db-field"><span></span><span class="fname">action</span><span class="ftype">VARCHAR(30)</span><span class="fdesc">VALIDER / REFOULER / …</span></div>
+    <div class="db-field"><span></span><span class="fname">snapshot_version</span><span class="ftype">INTEGER</span><span class="fdesc">Numéro de version créé</span></div>
+    <div class="db-field"><span class="fkey fk">FK</span><span class="fname">snapshot_id</span><span class="ftype">BIGINT</span><span class="fdesc">Lien vers le snapshot</span></div>
+    <div class="db-field"><span class="fkey lob">LOB</span><span class="fname">comments</span><span class="ftype">CLOB</span><span class="fdesc">Motif / observations</span></div>
+    <div class="db-field"><span></span><span class="fname">performed_by</span><span class="ftype">VARCHAR</span><span class="fdesc">Matricule qui a agi</span></div>
+    <div class="db-field"><span></span><span class="fname">performed_at</span><span class="ftype">TIMESTAMP</span><span class="fdesc">Auto (CreationTimestamp)</span></div>
+    <div class="db-field"><span></span><span class="fname">structure_mere</span><span class="ftype">VARCHAR(20)</span><span class="fdesc">DR parente de l'agence (filtre DR)</span></div>
+  </div>
+
+  <div class="callout be" style="margin-top:12px">
+    <strong>Lien entre les 2 tables</strong>
+    Chaque ligne de LOG pointe vers un SNAPSHOT via <code>snapshot_id</code> et <code>snapshot_version</code>. Un snapshot est créé en premier, puis le log est enregistré avec l'ID du snapshot.
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 3. BACKEND — LES ENDPOINTS REST                              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl be">☕ 3. Backend — Les 5 Endpoints REST (CanevasSnapshotController)</div>
+
+<p>Tous les endpoints sont sur la base <code>/api/canevas/{id}</code> où <code>{id}</code> est l'identifiant du canvas.</p>
+
+<!-- POST VALIDER -->
+<div class="http-card">
+  <div class="http-hdr post"><span class="verb v-post">POST</span><span class="url">/api/canevas/{id}/valider</span><span style="margin-left:auto;font-size:12px;color:#2E7D32">Valider &amp; Transmettre</span></div>
+  <div class="http-body">
+    <div class="http-row"><span class="lkey">Corps (JSON)</span><span class="lval"><code>ValidationRequestDto</code> : fromStructureCode, fromStructureLabel, toStructureCode, matricule, observations, avisValue ("FAVORABLE"|"DEFAVORABLE"|"SANS_AVIS"), engagementDetailleJson</span></div>
+    <div class="http-row"><span class="lkey">Ce que ça fait</span><span class="lval">① <strong>createSnapshot()</strong> avec status="VALID_DONNEE" → ② <strong>workflowLogService.log()</strong> avec action="VALIDER"</span></div>
+    <div class="http-row"><span class="lkey">Retourne</span><span class="lval"><code>SnapshotResponseDto</code> : snapshotId, versionNumber, structureCode</span></div>
+    <div class="http-row"><span class="lkey">Qui appelle</span><span class="lval">Le Chef Agence ou la DR — bouton "Valider &amp; Transmettre" dans le dialog</span></div>
+  </div>
+</div>
+
+<!-- POST REFOULER -->
+<div class="http-card">
+  <div class="http-hdr post"><span class="verb v-post">POST</span><span class="url">/api/canevas/{id}/refouler</span><span style="margin-left:auto;font-size:12px;color:#C62828">Refouler le dossier</span></div>
+  <div class="http-body">
+    <div class="http-row"><span class="lkey">Corps (JSON)</span><span class="lval"><code>RefoulementRequestDto</code> : fromStructureCode, fromStructureLabel, toStructureCode, matricule, motif (<strong>obligatoire</strong>), engagementDetailleJson</span></div>
+    <div class="http-row"><span class="lkey">Ce que ça fait</span><span class="lval">① <strong>createSnapshot()</strong> avec status="CORRIGE_DONNEE" → ② <strong>workflowLogService.log()</strong> avec action="REFOULER"</span></div>
+    <div class="http-row"><span class="lkey">Retourne</span><span class="lval"><code>SnapshotResponseDto</code> : snapshotId, versionNumber, structureCode</span></div>
+  </div>
+</div>
+
+<!-- GET SNAPSHOTS -->
+<div class="http-card">
+  <div class="http-hdr get"><span class="verb v-get">GET</span><span class="url">/api/canevas/{id}/snapshots?typeStructure=&amp;codeStructure=</span><span style="margin-left:auto;font-size:12px;color:#1565C0">Historique</span></div>
+  <div class="http-body">
+    <div class="http-row"><span class="lkey">Params optionnels</span><span class="lval"><code>typeStructure</code> + <code>codeStructure</code> → déclenche la vérification d'accès via <code>canAccessCanvas()</code></span></div>
+    <div class="http-row"><span class="lkey">Retourne</span><span class="lval"><code>List&lt;SnapshotSummaryDto&gt;</code> — liste légère (sans JSON CLOBs) triée par version ASC</span></div>
+    <div class="http-row"><span class="lkey">⚠ Problème</span><span class="lval"><code>canAccessCanvas()</code> retourne toujours <code>true</code> — logique d'accès commentée (voir section Problèmes)</span></div>
+  </div>
+</div>
+
+<!-- GET DETAIL -->
+<div class="http-card">
+  <div class="http-hdr get"><span class="verb v-get">GET</span><span class="url">/api/canevas/{id}/snapshots/{snapshotId}/detail</span><span style="margin-left:auto;font-size:12px;color:#1565C0">Détail complet</span></div>
+  <div class="http-body">
+    <div class="http-row"><span class="lkey">Ce que ça fait</span><span class="lval">Charge le snapshot par son ID exact. Désérialise tous les CLOBs JSON en <code>Object</code></span></div>
+    <div class="http-row"><span class="lkey">Retourne</span><span class="lval"><code>SnapshotDetailDto</code> — tout le contenu : engagements BNA/BCT, classes, détails parties, crédits, exploitation, garanties</span></div>
+    <div class="http-row"><span class="lkey">Utilisé par</span><span class="lval">Le bouton "œil" et le bouton "comparer" dans la table des snapshots</span></div>
+  </div>
+</div>
+
+<!-- GET WORKFLOW LOG -->
+<div class="http-card">
+  <div class="http-hdr get"><span class="verb v-get">GET</span><span class="url">/api/canevas/{id}/snapshots/workflow-log?typeStructure=&amp;codeStructure=</span><span style="margin-left:auto;font-size:12px;color:#1565C0">Journal</span></div>
+  <div class="http-body">
+    <div class="http-row"><span class="lkey">Filtrage serveur</span><span class="lval">type='1' → seulement <code>fromStructure = code</code> · type='2' → ses logs + agences (via <code>structureMere</code>) · autres → tout</span></div>
+    <div class="http-row"><span class="lkey">Retourne</span><span class="lval"><code>List&lt;CanevasWorkflowLog&gt;</code> — entité complète triée par date DESC</span></div>
+  </div>
+</div>
+
+<!-- Code Controller -->
+<div class="code-wrap" style="margin-top:18px">
+  <div class="code-fn"><span class="dot java"></span>CanevasSnapshotController.java — Endpoints POST</div>
+  <pre class="c">
+<span class="ln"><span class="an">@RestController</span></span>
+<span class="ln"><span class="an">@RequestMapping</span>(<span class="str">"/api/canevas"</span>)</span>
+<span class="ln"><span class="kw">public class</span> <span class="tp">CanevasSnapshotController</span> {</span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="cmt">// ── POST /api/canevas/{id}/valider ──</span></span>
+<span class="ln hl-be">  <span class="an">@PostMapping</span>(<span class="str">"/{id}/valider"</span>)</span>
+<span class="ln hl-be">  <span class="kw">public</span> <span class="tp">ResponseEntity</span>&lt;<span class="tp">SnapshotResponseDto</span>&gt; <span class="fn">valider</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id,</span>
+<span class="ln hl-be">                                             <span class="an">@RequestBody</span> <span class="tp">ValidationRequestDto</span> request) {</span>
+<span class="ln hl-be">    <span class="cmt">// ① Créer le snapshot</span></span>
+<span class="ln hl-be">    <span class="tp">CanevasStructureSnapshot</span> snapshot = snapshotService.<span class="fn">createSnapshot</span>(</span>
+<span class="ln hl-be">        id, request.<span class="fn">fromStructureCode</span>(), request.<span class="fn">fromStructureLabel</span>(),</span>
+<span class="ln hl-be">        request.<span class="fn">matricule</span>(), request.<span class="fn">matricule</span>(),</span>
+<span class="ln hl-be">        request.<span class="fn">observations</span>(), <span class="str">"VALID_DONNEE"</span>,  <span class="cmt">// ← statut fixe</span></span>
+<span class="ln hl-be">        <span class="kw">null</span>);</span>
+<span class="ln hl-be">    <span class="cmt">// ② Enregistrer le log d'action</span></span>
+<span class="ln hl-be">    workflowLogService.<span class="fn">log</span>(id,</span>
+<span class="ln hl-be">        request.<span class="fn">fromStructureCode</span>(), request.<span class="fn">toStructureCode</span>(),</span>
+<span class="ln hl-be">        <span class="str">"VALIDER"</span>,   <span class="cmt">// ← action fixe : même endpoint pour Chef Agence ET DR</span></span>
+<span class="ln hl-be">        snapshot.<span class="fn">getVersionNumber</span>(), snapshot.<span class="fn">getSnapshotId</span>(),</span>
+<span class="ln hl-be">        request.<span class="fn">observations</span>(), request.<span class="fn">matricule</span>());</span>
+<span class="ln hl-be">    <span class="kw">return</span> <span class="tp">ResponseEntity</span>.<span class="fn">ok</span>(<span class="kw">new</span> <span class="tp">SnapshotResponseDto</span>(</span>
+<span class="ln hl-be">        snapshot.<span class="fn">getSnapshotId</span>(), snapshot.<span class="fn">getVersionNumber</span>(),</span>
+<span class="ln hl-be">        request.<span class="fn">fromStructureCode</span>()));</span>
+<span class="ln hl-be">  }</span>
+<span class="ln"></span>
+<span class="ln hl-warn">  <span class="cmt">// ── POST /api/canevas/{id}/refouler ──</span></span>
+<span class="ln hl-warn">  <span class="an">@PostMapping</span>(<span class="str">"/{id}/refouler"</span>)</span>
+<span class="ln hl-warn">  <span class="kw">public</span> <span class="tp">ResponseEntity</span>&lt;<span class="tp">SnapshotResponseDto</span>&gt; <span class="fn">refouler</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id,</span>
+<span class="ln hl-warn">                                              <span class="an">@RequestBody</span> <span class="tp">RefoulementRequestDto</span> request) {</span>
+<span class="ln hl-warn">    <span class="tp">CanevasStructureSnapshot</span> snapshot = snapshotService.<span class="fn">createSnapshot</span>(</span>
+<span class="ln hl-warn">        id, request.<span class="fn">fromStructureCode</span>(), request.<span class="fn">fromStructureLabel</span>(),</span>
+<span class="ln hl-warn">        request.<span class="fn">matricule</span>(), request.<span class="fn">matricule</span>(),</span>
+<span class="ln hl-warn">        request.<span class="fn">motif</span>(), <span class="str">"CORRIGE_DONNEE"</span>,  <span class="cmt">// ← statut fixe</span></span>
+<span class="ln hl-warn">        <span class="kw">null</span>);</span>
+<span class="ln hl-warn">    workflowLogService.<span class="fn">log</span>(id, request.<span class="fn">fromStructureCode</span>(), request.<span class="fn">toStructureCode</span>(),</span>
+<span class="ln hl-warn">        <span class="str">"REFOULER"</span>, snapshot.<span class="fn">getVersionNumber</span>(), snapshot.<span class="fn">getSnapshotId</span>(),</span>
+<span class="ln hl-warn">        request.<span class="fn">motif</span>(), request.<span class="fn">matricule</span>());</span>
+<span class="ln hl-warn">    <span class="kw">return</span> <span class="tp">ResponseEntity</span>.<span class="fn">ok</span>(<span class="kw">new</span> <span class="tp">SnapshotResponseDto</span>(</span>
+<span class="ln hl-warn">        snapshot.<span class="fn">getSnapshotId</span>(), snapshot.<span class="fn">getVersionNumber</span>(),</span>
+<span class="ln hl-warn">        request.<span class="fn">fromStructureCode</span>()));</span>
+<span class="ln hl-warn">  }</span>
+<span class="ln">}</span></pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 4. BACKEND — createSnapshot() EN DÉTAIL                      -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl be">⚙ 4. Backend — La Méthode createSnapshot() en 8 étapes</div>
+
+<p>C'est <strong>le cœur du système</strong>. Elle est appelée à chaque action workflow (valider ou refouler). Elle collecte toutes les données du dossier depuis plusieurs sources et les sérialise en JSON dans la base.</p>
+
+<div class="steps">
+  <div class="step"><div class="step-body"><strong>Calcul de la version suivante</strong><p>Requête JPA <code>SELECT MAX(version_number) FROM CANEVAS_STRUCTURE_SNAPSHOT WHERE canevas_id = ?</code>. Si aucun snapshot → version = 1. Sinon → MAX + 1.</p></div></div>
+  <div class="step"><div class="step-body"><strong>Chargement du Caneva depuis la base locale</strong><p><code>canevaRepository.findById(canevasId)</code>. Lance <code>EntityNotFoundException</code> si introuvable. Cet objet contient les crédits, les sites, les actionnaires, etc.</p></div></div>
+  <div class="step"><div class="step-body"><strong>Chargement des engagements depuis Oracle SAEB</strong><p><code>engagementService.getListeEngagementClient(numSeqPers)</code> → BNA + BCT. Puis séparément : <code>getHistoriqueClasseBNA()</code>, <code>getHistoriqueClasseBCT()</code>, <code>getHistoriqueRetourClasseBctBNA()</code>. Chaque appel est dans un <code>try/catch</code> — si Oracle SAEB est indisponible, le snapshot est créé avec une liste vide (fail-safe).</p></div></div>
+  <div class="step"><div class="step-body"><strong>Construction du JSON engagement détaillé (5 onglets)</strong><p><code>buildFullEngagementDetailleJson(caneva)</code> construit un objet avec 5 clés : <code>relation</code>, <code>actionnaires</code>, <code>premierResponsable</code>, <code>groupe</code>, <code>vendeurs</code>. Pour chaque partie liée, on charge ses propres engagements BNA/BCT et classifications.</p></div></div>
+  <div class="step"><div class="step-body"><strong>Construction des JSON métier</strong><p><code>buildCreditsJson()</code> → courtTerme + investissement + achatTerrain · <code>buildExploitationJson()</code> → sites GPS + projetCourtTerme (barème, CA réalisé, CA prévisionnel, 3 mois achat) · <code>buildGarantiesJson()</code> → numCaneva + numSeqPers (partiel)</p></div></div>
+  <div class="step"><div class="step-body"><strong>Sérialisation en JSON avec Jackson ObjectMapper</strong><p><code>objectMapper.writeValueAsString(obj)</code> convertit chaque objet Java en chaîne JSON stockée en CLOB. Si erreur → log.error + <code>null</code> stocké (champ nullable).</p></div></div>
+  <div class="step"><div class="step-body"><strong>Persistance du snapshot en base</strong><p><code>snapshotRepo.save(snapshot)</code> — INSERT dans <code>CANEVAS_STRUCTURE_SNAPSHOT</code>. Retourne l'entité avec <code>snapshotId</code> généré.</p></div></div>
+  <div class="step"><div class="step-body"><strong>Mise à jour du Canvas parent</strong><p><code>caneva.setCurrentVersion(nextVersion)</code>, <code>caneva.setCurrentStructure(structureCode)</code>, <code>caneva.setLastSnapshotId(saved.getSnapshotId())</code>. Puis <code>canevaRepository.save(caneva)</code>. Le canvas sait toujours où il en est.</p></div></div>
+</div>
+
+<div class="code-wrap">
+  <div class="code-fn"><span class="dot java"></span>CanevasSnapshotService.java — createSnapshot() — lignes 51–125</div>
+  <pre class="c">
+<span class="ln"><span class="an">@Transactional</span>(propagation = Propagation.REQUIRES_NEW)</span>
+<span class="ln"><span class="kw">public</span> <span class="tp">CanevasStructureSnapshot</span> <span class="fn">createSnapshot</span>(</span>
+<span class="ln">    <span class="tp">Long</span> canevasId, <span class="tp">String</span> structureCode, <span class="tp">String</span> structureLabel,</span>
+<span class="ln">    <span class="tp">String</span> matricule, <span class="tp">String</span> createdBy, <span class="tp">String</span> observations,</span>
+<span class="ln">    <span class="tp">String</span> statusAtSnapshot, <span class="tp">String</span> avisJson) {</span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="cmt">// ÉTAPE 1 — Version suivante (MAX + 1)</span></span>
+<span class="ln hl-be">  <span class="tp">Integer</span> nextVersion = snapshotRepo</span>
+<span class="ln hl-be">      .<span class="fn">findMaxVersionByCanevasId</span>(canevasId)  <span class="cmt">// SELECT MAX(version_number) ...</span></span>
+<span class="ln hl-be">      .map(v -> v + <span class="num">1</span>)</span>
+<span class="ln hl-be">      .orElse(<span class="num">1</span>);  <span class="cmt">// premier snapshot = version 1</span></span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="cmt">// ÉTAPE 2 — Charger le canevas</span></span>
+<span class="ln hl-be">  <span class="tp">Caneva</span> caneva = canevaRepository.<span class="fn">findById</span>(canevasId)</span>
+<span class="ln hl-be">      .orElseThrow(() -> <span class="kw">new</span> <span class="tp">EntityNotFoundException</span>(<span class="str">"Canevas introuvable"</span>));</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="cmt">// ÉTAPE 3 — Engagements Oracle SAEB (fail-safe : try/catch partout)</span></span>
+<span class="ln hl-fe">  <span class="tp">String</span> numSeqPersStr = String.<span class="fn">valueOf</span>(caneva.<span class="fn">getNumSeqpers</span>());</span>
+<span class="ln hl-fe">  <span class="tp">EngagementDTO</span> engagement = <span class="fn">loadEngagementSafe</span>(numSeqPersStr);  <span class="cmt">// BNA + BCT</span></span>
+<span class="ln hl-fe">  <span class="tp">List</span>&lt;<span class="tp">ClasseDTO</span>&gt; classeBNA    = <span class="fn">loadClasseBNASafe</span>(numSeqPersStr);   <span class="cmt">// 3 ans</span></span>
+<span class="ln hl-fe">  <span class="tp">List</span>&lt;<span class="tp">ClasseDTO</span>&gt; classeBCT    = <span class="fn">loadClasseBCTSafe</span>(numSeqPersStr);</span>
+<span class="ln hl-fe">  <span class="tp">List</span>&lt;<span class="tp">ClasseBctDTO</span>&gt; classeRet = <span class="fn">loadClasseRetourBCTSafe</span>(numSeqPersStr);</span>
+<span class="ln"></span>
+<span class="ln hl-pur">  <span class="cmt">// ÉTAPE 4 — JSON engagement détaillé (5 onglets)</span></span>
+<span class="ln hl-pur">  <span class="tp">String</span> engDetailleJson = <span class="fn">buildFullEngagementDetailleJson</span>(caneva);</span>
+<span class="ln"></span>
+<span class="ln hl-warn">  <span class="cmt">// ÉTAPE 5 — JSON données métier</span></span>
+<span class="ln hl-warn">  <span class="tp">String</span> creditsJson   = <span class="fn">buildCreditsJson</span>(caneva);      <span class="cmt">// CT, invest, terrain</span></span>
+<span class="ln hl-warn">  <span class="tp">String</span> exploitJson   = <span class="fn">buildExploitationJson</span>(caneva); <span class="cmt">// sites + 4 types calcul</span></span>
+<span class="ln hl-warn">  <span class="tp">String</span> garantiesJson = <span class="fn">buildGarantiesJson</span>(caneva);   <span class="cmt">// partiel</span></span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="cmt">// ÉTAPES 6+7 — Construire et persister</span></span>
+<span class="ln hl-be">  <span class="tp">CanevasStructureSnapshot</span> snapshot = <span class="tp">CanevasStructureSnapshot</span>.<span class="fn">builder</span>()</span>
+<span class="ln hl-be">      .canevasId(canevasId).structureCode(structureCode).versionNumber(nextVersion)</span>
+<span class="ln hl-be">      .statusAtSnapshot(statusAtSnapshot).createdBy(createdBy).matricule(matricule)</span>
+<span class="ln hl-be">      .engagementBnaJson(<span class="fn">toJson</span>(engagement.<span class="fn">getListeEngagementBNA</span>()))</span>
+<span class="ln hl-be">      .engagementBctJson(<span class="fn">toJson</span>(engagement.<span class="fn">getListeEngagementBCT</span>()))</span>
+<span class="ln hl-be">      .classeBnaJson(<span class="fn">toJson</span>(classeBNA)).classeBctJson(<span class="fn">toJson</span>(classeBCT))</span>
+<span class="ln hl-be">      .classeRetourJson(<span class="fn">toJson</span>(classeRet))</span>
+<span class="ln hl-be">      .engagementDetailleJson(engDetailleJson)</span>
+<span class="ln hl-be">      .donneesCreditsJson(creditsJson).donneesExploitationJson(exploitJson)</span>
+<span class="ln hl-be">      .donneesGarantiesJson(garantiesJson).donneesAvisJson(avisJson)</span>
+<span class="ln hl-be">      .build();</span>
+<span class="ln hl-be">  <span class="tp">CanevasStructureSnapshot</span> saved = snapshotRepo.<span class="fn">save</span>(snapshot);  <span class="cmt">// INSERT SQL</span></span>
+<span class="ln"></span>
+<span class="ln hl-warn">  <span class="cmt">// ÉTAPE 8 — Mise à jour du Canvas parent</span></span>
+<span class="ln hl-warn">  caneva.<span class="fn">setCurrentVersion</span>(nextVersion);</span>
+<span class="ln hl-warn">  caneva.<span class="fn">setCurrentStructure</span>(structureCode);</span>
+<span class="ln hl-warn">  caneva.<span class="fn">setLastSnapshotId</span>(saved.<span class="fn">getSnapshotId</span>());</span>
+<span class="ln hl-warn">  canevaRepository.<span class="fn">save</span>(caneva);  <span class="cmt">// UPDATE SQL</span></span>
+<span class="ln"></span>
+<span class="ln">  <span class="kw">return</span> saved;</span>
+<span class="ln">}</span></pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 5. BACKEND — WorkflowLogService                              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl be">📋 5. Backend — WorkflowLogService : Enregistrement et Filtrage des Logs</div>
+
+<div class="dual">
+<div class="dual-col">
+<div class="dual-col-hdr be">🟢 log() — Enregistrement</div>
+<div class="dual-col-body">
+<p>Crée un enregistrement dans <code>CANEVAS_WORKFLOW_LOG</code>. Deux surcharges : avec et sans <code>structureMere</code>.</p>
+<div class="code-wrap">
+  <div class="code-fn"><span class="dot java"></span>WorkflowLogService.java</div>
+  <pre class="c">
+<span class="ln"><span class="an">@Transactional</span>(propagation = Propagation.REQUIRES_NEW)</span>
+<span class="ln"><span class="kw">public</span> <span class="tp">CanevasWorkflowLog</span> <span class="fn">log</span>(</span>
+<span class="ln">    <span class="tp">Long</span> canevasId,</span>
+<span class="ln">    <span class="tp">String</span> fromStructure, <span class="tp">String</span> toStructure,</span>
+<span class="ln">    <span class="tp">String</span> action,          <span class="cmt">// "VALIDER", "REFOULER"</span></span>
+<span class="ln">    <span class="tp">Integer</span> snapshotVersion, <span class="tp">Long</span> snapshotId,</span>
+<span class="ln">    <span class="tp">String</span> comments, <span class="tp">String</span> performedBy,</span>
+<span class="ln hl-warn">    <span class="tp">String</span> structureMere) { <span class="cmt">// null si pas utilisé</span></span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="tp">CanevasWorkflowLog</span> entry = <span class="tp">CanevasWorkflowLog</span>.<span class="fn">builder</span>()</span>
+<span class="ln hl-be">      .canevasId(canevasId)</span>
+<span class="ln hl-be">      .fromStructure(fromStructure)</span>
+<span class="ln hl-be">      .toStructure(toStructure)</span>
+<span class="ln hl-be">      .action(action)</span>
+<span class="ln hl-be">      .snapshotVersion(snapshotVersion)</span>
+<span class="ln hl-be">      .snapshotId(snapshotId)</span>
+<span class="ln hl-be">      .comments(comments)</span>
+<span class="ln hl-be">      .performedBy(performedBy)</span>
+<span class="ln hl-warn">      .structureMere(structureMere)</span>
+<span class="ln hl-be">      .build();</span>
+<span class="ln hl-be">  <span class="kw">return</span> workflowRepo.<span class="fn">save</span>(entry); <span class="cmt">// INSERT</span></span>
+<span class="ln">}</span></pre>
+</div>
+</div>
+</div>
+
+<div class="dual-col">
+<div class="dual-col-hdr be">🟢 getHistoryFiltered() — Lecture filtrée</div>
+<div class="dual-col-body">
+<p>Filtre différent selon le rôle de l'utilisateur qui consulte.</p>
+<div class="code-wrap">
+  <div class="code-fn"><span class="dot java"></span>WorkflowLogService.java — lignes 65–88</div>
+  <pre class="c">
+<span class="ln"><span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">CanevasWorkflowLog</span>&gt; <span class="fn">getHistoryFiltered</span>(</span>
+<span class="ln">    <span class="tp">Long</span> canevasId, <span class="tp">String</span> typeStructure, <span class="tp">String</span> codeStructure) {</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="kw">if</span> (<span class="str">"1"</span>.<span class="fn">equals</span>(typeStructure) &amp;&amp; codeStructure != <span class="kw">null</span>) {</span>
+<span class="ln hl-fe">    <span class="cmt">// Agence : seulement SES propres logs (fromStructure)</span></span>
+<span class="ln hl-fe">    <span class="kw">return</span> workflowRepo</span>
+<span class="ln hl-fe">      .<span class="fn">findByCanevasIdAndFromStructureOrderByPerformedAtDesc</span>(</span>
+<span class="ln hl-fe">          canevasId, codeStructure);</span>
+<span class="ln hl-fe">  }</span>
+<span class="ln hl-warn">  <span class="kw">if</span> (<span class="str">"2"</span>.<span class="fn">equals</span>(typeStructure) &amp;&amp; codeStructure != <span class="kw">null</span>) {</span>
+<span class="ln hl-warn">    <span class="cmt">// DR : ses logs + logs agences enfants (structureMere)</span></span>
+<span class="ln hl-warn">    <span class="tp">List</span>&lt;<span class="tp">CanevasWorkflowLog</span>&gt; propres = workflowRepo</span>
+<span class="ln hl-warn">      .<span class="fn">findByCanevasIdAndFromStructureOrderByPerformedAtDesc</span>(</span>
+<span class="ln hl-warn">          canevasId, codeStructure);</span>
+<span class="ln hl-warn">    <span class="tp">List</span>&lt;<span class="tp">CanevasWorkflowLog</span>&gt; agences = workflowRepo</span>
+<span class="ln hl-warn">      .<span class="fn">findByCanevasIdAndStructureMereOrderByPerformedAtDesc</span>(</span>
+<span class="ln hl-warn">          canevasId, codeStructure); <span class="cmt">// via structureMere</span></span>
+<span class="ln hl-warn">    <span class="tp">List</span>&lt;<span class="tp">CanevasWorkflowLog</span>&gt; merged = <span class="kw">new</span> <span class="tp">ArrayList</span>&lt;&gt;(propres);</span>
+<span class="ln hl-warn">    merged.<span class="fn">addAll</span>(agences);</span>
+<span class="ln hl-warn">    merged.<span class="fn">sort</span>(<span class="tp">Comparator</span>.<span class="fn">comparing</span>(<span class="tp">CanevasWorkflowLog</span>::<span class="fn">getPerformedAt</span>).reversed());</span>
+<span class="ln hl-warn">    <span class="kw">return</span> merged;</span>
+<span class="ln hl-warn">  }</span>
+<span class="ln hl-be">  <span class="kw">return</span> workflowRepo.<span class="fn">findByCanevasIdOrderByPerformedAtDesc</span>(canevasId); <span class="cmt">// DC : tout</span></span>
+<span class="ln">}</span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 6. FRONTEND — SnapshotService                                -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl fe">🔵 6. Frontend — SnapshotService : La Couche HTTP Angular</div>
+
+<p>Ce service Angular est la couche d'abstraction entre le composant et l'API REST. Il ne contient aucune logique métier — uniquement des appels HTTP.</p>
+
+<div class="code-wrap">
+  <div class="code-fn"><span class="dot ts"></span>snapshot.service.ts — Méthodes HTTP complètes</div>
+  <pre class="c">
+<span class="ln"><span class="an">@Injectable</span>({ providedIn: <span class="str">'root'</span> })</span>
+<span class="ln"><span class="kw">export class</span> <span class="tp">SnapshotService</span> {</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="kw">private</span> api = <span class="str">`${environment.apiURL}api/canevas`</span>;  <span class="cmt">// ex: http://localhost:8080/api/canevas</span></span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="cmt">// ① POST /valider</span></span>
+<span class="ln hl-be">  <span class="fn">validerEtTransmettre</span>(id: <span class="tp">number</span>, req: <span class="tp">ValidationRequest</span>): <span class="tp">Observable</span>&lt;<span class="tp">SnapshotResponse</span>&gt; {</span>
+<span class="ln hl-be">    <span class="kw">return this</span>.http.post&lt;<span class="tp">SnapshotResponse</span>&gt;(<span class="str">`${this.api}/${id}/valider`</span>, req);</span>
+<span class="ln hl-be">  }</span>
+<span class="ln"></span>
+<span class="ln hl-warn">  <span class="cmt">// ② POST /refouler</span></span>
+<span class="ln hl-warn">  <span class="fn">refouler</span>(id: <span class="tp">number</span>, req: <span class="tp">RefoulementRequest</span>): <span class="tp">Observable</span>&lt;<span class="tp">SnapshotResponse</span>&gt; {</span>
+<span class="ln hl-warn">    <span class="kw">return this</span>.http.post&lt;<span class="tp">SnapshotResponse</span>&gt;(<span class="str">`${this.api}/${id}/refouler`</span>, req);</span>
+<span class="ln hl-warn">  }</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="cmt">// ③ GET /snapshots — liste avec contrôle d'accès optionnel</span></span>
+<span class="ln hl-fe">  <span class="fn">getHistory</span>(id: <span class="tp">number</span>, typeStructure?: <span class="tp">string</span>, codeStructure?: <span class="tp">string</span>)</span>
+<span class="ln hl-fe">      : <span class="tp">Observable</span>&lt;<span class="tp">SnapshotSummary</span>[]&gt; {</span>
+<span class="ln hl-fe">    <span class="kw">let</span> params = <span class="kw">new</span> <span class="tp">HttpParams</span>();</span>
+<span class="ln hl-fe">    <span class="kw">if</span> (typeStructure) params = params.set(<span class="str">'typeStructure'</span>, typeStructure);</span>
+<span class="ln hl-fe">    <span class="kw">if</span> (codeStructure) params = params.set(<span class="str">'codeStructure'</span>, codeStructure);</span>
+<span class="ln hl-fe">    <span class="kw">return this</span>.http.get&lt;<span class="tp">SnapshotSummary</span>[]&gt;(<span class="str">`${this.api}/${id}/snapshots`</span>, { params });</span>
+<span class="ln hl-fe">  }</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="cmt">// ④ GET /snapshots/{snapshotId}/detail</span></span>
+<span class="ln hl-fe">  <span class="fn">getBySnapshotId</span>(canevasId: <span class="tp">number</span>, snapshotId: <span class="tp">number</span>): <span class="tp">Observable</span>&lt;<span class="tp">SnapshotDetail</span>&gt; {</span>
+<span class="ln hl-fe">    <span class="kw">return this</span>.http.get&lt;<span class="tp">SnapshotDetail</span>&gt;(</span>
+<span class="ln hl-fe">      <span class="str">`${this.api}/${canevasId}/snapshots/${snapshotId}/detail`</span>);</span>
+<span class="ln hl-fe">  }</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="cmt">// ⑤ GET /snapshots/workflow-log</span></span>
+<span class="ln hl-fe">  <span class="fn">getWorkflowLog</span>(id: <span class="tp">number</span>, typeStructure?: <span class="tp">string</span>, codeStructure?: <span class="tp">string</span>)</span>
+<span class="ln hl-fe">      : <span class="tp">Observable</span>&lt;<span class="tp">WorkflowLogEntry</span>[]&gt; {</span>
+<span class="ln hl-fe">    <span class="kw">let</span> params = <span class="kw">new</span> <span class="tp">HttpParams</span>();</span>
+<span class="ln hl-fe">    <span class="kw">if</span> (typeStructure) params = params.set(<span class="str">'typeStructure'</span>, typeStructure);</span>
+<span class="ln hl-fe">    <span class="kw">if</span> (codeStructure) params = params.set(<span class="str">'codeStructure'</span>, codeStructure);</span>
+<span class="ln hl-fe">    <span class="kw">return this</span>.http.get&lt;<span class="tp">WorkflowLogEntry</span>[]&gt;(</span>
+<span class="ln hl-fe">      <span class="str">`${this.api}/${id}/snapshots/workflow-log`</span>, { params });</span>
+<span class="ln hl-fe">  }</span>
+<span class="ln">}</span></pre>
+</div>
+
+<h3>Interfaces TypeScript (miroir des DTOs Java)</h3>
+<div class="dual">
+<div class="dual-col">
+<div class="dual-col-hdr fe">🔵 SnapshotSummary (= SnapshotSummaryDto)</div>
+<div class="dual-col-body">
+<div class="code-wrap"><div class="code-fn"><span class="dot ts"></span>snapshot.service.ts</div>
+<pre class="c">
+<span class="ln"><span class="kw">export interface</span> <span class="tp">SnapshotSummary</span> {</span>
+<span class="ln">  snapshotId:       <span class="tp">number</span>;</span>
+<span class="ln">  structureCode:    <span class="tp">string</span>;</span>
+<span class="ln">  structureLabel:   <span class="tp">string</span>;</span>
+<span class="ln">  versionNumber:    <span class="tp">number</span>;</span>
+<span class="ln">  statusAtSnapshot: <span class="tp">string</span>;</span>
+<span class="ln">  createdBy:        <span class="tp">string</span>;</span>
+<span class="ln">  matricule:        <span class="tp">string</span>;</span>
+<span class="ln">  createdAt:        <span class="tp">string</span>; <span class="cmt">// ISO date</span></span>
+<span class="ln">  observations:     <span class="tp">string</span>;</span>
+<span class="ln">}</span>
+<span class="ln"></span>
+<span class="ln"><span class="kw">export interface</span> <span class="tp">WorkflowLogEntry</span> {</span>
+<span class="ln">  logId:           <span class="tp">number</span>;</span>
+<span class="ln">  canevasId:       <span class="tp">number</span>;</span>
+<span class="ln">  fromStructure:   <span class="tp">string</span>;</span>
+<span class="ln">  toStructure:     <span class="tp">string</span>;</span>
+<span class="ln">  action:          <span class="tp">string</span>; <span class="cmt">// VALIDER, REFOULER...</span></span>
+<span class="ln">  snapshotVersion: <span class="tp">number</span>;</span>
+<span class="ln">  snapshotId:      <span class="tp">number</span>;</span>
+<span class="ln">  comments:        <span class="tp">string</span>;</span>
+<span class="ln">  performedBy:     <span class="tp">string</span>;</span>
+<span class="ln">  performedAt:     <span class="tp">string</span>;</span>
+<span class="ln">  structureMere?:  <span class="tp">string</span>;</span>
+<span class="ln">}</span></pre>
+</div>
+</div>
+</div>
+<div class="dual-col">
+<div class="dual-col-hdr fe">🔵 SnapshotDetail (= SnapshotDetailDto)</div>
+<div class="dual-col-body">
+<div class="code-wrap"><div class="code-fn"><span class="dot ts"></span>snapshot.service.ts</div>
+<pre class="c">
+<span class="ln"><span class="kw">export interface</span> <span class="tp">SnapshotDetail</span> <span class="kw">extends</span> <span class="tp">SnapshotSummary</span> {</span>
+<span class="ln">  <span class="cmt">// Les CLOBs JSON désérialisés par Java Object</span></span>
+<span class="ln">  engagementsBNA:      <span class="tp">any</span>[];</span>
+<span class="ln">  engagementsBCT:      <span class="tp">any</span>[];</span>
+<span class="ln">  classeBNA:           <span class="tp">any</span>[];</span>
+<span class="ln">  classeBCT:           <span class="tp">any</span>[];</span>
+<span class="ln">  classeRetour:        <span class="tp">any</span>[];</span>
+<span class="ln">  engagementDetaille:  <span class="tp">any</span>; <span class="cmt">// 5 onglets</span></span>
+<span class="ln">  creditsData:         <span class="tp">any</span>; <span class="cmt">// {courtTerme, investissement, achatTerrain}</span></span>
+<span class="ln">  exploitationData:    <span class="tp">any</span>; <span class="cmt">// {sites, projetCourtTerme}</span></span>
+<span class="ln">  garantiesData:       <span class="tp">any</span>;</span>
+<span class="ln">}</span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 7. FRONTEND — SnapshotHistoryComponent                       -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl fe">🔵 7. Frontend — SnapshotHistoryComponent : Gestion des Signaux et Actions</div>
+
+<h3>Les Signals — État réactif du composant</h3>
+<div class="code-wrap">
+  <div class="code-fn"><span class="dot ts"></span>snapshot-history.component.ts — Déclaration des signaux</div>
+  <pre class="c">
+<span class="ln"><span class="kw">export class</span> <span class="tp">SnapshotHistoryComponent</span> <span class="kw">implements</span> <span class="tp">OnInit</span> {</span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="cmt">// ── Services injectés ──</span></span>
+<span class="ln hl-fe">  <span class="kw">private</span> snapshotService  = inject(<span class="tp">SnapshotService</span>);</span>
+<span class="ln hl-fe">  <span class="kw">public</span>  canevasAgrService = inject(<span class="tp">CanevasAgrService</span>);  <span class="cmt">// signal: currentIdCaneva()</span></span>
+<span class="ln hl-fe">  <span class="kw">private</span> messageService   = inject(<span class="tp">MessageService</span>);    <span class="cmt">// toasts PrimeNG</span></span>
+<span class="ln hl-fe">  <span class="kw">private</span> userService      = inject(<span class="tp">UserService</span>);       <span class="cmt">// signal: user()</span></span>
+<span class="ln"></span>
+<span class="ln hl-be">  <span class="cmt">// ── Signaux de données ──</span></span>
+<span class="ln hl-be">  history     = signal&lt;<span class="tp">SnapshotSummary</span>[]&gt;([]);       <span class="cmt">// liste snapshots</span></span>
+<span class="ln hl-be">  workflowLog = signal&lt;<span class="tp">WorkflowLogEntry</span>[]&gt;([]);      <span class="cmt">// journal actions</span></span>
+<span class="ln hl-be">  selectedSnap = signal&lt;<span class="tp">SnapshotDetail</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>); <span class="cmt">// détail affiché</span></span>
+<span class="ln"></span>
+<span class="ln hl-fe">  <span class="cmt">// ── Signaux UI ──</span></span>
+<span class="ln hl-fe">  loading       = signal(<span class="kw">false</span>);           <span class="cmt">// spinner</span></span>
+<span class="ln hl-fe">  activeTab     = signal&lt;<span class="str">'log'</span>|<span class="str">'snapshots'</span>&gt;(<span class="str">'log'</span>);</span>
+<span class="ln hl-fe">  showValidDlg  = signal(<span class="kw">false</span>);           <span class="cmt">// dialog "Valider"</span></span>
+<span class="ln hl-fe">  showRefoulDlg = signal(<span class="kw">false</span>);           <span class="cmt">// dialog "Refouler"</span></span>
+<span class="ln hl-fe">  compareMode   = signal(<span class="kw">false</span>);           <span class="cmt">// panneau diff</span></span>
+<span class="ln"></span>
+<span class="ln hl-warn">  <span class="cmt">// ── Signaux COMPARAISON ──</span></span>
+<span class="ln hl-warn">  compareOldSnap  = signal&lt;<span class="tp">SnapshotDetail</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);</span>
+<span class="ln hl-warn">  compareNewSnap  = signal&lt;<span class="tp">SnapshotDetail</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);</span>
+<span class="ln hl-warn">  compareOldLabel = signal(<span class="str">''</span>);  <span class="cmt">// "Snapshot v3 — 20/03/2024"</span></span>
+<span class="ln hl-warn">  compareNewLabel = signal(<span class="str">''</span>);  <span class="cmt">// "État actuel v5 — 22/03/2024"</span></span>
+<span class="ln hl-warn">  compareLoading  = signal(<span class="kw">false</span>);</span>
+<span class="ln"></span>
+<span class="ln hl-pur">  <span class="cmt">// ── Computed signals — recalculés automatiquement quand les données changent ──</span></span>
+<span class="ln hl-pur">  filteredLogs   = computed(() => ...);  <span class="cmt">// filtre par rôle</span></span>
+<span class="ln hl-pur">  progressSteps  = computed(() => ...);  <span class="cmt">// stepper 4 étapes</span></span>
+<span class="ln hl-pur">  currentProgressLabel = computed(() => ...); <span class="cmt">// tag "En cours..."</span></span>
+<span class="ln hl-pur">  diffRows       = computed(() => ...);  <span class="cmt">// lignes de comparaison</span></span>
+<span class="ln hl-pur">  diffCount      = computed(() => ...);  <span class="cmt">// nb de différences</span></span>
+<span class="ln">}</span></pre>
+</div>
+
+<h3>Les 2 Actions principales : valider() et refouler()</h3>
+<div class="code-wrap">
+  <div class="code-fn"><span class="dot ts"></span>snapshot-history.component.ts — lignes 518–556</div>
+  <pre class="c">
+<span class="ln hl-be"><span class="cmt">// ── Bouton "Valider & Transmettre" ──</span></span>
+<span class="ln hl-be"><span class="fn">valider</span>(): <span class="tp">void</span> {</span>
+<span class="ln hl-be">  <span class="kw">const</span> id = <span class="kw">this</span>.activeCanevasId() || <span class="kw">this</span>.canevasAgrService.<span class="fn">currentIdCaneva</span>();</span>
+<span class="ln hl-be">  <span class="kw">if</span> (!id || id &lt;= <span class="num">0</span>) <span class="kw">return</span>;</span>
+<span class="ln hl-be"></span>
+<span class="ln hl-be">  <span class="kw">this</span>.snapshotService.<span class="fn">validerEtTransmettre</span>(id, <span class="kw">this</span>.validForm)</span>
+<span class="ln hl-be">    .<span class="fn">subscribe</span>({</span>
+<span class="ln hl-be">      next: (res: <span class="tp">SnapshotResponse</span>) => {</span>
+<span class="ln hl-be">        <span class="kw">this</span>.messageService.<span class="fn">add</span>({</span>
+<span class="ln hl-be">          severity: <span class="str">'success'</span>, summary: <span class="str">'Validé'</span>,</span>
+<span class="ln hl-be">          detail: <span class="str">`Snapshot v${res.versionNumber} créé`</span></span>
+<span class="ln hl-be">        });</span>
+<span class="ln hl-be">        <span class="kw">this</span>.showValidDlg.<span class="fn">set</span>(<span class="kw">false</span>);  <span class="cmt">// ferme le dialog</span></span>
+<span class="ln hl-be">        <span class="kw">this</span>.<span class="fn">loadAll</span>(id);              <span class="cmt">// rechargement complet</span></span>
+<span class="ln hl-be">      },</span>
+<span class="ln hl-be">      error: () => <span class="kw">this</span>.messageService.<span class="fn">add</span>({</span>
+<span class="ln hl-be">        severity: <span class="str">'error'</span>, summary: <span class="str">'Erreur'</span>, detail: <span class="str">'Échec validation'</span></span>
+<span class="ln hl-be">      })</span>
+<span class="ln hl-be">    });</span>
+<span class="ln hl-be">}</span>
+<span class="ln"></span>
+<span class="ln hl-warn"><span class="cmt">// ── Bouton "Refouler" ──</span></span>
+<span class="ln hl-warn"><span class="fn">refouler</span>(): <span class="tp">void</span> {</span>
+<span class="ln hl-warn">  <span class="kw">let</span> id = <span class="kw">this</span>.activeCanevasId() || <span class="kw">this</span>.canevasAgrService.<span class="fn">currentIdCaneva</span>();</span>
+<span class="ln hl-warn">  <span class="kw">if</span> (!id || !<span class="kw">this</span>.refoulForm.motif?.trim()) {</span>
+<span class="ln hl-warn">    <span class="kw">this</span>.messageService.<span class="fn">add</span>({ severity: <span class="str">'warn'</span>, detail: <span class="str">'Motif obligatoire'</span> });</span>
+<span class="ln hl-warn">    <span class="kw">return</span>;</span>
+<span class="ln hl-warn">  }</span>
+<span class="ln hl-warn">  <span class="kw">this</span>.snapshotService.<span class="fn">refouler</span>(id, <span class="kw">this</span>.refoulForm).<span class="fn">subscribe</span>({</span>
+<span class="ln hl-warn">    next: (res) => {</span>
+<span class="ln hl-warn">      <span class="kw">this</span>.showRefoulDlg.<span class="fn">set</span>(<span class="kw">false</span>);</span>
+<span class="ln hl-warn">      <span class="kw">this</span>.<span class="fn">loadAll</span>(id);  <span class="cmt">// rechargement complet</span></span>
+<span class="ln hl-warn">    },</span>
+<span class="ln hl-warn">    error: () => { <span class="cmt">/* toast error */</span> }</span>
+<span class="ln hl-warn">  });</span>
+<span class="ln hl-warn">}</span></pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 8. SÉQUENCE COMPLÈTE PAR STADE                               -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl full">🔄 8. Séquence Complète — Ce qui se passe à chaque stade</div>
+
+<h3>Stade 1 — Chef Agence clique "Valider &amp; Transmettre"</h3>
+<div class="seq">
+  <div class="seq-row" style="background:#E8F5E9">
+    <div class="seq-from" style="background:#A5D6A7;color:#1B5E20">Angular</div>
+    <div class="seq-msg">Utilisateur remplit dialog → <code>validForm</code> : fromStructure='AGC-059', toStructure='DR-05', avis='FAVORABLE'</div>
+    <div class="seq-to" style="background:#A5D6A7;color:#1B5E20">Dialog UI</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#A5D6A7;color:#1B5E20">valider()</div>
+    <div class="seq-msg"><code>POST /api/canevas/285/valider</code> avec corps JSON ValidationRequestDto</div>
+    <div class="seq-to" style="background:#FFF8E1;color:#E65100">Spring Boot</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#FFF8E1;color:#E65100">Controller</div>
+    <div class="seq-msg">Appelle <code>createSnapshot(285, "AGC-059", ..., "VALID_DONNEE", null)</code></div>
+    <div class="seq-to" style="background:#E3F2FD;color:#1565C0">Service</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#E3F2FD;color:#1565C0">Service</div>
+    <div class="seq-msg">Calcule version=3, charge Caneva, charge engagements Oracle SAEB, sérialise 9 JSON CLOBs</div>
+    <div class="seq-to" style="background:#FCE4EC;color:#AD1457">Oracle/Postgres</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#FCE4EC;color:#AD1457">DB</div>
+    <div class="seq-msg">INSERT CANEVAS_STRUCTURE_SNAPSHOT (id=42, version=3, status='VALID_DONNEE', 9 CLOBs)</div>
+    <div class="seq-to" style="background:#E3F2FD;color:#1565C0">Retour</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#E3F2FD;color:#1565C0">Service</div>
+    <div class="seq-msg">Appelle <code>workflowLogService.log(285, "AGC-059", "DR-05", "VALIDER", 3, 42, "observations", "MAT001")</code></div>
+    <div class="seq-to" style="background:#FCE4EC;color:#AD1457">Oracle/Postgres</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#FCE4EC;color:#AD1457">DB</div>
+    <div class="seq-msg">INSERT CANEVAS_WORKFLOW_LOG (canevasId=285, from='AGC-059', to='DR-05', action='VALIDER', snapshotVersion=3, snapshotId=42)</div>
+    <div class="seq-to" style="background:#FCE4EC;color:#AD1457">DB</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#FCE4EC;color:#AD1457">DB</div>
+    <div class="seq-msg">UPDATE CANEVAS_AGRICOLE SET current_version=3, current_structure='AGC-059', last_snapshot_id=42</div>
+    <div class="seq-to" style="background:#FCE4EC;color:#AD1457">DB</div>
+  </div>
+  <div class="seq-row">
+    <div class="seq-from" style="background:#FFF8E1;color:#E65100">Spring Boot</div>
+    <div class="seq-msg">Retourne <code>{ snapshotId: 42, versionNumber: 3, structureCode: "AGC-059" }</code></div>
+    <div class="seq-to" style="background:#A5D6A7;color:#1B5E20">Angular</div>
+  </div>
+  <div class="seq-row" style="background:#E8F5E9">
+    <div class="seq-from" style="background:#A5D6A7;color:#1B5E20">Angular</div>
+    <div class="seq-msg">Toast "Snapshot v3 créé" ✅ · Ferme dialog · <code>loadAll(285)</code> → GET /snapshots + GET /workflow-log → signaux mis à jour → stepper recalculé</div>
+    <div class="seq-to" style="background:#A5D6A7;color:#1B5E20">UI mis à jour</div>
+  </div>
+</div>
+
+<h3>Stade 2 — Refoulement avec motif</h3>
+<table class="tbl">
+  <thead><tr><th>Acteur</th><th>Action</th><th>DB : status</th><th>DB : action</th></tr></thead>
+  <tbody>
+    <tr><td>Chef Agence</td><td>POST /refouler avec motif</td><td><code>CORRIGE_DONNEE</code></td><td><code>REFOULER</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Stade 3 — Toutes les transitions et leurs statuts en base</h3>
+<table class="tbl">
+  <thead><tr><th>Qui agit</th><th>Endpoint appelé</th><th>statusAtSnapshot en DB</th><th>action en DB</th><th>toStructure type</th></tr></thead>
+  <tbody>
+    <tr><td>Chef Agence (valider)</td><td>POST /valider</td><td><span class="badge b-be">VALID_DONNEE</span></td><td><code>VALIDER</code></td><td>DR</td></tr>
+    <tr><td>Chef Agence (refouler)</td><td>POST /refouler</td><td><span class="badge b-d">CORRIGE_DONNEE</span></td><td><code>REFOULER</code></td><td>AGC</td></tr>
+    <tr><td>Direction Régionale (valider)</td><td>POST /valider</td><td><span class="badge b-be">VALID_DONNEE</span></td><td><code>VALIDER</code></td><td>DC</td></tr>
+    <tr><td>Direction Régionale (refouler)</td><td>POST /refouler</td><td><span class="badge b-d">CORRIGE_DONNEE</span></td><td><code>REFOULER</code></td><td>DR/AGC</td></tr>
+    <tr><td>Lecture seule (bouton œil)</td><td>GET /snapshots/{id}/detail</td><td>(lecture)</td><td>(lecture)</td><td>—</td></tr>
+    <tr><td>Comparaison (bouton ⊞)</td><td>2× GET /snapshots/{id}/detail</td><td>(lecture)</td><td>(lecture)</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <strong>⚠ Limitation identifiée dans le code actuel</strong>
+  Le backend utilise toujours <code>"VALIDER"</code> comme action et <code>"VALID_DONNEE"</code> comme statut, quel que soit le niveau hiérarchique qui valide. Les actions <code>PRE_VALIDER</code>, <code>VALIDER_DR</code>, <code>PEC_CHARGEE_COMM</code> etc. existent dans les dictionnaires du frontend (<code>actionLabel</code>, <code>actionSeverity</code>) mais elles doivent être générées par d'autres endpoints backend non encore implémentés dans <code>CanevasSnapshotController</code>.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 9. LES PROBLÈMES IDENTIFIÉS DANS LE CODE                    -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl warn">🐛 9. Problèmes Identifiés dans le Code Actuel</div>
+
+<!-- Backend issues -->
+<h3>🟢 Côté Backend</h3>
+
+<div class="issue">
+  <div class="issue-hdr crit"><span>🚨</span>canAccessCanvas() retourne toujours true — Sécurité désactivée<span class="itag crit">CRITIQUE</span></div>
+  <div class="issue-body">
+    <p><strong>Fichier :</strong> <code>CanevasSnapshotService.java</code>, lignes 754–774</p>
+    <p>Toute la logique d'autorisation est commentée. N'importe quel utilisateur peut consulter n'importe quel canvas en passant son ID, même s'il ne lui appartient pas.</p>
+    <div class="code-wrap"><div class="code-fn"><span class="dot java"></span>CanevasSnapshotService.java — lignes 754–774</div>
+    <pre class="c">
+<span class="ln"><span class="kw">public boolean</span> <span class="fn">canAccessCanvas</span>(<span class="tp">Long</span> canevasId, <span class="tp">String</span> typeStructure, <span class="tp">String</span> codeStructure) {</span>
+<span class="ln hl-red">  <span class="cmt">// Type 5 (Admin / Dir. Centrale) - voit tout</span></span>
+<span class="ln hl-red"><span class="cmt">/*  if ("5".equals(typeStructure)) return true;</span></span>
+<span class="ln hl-red">    if ("2".equals(typeStructure)) {</span></span>
+<span class="ln hl-red">        return codeStructure.equals(caneva.getCurrentStructure())</span></span>
+<span class="ln hl-red">               || codeStructure.equals(caneva.getStructureMere());</span></span>
+<span class="ln hl-red">    }</span></span>
+<span class="ln hl-red">    if ("1".equals(typeStructure)) {</span></span>
+<span class="ln hl-red">        return codeStructure.equals(caneva.getCodeStructure());</span></span>
+<span class="ln hl-red">    } */</span></span>
+<span class="ln hl-red">  <span class="kw">return true</span>; <span class="cmt">// ← TOUJOURS VRAI : pas de contrôle d'accès</span></span>
+<span class="ln">}</span></pre>
+    </div>
+  </div>
+</div>
+
+<div class="issue">
+  <div class="issue-hdr crit"><span>🚨</span>buildGarantiesJson() ne serialize pas les vraies garanties<span class="itag crit">Données incomplètes</span></div>
+  <div class="issue-body">
+    <p><strong>Fichier :</strong> <code>CanevasSnapshotService.java</code>, lignes 527–532</p>
+    <p>La méthode ne stocke que le <code>numCaneva</code> et <code>numSeqPers</code> — pas les vraies données de garanties. C'est pourquoi le frontend affiche les garanties en JSON brut sans structure.</p>
+    <div class="code-wrap"><div class="code-fn"><span class="dot java"></span></div>
+    <pre class="c">
+<span class="ln hl-red"><span class="kw">private</span> <span class="tp">String</span> <span class="fn">buildGarantiesJson</span>(<span class="tp">Caneva</span> caneva) {</span>
+<span class="ln hl-red">  <span class="tp">Map</span>&lt;<span class="tp">String</span>, <span class="tp">Object</span>&gt; garanties = <span class="kw">new</span> <span class="tp">HashMap</span>&lt;&gt;();</span>
+<span class="ln hl-red">  garanties.put(<span class="str">"numCaneva"</span>,  caneva.<span class="fn">getId</span>());       <span class="cmt">// ← seulement l'ID</span></span>
+<span class="ln hl-red">  garanties.put(<span class="str">"numSeqPers"</span>, caneva.<span class="fn">getNumSeqpers</span>()); <span class="cmt">// ← pas les vraies données</span></span>
+<span class="ln hl-red">  <span class="kw">return</span> <span class="fn">toJson</span>(garanties);</span>
+<span class="ln hl-red">}</span></span></pre>
+    </div>
+  </div>
+</div>
+
+<div class="issue">
+  <div class="issue-hdr maj"><span>⚠</span>getHistoryFiltered() manque le filtre toStructure pour l'Agence<span class="itag maj">Logique</span></div>
+  <div class="issue-body">
+    <p><strong>Fichier :</strong> <code>WorkflowLogService.java</code>, ligne 71</p>
+    <p>Pour type='1', le backend ne filtre que <code>fromStructure</code>. Mais le frontend filtre aussi <code>toStructure</code> dans <code>filteredLogs</code>. Une agence qui reçoit un refoulement (elle est <code>toStructure</code>) ne verra pas ce log côté serveur — seulement côté client si les paramètres ne sont pas envoyés.</p>
+    <div class="code-wrap"><div class="code-fn"><span class="dot java"></span>WorkflowLogService.java</div>
+    <pre class="c">
+<span class="ln hl-red"><span class="kw">if</span> (<span class="str">"1"</span>.equals(typeStructure) &amp;&amp; codeStructure != <span class="kw">null</span>) {</span>
+<span class="ln hl-red">    <span class="kw">return</span> workflowRepo</span>
+<span class="ln hl-red">      .<span class="fn">findByCanevasIdAndFromStructureOrderByPerformedAtDesc</span>(canevasId, codeStructure);</span>
+<span class="ln hl-red">    <span class="cmt">// ← manque : OR toStructure = codeStructure (pour voir les refoulements reçus)</span></span>
+<span class="ln hl-red">}</span></span></pre>
+    </div>
+  </div>
+</div>
+
+<div class="issue">
+  <div class="issue-hdr maj"><span>⚠</span>ValidationRequestDto — Commentaire sur le mauvais champ<span class="itag maj">Documentation</span></div>
+  <div class="issue-body">
+    <p><strong>Fichier :</strong> <code>ValidationRequestDto.java</code>, ligne 11</p>
+    <p>Le commentaire <code>// "FAVORABLE" | "DEFAVORABLE" | "SANS_AVIS"</code> est placé sur <code>engagementDetailleJson</code> au lieu de <code>avisValue</code>. Trompeur pour les développeurs.</p>
+    <div class="code-wrap"><div class="code-fn"><span class="dot java"></span>ValidationRequestDto.java</div>
+    <pre class="c">
+<span class="ln"><span class="kw">public record</span> <span class="tp">ValidationRequestDto</span>(</span>
+<span class="ln">    <span class="tp">String</span> fromStructureCode, <span class="tp">String</span> fromStructureLabel,</span>
+<span class="ln">    <span class="tp">String</span> toStructureCode, <span class="tp">String</span> matricule,</span>
+<span class="ln">    <span class="tp">String</span> observations,</span>
+<span class="ln hl-warn">    <span class="tp">String</span> avisValue,   <span class="cmt">// ← devrait avoir le commentaire "FAVORABLE|DEFAVORABLE|SANS_AVIS"</span></span>
+<span class="ln hl-red">    <span class="tp">String</span> engagementDetailleJson <span class="cmt">// "FAVORABLE" | "DEFAVORABLE" | "SANS_AVIS" ← FAUX !</span></span>
+<span class="ln">) {}</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Frontend issues -->
+<h3 style="margin-top:24px">🔵 Côté Frontend</h3>
+
+<div class="issue">
+  <div class="issue-hdr crit"><span>🚨</span>Boutons Valider/Refouler visibles par tous — Guard canAct() commenté<span class="itag crit">Sécurité</span></div>
+  <div class="issue-body">
+    <p><strong>Fichier :</strong> <code>snapshot-history.component.html</code>, lignes 99–108</p>
+    <p>Le bloc <code>@if (canAct())</code> est commenté avec une syntaxe HTML invalide. Les boutons sont donc accessibles à tous les utilisateurs, même les agents sans droit de validation.</p>
+  </div>
+</div>
+
+<div class="issue">
+  <div class="issue-hdr maj"><span>⚠</span>loadAll() appelle getWorkflowLog() SANS paramètres de filtrage<span class="itag maj">Logique</span></div>
+  <div class="issue-body">
+    <p><strong>Fichier :</strong> <code>snapshot-history.component.ts</code>, lignes 360–372</p>
+    <p>Dans <code>loadAll()</code>, <code>getWorkflowLog(id)</code> est appelé sans <code>typeStructure</code> ni <code>codeStructure</code> — le backend retourne donc tous les logs. Le filtrage se fait uniquement côté client dans le computed <code>filteredLogs</code>. Cela charge des données inutiles sur le réseau et expose les logs d'autres structures au navigateur.</p>
+    <div class="code-wrap"><div class="code-fn"><span class="dot ts"></span>snapshot-history.component.ts</div>
+    <pre class="c">
+<span class="ln"><span class="kw">private</span> <span class="fn">loadAll</span>(id: <span class="tp">number</span>): <span class="tp">void</span> {</span>
+<span class="ln hl-red">  <span class="kw">this</span>.snapshotService.<span class="fn">getWorkflowLog</span>(id)  <span class="cmt">// ← sans typeStructure ni codeStructure</span></span>
+<span class="ln hl-red">    .<span class="fn">subscribe</span>({ next: d => <span class="kw">this</span>.workflowLog.<span class="fn">set</span>(d), ... });</span>
+<span class="ln hl-warn">  <span class="cmt">// ✅ Devrait être :</span></span>
+<span class="ln hl-be">  <span class="kw">const</span> u = <span class="kw">this</span>.userService.user();</span>
+<span class="ln hl-be">  <span class="kw">this</span>.snapshotService.<span class="fn">getWorkflowLog</span>(id, u?.typeStructure, u?.codeStructure)</span>
+<span class="ln hl-be">    .<span class="fn">subscribe</span>({ next: d => <span class="kw">this</span>.workflowLog.<span class="fn">set</span>(d), ... });</span>
+<span class="ln">}</span></pre>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 10. TABLEAU DE CORRESPONDANCE BE ↔ FE                        -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-ttl full">📊 10. Tableau de Correspondance Backend ↔ Frontend</div>
+
+<table class="tbl">
+  <thead>
+    <tr>
+      <th>Concept</th>
+      <th>🟢 Backend (Java)</th>
+      <th>🔵 Frontend (Angular)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Table snapshot</strong></td><td><code>CanevasStructureSnapshot</code> → <code>CANEVAS_STRUCTURE_SNAPSHOT</code></td><td>Interface <code>SnapshotSummary</code> / <code>SnapshotDetail</code></td></tr>
+    <tr><td><strong>Table logs</strong></td><td><code>CanevasWorkflowLog</code> → <code>CANEVAS_WORKFLOW_LOG</code></td><td>Interface <code>WorkflowLogEntry</code></td></tr>
+    <tr><td><strong>Créer snapshot</strong></td><td><code>CanevasSnapshotService.createSnapshot()</code></td><td><code>SnapshotService.validerEtTransmettre()</code> ou <code>refouler()</code></td></tr>
+    <tr><td><strong>Liste snapshots</strong></td><td><code>snapshotRepo.findByCanevasIdOrderByVersionNumberAsc()</code></td><td><code>signal history = signal&lt;SnapshotSummary[]&gt;</code></td></tr>
+    <tr><td><strong>Détail snapshot</strong></td><td><code>objectMapper.readValue(clob, Object.class)</code></td><td><code>selectedSnap = signal&lt;SnapshotDetail|null&gt;</code></td></tr>
+    <tr><td><strong>Logs filtrés</strong></td><td><code>WorkflowLogService.getHistoryFiltered()</code></td><td><code>filteredLogs = computed()</code></td></tr>
+    <tr><td><strong>Contrôle d'accès</strong></td><td><code>canAccessCanvas()</code> → toujours true ⚠</td><td><code>canAct() = computed()</code> → commenté ⚠</td></tr>
+    <tr><td><strong>Action Valider</strong></td><td>status="VALID_DONNEE", action="VALIDER"</td><td><code>actionLabel("VALIDER")</code> → "Valider", badge vert</td></tr>
+    <tr><td><strong>Action Refouler</strong></td><td>status="CORRIGE_DONNEE", action="REFOULER"</td><td><code>actionLabel("REFOULER")</code> → "Refouler", badge rouge</td></tr>
+    <tr><td><strong>Progression</strong></td><td>non géré — c'est une logique frontend</td><td><code>progressSteps = computed()</code> sur les logs et statuts</td></tr>
+    <tr><td><strong>Requêtes JPA</strong></td><td><code>CanevasSnapshotRepository</code>, <code>CanevasWorkflowLogRepository</code></td><td>Pas de JPA — tout passe par HTTP REST</td></tr>
+    <tr><td><strong>Sérialisation</strong></td><td><code>ObjectMapper.writeValueAsString()</code> → JSON → CLOB</td><td>Angular <code>HttpClient</code> décode le JSON automatiquement</td></tr>
+    <tr><td><strong>Transaction</strong></td><td><code>@Transactional(REQUIRES_NEW)</code> — snapshot + log atomiques</td><td>Gestion des erreurs dans <code>.subscribe({ error: ... })</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+</div><!-- /wrap -->
+<footer>
+  Guide Fullstack — Workflow Snapshot Backend + Frontend — Canvas Agricole BNA<br>
+  Fichiers analysés : CanevasSnapshotController.java · CanevasSnapshotService.java · WorkflowLogService.java · CanevasStructureSnapshot.java · CanevasWorkflowLog.java · snapshot.service.ts · snapshot-history.component.ts
+</footer>
+</body>
+</html>

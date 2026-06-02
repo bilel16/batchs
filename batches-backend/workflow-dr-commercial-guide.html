@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide Développeur — Transition DR → Circuit Commercial &amp; Affichage Workflow</title>
+  <style>
+    :root {
+      --blue:    #1565C0;
+      --green:   #2E7D32;
+      --orange:  #E65100;
+      --red:     #C62828;
+      --purple:  #6A1B9A;
+      --teal:    #00695C;
+      --gray:    #37474F;
+      --bg:      #F4F6F9;
+      --card:    #FFFFFF;
+      --border:  #DDE3EA;
+      --code-bg: #1A2332;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: #1C2833;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #0D47A1, #1565C0 60%, #1976D2);
+      color: white;
+      padding: 44px 60px;
+    }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .header p  { opacity: .85; font-size: 15px; }
+    .tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .tag {
+      background: rgba(255,255,255,.15);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+    /* ── SECTION ── */
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--blue);
+      border-bottom: 3px solid var(--blue);
+      padding-bottom: 10px;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray);
+      margin: 22px 0 10px;
+    }
+    p { margin-bottom: 10px; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      margin: 20px 0;
+    }
+    .flow-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .flow-node {
+      border-radius: 10px;
+      padding: 14px 18px;
+      min-width: 170px;
+      text-align: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .flow-node .node-role  { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; opacity: .75; }
+    .flow-node .node-label { font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .flow-node .node-status{ font-size: 11px; margin-top: 4px; opacity: .8; }
+
+    .node-agence  { background: #E3F2FD; border: 2px solid #90CAF9; color: #1565C0; }
+    .node-chef    { background: #E8F5E9; border: 2px solid #A5D6A7; color: #2E7D32; }
+    .node-dr      { background: #FFF8E1; border: 2px solid #FFE082; color: #E65100; }
+    .node-dc      { background: #FCE4EC; border: 2px solid #F48FB1; color: #AD1457; }
+    .node-comm    { background: #F3E5F5; border: 2px solid #CE93D8; color: #6A1B9A; }
+    .node-final-ok{ background: #E8F5E9; border: 2px solid #66BB6A; color: #1B5E20; }
+    .node-final-ko{ background: #FFEBEE; border: 2px solid #EF9A9A; color: #B71C1C; }
+
+    /* Arrow connector */
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .flow-arrow::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0;
+      width: 100%; height: 2px;
+      background: #90A4AE;
+    }
+    .flow-arrow .arrow-label {
+      background: white;
+      border: 1px solid #B0BEC5;
+      border-radius: 4px;
+      font-size: 10px;
+      padding: 2px 5px;
+      color: #546E7A;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .flow-arrow .arr { font-size: 16px; color: #78909C; position: relative; z-index: 1; }
+
+    /* Vertical connector */
+    .flow-vconn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      margin-left: 85px;
+      position: relative;
+    }
+    .flow-vconn::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 0;
+      width: 2px; height: 100%;
+      background: #90A4AE;
+    }
+    .flow-vconn .vc-label {
+      background: white;
+      border: 1px solid #B0BEC5;
+      border-radius: 4px;
+      font-size: 10px;
+      padding: 2px 6px;
+      color: #546E7A;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Commercial sub-flow */
+    .comm-flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 16px 0;
+      overflow-x: auto;
+      padding: 12px 0;
+    }
+    .comm-node {
+      border-radius: 8px;
+      padding: 10px 14px;
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 130px;
+    }
+    .comm-arrow {
+      display: flex; align-items: center;
+      padding: 0 6px;
+      color: #9E9E9E;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ── CODE ANNOTATED ── */
+    .code-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .code-filename {
+      background: #2D3748;
+      color: #A0AEC0;
+      font-size: 11px;
+      padding: 7px 14px;
+      font-family: 'Consolas', monospace;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .code-filename .dot { width: 8px; height: 8px; border-radius: 50%; background: #4A5568; }
+    .code-filename .dot.ts { background: #3178C6; }
+    .code-filename .dot.html { background: #E44D26; }
+
+    .code-body {
+      display: flex;
+    }
+    .code-annotations {
+      width: 260px;
+      flex-shrink: 0;
+      border-right: 1px solid #2D3748;
+      background: #151F2E;
+    }
+    .ann-item {
+      padding: 0;
+      border-bottom: 1px solid #1E2A3A;
+    }
+    .ann-header {
+      padding: 6px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .ann-body {
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+    .ann-header.blue   { background: #1E3A5F; color: #90CAF9; }
+    .ann-header.green  { background: #1B3A2B; color: #A5D6A7; }
+    .ann-header.orange { background: #3A2810; color: #FFB74D; }
+    .ann-header.purple { background: #2D1B3A; color: #CE93D8; }
+    .ann-header.red    { background: #3A1A1A; color: #EF9A9A; }
+    .ann-header.teal   { background: #0A2A28; color: #80CBC4; }
+
+    pre.code {
+      background: var(--code-bg);
+      color: #CDD9E5;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.75;
+      padding: 0;
+      overflow-x: auto;
+      flex: 1;
+    }
+    pre.code .ln {
+      display: block;
+      padding: 0 16px;
+      min-height: 1.75em;
+      white-space: pre;
+    }
+    pre.code .ln:hover { background: rgba(255,255,255,.04); }
+
+    /* highlight colors */
+    .hl-blue   { background: rgba(21, 101, 192, 0.18) !important; border-left: 3px solid #1565C0; }
+    .hl-green  { background: rgba(46, 125, 50, 0.18) !important;  border-left: 3px solid #2E7D32; }
+    .hl-orange { background: rgba(230, 81, 0, 0.18) !important;   border-left: 3px solid #E65100; }
+    .hl-purple { background: rgba(106, 27, 154, 0.18) !important; border-left: 3px solid #6A1B9A; }
+    .hl-red    { background: rgba(198, 40, 40, 0.18) !important;  border-left: 3px solid #C62828; }
+    .hl-teal   { background: rgba(0, 105, 92, 0.18) !important;   border-left: 3px solid #00695C; }
+
+    /* syntax tokens */
+    .kw   { color: #79B8FF; }
+    .str  { color: #9ECE6A; }
+    .cmt  { color: #6272A4; font-style: italic; }
+    .fn   { color: #E2A663; }
+    .tp   { color: #89DCEB; }
+    .num  { color: #D3869B; }
+    .op   { color: #CDD9E5; }
+
+    /* ── TOOLTIP CALLOUT ── */
+    .callout {
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 14px 0;
+      border-left: 4px solid;
+      font-size: 13px;
+    }
+    .callout.info    { background: #E3F2FD; border-color: #1565C0; color: #0D47A1; }
+    .callout.warning { background: #FFF8E1; border-color: #F57F17; color: #E65100; }
+    .callout.success { background: #E8F5E9; border-color: #2E7D32; color: #1B5E20; }
+    .callout.purple  { background: #F3E5F5; border-color: #6A1B9A; color: #4A148C; }
+    .callout strong  { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .b-blue   { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+    .b-green  { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+    .b-orange { background: #FFF8E1; color: #E65100; border: 1px solid #FFE082; }
+    .b-red    { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+    .b-purple { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }
+    .b-gray   { background: #ECEFF1; color: #37474F; border: 1px solid #B0BEC5; }
+
+    /* ── TABLE ── */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    .tbl th {
+      background: #ECEFF1;
+      padding: 9px 14px;
+      text-align: left;
+      color: var(--gray);
+      border-bottom: 2px solid var(--border);
+      font-weight: 600;
+    }
+    .tbl td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: #F8FAFC; }
+
+    /* ── STEPPER PREVIEW ── */
+    .stepper-preview {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+    .sp-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 110px;
+      position: relative;
+    }
+    .sp-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: calc(50% + 20px);
+      width: calc(100% - 40px);
+      height: 2px;
+      background: #CFD8DC;
+    }
+    .sp-step.done::after { background: var(--green); }
+    .sp-circle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      position: relative; z-index: 1;
+    }
+    .sp-step.done   .sp-circle { background: var(--green);  color: white; }
+    .sp-step.active .sp-circle { background: var(--blue);   color: white; box-shadow: 0 0 0 4px rgba(21,101,192,.2); }
+    .sp-step.idle   .sp-circle { background: #CFD8DC;       color: #78909C; }
+    .sp-step.comm   .sp-circle { background: var(--purple); color: white; box-shadow: 0 0 0 4px rgba(106,27,154,.2); }
+    .sp-lbl  { margin-top: 8px; text-align: center; }
+    .sp-lbl strong { font-size: 12px; display: block; }
+    .sp-lbl span   { font-size: 10px; color: #78909C; }
+    .sp-lbl .comm-sub { color: var(--purple); font-weight: 600; }
+
+    /* ── TIMELINE PREVIEW ── */
+    .tl-preview {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 14px 0;
+    }
+    .tl-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .tl-entry:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 16px; top: 34px;
+      width: 2px; height: calc(100% - 14px);
+      background: #CFD8DC;
+    }
+    .tl-dot {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+    .tl-card-mini {
+      flex: 1;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    .tl-card-mini .tl-top {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .tl-card-mini .tl-meta { font-size: 11px; color: #78909C; margin-top: 3px; }
+
+    /* ── NUMBERED STEPS ── */
+    .num-steps { counter-reset: step; }
+    .num-step {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .num-step::before {
+      content: counter(step);
+      min-width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .num-step-body strong { font-size: 14px; display: block; margin-bottom: 4px; }
+    .num-step-body p { font-size: 13px; color: #455A64; }
+
+    /* footer */
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: #78909C;
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 24px; }
+      .container { padding: 20px 14px; }
+      .section { padding: 20px; }
+      .code-annotations { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HEADER                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="header">
+  <h1>🔀 Transition DR → Circuit Commercial &amp; Affichage Workflow</h1>
+  <p>Guide complet pour développeur débutant — Comment le dossier passe de la Direction Régionale au Circuit Commercial, et comment tout s'affiche à l'écran</p>
+  <div class="tags">
+    <span class="tag">Angular 17 Signals</span>
+    <span class="tag">snapshot-history.component.ts</span>
+    <span class="tag">snapshot.service.ts</span>
+    <span class="tag">Niveau : Débutant</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 1 — VUE D'ENSEMBLE DU CIRCUIT COMPLET              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🗺 Partie 1 — Vue d'ensemble : du Chef Agence jusqu'à la Décision Finale</div>
+
+  <p>Voici le chemin <strong>complet</strong> qu'un dossier agricole suit depuis le chef d'agence jusqu'à la décision finale. Chaque flèche représente une action qui crée un nouveau snapshot en base de données.</p>
+
+  <!-- FLOW VISUEL PRINCIPAL -->
+  <div style="overflow-x:auto; padding: 10px 0;">
+    <div style="min-width: 900px;">
+
+      <!-- Ligne 1 : Agence → Chef → DR -->
+      <div style="display:flex; align-items:center; gap:0; margin-bottom:0;">
+        <div class="flow-node node-agence" style="width:160px">
+          <div class="node-role">🏢 Agence</div>
+          <div class="node-label">Saisie dossier</div>
+          <div class="node-status">Snapshot v1 créé</div>
+        </div>
+        <div class="flow-arrow"><span class="arrow-label">PRE_VALIDER</span><span class="arr">→</span></div>
+        <div class="flow-node node-chef" style="width:160px">
+          <div class="node-role">👔 Chef Agence</div>
+          <div class="node-label">Validation initiale</div>
+          <div class="node-status">VALID_DONNEE</div>
+        </div>
+        <div class="flow-arrow"><span class="arrow-label">VALIDER</span><span class="arr">→</span></div>
+        <div class="flow-node node-dr" style="width:160px">
+          <div class="node-role">🏛 Direction Régionale</div>
+          <div class="node-label">Analyse &amp; Avis</div>
+          <div class="node-status">VALIDER_DR</div>
+        </div>
+        <div class="flow-arrow"><span class="arrow-label">ENVOYER</span><span class="arr">→</span></div>
+        <div class="flow-node node-dc" style="width:160px">
+          <div class="node-role">🏦 Direction Centrale</div>
+          <div class="node-label">Orientation</div>
+          <div class="node-status">Reçoit le dossier</div>
+        </div>
+      </div>
+
+      <!-- Séparateur avec branchement -->
+      <div style="display:flex; margin-left:640px; margin-top:0;">
+        <div style="display:flex; flex-direction:column; align-items:center; width:160px;">
+          <div style="width:2px; height:20px; background:#90A4AE;"></div>
+          <div style="font-size:11px; color:#546E7A; background:white; border:1px solid #B0BEC5; padding:2px 8px; border-radius:4px;">Deux chemins possibles</div>
+          <div style="display:flex; gap:60px; align-items:flex-start; margin-top:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:2px; height:16px; background:#90A4AE;"></div>
+              <div style="font-size:10px; color:#546E7A;">Direct</div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:2px; height:16px; background:#6A1B9A;"></div>
+              <div style="font-size:10px; color:#6A1B9A; font-weight:bold;">Via Commercial</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 2 : Les deux destinations -->
+      <div style="display:flex; align-items:flex-start; gap:20px; margin-left:560px; margin-top:0;">
+        <div class="flow-node node-final-ok" style="width:140px; margin-top:6px;">
+          <div class="node-role">✅ Décision Directe</div>
+          <div class="node-label">DECISION_FINALE</div>
+          <div class="node-status">ACCORD ou REJET</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <div class="flow-node node-comm" style="width:140px;">
+            <div class="node-role">💼 Chargé Commercial</div>
+            <div class="node-label">PEC_CHARGEE_COMM</div>
+          </div>
+          <div style="font-size:16px; color:#9E9E9E;">↓</div>
+          <div class="flow-node node-comm" style="width:140px;">
+            <div class="node-role">🏢 Division Comm.</div>
+            <div class="node-label">PEC_DEVISION_COMM</div>
+          </div>
+          <div style="font-size:16px; color:#9E9E9E;">↓</div>
+          <div class="flow-node node-comm" style="width:140px;">
+            <div class="node-role">🏛 Département Comm.</div>
+            <div class="node-label">PEC_DEP_COMM</div>
+          </div>
+          <div style="font-size:16px; color:#9E9E9E;">↓</div>
+          <div class="flow-node node-comm" style="width:140px;">
+            <div class="node-role">🏦 Centrale Comm.</div>
+            <div class="node-label">VALID_CENTRALE_COMM</div>
+          </div>
+          <div style="font-size:16px; color:#9E9E9E;">↓</div>
+          <div class="flow-node node-final-ok" style="width:140px;">
+            <div class="node-role">⭐ Décision Finale</div>
+            <div class="node-label">ACCORD / REJET</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout info" style="margin-top:24px">
+    <strong>💡 Pour le développeur débutant</strong>
+    Chaque rectangle ci-dessus correspond à un enregistrement dans la table <code>workflow_log</code> en base de données. L'action (ex: <code>ENVOYER</code>) est la clé qui détermine ce qui s'affiche à l'écran. Le frontend lit ces enregistrements et affiche automatiquement la progression.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 2 — LA TRANSITION DR → COMMERCIAL EN DÉTAIL        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🔀 Partie 2 — La Transition Direction Régionale → Circuit Commercial</div>
+
+  <h3>Comment ça se passe concrètement ?</h3>
+
+  <div class="num-steps">
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>La DR valide le dossier avec action <code>VALIDER</code></strong>
+        <p>Le gestionnaire DR clique sur "Valider &amp; Transmettre". Il saisit <code>toStructureCode = 'DC-01'</code> (Direction Centrale), choisit son avis (FAVORABLE / DEFAVORABLE / SANS_AVIS). Le backend crée un snapshot avec <code>statusAtSnapshot = 'VALIDER_DR'</code> et un log de workflow <code>action='VALIDER', fromStructure='DR-05', toStructure='DC-01'</code>.</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>La DC reçoit le dossier et décide d'envoyer au pôle commercial</strong>
+        <p>Le responsable DC voit le dossier avec statut <code>VALIDER_DR</code>. S'il juge que le dossier nécessite une analyse commerciale approfondie (montant élevé, nouveau produit, marché à risque…), il clique sur "Envoyer" → action <code>ENVOYER</code>. Cela marque le début du circuit commercial.</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Le chargé commercial prend en charge — <code>PEC_CHARGEE_COMM</code></strong>
+        <p>Un chargé commercial reçoit le dossier. Il clique "Prise en charge" → l'action <code>PEC_CHARGEE_COMM</code> est enregistrée. Le snapshot obtient le statut <code>PEC_CHARGEE_COMM</code>. C'est le moment où l'écran change de sublabel : le stepper affiche "<strong>Pôle Commercial</strong>" au lieu de "Dir. Centrale".</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Escalade dans le circuit — Division → Département → Centrale</strong>
+        <p>Le dossier remonte la hiérarchie commerciale : Division (<code>PEC_DEVISION_COMM</code>), puis Département (<code>PEC_DEP_COMM</code>), puis validation par la Centrale Commerciale (<code>VALID_CENTRALE_COMM</code>). Chaque étape crée un log et met à jour le statut du dernier snapshot.</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Décision Finale — <code>DECISION_FINALE</code></strong>
+        <p>La Direction Centrale prend la décision avec statut final <code>DEC_FINAL_PRISE_ACCORD</code> ou <code>DEC_FINAL_PRISE_REJET</code>. Le dossier est clôturé. Le stepper passe toutes les étapes en "done" (vert).</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Le moment clé : comment le frontend sait qu'on est dans la phase commerciale ?</h3>
+
+  <div class="callout purple">
+    <strong>🧠 La variable inCommercialPhase</strong>
+    C'est une simple condition booléenne calculée dans <code>progressSteps</code>. Elle est vraie si au moins un statut commercial est présent dans les snapshots ET que l'étape 4 n'est pas encore terminée. Quand elle est vraie, le label de l'étape 4 change dynamiquement de <em>"Dir. Centrale"</em> à <em>"Pôle Commercial"</em>.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot ts"></span>snapshot-history.component.ts — progressSteps (lignes 101–166)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">① Collecte des données</div>
+          <div class="ann-body">On récupère tous les logs et tous les snapshots depuis les signals. On crée des Set pour faire des recherches rapides (<code>.has()</code> = O(1)).</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header green">② 4 conditions booléennes</div>
+          <div class="ann-body">Chaque step est "terminé" si une des actions/statuts correspondants existe. C'est un OU logique (<code>||</code>) : n'importe laquelle des preuves suffit.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header purple">③ Détection phase commerciale</div>
+          <div class="ann-body">C'est LA condition centrale de cette partie. Elle est vraie si on est dans le commercial ET que la décision finale n'est pas encore prise.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">④ Étape active calculée</div>
+          <div class="ann-body">Opérateur ternaire chaîné : on cherche la première étape non terminée. Si toutes sont faites, activeStep=5 (aucune étape active = circuit terminé).</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header teal">⑤ Sublabel dynamique</div>
+          <div class="ann-body">Le sublabel de l'étape 4 change selon <code>inCommercialPhase</code>. C'est ce qui fait passer l'affichage de "Dir. Centrale" à "Pôle Commercial" sur le stepper.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln hl-blue"><span class="kw">progressSteps</span> = <span class="fn">computed</span>((): <span class="tp">ProgressStep</span>[] => {</span>
+<span class="ln hl-blue">  <span class="kw">const</span> logs    = <span class="kw">this</span>.workflowLog();    <span class="cmt">// tous les logs workflow</span></span>
+<span class="ln hl-blue">  <span class="kw">const</span> snaps   = <span class="kw">this</span>.history();        <span class="cmt">// tous les snapshots</span></span>
+<span class="ln hl-blue">  <span class="kw">const</span> actions = <span class="kw">new</span> Set(logs.map(l => l.action));           <span class="cmt">// Set des actions</span></span>
+<span class="ln hl-blue">  <span class="kw">const</span> statuses = <span class="kw">new</span> Set(snaps.map(s => s.statusAtSnapshot)); <span class="cmt">// Set des statuts</span></span>
+<span class="ln"></span>
+<span class="ln hl-blue">  <span class="kw">const</span> has       = (a: string) => actions.has(a);  <span class="cmt">// ex: has('VALIDER')</span></span>
+<span class="ln hl-blue">  <span class="kw">const</span> hasStatus = (s: string) => statuses.has(s); <span class="cmt">// ex: hasStatus('VALIDER_DR')</span></span>
+<span class="ln"></span>
+<span class="ln hl-green">  <span class="cmt">// ═══ 4 BOOLÉENS : étape terminée ou non ═══</span></span>
+<span class="ln hl-green">  <span class="kw">const</span> step1done = snaps.length > <span class="num">0</span>;  <span class="cmt">// vrai dès qu'un snapshot existe</span></span>
+<span class="ln hl-green">  <span class="kw">const</span> step2done = has(<span class="str">'PRE_VALIDER'</span>)  || hasStatus(<span class="str">'VALID_DONNEE'</span>);</span>
+<span class="ln hl-green">  <span class="kw">const</span> step3done = has(<span class="str">'VALIDER'</span>)      || hasStatus(<span class="str">'VALIDER_DR'</span>)</span>
+<span class="ln hl-green">                  || hasStatus(<span class="str">'PEC_AVIS_DEC'</span>);</span>
+<span class="ln hl-green">  <span class="kw">const</span> step4done = has(<span class="str">'DECISION_FINALE'</span>)</span>
+<span class="ln hl-green">      || hasStatus(<span class="str">'DEC_FINAL_PRISE_ACCORD'</span>)</span>
+<span class="ln hl-green">      || hasStatus(<span class="str">'DEC_FINAL_PRISE_REJET'</span>)</span>
+<span class="ln hl-green">      || hasStatus(<span class="str">'VALID_CENTRALE_COMM'</span>);</span>
+<span class="ln"></span>
+<span class="ln hl-purple">  <span class="cmt">// ═══ DÉTECTION PHASE COMMERCIALE ═══</span></span>
+<span class="ln hl-purple">  <span class="cmt">// Vrai si un statut commercial est présent ET step4 pas encore finie</span></span>
+<span class="ln hl-purple">  <span class="kw">const</span> inCommercialPhase = (</span>
+<span class="ln hl-purple">      hasStatus(<span class="str">'PEC_CHARGEE_COMM'</span>)    <span class="cmt">// chargé commercial a pris en charge</span></span>
+<span class="ln hl-purple">      || hasStatus(<span class="str">'PEC_DEVISION_COMM'</span>) <span class="cmt">// passé à la division</span></span>
+<span class="ln hl-purple">      || hasStatus(<span class="str">'PEC_DEP_COMM'</span>)      <span class="cmt">// passé au département</span></span>
+<span class="ln hl-purple">  ) && !step4done;   <span class="cmt">// ← ET la décision finale n'est pas encore rendue</span></span>
+<span class="ln"></span>
+<span class="ln hl-orange">  <span class="cmt">// ═══ QUELLE ÉTAPE EST EN COURS ? ═══</span></span>
+<span class="ln hl-orange">  <span class="cmt">// Lecture : si step1 pas fait → actif=1, sinon si step2 pas fait → actif=2, etc.</span></span>
+<span class="ln hl-orange">  <span class="kw">const</span> activeStep = !step1done ? <span class="num">1</span></span>
+<span class="ln hl-orange">                   : !step2done ? <span class="num">2</span></span>
+<span class="ln hl-orange">                   : !step3done ? <span class="num">3</span></span>
+<span class="ln hl-orange">                   : !step4done ? <span class="num">4</span> : <span class="num">5</span>;  <span class="cmt">// 5 = tout terminé</span></span>
+<span class="ln"></span>
+<span class="ln">  <span class="kw">return</span> [</span>
+<span class="ln">    { label: <span class="str">'Saisie'</span>,    sublabel: <span class="str">'Agence'</span>,      icon: <span class="str">'pi pi-pencil'</span>,       done: step1done, active: activeStep === <span class="num">1</span> },</span>
+<span class="ln">    { label: <span class="str">'Validation'</span>, sublabel: <span class="str">'Chef Agence'</span>, icon: <span class="str">'pi pi-check-circle'</span>, done: step2done, active: activeStep === <span class="num">2</span> },</span>
+<span class="ln">    { label: <span class="str">'Analyse'</span>,    sublabel: <span class="str">'Dir. Régionale'</span>,icon: <span class="str">'pi pi-search'</span>,      done: step3done, active: activeStep === <span class="num">3</span> },</span>
+<span class="ln hl-teal">    {</span>
+<span class="ln hl-teal">      label:    <span class="str">'Décision'</span>,</span>
+<span class="ln hl-teal">      sublabel: inCommercialPhase ? <span class="str">'Pôle Commercial'</span> : <span class="str">'Dir. Centrale'</span>,  <span class="cmt">// ← DYNAMIQUE !</span></span>
+<span class="ln hl-teal">      icon:     <span class="str">'pi pi-star'</span>,</span>
+<span class="ln hl-teal">      done:     step4done,</span>
+<span class="ln hl-teal">      active:   activeStep === <span class="num">4</span></span>
+<span class="ln hl-teal">    }</span>
+<span class="ln">  ];</span>
+<span class="ln">});</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 3 — LE STEPPER À L'ÉCRAN (états visuels)           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">📊 Partie 3 — Le Stepper à l'Écran : tous les états possibles</div>
+
+  <p>Le stepper en haut de la page change visuellement en fonction de l'avancement du dossier. Voici à quoi il ressemble à chaque étape :</p>
+
+  <h3>État A — Dossier à l'étape Validation Chef Agence (step2 actif)</h3>
+  <div class="stepper-preview">
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Saisie</strong><span>Agence</span></div></div>
+    <div style="width:60px;height:2px;background:var(--green);margin-top:-20px"></div>
+    <div class="sp-step active"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Validation</strong><span>Chef Agence</span></div></div>
+    <div style="width:60px;height:2px;background:#CFD8DC;margin-top:-20px"></div>
+    <div class="sp-step idle"><div class="sp-circle">🔍</div><div class="sp-lbl"><strong>Analyse</strong><span>Dir. Régionale</span></div></div>
+    <div style="width:60px;height:2px;background:#CFD8DC;margin-top:-20px"></div>
+    <div class="sp-step idle"><div class="sp-circle">⭐</div><div class="sp-lbl"><strong>Décision</strong><span>Dir. Centrale</span></div></div>
+  </div>
+
+  <h3>État B — Dossier dans le circuit commercial (inCommercialPhase = true)</h3>
+  <div class="stepper-preview">
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Saisie</strong><span>Agence</span></div></div>
+    <div style="width:60px;height:2px;background:var(--green);margin-top:-20px"></div>
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Validation</strong><span>Chef Agence</span></div></div>
+    <div style="width:60px;height:2px;background:var(--green);margin-top:-20px"></div>
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Analyse</strong><span>Dir. Régionale</span></div></div>
+    <div style="width:60px;height:2px;background:#CFD8DC;margin-top:-20px"></div>
+    <div class="sp-step comm"><div class="sp-circle">💼</div><div class="sp-lbl"><strong>Décision</strong><span class="comm-sub">Pôle Commercial</span></div></div>
+  </div>
+  <p style="font-size:12px; color:#6A1B9A; margin-top:6px">⬆ Remarquez : le sublabel de l'étape 4 est "<strong>Pôle Commercial</strong>" en violet au lieu de "Dir. Centrale"</p>
+
+  <h3>État C — Dossier accordé (toutes étapes terminées)</h3>
+  <div class="stepper-preview">
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Saisie</strong><span>Agence</span></div></div>
+    <div style="width:60px;height:2px;background:var(--green);margin-top:-20px"></div>
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Validation</strong><span>Chef Agence</span></div></div>
+    <div style="width:60px;height:2px;background:var(--green);margin-top:-20px"></div>
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Analyse</strong><span>Dir. Régionale</span></div></div>
+    <div style="width:60px;height:2px;background:var(--green);margin-top:-20px"></div>
+    <div class="sp-step done"><div class="sp-circle">✓</div><div class="sp-lbl"><strong>Décision</strong><span>Dir. Centrale</span></div></div>
+  </div>
+  <p style="font-size:12px; color:var(--green); margin-top:6px">⬆ Quand tous les steps ont <code>done: true</code>, le tag affiché en haut devient "Dossier traité — Accord" en vert.</p>
+
+  <h3>Code HTML du stepper (template)</h3>
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot html"></span>snapshot-history.component.html — Stepper (lignes 58–80)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">@for = boucle</div>
+          <div class="ann-body">Angular 17 : boucle sur le tableau <code>progressSteps()</code>. <code>$index</code> = position (0,1,2,3). <code>$last</code> = vrai pour le dernier élément.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header green">Classes CSS dynamiques</div>
+          <div class="ann-body"><code>[class.done]="step.done"</code> → ajoute la classe CSS <code>done</code> si <code>step.done</code> est vrai → cercle vert. <code>[class.active]</code> → cercle bleu pulsant.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">@if imbriqué</div>
+          <div class="ann-body">Si step terminé → affiche une coche ✓. Sinon → affiche l'icône de l'étape (crayon, loupe, etc.).</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header teal">Ligne de connexion</div>
+          <div class="ann-body">La ligne entre chaque step est verte si l'étape est terminée (<code>[class.done]</code>), grise sinon. Masquée sur le dernier step (<code>@if (!last)</code>).</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln hl-blue">&lt;<span class="kw">div</span> class="stepper"&gt;</span>
+<span class="ln hl-blue">  @for (step of progressSteps(); <span class="fn">track</span> step.label;</span>
+<span class="ln hl-blue">        let i = $index; let last = $last) {</span>
+<span class="ln"></span>
+<span class="ln">    &lt;div class="stepper-item"&gt;</span>
+<span class="ln"></span>
+<span class="ln hl-green">      &lt;div class="stepper-circle"</span>
+<span class="ln hl-green">           [class.done]="step.done"</span>
+<span class="ln hl-green">           [class.active]="step.active &amp;&amp; !step.done"&gt;</span>
+<span class="ln"></span>
+<span class="ln hl-orange">        @if (step.done) {</span>
+<span class="ln hl-orange">          &lt;i class="pi pi-check"&gt;&lt;/i&gt;  <span class="cmt">&lt;!-- ✓ vert quand terminé --&gt;</span></span>
+<span class="ln hl-orange">        } @else {</span>
+<span class="ln hl-orange">          &lt;i [class]="step.icon"&gt;&lt;/i&gt;  <span class="cmt">&lt;!-- icône spécifique à l'étape --&gt;</span></span>
+<span class="ln hl-orange">        }</span>
+<span class="ln hl-green">      &lt;/div&gt;</span>
+<span class="ln"></span>
+<span class="ln">      &lt;div class="stepper-label"&gt;</span>
+<span class="ln">        &lt;span class="stepper-main"&gt;{{ step.label }}&lt;/span&gt;</span>
+<span class="ln hl-teal">        &lt;span class="stepper-sub"&gt;{{ step.sublabel }}&lt;/span&gt;  <span class="cmt">&lt;!-- "Pôle Commercial" si phase comm --&gt;</span></span>
+<span class="ln">      &lt;/div&gt;</span>
+<span class="ln"></span>
+<span class="ln hl-teal">      @if (!last) {</span>
+<span class="ln hl-teal">        &lt;div class="stepper-line" [class.done]="step.done"&gt;&lt;/div&gt;</span>
+<span class="ln hl-teal">      }</span>
+<span class="ln">    &lt;/div&gt;</span>
+<span class="ln hl-blue">  }</span>
+<span class="ln hl-blue">&lt;/div&gt;</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 4 — LE LABEL DE PROGRESSION (TAG EN HAUT)          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🏷 Partie 4 — Le Tag de Progression : "En cours — Chargé Commercial"</div>
+
+  <p>Le tag coloré affiché à côté du titre "Progression du dossier" se met à jour automatiquement. C'est la fonction <code>currentProgressLabel()</code> qui produit ce texte.</p>
+
+  <h3>Textes affichés selon l'état</h3>
+  <table class="tbl">
+    <thead><tr><th>Statut présent dans les snapshots</th><th>Texte affiché</th><th>Couleur tag</th></tr></thead>
+    <tbody>
+      <tr><td>Aucun snapshot</td><td>"En attente"</td><td><span class="badge b-gray">secondary</span></td></tr>
+      <tr><td>step2 actif (VALID_DONNEE)</td><td>"En cours — Validation (Chef Agence)"</td><td><span class="badge b-blue">info</span></td></tr>
+      <tr><td>step3 actif (VALIDER_DR)</td><td>"En cours — Analyse (Dir. Régionale)"</td><td><span class="badge b-blue">info</span></td></tr>
+      <tr><td>PEC_CHARGEE_COMM présent</td><td>"En cours — Chargé Commercial"</td><td><span class="badge b-blue">info</span></td></tr>
+      <tr><td>PEC_DEVISION_COMM présent</td><td>"En cours — Division Commerciale"</td><td><span class="badge b-blue">info</span></td></tr>
+      <tr><td>PEC_DEP_COMM présent</td><td>"En cours — Département Commercial"</td><td><span class="badge b-blue">info</span></td></tr>
+      <tr><td>CORRIGE_DONNEE présent</td><td>"En cours — ..." + tag warning</td><td><span class="badge b-orange">warning</span></td></tr>
+      <tr><td>DEC_FINAL_PRISE_ACCORD</td><td>"Dossier traité — Accord"</td><td><span class="badge b-green">success</span></td></tr>
+      <tr><td>DEC_FINAL_PRISE_REJET</td><td>"Dossier traité — Rejet"</td><td><span class="badge b-red">danger</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot ts"></span>snapshot-history.component.ts — currentProgressLabel (lignes 168–196)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header green">Cas terminal — tout terminé</div>
+          <div class="ann-body">Si tous les steps sont <code>done=true</code> → on cherche le statut final parmi les snapshots pour afficher "Accord" ou "Rejet".</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header purple">Cas commercial spécifique</div>
+          <div class="ann-body">Ce dictionnaire traduit le code statut en libellé humain pour les sous-étapes commerciales. Chaque clé est vérifiée avec <code>statuses.has()</code>.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">Cas générique</div>
+          <div class="ann-body">Pour toutes les autres étapes (Saisie, Validation, Analyse), on utilise <code>steps.find(s => s.active)</code> pour trouver l'étape active et afficher son label.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln"><span class="kw">currentProgressLabel</span> = <span class="fn">computed</span>((): <span class="tp">string</span> => {</span>
+<span class="ln">  <span class="kw">const</span> snaps   = <span class="kw">this</span>.history();</span>
+<span class="ln">  <span class="kw">const</span> statuses = <span class="kw">new</span> Set(snaps.map(s => s.statusAtSnapshot));</span>
+<span class="ln">  <span class="kw">const</span> steps    = <span class="kw">this</span>.progressSteps();</span>
+<span class="ln"></span>
+<span class="ln hl-green">  <span class="cmt">// ① CAS TERMINAL : toutes les étapes terminées</span></span>
+<span class="ln hl-green">  <span class="kw">if</span> (steps.<span class="fn">every</span>(s => s.done)) {</span>
+<span class="ln hl-green">    <span class="kw">if</span> (statuses.has(<span class="str">'DEC_FINAL_PRISE_ACCORD'</span>)) <span class="kw">return</span> <span class="str">'Dossier traité — Accord'</span>;</span>
+<span class="ln hl-green">    <span class="kw">if</span> (statuses.has(<span class="str">'DEC_FINAL_PRISE_REJET'</span>))  <span class="kw">return</span> <span class="str">'Dossier traité — Rejet'</span>;</span>
+<span class="ln hl-green">    <span class="kw">if</span> (statuses.has(<span class="str">'VALID_CENTRALE_COMM'</span>))    <span class="kw">return</span> <span class="str">'Dossier traité — Validé Centrale Commerciale'</span>;</span>
+<span class="ln hl-green">    <span class="kw">return</span> <span class="str">'Dossier traité — Décision finale rendue'</span>;</span>
+<span class="ln hl-green">  }</span>
+<span class="ln"></span>
+<span class="ln hl-purple">  <span class="cmt">// ② SOUS-ÉTAPES COMMERCIALES : libellés détaillés</span></span>
+<span class="ln hl-purple">  <span class="kw">const</span> commercialLabels: Record&lt;<span class="tp">string</span>, <span class="tp">string</span>&gt; = {</span>
+<span class="ln hl-purple">    <span class="str">'PEC_CHARGEE_COMM'</span>:  <span class="str">'Chargé Commercial'</span>,</span>
+<span class="ln hl-purple">    <span class="str">'PEC_DEVISION_COMM'</span>: <span class="str">'Division Commerciale'</span>,</span>
+<span class="ln hl-purple">    <span class="str">'PEC_DEP_COMM'</span>:      <span class="str">'Département Commercial'</span>,</span>
+<span class="ln hl-purple">  };</span>
+<span class="ln hl-purple">  <span class="cmt">// Pour chaque entrée du dictionnaire, vérifier si ce statut existe</span></span>
+<span class="ln hl-purple">  <span class="kw">for</span> (<span class="kw">const</span> [status, label] <span class="kw">of</span> Object.<span class="fn">entries</span>(commercialLabels)) {</span>
+<span class="ln hl-purple">    <span class="kw">if</span> (statuses.has(status)) <span class="kw">return</span> <span class="str">`En cours — ${label}`</span>;</span>
+<span class="ln hl-purple">  }</span>
+<span class="ln"></span>
+<span class="ln hl-orange">  <span class="cmt">// ③ CAS GÉNÉRIQUE : pour Saisie, Validation, Analyse</span></span>
+<span class="ln hl-orange">  <span class="kw">const</span> active = steps.<span class="fn">find</span>(s => s.active);  <span class="cmt">// trouver l'étape en cours</span></span>
+<span class="ln hl-orange">  <span class="kw">if</span> (active) <span class="kw">return</span> <span class="str">`En cours — ${active.label} (${active.sublabel})`</span>;</span>
+<span class="ln"></span>
+<span class="ln">  <span class="kw">return</span> <span class="str">'En attente'</span>;</span>
+<span class="ln">});</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 5 — LA TIMELINE : AFFICHAGE DES ACTIONS WORKFLOW   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">📋 Partie 5 — La Timeline : Comment chaque action s'affiche</div>
+
+  <p>L'onglet "Journal workflow" affiche une timeline chronologique de toutes les actions. Voici comment ça s'affiche pour un dossier ayant traversé le circuit commercial :</p>
+
+  <h3>Aperçu visuel de la timeline (exemple circuit complet)</h3>
+  <div class="tl-preview">
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#E8F5E9">✓</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-green">Pré-Valider</span>
+          <span style="font-size:12px"><strong>AGC-059</strong> → <strong>DR-05</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">15/03/2025 09:14</span>
+          <span class="badge b-blue" style="font-size:10px">v2</span>
+        </div>
+        <div class="tl-meta">Par : Kamel Nasri — "Dossier complet, validé"</div>
+      </div>
+    </div>
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#E8F5E9">✓</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-green">Valider</span>
+          <span style="font-size:12px"><strong>DR-05</strong> → <strong>DC-01</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">17/03/2025 14:30</span>
+          <span class="badge b-blue" style="font-size:10px">v3</span>
+        </div>
+        <div class="tl-meta">Par : Sonia Mejri — "Avis DEFAVORABLE partiel, encours élevé"</div>
+      </div>
+    </div>
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#E3F2FD">📨</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-blue">Envoyer</span>
+          <span style="font-size:12px"><strong>DC-01</strong> → <strong>COMM-01</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">18/03/2025 10:05</span>
+          <span class="badge b-blue" style="font-size:10px">v4</span>
+        </div>
+        <div class="tl-meta">Par : Directeur Kaabachi</div>
+      </div>
+    </div>
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#F3E5F5">📥</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-purple">PEC Chargé Commercial</span>
+          <span style="font-size:12px"><strong>COMM-01</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">18/03/2025 11:20</span>
+          <span class="badge b-blue" style="font-size:10px">v5</span>
+        </div>
+        <div class="tl-meta">Par : Chargé Hassen</div>
+      </div>
+    </div>
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#F3E5F5">📥</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-purple">PEC Division Commercial</span>
+          <span style="font-size:12px"><strong>COMM-01</strong> → <strong>DIV-01</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">20/03/2025 09:45</span>
+          <span class="badge b-blue" style="font-size:10px">v6</span>
+        </div>
+        <div class="tl-meta">Par : Chef Division Ayari</div>
+      </div>
+    </div>
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#E8F5E9">✓</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-green">Validation Centrale</span>
+          <span style="font-size:12px"><strong>DC-COMM</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">22/03/2025 16:00</span>
+          <span class="badge b-blue" style="font-size:10px">v8</span>
+        </div>
+        <div class="tl-meta">Par : Directrice Fatouhi — "Accord commercial obtenu"</div>
+      </div>
+    </div>
+
+    <div class="tl-entry">
+      <div class="tl-dot" style="background:#E8F5E9">⭐</div>
+      <div class="tl-card-mini">
+        <div class="tl-top">
+          <span class="badge b-green">Décision Finale</span>
+          <span style="font-size:12px"><strong>DC-01</strong></span>
+          <span style="font-size:11px;color:#78909C;margin-left:auto">24/03/2025 10:30</span>
+          <span class="badge b-blue" style="font-size:10px">v9</span>
+        </div>
+        <div class="tl-meta">Par : DG Slimane — "ACCORD 50 000 TND CT"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <h3>Les 3 fonctions qui contrôlent l'affichage de chaque entrée timeline</h3>
+  <p>Pour chaque action (<code>log.action</code>), trois méthodes du composant décident comment l'afficher :</p>
+
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot ts"></span>snapshot-history.component.ts — Méthodes d'affichage (lignes 559–606)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">actionLabel()</div>
+          <div class="ann-body">Traduit le code technique (<code>'PEC_CHARGEE_COMM'</code>) en texte lisible (<code>'PEC Chargé Commercial'</code>). Si l'action n'est pas dans la liste → retourne le code brut (fallback).</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header green">actionSeverity()</div>
+          <div class="ann-body">Retourne la couleur PrimeNG pour le badge : 'success'=vert, 'info'=bleu, 'warning'=orange, 'danger'=rouge, 'secondary'=gris.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">iconForAction()</div>
+          <div class="ann-body">Retourne la classe CSS de l'icône PrimeIcons. 'pi pi-check' = coche, 'pi pi-times' = croix, 'pi pi-inbox' = boîte réception, 'pi pi-send' = flèche envoi.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln hl-blue"><span class="cmt">// ① TEXTE AFFICHÉ dans le badge de la timeline</span></span>
+<span class="ln hl-blue"><span class="fn">actionLabel</span>(a: <span class="tp">string</span>): <span class="tp">string</span> {</span>
+<span class="ln hl-blue">  <span class="kw">const</span> m: Record&lt;<span class="tp">string</span>, <span class="tp">string</span>&gt; = {</span>
+<span class="ln hl-blue">    <span class="str">VALIDER</span>:             <span class="str">'Valider'</span>,</span>
+<span class="ln hl-blue">    <span class="str">PRE_VALIDER</span>:         <span class="str">'Pré-Valider'</span>,</span>
+<span class="ln hl-blue">    <span class="str">REFOULER</span>:            <span class="str">'Refouler'</span>,</span>
+<span class="ln hl-blue">    <span class="str">ENVOYER</span>:             <span class="str">'Envoyer'</span>,</span>
+<span class="ln hl-blue">    <span class="str">PEC_CHARGEE_COMM</span>:    <span class="str">'PEC Chargé Commercial'</span>,</span>
+<span class="ln hl-blue">    <span class="str">PEC_DEVISION_COMM</span>:   <span class="str">'PEC Division Commercial'</span>,</span>
+<span class="ln hl-blue">    <span class="str">PEC_DEP_COMM</span>:        <span class="str">'PEC Département Commercial'</span>,</span>
+<span class="ln hl-blue">    <span class="str">VALID_CENTRALE_COMM</span>: <span class="str">'Validation Centrale'</span>,</span>
+<span class="ln hl-blue">    <span class="str">DECISION_FINALE</span>:     <span class="str">'Décision Finale'</span>,</span>
+<span class="ln hl-blue">    <span class="cmt">// ...autres actions</span></span>
+<span class="ln hl-blue">  };</span>
+<span class="ln hl-blue">  <span class="kw">return</span> m[a] ?? a;  <span class="cmt">// ?? = si non trouvé, retourner le code brut</span></span>
+<span class="ln hl-blue">}</span>
+<span class="ln"></span>
+<span class="ln hl-green"><span class="cmt">// ② COULEUR du badge (système PrimeNG)</span></span>
+<span class="ln hl-green"><span class="fn">actionSeverity</span>(a: <span class="tp">string</span>) {</span>
+<span class="ln hl-green">  <span class="kw">const</span> m = {</span>
+<span class="ln hl-green">    <span class="str">VALIDER</span>:          <span class="str">'success'</span>,    <span class="cmt">// vert</span></span>
+<span class="ln hl-green">    <span class="str">PRE_VALIDER</span>:      <span class="str">'info'</span>,       <span class="cmt">// bleu</span></span>
+<span class="ln hl-green">    <span class="str">REFOULER</span>:         <span class="str">'danger'</span>,     <span class="cmt">// rouge</span></span>
+<span class="ln hl-green">    <span class="str">CORRIGER</span>:         <span class="str">'warning'</span>,    <span class="cmt">// orange</span></span>
+<span class="ln hl-green">    <span class="str">PEC_CHARGEE_COMM</span>: <span class="str">'info'</span>,       <span class="cmt">// bleu</span></span>
+<span class="ln hl-green">    <span class="str">PEC_DEP_COMM</span>:     <span class="str">'warning'</span>,    <span class="cmt">// orange (niveau supérieur)</span></span>
+<span class="ln hl-green">    <span class="str">VALID_CENTRALE_COMM</span>: <span class="str">'success'</span>, <span class="cmt">// vert</span></span>
+<span class="ln hl-green">    <span class="str">DECISION_FINALE</span>:  <span class="str">'success'</span>,   <span class="cmt">// vert</span></span>
+<span class="ln hl-green">  };</span>
+<span class="ln hl-green">  <span class="kw">return</span> m[a] ?? <span class="str">'secondary'</span>; <span class="cmt">// gris par défaut</span></span>
+<span class="ln hl-green">}</span>
+<span class="ln"></span>
+<span class="ln hl-orange"><span class="cmt">// ③ ICÔNE affiché dans le rond de la timeline</span></span>
+<span class="ln hl-orange"><span class="fn">iconForAction</span>(a: <span class="tp">string</span>): <span class="tp">string</span> {</span>
+<span class="ln hl-orange">  <span class="kw">if</span> ([<span class="str">'VALIDER'</span>,<span class="str">'PRE_VALIDER'</span>,<span class="str">'VALID_CENTRALE_COMM'</span>].includes(a))</span>
+<span class="ln hl-orange">    <span class="kw">return</span> <span class="str">'pi pi-check'</span>;   <span class="cmt">// coche ✓</span></span>
+<span class="ln hl-orange">  <span class="kw">if</span> ([<span class="str">'REFOULER'</span>,<span class="str">'CORRIGER'</span>].includes(a))</span>
+<span class="ln hl-orange">    <span class="kw">return</span> <span class="str">'pi pi-times'</span>;   <span class="cmt">// croix ✗</span></span>
+<span class="ln hl-orange">  <span class="kw">if</span> (a === <span class="str">'DECISION_FINALE'</span>)</span>
+<span class="ln hl-orange">    <span class="kw">return</span> <span class="str">'pi pi-star'</span>;    <span class="cmt">// étoile ★</span></span>
+<span class="ln hl-orange">  <span class="kw">if</span> ([<span class="str">'PRENDRE_EN_CHARGE'</span>,<span class="str">'PEC_CHARGEE_COMM'</span>,</span>
+<span class="ln hl-orange">       <span class="str">'PEC_DEVISION_COMM'</span>,<span class="str">'PEC_DEP_COMM'</span>].includes(a))</span>
+<span class="ln hl-orange">    <span class="kw">return</span> <span class="str">'pi pi-inbox'</span>;  <span class="cmt">// boîte de réception</span></span>
+<span class="ln hl-orange">  <span class="kw">return</span> <span class="str">'pi pi-send'</span>;     <span class="cmt">// flèche envoi (défaut)</span></span>
+<span class="ln hl-orange">}</span></pre>
+    </div>
+  </div>
+
+  <h3>Code HTML de la timeline (template)</h3>
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot html"></span>snapshot-history.component.html — Timeline (lignes 125–159)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">p-timeline</div>
+          <div class="ann-body">Composant PrimeNG. <code>[value]="filteredLogs()"</code> reçoit le tableau de logs filtrés. Chaque entrée est rendue par les templates "marker" et "content".</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header purple">Marqueur coloré</div>
+          <div class="ann-body">Les classes CSS <code>tl-valider</code>, <code>tl-refouler</code>, <code>tl-pec</code> appliquent des couleurs différentes au rond de la timeline selon l'action.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">Structure → Structure</div>
+          <div class="ann-body"><code>log.fromStructure</code> → <code>log.toStructure</code> : affiche la chaîne de transmission ex: "DR-05 → DC-01". La flèche est masquée si from = to (même structure).</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header teal">Badge version</div>
+          <div class="ann-body"><code>log.snapshotVersion</code> : numéro du snapshot créé lors de cette action. Permet de retrouver le snapshot correspondant dans la liste.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln hl-blue">&lt;<span class="kw">p-timeline</span> [value]="filteredLogs()" align="left"&gt;</span>
+<span class="ln"></span>
+<span class="ln hl-purple">  &lt;<span class="kw">ng-template</span> pTemplate="marker" let-log&gt;</span>
+<span class="ln hl-purple">    &lt;span class="tl-marker"</span>
+<span class="ln hl-purple">      [class.tl-valider]="log.action==='VALIDER'</span>
+<span class="ln hl-purple">                          ||log.action==='PRE_VALIDER'</span>
+<span class="ln hl-purple">                          ||log.action==='DECISION_FINALE'"</span>
+<span class="ln hl-purple">      [class.tl-refouler]="log.action==='REFOULER'</span>
+<span class="ln hl-purple">                           ||log.action==='CORRIGER'"</span>
+<span class="ln hl-purple">      [class.tl-pec]="log.action==='PRENDRE_EN_CHARGE'"</span>
+<span class="ln hl-purple">      [class.tl-envoyer]="log.action==='ENVOYER'</span>
+<span class="ln hl-purple">                          ||log.action==='ENVOYER_SUPERVISEUR'"&gt;</span>
+<span class="ln hl-purple">      &lt;i [class]="iconForAction(log.action)"&gt;&lt;/i&gt;</span>
+<span class="ln hl-purple">    &lt;/span&gt;</span>
+<span class="ln hl-purple">  &lt;/ng-template&gt;</span>
+<span class="ln"></span>
+<span class="ln">  &lt;<span class="kw">ng-template</span> pTemplate="content" let-log&gt;</span>
+<span class="ln">    &lt;div class="tl-card"&gt;</span>
+<span class="ln">      &lt;div class="tl-card-header"&gt;</span>
+<span class="ln"></span>
+<span class="ln">        &lt;<span class="kw">p-tag</span> [value]="actionLabel(log.action)"</span>
+<span class="ln">               [severity]="actionSeverity(log.action)"&gt;&lt;/<span class="kw">p-tag</span>&gt;</span>
+<span class="ln"></span>
+<span class="ln hl-orange">        &lt;span class="tl-structures"&gt;</span>
+<span class="ln hl-orange">          &lt;strong&gt;{{ log.fromStructure }}&lt;/strong&gt;</span>
+<span class="ln hl-orange">          @if (log.toStructure &amp;&amp; log.toStructure !== log.fromStructure) {</span>
+<span class="ln hl-orange">            &lt;i class="pi pi-arrow-right"&gt;&lt;/i&gt;</span>
+<span class="ln hl-orange">            &lt;strong&gt;{{ log.toStructure }}&lt;/strong&gt;</span>
+<span class="ln hl-orange">          }</span>
+<span class="ln hl-orange">        &lt;/span&gt;</span>
+<span class="ln"></span>
+<span class="ln">        &lt;span class="tl-date"&gt;{{ log.performedAt | date:'dd/MM/yyyy HH:mm' }}&lt;/span&gt;</span>
+<span class="ln"></span>
+<span class="ln hl-teal">        @if (log.snapshotVersion) {</span>
+<span class="ln hl-teal">          &lt;<span class="kw">p-badge</span> [value]="'v' + log.snapshotVersion" severity="info"&gt;</span>
+<span class="ln hl-teal">          &lt;/<span class="kw">p-badge</span>&gt;</span>
+<span class="ln hl-teal">        }</span>
+<span class="ln"></span>
+<span class="ln">      &lt;/div&gt;</span>
+<span class="ln">      &lt;div class="tl-card-body"&gt;</span>
+<span class="ln">        &lt;span&gt;Par : &lt;strong&gt;{{ log.performedBy }}&lt;/strong&gt;&lt;/span&gt;</span>
+<span class="ln">        @if (log.comments) {</span>
+<span class="ln">          &lt;span&gt;"{{ log.comments }}"&lt;/span&gt;</span>
+<span class="ln">        }</span>
+<span class="ln">      &lt;/div&gt;</span>
+<span class="ln">    &lt;/div&gt;</span>
+<span class="ln">  &lt;/ng-template&gt;</span>
+<span class="ln hl-blue">&lt;/<span class="kw">p-timeline</span>&gt;</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 6 — FILTRE DES LOGS PAR RÔLE                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🔐 Partie 6 — Filtrage des logs selon le rôle utilisateur</div>
+
+  <p>Tous les utilisateurs ne voient pas les mêmes logs. Un agent d'agence ne doit pas voir les échanges internes DR ↔ DC. C'est le computed signal <code>filteredLogs</code> qui gère cela.</p>
+
+  <h3>Règles de filtrage</h3>
+  <table class="tbl">
+    <thead><tr><th>Type (typeStructure)</th><th>Ce qu'il voit</th><th>Logique</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-blue">typeStructure = '1'</span><br>Agent / Chef Agence</td>
+        <td>Seulement les logs où son agence est impliquée (émetteur ou destinataire)</td>
+        <td><code>fromStructure === code || toStructure === code</code></td>
+      </tr>
+      <tr>
+        <td><span class="badge b-orange">typeStructure = '2'</span><br>Direction Régionale</td>
+        <td>Les logs où sa structure est impliquée + les logs de ses agences enfants</td>
+        <td><code>fromStructure === code || toStructure === code || structureMere === code</code></td>
+      </tr>
+      <tr>
+        <td><span class="badge b-purple">typeStructure = '5'</span><br>Direction Centrale</td>
+        <td>Tous les logs</td>
+        <td>Pas de filtre — retourne <code>logs</code> complet</td>
+      </tr>
+      <tr>
+        <td>Mode Consultation<br>(canvas != canvas courant)</td>
+        <td>Tous les logs</td>
+        <td><code>activeCanevasId !== currentIdCaneva</code> → pas de filtre</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot ts"></span>snapshot-history.component.ts — filteredLogs (lignes 77–92)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">Mode consultation</div>
+          <div class="ann-body">Si l'utilisateur regarde un canvas différent du sien (via la recherche), il voit tout. Pas de restriction en consultation externe.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">Type '1' = Agence</div>
+          <div class="ann-body">Filtre strict : seulement les logs où son code structure apparaît en fromStructure ou toStructure. Il ne voit pas les échanges DR-DC.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header green">Type '2' = DR</div>
+          <div class="ann-body">Filtre élargi : voit aussi les logs des agences enfants grâce à <code>structureMere</code>. Ex: DR-05 voit les logs de AGC-059 si AGC-059.structureMere = 'DR-05'.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header teal">Autres types</div>
+          <div class="ann-body">Retourne tous les logs sans filtre. Couvre la DC (type '5') et tout autre type non explicitement géré.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln"><span class="kw">filteredLogs</span> = <span class="fn">computed</span>(() => {</span>
+<span class="ln">  <span class="kw">const</span> logs = <span class="kw">this</span>.workflowLog();       <span class="cmt">// tous les logs chargés</span></span>
+<span class="ln">  <span class="kw">const</span> type = <span class="kw">this</span>.userType();           <span class="cmt">// ex: '1', '2', '5'</span></span>
+<span class="ln">  <span class="kw">const</span> code = <span class="kw">this</span>.userCode();           <span class="cmt">// ex: 'AGC-059', 'DR-05'</span></span>
+<span class="ln"></span>
+<span class="ln hl-blue">  <span class="cmt">// ① MODE CONSULTATION : canvas différent du canvas courant</span></span>
+<span class="ln hl-blue">  <span class="kw">if</span> (<span class="kw">this</span>.activeCanevasId() !== <span class="kw">this</span>.canevasAgrService.currentIdCaneva()) {</span>
+<span class="ln hl-blue">    <span class="kw">return</span> logs;  <span class="cmt">// pas de filtre en consultation</span></span>
+<span class="ln hl-blue">  }</span>
+<span class="ln"></span>
+<span class="ln hl-orange">  <span class="cmt">// ② TYPE '1' = Agent / Chef Agence</span></span>
+<span class="ln hl-orange">  <span class="kw">if</span> (type === <span class="str">'1'</span> &amp;&amp; code)</span>
+<span class="ln hl-orange">    <span class="kw">return</span> logs.<span class="fn">filter</span>(l =></span>
+<span class="ln hl-orange">      l.fromStructure === code || l.toStructure === code</span>
+<span class="ln hl-orange">    );</span>
+<span class="ln"></span>
+<span class="ln hl-green">  <span class="cmt">// ③ TYPE '2' = Direction Régionale (voit aussi ses agences enfants)</span></span>
+<span class="ln hl-green">  <span class="kw">if</span> (type === <span class="str">'2'</span> &amp;&amp; code)</span>
+<span class="ln hl-green">    <span class="kw">return</span> logs.<span class="fn">filter</span>(l =></span>
+<span class="ln hl-green">      l.fromStructure === code</span>
+<span class="ln hl-green">      || l.toStructure === code</span>
+<span class="ln hl-green">      || l.structureMere === code    <span class="cmt">// agences sous sa responsabilité</span></span>
+<span class="ln hl-green">    );</span>
+<span class="ln"></span>
+<span class="ln hl-teal">  <span class="cmt">// ④ AUTRES TYPES (DC type '5', etc.) → tout voir</span></span>
+<span class="ln hl-teal">  <span class="kw">return</span> logs;</span>
+<span class="ln">});</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 7 — CHARGEMENT DES DONNÉES (loadAll + searchCanvas) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">📡 Partie 7 — Chargement des données : loadAll() et searchCanvas()</div>
+
+  <p>Quand l'utilisateur arrive sur la page ou cherche un canvas, ces deux méthodes lancent les appels HTTP vers l'API. Voici comment elles fonctionnent :</p>
+
+  <div class="code-wrap">
+    <div class="code-filename"><span class="dot ts"></span>snapshot-history.component.ts — loadAll() (lignes 360–372)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">loading signal</div>
+          <div class="ann-body"><code>loading.set(true)</code> → l'écran affiche un spinner. <code>loading.set(false)</code> dans le callback → le spinner disparaît. C'est un signal réactif.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header green">2 appels indépendants</div>
+          <div class="ann-body">getHistory() charge la liste des snapshots. getWorkflowLog() charge les logs. Ils s'exécutent en parallèle (pas de await l'un après l'autre).</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header red">Problème connu</div>
+          <div class="ann-body">Si getWorkflowLog échoue, il n'y a pas de gestion d'erreur visible à l'utilisateur. Voir <a href="../snapshot-workflow-analyse.html" style="color:#EF9A9A">l'analyse complète</a> bug #3.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln"><span class="kw">private</span> <span class="fn">loadAll</span>(id: <span class="tp">number</span>): <span class="tp">void</span> {</span>
+<span class="ln hl-blue">  <span class="kw">this</span>.loading.<span class="fn">set</span>(<span class="kw">true</span>);  <span class="cmt">// ← affiche le spinner</span></span>
+<span class="ln"></span>
+<span class="ln hl-green">  <span class="cmt">// ① Appel 1 : liste des snapshots</span></span>
+<span class="ln hl-green">  <span class="kw">this</span>.snapshotService.<span class="fn">getHistory</span>(id).<span class="fn">subscribe</span>({</span>
+<span class="ln hl-green">    next:  d => {</span>
+<span class="ln hl-green">      <span class="kw">this</span>.history.<span class="fn">set</span>(d);       <span class="cmt">// stocke dans le signal</span></span>
+<span class="ln hl-green">      <span class="kw">this</span>.loading.<span class="fn">set</span>(<span class="kw">false</span>);  <span class="cmt">// cache le spinner</span></span>
+<span class="ln hl-green">    },</span>
+<span class="ln hl-green">    error: () => <span class="kw">this</span>.loading.<span class="fn">set</span>(<span class="kw">false</span>)</span>
+<span class="ln hl-green">  });</span>
+<span class="ln"></span>
+<span class="ln hl-green">  <span class="cmt">// ② Appel 2 : logs workflow (indépendant du premier)</span></span>
+<span class="ln hl-green">  <span class="kw">this</span>.snapshotService.<span class="fn">getWorkflowLog</span>(id).<span class="fn">subscribe</span>({</span>
+<span class="ln hl-green">    next:  d => <span class="kw">this</span>.workflowLog.<span class="fn">set</span>(d),  <span class="cmt">// stocke dans le signal</span></span>
+<span class="ln hl-red">    error: e => console.error(<span class="str">'WorkflowLog error'</span>, e)  <span class="cmt">// ← bug : pas de message user</span></span>
+<span class="ln hl-green">  });</span>
+<span class="ln">}</span></pre>
+    </div>
+  </div>
+
+  <div class="code-wrap" style="margin-top:20px">
+    <div class="code-filename"><span class="dot ts"></span>snapshot-history.component.ts — searchCanvas() (lignes 386–423)</div>
+    <div class="code-body">
+      <div class="code-annotations">
+        <div class="ann-item">
+          <div class="ann-header blue">Validation input</div>
+          <div class="ann-body">Vérifie que l'ID saisi est > 0 avant d'appeler l'API. Si invalide → toast warning.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header green">getHistory avec params</div>
+          <div class="ann-body">En mode recherche, on passe typeStructure + codeStructure pour que le serveur vérifie si l'utilisateur a le droit d'accéder à ce canvas. Renvoie 403 si accès refusé.</div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-header orange">Gestion erreurs HTTP</div>
+          <div class="ann-body">3 cas gérés : 403 (accès refusé), 404 (canvas inexistant), autre (erreur générique). Bonne pratique de gestion d'erreur.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="ln"><span class="fn">searchCanvas</span>(): <span class="tp">void</span> {</span>
+<span class="ln hl-blue">  <span class="kw">const</span> id = <span class="kw">this</span>.searchCanevasId();</span>
+<span class="ln hl-blue">  <span class="kw">if</span> (!id || id &lt;= <span class="num">0</span>) {</span>
+<span class="ln hl-blue">    <span class="kw">this</span>.messageService.<span class="fn">add</span>({ severity: <span class="str">'warn'</span>, detail: <span class="str">'Saisissez un numéro valide'</span> });</span>
+<span class="ln hl-blue">    <span class="kw">return</span>;</span>
+<span class="ln hl-blue">  }</span>
+<span class="ln"></span>
+<span class="ln">  <span class="kw">const</span> u = <span class="kw">this</span>.userService.user();</span>
+<span class="ln hl-green">  <span class="kw">this</span>.snapshotService.<span class="fn">getHistory</span>(id, u?.typeStructure, u?.codeStructure).<span class="fn">subscribe</span>({</span>
+<span class="ln hl-green">    next: d => {</span>
+<span class="ln hl-green">      <span class="kw">this</span>.activeCanevasId.<span class="fn">set</span>(id);     <span class="cmt">// ← met à jour l'ID actif</span></span>
+<span class="ln hl-green">      <span class="kw">this</span>.history.<span class="fn">set</span>(d);</span>
+<span class="ln hl-green">      <span class="kw">this</span>.selectedSnap.<span class="fn">set</span>(<span class="kw">null</span>);</span>
+<span class="ln hl-green">      <span class="kw">this</span>.compareMode.<span class="fn">set</span>(<span class="kw">false</span>);</span>
+<span class="ln hl-green">      <span class="kw">this</span>.loading.<span class="fn">set</span>(<span class="kw">false</span>);</span>
+<span class="ln hl-green">      <span class="kmt">// Charge aussi les logs après succès</span></span>
+<span class="ln hl-green">      <span class="kw">this</span>.snapshotService.<span class="fn">getWorkflowLog</span>(id).<span class="fn">subscribe</span>({</span>
+<span class="ln hl-green">        next: logs => <span class="kw">this</span>.workflowLog.<span class="fn">set</span>(logs)</span>
+<span class="ln hl-green">      });</span>
+<span class="ln hl-green">    },</span>
+<span class="ln hl-orange">    error: (err) => {</span>
+<span class="ln hl-orange">      <span class="kw">this</span>.loading.<span class="fn">set</span>(<span class="kw">false</span>);</span>
+<span class="ln hl-orange">      <span class="kw">if</span> (err.status === <span class="num">403</span>)</span>
+<span class="ln hl-orange">        <span class="cmt">// → "Accès refusé"</span></span>
+<span class="ln hl-orange">      <span class="kw">else if</span> (err.status === <span class="num">404</span>)</span>
+<span class="ln hl-orange">        <span class="cmt">// → "Canvas introuvable"</span></span>
+<span class="ln hl-orange">      <span class="kw">else</span></span>
+<span class="ln hl-orange">        <span class="cmt">// → "Erreur générique"</span></span>
+<span class="ln hl-orange">    }</span>
+<span class="ln">  });</span>
+<span class="ln">}</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PARTIE 8 — RÉCAPITULATIF POUR LE DÉBUTANT                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🗝 Partie 8 — Récapitulatif : les fichiers à connaître et leur rôle</div>
+
+  <table class="tbl">
+    <thead><tr><th>Fichier</th><th>Rôle</th><th>Clé à retenir</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>snapshot-history.component.ts</code></td>
+        <td>Cerveau de la page. Contient toute la logique : chargement, filtrage, calcul de progression, actions.</td>
+        <td>Modifier ici pour ajouter une nouvelle action ou un nouveau statut commercial.</td>
+      </tr>
+      <tr>
+        <td><code>snapshot-history.component.html</code></td>
+        <td>Vue HTML. Affiche le stepper, la timeline, la table des snapshots, les dialogues.</td>
+        <td>Modifier ici pour changer l'apparence. La logique reste dans le .ts.</td>
+      </tr>
+      <tr>
+        <td><code>snapshot.service.ts</code></td>
+        <td>Couche HTTP. Appels REST vers le backend. Contient aussi les interfaces TypeScript.</td>
+        <td>Modifier ici si une URL d'API change ou si une nouvelle interface est nécessaire.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Si vous voulez ajouter une nouvelle sous-étape commerciale (ex: COMITE_CREDIT)</h3>
+
+  <div class="callout warning">
+    <strong>⚠ Points à modifier dans 3 endroits</strong>
+    Pour ajouter l'action <code>COMITE_CREDIT</code> qui s'insère entre <code>VALID_CENTRALE_COMM</code> et <code>DECISION_FINALE</code> :
+  </div>
+
+  <div class="num-steps" style="margin-top:16px">
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Dans <code>progressSteps()</code> — <code>inCommercialPhase</code></strong>
+        <p>Ajouter <code>|| hasStatus('COMITE_CREDIT')</code> dans la condition de détection de la phase commerciale.</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Dans <code>currentProgressLabel()</code> — <code>commercialLabels</code></strong>
+        <p>Ajouter <code>'COMITE_CREDIT': 'Comité de Crédit'</code> dans le dictionnaire.</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Dans <code>actionLabel()</code>, <code>actionSeverity()</code>, <code>iconForAction()</code></strong>
+        <p>Ajouter le mapping pour l'affichage dans la timeline : label = "Comité Crédit", severity = 'warning', icon = 'pi pi-users'.</p>
+      </div>
+    </div>
+    <div class="num-step">
+      <div class="num-step-body">
+        <strong>Dans <code>statusSeverity()</code></strong>
+        <p>Ajouter <code>'COMITE_CREDIT': 'warning'</code> pour que le badge statut dans la table des snapshots soit coloré correctement.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  Guide développeur débutant — Workflow Snapshot Circuit Commercial — Canvas Agricole BNA<br>
+  Fichiers : snapshot-history.component.ts · snapshot-history.component.html · snapshot.service.ts
+</footer>
+
+</body>
+</html>
