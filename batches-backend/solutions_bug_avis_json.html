@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solutions — Bug donnees_avis_json vide</title>
+  <style>
+    :root {
+      --rouge:   #e74c3c;
+      --vert:    #27ae60;
+      --bleu:    #2980b9;
+      --orange:  #e67e22;
+      --violet:  #8e44ad;
+      --gris:    #ecf0f1;
+      --gris2:   #bdc3c7;
+      --blanc:   #ffffff;
+      --texte:   #2c3e50;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f6fa;
+      color: var(--texte);
+      padding: 24px;
+      line-height: 1.7;
+    }
+    h1 { font-size: 1.8rem; color: var(--rouge); margin-bottom: 6px; }
+    h2 { font-size: 1.35rem; margin: 32px 0 10px; }
+    h3 { font-size: 1.1rem; margin: 18px 0 8px; }
+    .subtitle { color: #666; font-size: 0.95rem; margin-bottom: 30px; }
+
+    /* ─── Carte générique ─── */
+    .card {
+      background: var(--blanc);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    /* ─── Badge solution ─── */
+    .badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 10px;
+    }
+    .badge-s1 { background:#d5f5e3; color:#1e8449; }
+    .badge-s2 { background:#d6eaf8; color:#1a5276; }
+    .badge-s3 { background:#f4ecf7; color:#6c3483; }
+    .badge-bonus { background:#fef9e7; color:#9a7d0a; border:1px solid #f0d060; }
+    .badge-bug  { background:#fde8e8; color:#922b21; }
+
+    /* ─── Diagramme transaction ─── */
+    .diagramme {
+      background: #1e272e;
+      color: #dfe6e9;
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+    .diagramme .t1  { color: #00cec9; }
+    .diagramme .t2  { color: #fd79a8; }
+    .diagramme .ok  { color: #55efc4; }
+    .diagramme .err { color: #e17055; }
+    .diagramme .cmt { color: #636e72; }
+
+    /* ─── Blocs avantages / inconvénients ─── */
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    @media(max-width:600px){ .pros-cons { grid-template-columns: 1fr; } }
+    .pros, .cons {
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .pros { background: #eafaf1; border-left: 4px solid var(--vert); }
+    .cons { background: #fdf2f2; border-left: 4px solid var(--rouge); }
+    .pros h4 { color: var(--vert); margin-bottom: 8px; }
+    .cons h4 { color: var(--rouge); margin-bottom: 8px; }
+    ul { padding-left: 18px; }
+    li { margin-bottom: 5px; }
+
+    /* ─── Bloc de code ─── */
+    .code-block {
+      background: #1e272e;
+      border-radius: 8px;
+      padding: 18px 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.83rem;
+      margin: 14px 0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .code-block .rem    { color: #95a5a6; }
+    .code-block .kw     { color: #74b9ff; }
+    .code-block .ann    { color: #a29bfe; }
+    .code-block .str    { color: #55efc4; }
+    .code-block .add    { color: #00b894; background: rgba(0,184,148,.15); display:block; padding: 1px 4px; border-radius:3px; }
+    .code-block .del    { color: #d63031; background: rgba(214,48,49,.12); display:block; padding: 1px 4px; border-radius:3px; text-decoration:line-through; }
+    .code-block .normal { color: #dfe6e9; }
+    .code-block .ln     { color: #636e72; margin-right: 14px; user-select:none; }
+
+    /* ─── Étiquette fichier ─── */
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #2d3436;
+      color: #81ecec;
+      border-radius: 6px 6px 0 0;
+      padding: 6px 14px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      margin-bottom: -4px;
+    }
+    .file-label .icon { font-size: 1rem; }
+
+    /* ─── Tableau comparatif ─── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.88rem;
+    }
+    th {
+      background: #2c3e50;
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    td { padding: 9px 14px; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f9fa; }
+    .check { color: var(--vert); font-weight: bold; }
+    .cross  { color: var(--rouge); font-weight: bold; }
+    .mid    { color: var(--orange); font-weight: bold; }
+
+    /* ─── Alerte ─── */
+    .alerte {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+    .alerte strong { color: #856404; }
+
+    /* ─── Recommandation ─── */
+    .recommandation {
+      background: linear-gradient(135deg, #d5f5e3, #eaf4fb);
+      border: 2px solid var(--vert);
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-top: 30px;
+    }
+    .recommandation h2 { color: var(--vert); margin-top: 0; }
+
+    /* ─── Step numéroté ─── */
+    .steps { counter-reset: step; }
+    .step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+      align-items: flex-start;
+    }
+    .step-num {
+      counter-increment: step;
+      background: var(--bleu);
+      color: white;
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .step-body { flex: 1; }
+    .step-body p { margin-bottom: 6px; }
+
+    /* ─── Section header ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .section-num {
+      background: var(--bleu);
+      color: white;
+      border-radius: 8px;
+      padding: 4px 14px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .section-num.s1 { background: var(--vert); }
+    .section-num.s2 { background: var(--bleu); }
+    .section-num.s3 { background: var(--violet); }
+    .section-num.bonus { background: var(--orange); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  TITRE                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1>🐛 Bug — <code>donnees_avis_json</code> vide dans le snapshot</h1>
+<p class="subtitle">
+  Analyse complète + 3 solutions avec avantages/inconvénients + emplacements exacts dans le code
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  ANALYSE DU BUG                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>🔍 Pourquoi le bug se produit</h2>
+
+  <p>
+    Quand on appelle <strong>POST /api/avis</strong>, voici ce qui se passe
+    avec les transactions de base de données :
+  </p>
+
+  <div class="diagramme">
+<span class="t1">═══ TRANSACTION T1 (AvisService.saveAvis) ══════════════════════════════</span>
+│
+├─ <span class="ok">✔</span> <span class="normal">avisRepository.save(avis)</span>
+│       <span class="cmt">└→ L'avis est en mémoire (JPA cache), pas encore écrit en BDD</span>
+│
+├─ <span class="ok">✔</span> <span class="normal">updateCaneva(...)</span>
+│       <span class="cmt">└→ Mise à jour du canevas, toujours dans T1</span>
+│
+├─ <span class="ok">✔</span> <span class="normal">snapshotService.createSnapshot(...)  ← appel</span>
+│
+│   <span class="t2">╔═══ TRANSACTION T2 (REQUIRES_NEW) ═════════════════════════════════╗</span>
+│   <span class="t2">║</span>  <span class="t2">@Transactional(propagation = Propagation.REQUIRES_NEW)</span>           <span class="t2">║</span>
+│   <span class="t2">║</span>  └─ T2 est une transaction SÉPARÉE — T1 est en pause              <span class="t2">║</span>
+│   <span class="t2">║</span>                                                                   <span class="t2">║</span>
+│   <span class="t2">║</span>  buildAvisJson(canevasId)                                         <span class="t2">║</span>
+│   <span class="t2">║</span>  └─ avisRepository.findAllByNumCaneva(canevasId)                  <span class="t2">║</span>
+│   <span class="t2">║</span>       └─ <span class="err">LIT DEPUIS LA BDD</span>                                       <span class="t2">║</span>
+│   <span class="t2">║</span>           <span class="err">→ L'avis de T1 n'est PAS encore committé !</span>               <span class="t2">║</span>
+│   <span class="t2">║</span>           <span class="err">→ donnees_avis_json = [] (vide)</span>                          <span class="t2">║</span>
+│   <span class="t2">╚═══════════════════════════════════════════════════════════════════╝</span>
+│
+└─ <span class="normal">return savedDTO</span>
+<span class="cmt">   [T1 committe ici — trop tard pour le snapshot déjà créé]</span>
+  </div>
+
+  <div class="alerte">
+    <strong>⚠️ Deuxième problème (bug bonus) :</strong>
+    Dans <code>buildAvisJson()</code> à la ligne 537, il y a du code de débogage
+    non professionnel qui doit être nettoyé :
+    <code>System system = null; system.out.println(...)</code>
+    (accès à un champ statique via une variable nulle — mauvaise pratique).
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  SOLUTION 1                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header">
+    <span class="section-num s1">Solution 1</span>
+    <h2 style="margin:0">Changer <code>REQUIRES_NEW</code> → <code>REQUIRED</code>
+      <span class="badge badge-s1">⭐ La plus simple</span>
+    </h2>
+  </div>
+
+  <p>
+    La cause est que <code>createSnapshot()</code> s'exécute dans une <strong>nouvelle transaction séparée</strong>
+    (<code>REQUIRES_NEW</code>) qui ne peut pas voir les données non commitées de T1.
+    En changeant pour <code>REQUIRED</code> (valeur par défaut de Spring),
+    le snapshot s'exécute dans <em>la même transaction</em> que <code>saveAvis()</code>,
+    et voit donc l'avis qui vient d'être sauvegardé.
+  </p>
+
+  <!-- Avantages / Inconvénients -->
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>✅ Avantages</h4>
+      <ul>
+        <li><strong>1 seule ligne à changer</strong> dans un seul fichier</li>
+        <li>Le snapshot voit immédiatement le nouvel avis</li>
+        <li>Aucun risque de régression sur les autres endpoints</li>
+        <li>Solution la plus rapide à mettre en place</li>
+        <li>Facile à comprendre pour un débutant</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>❌ Inconvénients</h4>
+      <ul>
+        <li>
+          Si <code>createSnapshot()</code> plante → toute la transaction est annulée
+          (l'avis sauvegardé est aussi perdu)
+        </li>
+        <li>
+          Perd l'isolation : si le snapshot prend du temps, il bloque T1
+        </li>
+        <li>
+          Si <code>createSnapshot()</code> est appelé depuis d'autres services
+          en dehors d'une transaction, cela pourrait changer le comportement
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Code à changer -->
+  <h3>📁 Où modifier le code</h3>
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java
+  </div>
+  <div class="code-block">
+<span class="ln"> 50</span><span class="normal">    /**</span>
+<span class="ln"> 51</span><span class="normal">     * Crée un snapshot complet lors d'une transition de workflow.</span>
+<span class="ln"> 52</span><span class="del">    @Transactional(propagation = Propagation.REQUIRES_NEW)</span>
+<span class="ln"> 52</span><span class="add">    @Transactional   // REQUIRED par défaut = même transaction que l'appelant</span>
+<span class="ln"> 53</span><span class="normal">    public CanevasStructureSnapshot createSnapshot(</span>
+<span class="ln"> 54</span><span class="normal">            Long canevasId, String structureCode, String structureLabel,</span>
+<span class="ln"> 55</span><span class="normal">            String matricule, String createdBy, String observations,</span>
+<span class="ln"> 56</span><span class="normal">            String statusAtSnapshot,</span>
+<span class="ln"> 57</span><span class="normal">            String avisJson) {</span>
+  </div>
+
+  <div class="alerte">
+    <strong>Rappel :</strong> Supprimer aussi l'import inutile si
+    <code>Propagation.REQUIRES_NEW</code> n'est plus utilisé nulle part dans le fichier.
+    Ligne à vérifier en haut du fichier :
+    <code>import org.springframework.transaction.annotation.Propagation;</code>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  SOLUTION 2                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header">
+    <span class="section-num s2">Solution 2</span>
+    <h2 style="margin:0">Construire le JSON des avis dans T1 et l'utiliser dans le snapshot
+      <span class="badge badge-s2">⚖️ Meilleur équilibre</span>
+    </h2>
+  </div>
+
+  <p>
+    Au lieu de laisser <code>createSnapshot()</code> relire la BDD (dans T2),
+    on construit la liste complète des avis <strong>dans T1</strong>
+    (où le nouvel avis est visible), et on la passe directement au snapshot.
+    On garde <code>REQUIRES_NEW</code> pour l'isolation.
+  </p>
+  <p>
+    <strong>Note importante :</strong> actuellement, le paramètre <code>avisJson</code>
+    est déjà envoyé à <code>createSnapshot()</code> depuis <code>AvisService</code>,
+    mais il n'est jamais utilisé (le code appelle quand même <code>buildAvisJson(canevasId)</code>
+    en ignorant ce paramètre). Cette solution corrige ce problème.
+  </p>
+
+  <!-- Avantages / Inconvénients -->
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>✅ Avantages</h4>
+      <ul>
+        <li>Garde l'isolation (<code>REQUIRES_NEW</code>) entre les deux transactions</li>
+        <li>Si le snapshot échoue, l'avis est quand même sauvegardé</li>
+        <li>Résout le bug sans changer la logique transactionnelle</li>
+        <li>Utilise enfin le paramètre <code>avisJson</code> qui était déjà prévu</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>❌ Inconvénients</h4>
+      <ul>
+        <li>Modifications dans <strong>deux fichiers</strong> au lieu d'un</li>
+        <li>Il faut ajouter une méthode helper dans <code>AvisService</code></li>
+        <li>Le JSON est construit deux fois (une fois dans AvisService, une fois si fallback)</li>
+        <li>Un peu plus de code à comprendre pour un débutant</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>📁 Changement 1 — AvisService.java</h3>
+
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/service/AvisService.java
+  </div>
+  <div class="code-block">
+<span class="rem">// ── Ajouter ces imports en haut du fichier (si pas déjà présents) ──</span>
+<span class="ann">import java.util.stream.Collectors;</span>
+<span class="ann">import java.util.LinkedHashMap;</span>
+
+<span class="rem">// ─────────────────────────────────────────────────────────────────────────</span>
+<span class="rem">// Dans la méthode saveAvis(), AVANT l'appel à snapshotService.createSnapshot()</span>
+<span class="rem">// Remplacer les lignes 244-256 (construction de avisJson) par ceci :</span>
+<span class="rem">// ─────────────────────────────────────────────────────────────────────────</span>
+
+<span class="rem">// ── 4. Construire le JSON de TOUS les avis dans la transaction T1 ────────</span>
+<span class="add">        String tousAvisJson = buildTousAvisJsonDansT1(dto.getNumCaneva());</span>
+
+<span class="rem">// ─────────────────────────────────────────────────────────────────────────</span>
+<span class="rem">// Dans l'appel à createSnapshot() (ligne ~262), passer tousAvisJson :</span>
+<span class="rem">// ─────────────────────────────────────────────────────────────────────────</span>
+
+        <span class="rem">// ── 5. Créer le snapshot ────────────────────────────────────────────</span>
+        <span class="kw">var</span> snap = snapshotService.createSnapshot(
+                dto.getNumCaneva(), structureCode, structureLabel,
+                matriculeLog, matriculeLog, observations, statusAtSnap,
+<span class="del">                avisJson);    // ← ancien paramètre (un seul avis, pas utilisé)</span>
+<span class="add">                tousAvisJson); // ← nouveau : JSON complet de tous les avis</span>
+
+<span class="rem">// ─────────────────────────────────────────────────────────────────────────</span>
+<span class="rem">// Ajouter cette méthode PRIVÉE à la fin de AvisService.java</span>
+<span class="rem">// (après la méthode findHeadMatricule, vers la ligne 415)</span>
+<span class="rem">// ─────────────────────────────────────────────────────────────────────────</span>
+
+<span class="add">    /**</span>
+<span class="add">     * Construit le JSON de TOUS les avis d'un canevas.</span>
+<span class="add">     * S'exécute dans la même transaction que saveAvis() → voit l'avis</span>
+<span class="add">     * qui vient d'être sauvegardé (pas encore committé en BDD).</span>
+<span class="add">     */</span>
+<span class="add">    private String buildTousAvisJsonDansT1(Long numCaneva) {</span>
+<span class="add">        try {</span>
+<span class="add">            List&lt;Avis&gt; avisList = avisRepository.findAllByNumCaneva(numCaneva);</span>
+<span class="add">            List&lt;Map&lt;String, Object&gt;&gt; result = avisList.stream().map(a -> {</span>
+<span class="add">                Map&lt;String, Object&gt; m = new LinkedHashMap&lt;&gt;();</span>
+<span class="add">                m.put("id",                      a.getId());</span>
+<span class="add">                m.put("numCaneva",               a.getNumCaneva());</span>
+<span class="add">                m.put("numSeqpers",              a.getNumSeqpers());</span>
+<span class="add">                m.put("statusAvis",              a.getStatusAvis());</span>
+<span class="add">                m.put("structure",               a.getStructure());</span>
+<span class="add">                m.put("matricule",               a.getMatricule());</span>
+<span class="add">                m.put("avisValue",               a.getAvisValue());</span>
+<span class="add">                m.put("codeStructureReceptrice", a.getCodeStructureReceptrice());</span>
+<span class="add">                m.put("commentaire",             a.getCommentaire());</span>
+<span class="add">                return m;</span>
+<span class="add">            }).collect(Collectors.toList());</span>
+<span class="add">            return objectMapper.writeValueAsString(result);</span>
+<span class="add">        } catch (Exception e) {</span>
+<span class="add">            log.warn("Impossible de construire tousAvisJson pour canevas={}", numCaneva, e);</span>
+<span class="add">            return null;</span>
+<span class="add">        }</span>
+<span class="add">    }</span>
+  </div>
+
+  <h3>📁 Changement 2 — CanevasSnapshotService.java</h3>
+
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java
+  </div>
+  <div class="code-block">
+<span class="rem">// Dans la méthode createSnapshot(), dans le builder (vers ligne 112)</span>
+<span class="rem">// Remplacer l'appel à buildAvisJson() par l'utilisation du paramètre :</span>
+
+<span class="del">                .donneesAvisJson(buildAvisJson(canevasId))</span>
+<span class="add">                .donneesAvisJson(avisJson != null ? avisJson : buildAvisJson(canevasId))</span>
+
+<span class="rem">// Explication :</span>
+<span class="rem">// - Si avisJson est fourni (vient de AvisService avec tous les avis) → l'utiliser</span>
+<span class="rem">// - Sinon (appel depuis CanevasSnapshotController pour valider/refouler) → relire la BDD</span>
+<span class="rem">// (dans ce cas les avis sont déjà committés, pas de problème de transaction)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  SOLUTION 3                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header">
+    <span class="section-num s3">Solution 3</span>
+    <h2 style="margin:0">Utiliser <code>@TransactionalEventListener</code>
+      <span class="badge badge-s3">🏗️ La plus propre architecturalement</span>
+    </h2>
+  </div>
+
+  <p>
+    Au lieu d'appeler directement <code>createSnapshot()</code> depuis <code>saveAvis()</code>,
+    on publie un <strong>événement Spring</strong> après la sauvegarde de l'avis.
+    Le snapshot est créé seulement <em>après le commit de T1</em>,
+    donc il peut lire l'avis en toute sécurité.
+  </p>
+
+  <!-- Avantages / Inconvénients -->
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>✅ Avantages</h4>
+      <ul>
+        <li>Parfaitement isolé : snapshot créé APRÈS le commit de l'avis</li>
+        <li>Séparation des responsabilités (principe SOLID)</li>
+        <li>Si le snapshot échoue, l'avis est déjà sauvegardé en BDD</li>
+        <li>Facilement extensible (d'autres listeners peuvent écouter le même événement)</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>❌ Inconvénients</h4>
+      <ul>
+        <li><strong>La plus complexe</strong> à implémenter (3 fichiers + 1 nouveau fichier)</li>
+        <li>Déconseillée pour un débutant sans expérience Spring Events</li>
+        <li>
+          Le snapshot est asynchrone par rapport au retour de l'API → si le frontend
+          recharge le snapshot immédiatement, il peut ne pas encore exister
+        </li>
+        <li>Debugging plus difficile (flux indirect)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>📁 Étape 1 — Créer une classe événement (nouveau fichier)</h3>
+
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/events/AvisSauvegardeEvent.java
+    &nbsp;&nbsp;← nouveau fichier à créer dans le dossier "events"
+  </div>
+  <div class="code-block">
+<span class="add">package net.kachout.saeb.events;</span>
+<span class="add"></span>
+<span class="add">public class AvisSauvegardeEvent {</span>
+<span class="add">    private final Long canevasId;</span>
+<span class="add">    private final String structureCode;</span>
+<span class="add">    private final String structureLabel;</span>
+<span class="add">    private final String matricule;</span>
+<span class="add">    private final String observations;</span>
+<span class="add">    private final String statusAtSnapshot;</span>
+<span class="add"></span>
+<span class="add">    public AvisSauvegardeEvent(Long canevasId, String structureCode, String structureLabel,</span>
+<span class="add">                               String matricule, String observations, String statusAtSnapshot) {</span>
+<span class="add">        this.canevasId       = canevasId;</span>
+<span class="add">        this.structureCode   = structureCode;</span>
+<span class="add">        this.structureLabel  = structureLabel;</span>
+<span class="add">        this.matricule       = matricule;</span>
+<span class="add">        this.observations    = observations;</span>
+<span class="add">        this.statusAtSnapshot = statusAtSnapshot;</span>
+<span class="add">    }</span>
+<span class="add"></span>
+<span class="add">    // Getters</span>
+<span class="add">    public Long getCanevasId()         { return canevasId; }</span>
+<span class="add">    public String getStructureCode()   { return structureCode; }</span>
+<span class="add">    public String getStructureLabel()  { return structureLabel; }</span>
+<span class="add">    public String getMatricule()       { return matricule; }</span>
+<span class="add">    public String getObservations()    { return observations; }</span>
+<span class="add">    public String getStatusAtSnapshot(){ return statusAtSnapshot; }</span>
+<span class="add">}</span>
+  </div>
+
+  <h3>📁 Étape 2 — Publier l'événement dans AvisService.java</h3>
+
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/service/AvisService.java
+  </div>
+  <div class="code-block">
+<span class="rem">// 1. Ajouter ces imports en haut</span>
+<span class="add">import net.kachout.saeb.events.AvisSauvegardeEvent;</span>
+<span class="add">import org.springframework.context.ApplicationEventPublisher;</span>
+
+<span class="rem">// 2. Ajouter le champ dans la classe</span>
+<span class="add">    private final ApplicationEventPublisher eventPublisher;</span>
+
+<span class="rem">// 3. Ajouter le paramètre dans le constructeur</span>
+<span class="add">    public AvisService(AvisRepository avisRepository, ..., ApplicationEventPublisher eventPublisher) {</span>
+<span class="add">        ...  // les autres assignations existantes</span>
+<span class="add">        this.eventPublisher = eventPublisher;</span>
+<span class="add">    }</span>
+
+<span class="rem">// 4. Dans saveAvis(), remplacer l'appel à snapshotService.createSnapshot()</span>
+<span class="rem">// par une publication d'événement (vers les lignes 259-271) :</span>
+
+<span class="del">        try {</span>
+<span class="del">            var snap = snapshotService.createSnapshot(</span>
+<span class="del">                    dto.getNumCaneva(), structureCode, structureLabel,</span>
+<span class="del">                    matriculeLog, matriculeLog, observations, statusAtSnap,</span>
+<span class="del">                    avisJson);</span>
+<span class="del">            ...snapshotId = snap.getSnapshotId();</span>
+<span class="del">        } catch (Exception e) { ... }</span>
+<span class="add">        // Publier l'événement — le snapshot sera créé APRÈS le commit de T1</span>
+<span class="add">        eventPublisher.publishEvent(new AvisSauvegardeEvent(</span>
+<span class="add">                dto.getNumCaneva(), structureCode, structureLabel,</span>
+<span class="add">                matriculeLog, observations, statusAtSnap));</span>
+  </div>
+
+  <h3>📁 Étape 3 — Écouter l'événement dans CanevasSnapshotService.java</h3>
+
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java
+  </div>
+  <div class="code-block">
+<span class="rem">// Ajouter ces imports en haut</span>
+<span class="add">import net.kachout.saeb.events.AvisSauvegardeEvent;</span>
+<span class="add">import org.springframework.transaction.event.TransactionalEventListener;</span>
+<span class="add">import org.springframework.transaction.event.TransactionPhase;</span>
+
+<span class="rem">// Ajouter cette méthode dans la classe CanevasSnapshotService</span>
+<span class="add">    /**</span>
+<span class="add">     * Écoute l'événement AvisSauvegardeEvent et crée le snapshot</span>
+<span class="add">     * APRÈS que T1 (saveAvis) soit committé.</span>
+<span class="add">     * À ce moment, l'avis est déjà en BDD → buildAvisJson() le verra.</span>
+<span class="add">     */</span>
+<span class="add">    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)</span>
+<span class="add">    @Transactional(propagation = Propagation.REQUIRES_NEW)</span>
+<span class="add">    public void onAvisSauvegarde(AvisSauvegardeEvent event) {</span>
+<span class="add">        try {</span>
+<span class="add">            createSnapshot(</span>
+<span class="add">                    event.getCanevasId(),</span>
+<span class="add">                    event.getStructureCode(),</span>
+<span class="add">                    event.getStructureLabel(),</span>
+<span class="add">                    event.getMatricule(),</span>
+<span class="add">                    event.getMatricule(),</span>
+<span class="add">                    event.getObservations(),</span>
+<span class="add">                    event.getStatusAtSnapshot(),</span>
+<span class="add">                    null  // pas besoin de passer avisJson, buildAvisJson() relira la BDD</span>
+<span class="add">            );</span>
+<span class="add">        } catch (Exception e) {</span>
+<span class="add">            log.error("Échec snapshot après commit avis canevas={}",</span>
+<span class="add">                      event.getCanevasId(), e);</span>
+<span class="add">        }</span>
+<span class="add">    }</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  BONUS BUG                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header">
+    <span class="section-num bonus">Bonus</span>
+    <h2 style="margin:0">Nettoyer le code de débogage dans <code>buildAvisJson()</code>
+      <span class="badge badge-bonus">Code à nettoyer</span>
+    </h2>
+  </div>
+
+  <p>
+    Dans <code>CanevasSnapshotService.java</code> à la ligne 537, il y a du code de débogage
+    qui a été laissé par erreur. Ce n'est pas un bug qui fait planter l'application,
+    mais c'est une <strong>mauvaise pratique</strong> à corriger.
+  </p>
+
+  <div class="file-label">
+    <span class="icon">☕</span>
+    backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java
+    — lignes 535–538
+  </div>
+  <div class="code-block">
+<span class="ln">535</span><span class="normal">    private String buildAvisJson(Long canevasId) {</span>
+<span class="ln">536</span><span class="normal">        List&lt;Avis&gt; avisList = avisRepository.findAllByNumCaneva(canevasId);</span>
+<span class="ln">537</span><span class="del">        System system = null;                                        // ← variable inutile</span>
+<span class="ln">538</span><span class="del">        system.out.println("longueure de liste " + avisList.size()); // ← code de debug</span>
+<span class="ln">537</span><span class="add">        log.info("buildAvisJson: {} avis trouvés pour canevasId={}", avisList.size(), canevasId);</span>
+<span class="ln">539</span><span class="normal">        List&lt;Map&lt;String, Object&gt;&gt; result = avisList.stream().map(a -> {</span>
+  </div>
+
+  <div class="alerte">
+    <strong>Pourquoi utiliser <code>log.info</code> plutôt que <code>System.out.println</code> ?</strong>
+    Dans une application Spring Boot professionnelle, on utilise toujours le logger
+    (qui est déjà configuré dans la classe avec <code>@Slf4j</code>).
+    Cela permet de contrôler le niveau de log, de le rediriger vers des fichiers,
+    et de l'activer/désactiver facilement sans modifier le code.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  TABLEAU COMPARATIF                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>📊 Tableau comparatif des 3 solutions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Critère</th>
+        <th>Solution 1<br><small>REQUIRED</small></th>
+        <th>Solution 2<br><small>JSON pré-construit</small></th>
+        <th>Solution 3<br><small>EventListener</small></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Résout le bug</td>
+        <td class="check">✔ Oui</td>
+        <td class="check">✔ Oui</td>
+        <td class="check">✔ Oui</td>
+      </tr>
+      <tr>
+        <td>Simplicité (pour débutant)</td>
+        <td class="check">⭐⭐⭐ Très simple</td>
+        <td class="mid">⭐⭐ Intermédiaire</td>
+        <td class="cross">⭐ Complexe</td>
+      </tr>
+      <tr>
+        <td>Nb de fichiers à modifier</td>
+        <td class="check">1 fichier</td>
+        <td class="mid">2 fichiers</td>
+        <td class="cross">3 fichiers + 1 à créer</td>
+      </tr>
+      <tr>
+        <td>Isolation des transactions</td>
+        <td class="cross">❌ Perdue</td>
+        <td class="check">✔ Conservée</td>
+        <td class="check">✔ Parfaite</td>
+      </tr>
+      <tr>
+        <td>Avis sauvegardé si snapshot échoue</td>
+        <td class="cross">❌ Non (rollback total)</td>
+        <td class="check">✔ Oui</td>
+        <td class="check">✔ Oui (déjà committé)</td>
+      </tr>
+      <tr>
+        <td>Risque de régression</td>
+        <td class="mid">⚠️ Faible</td>
+        <td class="check">✅ Très faible</td>
+        <td class="mid">⚠️ Moyen (flux indirect)</td>
+      </tr>
+      <tr>
+        <td>Temps d'implémentation estimé</td>
+        <td class="check">5 minutes</td>
+        <td class="mid">30 minutes</td>
+        <td class="cross">2–3 heures</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  RECOMMANDATION FINALE                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="recommandation">
+  <h2>✅ Recommandation finale</h2>
+
+  <p style="margin-bottom:14px;">
+    En tant que <strong>développeur débutant sur ce projet</strong>,
+    voici l'approche conseillée :
+  </p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p>
+          <strong>Appliquer la Solution 1 maintenant</strong> (5 minutes) :
+          changer <code>@Transactional(propagation = Propagation.REQUIRES_NEW)</code>
+          en <code>@Transactional</code> dans
+          <code>CanevasSnapshotService.java</code> ligne 52.
+        </p>
+        <p>
+          C'est suffisant pour résoudre le bug. Le risque est acceptable :
+          si le snapshot échoue, Spring affiche un warning dans les logs
+          (le <code>try/catch</code> dans <code>AvisService</code> ligne 268 l'attrape déjà).
+        </p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p>
+          <strong>Nettoyer le code de debug</strong> (2 minutes) :
+          dans <code>CanevasSnapshotService.java</code> lignes 537–538,
+          remplacer les deux lignes par
+          <code>log.info("buildAvisJson: {} avis trouvés pour canevasId={}", avisList.size(), canevasId);</code>
+        </p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p>
+          <strong>Plus tard, si vous avez le temps</strong> :
+          migrer vers la Solution 2 qui offre une meilleure isolation
+          (l'avis est sauvegardé même si le snapshot échoue).
+          La Solution 3 est réservée à une refactorisation avancée.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br/>
+<div class="card" style="background:#f0f0f0; font-size:0.82rem; color:#555;">
+  <strong>Fichiers concernés (résumé) :</strong><br/><br/>
+  📂 <code>backend-saeb/src/main/java/net/kachout/saeb/service/CanevasSnapshotService.java</code><br/>
+  &nbsp;&nbsp;&nbsp;↳ Ligne 52 : changer la propagation (Solution 1)<br/>
+  &nbsp;&nbsp;&nbsp;↳ Lignes 537–538 : nettoyer le code de debug (Bonus)<br/>
+  &nbsp;&nbsp;&nbsp;↳ Ligne 112 : utiliser le paramètre avisJson si fourni (Solution 2)<br/><br/>
+  📂 <code>backend-saeb/src/main/java/net/kachout/saeb/service/AvisService.java</code><br/>
+  &nbsp;&nbsp;&nbsp;↳ Après ligne 80 : ajouter buildTousAvisJsonDansT1() (Solution 2)<br/>
+  &nbsp;&nbsp;&nbsp;↳ Ligne 262 : passer tousAvisJson à createSnapshot() (Solution 2)<br/>
+</div>
+
+</body>
+</html>
