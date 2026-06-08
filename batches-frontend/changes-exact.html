@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGCANVAS — Modifications Exactes</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16a34a;--green-light:#dcfce7;--red:#dc2626;--red-light:#fee2e2;
+  --blue:#2563eb;--blue-light:#dbeafe;--amber:#d97706;--amber-light:#fef3c7;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-500:#6b7280;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:var(--gray-800);line-height:1.6}
+
+/* NAV */
+.sidenav{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--gray-900);overflow-y:auto;padding:0 0 40px}
+.sidenav .brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidenav .brand h1{font-size:14px;font-weight:800;color:#4ade80;letter-spacing:.5px}
+.sidenav .brand p{font-size:11px;color:#6b7280;margin-top:2px}
+.sidenav .nav-section{padding:16px 18px 4px;font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.sidenav a{display:flex;align-items:center;gap:8px;padding:8px 18px;color:#9ca3af;text-decoration:none;font-size:12.5px;transition:all .15s}
+.sidenav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.sidenav a .num{margin-left:auto;background:#374151;color:#6b7280;font-size:10px;padding:1px 6px;border-radius:100px;font-weight:700}
+
+/* MAIN */
+.main{margin-left:260px;padding:36px 44px 80px;max-width:1200px}
+.page-title{font-size:28px;font-weight:800;color:var(--gray-900);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--gray-500);margin-bottom:48px}
+
+/* CHANGE BLOCK */
+.change{background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:32px;overflow:hidden}
+.change-header{padding:16px 22px;border-bottom:1px solid var(--gray-100);display:flex;align-items:flex-start;gap:14px}
+.change-num{width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.change-title{font-size:15px;font-weight:700;color:var(--gray-900)}
+.change-file{font-size:12px;color:var(--gray-500);font-family:monospace;margin-top:2px}
+.change-body{padding:22px}
+
+/* DIFF */
+.diff{border-radius:10px;overflow:hidden;font-size:12.5px;font-family:'Consolas','Cascadia Code',monospace;margin:12px 0;border:1px solid var(--gray-200)}
+.diff-label{padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;font-family:var(--font,sans-serif)}
+.diff-label.old{background:var(--red-light);color:var(--red)}
+.diff-label.new{background:var(--green-light);color:var(--green)}
+.diff-code{padding:14px 16px;overflow-x:auto;white-space:pre;line-height:1.7}
+.diff-code.old-code{background:#fff8f8;border-top:1px solid #fecaca}
+.diff-code.new-code{background:#f0fdf4;border-top:1px solid #bbf7d0}
+.diff-code .del{color:var(--red);background:#fee2e2;display:block;padding:0 4px;margin:0 -4px;border-radius:3px}
+.diff-code .add{color:#15803d;background:#dcfce7;display:block;padding:0 4px;margin:0 -4px;border-radius:3px}
+.diff-code .keep{color:#374151}
+.diff-code .cmt{color:#9ca3af}
+
+/* SECTION TITLE */
+.section-title{font-size:19px;font-weight:800;color:var(--gray-900);margin:56px 0 6px;padding-bottom:10px;border-bottom:3px solid #22c55e}
+.section-sub{font-size:13px;color:var(--gray-500);margin-bottom:22px}
+
+/* NOTES */
+.note{display:flex;gap:10px;padding:12px 16px;border-radius:8px;font-size:13px;margin:12px 0}
+.note-green{background:var(--green-light);border:1px solid #86efac;color:#15803d}
+.note-blue{background:var(--blue-light);border:1px solid #93c5fd;color:#1e40af}
+.note-amber{background:var(--amber-light);border:1px solid #fde68a;color:#92400e}
+.note .icon{font-size:16px;flex-shrink:0}
+
+/* RESULT PREVIEW */
+.preview-box{border:2px dashed var(--gray-200);border-radius:10px;padding:16px;margin:14px 0;background:var(--gray-50)}
+.preview-box .preview-label{font-size:11px;color:var(--gray-500);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+
+/* TOPBAR PREVIEW */
+.tb-after{background:#fff;border-bottom:1px solid #e5e7eb;height:52px;display:flex;align-items:center;gap:12px;padding:0 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:8px}
+.tb-brand{font-weight:800;font-size:15px;color:#15803d;display:flex;align-items:center;gap:8px}
+.tb-brand-icon{width:30px;height:30px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:12px}
+.tb-sep{width:1px;height:24px;background:#e5e7eb}
+.tb-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:100px;font-size:11px;color:#6b7280}
+.tb-pill strong{color:#1f2937}
+.tb-spacer{flex:1}
+.tb-date{font-size:11px;color:#9ca3af;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 9px;border-radius:100px}
+.tb-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#16a34a);color:#fff;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center}
+.tb-logout{padding:5px 11px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}
+
+/* SIDEBAR PREVIEW */
+.sb-after{background:#111827;padding:10px 10px;border-radius:8px;width:200px}
+.sb-group{padding:12px 8px 3px;font-size:9px;color:#4b5563;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.sb-item{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:6px;cursor:pointer;margin-bottom:1px;color:#9ca3af;font-size:11px}
+.sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.sb-item.active{background:linear-gradient(135deg,#15803d,#16a34a);color:#fff}
+.sb-icon{width:24px;height:24px;border-radius:5px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.sb-item.active .sb-icon{background:rgba(255,255,255,.15)}
+.sb-sub{padding-left:38px}
+.sb-sub-item{padding:5px 6px;color:#6b7280;font-size:10.5px;cursor:pointer;border-radius:5px;display:flex;align-items:center;gap:5px}
+.sb-sub-item::before{content:'';width:3px;height:3px;border-radius:50%;background:#4b5563;flex-shrink:0}
+.sb-sub-item:hover{color:#4ade80}
+.sb-sub-item.active-s{color:#4ade80}
+.sb-sub-item.active-s::before{background:#4ade80}
+
+/* BADGE DEMO */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700}
+.bg-green{background:#dcfce7;color:#15803d}
+.bg-amber{background:#fef3c7;color:#d97706}
+.bg-red{background:#fee2e2;color:#dc2626}
+.bg-blue{background:#dbeafe;color:#2563eb}
+.bg-gray{background:#f3f4f6;color:#6b7280}
+.flex{display:flex}.gap-2{gap:8px}.flex-wrap{flex-wrap:wrap}.mt-2{margin-top:8px}
+
+@media(max-width:800px){.sidenav{display:none}.main{margin-left:0;padding:20px}}
+</style>
+</head>
+<body>
+
+<nav class="sidenav">
+  <div class="brand"><h1>PGCANVAS — Modifications</h1><p>Fichiers exacts à modifier</p></div>
+  <div class="nav-section">CSS / Thème</div>
+  <a href="#s1">1. theme.css — Variables globales <span class="num">5</span></a>
+  <a href="#s2">2. _variables.scss <span class="num">2</span></a>
+  <a href="#s3">3. _topbar.scss <span class="num">3</span></a>
+  <a href="#s4">4. _menu.scss — Sidebar <span class="num">4</span></a>
+  <a href="#s5">5. _content.scss <span class="num">1</span></a>
+  <a href="#s6">6. _utils.scss — Card <span class="num">2</span></a>
+  <a href="#s7">7. styles.css — Global <span class="num">3</span></a>
+  <div class="nav-section">HTML / Angular</div>
+  <a href="#s8">8. app.topbar.component.html <span class="num">↻</span></a>
+  <a href="#s9">9. app.menuitem.component.html <span class="num">2</span></a>
+  <a href="#s10">10. app.footer.component.html <span class="num">1</span></a>
+</nav>
+
+<main class="main">
+  <h1 class="page-title">Modifications Exactes — PGCANVAS</h1>
+  <p class="page-sub">Pour chaque amélioration : chemin du fichier, lignes concernées, ancien code et nouveau code.</p>
+
+  <!-- ========== SECTION CSS ========== -->
+  <h2 class="section-title" id="s1">1 — theme.css · Variables Globales</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/assets/layout/styles/theme/saga-green/theme.css</code> · Lignes 1–51</p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">1</div>
+      <div>
+        <div class="change-title">Couleur primaire plus moderne + border-radius + focus ring</div>
+        <div class="change-file">theme.css · lignes 14, 39, 49</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT — lignes 14, 39, 47, 49 (theme.css)</div>
+        <div class="diff-code old-code"><span class="keep">  --text-color: #495057;</span>
+<span class="del">  --primary-color: #4CAF50;</span>
+<span class="keep">  --primary-color-text: #ffffff;</span>
+<span class="keep">  ...</span>
+<span class="del">  --border-radius: 3px;</span>
+<span class="keep">  --surface-ground: #f8f9fa;</span>
+<span class="keep">  ...</span>
+<span class="del">  --highlight-bg: #E8F5E9;</span>
+<span class="del">  --focus-ring: 0 0 0 0.2rem #b7e0b8;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS — mêmes lignes (theme.css)</div>
+        <div class="diff-code new-code"><span class="keep">  --text-color: #374151;</span>
+<span class="add">  --primary-color: #22c55e;</span>
+<span class="keep">  --primary-color-text: #ffffff;</span>
+<span class="keep">  ...</span>
+<span class="add">  --border-radius: 8px;</span>
+<span class="keep">  --surface-ground: #f1f5f9;</span>
+<span class="keep">  ...</span>
+<span class="add">  --highlight-bg: #f0fdf4;</span>
+<span class="add">  --focus-ring: 0 0 0 0.2rem rgba(34,197,94,0.25);</span></div>
+      </div>
+      <div class="note note-green"><span class="icon">💡</span><span>Ces 5 lignes changent l'apparence de <strong>tous</strong> les composants PrimeNG en même temps : boutons, inputs, tabs, progress bars, calendriers…</span></div>
+    </div>
+  </div>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">2</div>
+      <div>
+        <div class="change-title">Ajouter les variables de shadow et de card dans :root</div>
+        <div class="change-file">theme.css · après la ligne 49 (dans le premier bloc :root)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label new">✓ AJOUTER ces lignes après --focus-ring (ligne 49)</div>
+        <div class="diff-code new-code"><span class="add">  --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --surface-card-border: 1px solid #e5e7eb;
+  --topbar-height: 5rem;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== VARIABLES SCSS ========== -->
+  <h2 class="section-title" id="s2">2 — _variables.scss</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/assets/layout/styles/layout/_variables.scss</code> · 3 lignes au total</p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">3</div>
+      <div>
+        <div class="change-title">Taille de police de base + border-radius des layouts</div>
+        <div class="change-file">_variables.scss · lignes 2–3</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT (_variables.scss — fichier complet)</div>
+        <div class="diff-code old-code"><span class="del">$scale:14px;</span>
+<span class="del">$borderRadius:12px;</span>
+<span class="keep">$transitionDuration:.2s;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="add">$scale:14px;</span>
+<span class="add">$borderRadius:10px;</span>
+<span class="keep">$transitionDuration:.18s;</span></div>
+      </div>
+      <div class="note note-blue"><span class="icon">ℹ</span><span><code>$borderRadius</code> s'applique à la sidebar, aux overlays et aux sous-menus via les fichiers SCSS qui utilisent <code>$borderRadius</code>. On le réduit de 12 à 10px pour un look plus compact et professionnel.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== TOPBAR SCSS ========== -->
+  <h2 class="section-title" id="s3">3 — _topbar.scss</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/assets/layout/styles/layout/_topbar.scss</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">4</div>
+      <div>
+        <div class="change-title">Topbar : ombre plus marquée + hauteur réduite</div>
+        <div class="change-file">_topbar.scss · lignes 1–13 (bloc .layout-topbar)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT (lignes 1–13)</div>
+        <div class="diff-code old-code"><span class="keep">.layout-topbar {
+    position: fixed;</span>
+<span class="del">    height: 5rem;</span>
+<span class="keep">    z-index: 997;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0 2rem;
+    background-color: var(--surface-card);
+    transition: left $transitionDuration;
+    display: flex;
+    align-items: center;</span>
+<span class="del">    box-shadow: 0px 3px 5px rgba(0,0,0,.02), 0px 0px 2px rgba(0,0,0,.05), 0px 1px 4px rgba(0,0,0,.08);</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="keep">.layout-topbar {
+    position: fixed;</span>
+<span class="add">    height: 4.5rem;</span>
+<span class="keep">    z-index: 997;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0 2rem;
+    background-color: var(--surface-card);
+    transition: left $transitionDuration;
+    display: flex;
+    align-items: center;</span>
+<span class="add">    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border-bottom: 1px solid var(--surface-border);</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">5</div>
+      <div>
+        <div class="change-title">Logo topbar : taille et espacement</div>
+        <div class="change-file">_topbar.scss · lignes 15–32 (bloc .layout-topbar-logo)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT (ligne 22)</div>
+        <div class="diff-code old-code"><span class="keep">    .layout-topbar-logo {
+        display: flex;
+        align-items: center;
+        color: var(--surface-900);
+        font-size: 1.5rem;
+        font-weight: 500;</span>
+<span class="del">        width: 300px;</span>
+<span class="keep">        border-radius: 12px;
+        img {</span>
+<span class="del">            height: 2.5rem;</span>
+<span class="keep">            margin-right: .5rem;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="keep">    .layout-topbar-logo {
+        display: flex;
+        align-items: center;
+        color: var(--surface-900);
+        font-size: 1.5rem;
+        font-weight: 500;</span>
+<span class="add">        width: 260px;</span>
+<span class="keep">        border-radius: 8px;
+        img {</span>
+<span class="add">            height: 2rem;</span>
+<span class="keep">            margin-right: .5rem;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MENU SCSS ========== -->
+  <h2 class="section-title" id="s4">4 — _menu.scss · Sidebar</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/assets/layout/styles/layout/_menu.scss</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">6</div>
+      <div>
+        <div class="change-title">Sidebar : fond sombre + padding + largeur + ombre</div>
+        <div class="change-file">_menu.scss · lignes 1–16 (bloc .layout-sidebar)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT (lignes 1–16)</div>
+        <div class="diff-code old-code"><span class="keep">.layout-sidebar {
+    position: fixed;</span>
+<span class="del">    width: 300px;</span>
+<span class="del">    height: calc(100vh - 9rem);</span>
+<span class="keep">    z-index: 999;
+    overflow-y: auto;
+    user-select: none;</span>
+<span class="del">    top: 7rem;</span>
+<span class="del">    left: 2rem;</span>
+<span class="keep">    transition: transform $transitionDuration, left $transitionDuration;</span>
+<span class="del">    background-color: var(--surface-overlay);</span>
+<span class="del">    // background-image: linear-gradient(to right, var(--green-50), var(--green-400));</span>
+<span class="keep">    border-radius: $borderRadius;</span>
+<span class="del">    padding: 0.5rem 1.5rem;</span>
+<span class="del">    box-shadow: 0px 3px 5px rgba(0, 0, 0, .02), 0px 0px 2px rgba(0, 0, 0, .05), 0px 1px 4px rgba(0, 0, 0, .08);</span>
+<span class="keep">}</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="keep">.layout-sidebar {
+    position: fixed;</span>
+<span class="add">    width: 270px;</span>
+<span class="add">    height: calc(100vh - 8rem);</span>
+<span class="keep">    z-index: 999;
+    overflow-y: auto;
+    user-select: none;</span>
+<span class="add">    top: 6rem;</span>
+<span class="add">    left: 1.5rem;</span>
+<span class="keep">    transition: transform $transitionDuration, left $transitionDuration;</span>
+<span class="add">    background-color: #1a2332;</span>
+<span class="keep">    border-radius: $borderRadius;</span>
+<span class="add">    padding: 0.75rem 0.75rem;</span>
+<span class="add">    box-shadow: 0 8px 24px rgba(0,0,0,0.18);</span>
+<span class="keep">}</span></div>
+      </div>
+      <div class="note note-amber"><span class="icon">⚠</span><span>Si vous préférez garder le fond blanc (thème clair), utilisez <code>background-color: var(--surface-overlay)</code> et ajustez uniquement le padding et la box-shadow.</span></div>
+
+      <div class="preview-box">
+        <div class="preview-label">Résultat visuel de la sidebar</div>
+        <div class="sb-after">
+          <div class="sb-group">Principal</div>
+          <div class="sb-item"><div class="sb-icon">🏠</div> Accueil</div>
+          <div class="sb-item active"><div class="sb-icon">📋</div> Gestion Canevas</div>
+          <div class="sb-sub">
+            <div class="sb-sub-item active-s">PEC Canevas Agricole</div>
+            <div class="sb-sub-item">Validation Canevas</div>
+            <div class="sb-sub-item">PEC Avis</div>
+          </div>
+          <div class="sb-item"><div class="sb-icon">🔀</div> Affectation</div>
+          <div class="sb-group">Traitements</div>
+          <div class="sb-item"><div class="sb-icon">↩</div> Refoulement</div>
+          <div class="sb-item"><div class="sb-icon">🔄</div> Réexamen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">7</div>
+      <div>
+        <div class="change-title">Items du menu : couleur texte, hover et active sur fond sombre</div>
+        <div class="change-file">_menu.scss · lignes 23–30 (bloc .layout-root-menuitem) et lignes 37–94 (bloc ul a)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT — label de groupe (lignes 24–29)</div>
+        <div class="diff-code old-code"><span class="keep">    .layout-root-menuitem {
+        >.layout-menuitem-root-text {
+            font-size: .857rem;
+            text-transform: uppercase;
+            font-weight: 700;</span>
+<span class="del">            color: var(--surface-900);</span>
+<span class="keep">            margin: .75rem 0;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS — label de groupe visible sur fond sombre</div>
+        <div class="diff-code new-code"><span class="keep">    .layout-root-menuitem {
+        >.layout-menuitem-root-text {
+            font-size: .75rem;
+            text-transform: uppercase;
+            font-weight: 700;</span>
+<span class="add">            color: #4b5563;
+            letter-spacing: 0.06em;
+            padding: 0.5rem 0.5rem 0.25rem;</span>
+<span class="keep">            margin: .75rem 0;</span></div>
+      </div>
+
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT — liens du menu (lignes 60–93)</div>
+        <div class="diff-code old-code"><span class="keep">        a {
+            display: flex;
+            align-items: center;
+            position: relative;
+            outline: 0 none;</span>
+<span class="del">            color: var(--text-color);</span>
+<span class="keep">            cursor: pointer;</span>
+<span class="del">            padding: .75rem 1rem;</span>
+<span class="keep">            border-radius: $borderRadius;
+            transition: background-color $transitionDuration, box-shadow $transitionDuration;</span>
+<span class="keep">            &.active-route {
+                font-weight: 700;</span>
+<span class="del">                color: var(--primary-color);</span>
+<span class="keep">            }
+            &:hover {</span>
+<span class="del">                background-color: var(--surface-hover);</span>
+<span class="keep">            }</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS — liens adaptés au fond sombre</div>
+        <div class="diff-code new-code"><span class="keep">        a {
+            display: flex;
+            align-items: center;
+            position: relative;
+            outline: 0 none;</span>
+<span class="add">            color: #9ca3af;</span>
+<span class="keep">            cursor: pointer;</span>
+<span class="add">            padding: .6rem .75rem;
+            margin-bottom: 2px;</span>
+<span class="keep">            border-radius: 8px;
+            transition: background-color $transitionDuration, box-shadow $transitionDuration;</span>
+<span class="keep">            &.active-route {
+                font-weight: 700;</span>
+<span class="add">                color: #ffffff;
+                background: linear-gradient(135deg, #15803d, #16a34a);
+                box-shadow: 0 2px 8px rgba(22,163,74,0.3);</span>
+<span class="keep">            }
+            &:hover {</span>
+<span class="add">                background-color: rgba(255,255,255,0.07);
+                color: #ffffff;</span>
+<span class="keep">            }</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">8</div>
+      <div>
+        <div class="change-title">Icônes du menu : wrapper avec fond</div>
+        <div class="change-file">_menu.scss · ajouter après la ligne 94 (après le bloc ul a)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label new">✓ AJOUTER à la fin du bloc .layout-menu ul a</div>
+        <div class="diff-code new-code"><span class="add">            .layout-menuitem-icon {
+                width: 26px;
+                height: 26px;
+                border-radius: 6px;
+                background: rgba(255,255,255,0.07);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: .6rem;
+                font-size: .9rem;
+                flex-shrink: 0;
+            }
+            &.active-route .layout-menuitem-icon {
+                background: rgba(255,255,255,0.18);
+            }</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CONTENT SCSS ========== -->
+  <h2 class="section-title" id="s5">5 — _content.scss · Zone de Contenu</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/assets/layout/styles/layout/_content.scss</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">9</div>
+      <div>
+        <div class="change-title">Ajuster le padding-top du contenu principal (topbar plus courte)</div>
+        <div class="change-file">_content.scss · ligne 7</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT (ligne 7)</div>
+        <div class="diff-code old-code"><span class="del">    padding: 7rem 2rem 2rem 4rem;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="add">    padding: 6.5rem 2rem 2rem 2rem;</span></div>
+      </div>
+      <div class="note note-blue"><span class="icon">ℹ</span><span>On réduit le <code>padding-top</code> de <code>7rem</code> à <code>6.5rem</code> car la topbar passe de <code>5rem</code> à <code>4.5rem</code>. On réduit aussi <code>padding-left</code> de <code>4rem</code> à <code>2rem</code> pour gagner de l'espace horizontal.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== UTILS SCSS ========== -->
+  <h2 class="section-title" id="s6">6 — _utils.scss · Cartes</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/assets/layout/styles/layout/_utils.scss</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">10</div>
+      <div>
+        <div class="change-title">Cartes (.card) : ombre et bordure plus raffinées</div>
+        <div class="change-file">_utils.scss · lignes 1–12 (bloc .card)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT</div>
+        <div class="diff-code old-code"><span class="keep">.card {
+    background: var(--surface-card);</span>
+<span class="del">    border: 1px solid var(--surface-border);</span>
+<span class="del">    padding: 2rem;</span>
+<span class="del">    margin-bottom: 2rem;</span>
+<span class="del">    box-shadow: var(--card-shadow);</span>
+<span class="keep">    border-radius: $borderRadius;
+}</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="keep">.card {
+    background: var(--surface-card);</span>
+<span class="add">    border: 1px solid rgba(0,0,0,0.06);</span>
+<span class="add">    padding: 1.5rem;</span>
+<span class="add">    margin-bottom: 1.5rem;</span>
+<span class="add">    box-shadow: 0 2px 12px rgba(0,0,0,0.07);</span>
+<span class="keep">    border-radius: $borderRadius;
+}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STYLES.CSS ========== -->
+  <h2 class="section-title" id="s7">7 — styles.css · Overrides Globaux PrimeNG</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/styles.css</code> — Ajouter à la fin du fichier</p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">11</div>
+      <div>
+        <div class="change-title">Ajouter des overrides globaux PrimeNG à la fin de styles.css</div>
+        <div class="change-file">styles.css · après la ligne 38 (fin du fichier)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT — fin du fichier (lignes 23–38)</div>
+        <div class="diff-code old-code"><span class="keep">/* credit-form.component.css */
+.credit-container {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+.item-container {
+  border: 1px solid #eee;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 3px;
+}</span>
+<span class="cmt">/* fin du fichier */</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS — ajouter ces blocs après la ligne 38</div>
+        <div class="diff-code new-code"><span class="keep">/* credit-form.component.css */
+.credit-container {
+  border: 1px solid #e5e7eb;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.item-container {
+  border: 1px solid #f3f4f6;
+  padding: 1rem;
+  margin: 8px 0;
+  border-radius: 8px;
+  background: #fafafa;
+}</span>
+
+<span class="add">/* ============ OVERRIDES PRIMENG GLOBAUX ============ */
+
+/* p-table — header arrondi et hover vert */
+.p-datatable .p-datatable-thead > tr > th {
+  background: #f9fafb !important;
+  color: #6b7280 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700 !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: #f0fdf4 !important;
+}
+
+/* p-button — coins arrondis et ombre */
+.p-button {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: transform 0.15s, box-shadow 0.15s !important;
+}
+.p-button:not(:disabled):hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(34,197,94,0.25) !important;
+}
+
+/* p-inputtext — focus ring vert */
+.p-inputtext:focus {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.15) !important;
+}
+
+/* p-dropdown — focus ring */
+.p-dropdown:not(.p-disabled).p-focus {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.15) !important;
+}
+
+/* p-card — ombre uniforme */
+.p-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+/* p-tag — statuts */
+.p-tag.p-tag-success  { background: #dcfce7 !important; color: #15803d !important; }
+.p-tag.p-tag-warning  { background: #fef3c7 !important; color: #d97706 !important; }
+.p-tag.p-tag-danger   { background: #fee2e2 !important; color: #dc2626 !important; }
+.p-tag.p-tag-info     { background: #dbeafe !important; color: #2563eb !important; }
+
+/* Toast — décalage topbar */
+.p-toast.p-toast-top-right,
+.p-toast.p-toast-top-center { top: 80px !important; }
+
+/* p-dialog — coins arrondis */
+.p-dialog { border-radius: 16px !important; overflow: hidden; }
+.p-dialog .p-dialog-header { padding: 1.25rem 1.5rem !important; }
+.p-dialog .p-dialog-content { padding: 0 1.5rem 1.5rem !important; }
+
+/* p-steps — style amélioré */
+.p-steps .p-steps-item .p-menuitem-link .p-steps-number {
+  border-radius: 50% !important;
+  font-weight: 700 !important;
+}
+.p-steps .p-steps-item.p-highlight .p-steps-number {
+  background: #22c55e !important;
+  border-color: #22c55e !important;
+  color: #fff !important;
+}
+
+/* Scrollbar fine */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }</span></div>
+      </div>
+      <div class="note note-green"><span class="icon">💡</span><span>Ces overrides utilisent <code>!important</code> pour surcharger les styles encapsulés de PrimeNG sans modifier les fichiers de la bibliothèque. C'est l'approche recommandée pour les customisations globales PrimeNG dans Angular.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== TOPBAR HTML ========== -->
+  <h2 class="section-title" id="s8">8 — app.topbar.component.html · Structure</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/app/_components/layout/app.topbar.component.html</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">12</div>
+      <div>
+        <div class="change-title">Remplacer le contenu du p-toolbar par une disposition plus claire</div>
+        <div class="change-file">app.topbar.component.html — remplacement complet du fichier (65 lignes)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT — fichier complet (65 lignes)</div>
+        <div class="diff-code old-code"><span class="keep">&lt;div class="layout-topbar"&gt;
+    &lt;a class="col-12 md:col-4 layout-topbar-logo" routerLink=""&gt;
+        &lt;img src="assets/layout/images/BNAF.png" alt="logo BNA"&gt;
+        &lt;span&gt;&lt;/span&gt;
+    &lt;/a&gt;
+    &lt;button #menubutton class="p-link layout-topbar-button" (click)="layoutService.onMenuToggle()"&gt;
+        &lt;i class="pi pi-bars"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+    &lt;div #topbarmenu class="layout-topbar-menu" ...&gt;
+        &lt;p-toolbar styleClass="layout-topbar-menu-button"</span>
+<span class="del">            [style]="{ 'border-radius': '3rem', 'background-image': 'linear-gradient(to right, var(--green-50), var(--green-400))' }"&gt;</span>
+<span class="keep">            &lt;ng-template pTemplate="start"&gt;
+                &lt;div class="flex flex-wrap align-items-left gap-3"&gt;
+                    &lt;button pButton ... class="p-button-raised p-button-rounded"&gt;
+                        &lt;i class="pi pi-user"&gt;
+                            {{unifiedAuthService.getUsername()}}
+                            {{unifiedAuthService.getPoste()}}
+                        &lt;/i&gt;
+                    &lt;/button&gt;
+                    &lt;button pButton ... class="p-button-raised p-button-rounded"&gt;
+                        &lt;i class="pi pi-building"&gt;
+                            {{unifiedAuthService.getCodeStructure()}}
+                            {{unifiedAuthService.getLibelleStructure()}}
+                        &lt;/i&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/ng-template&gt;
+            &lt;ng-template pTemplate="center"&gt;
+                ...dates...
+            &lt;/ng-template&gt;
+            &lt;ng-template pTemplate="end"&gt;
+                &lt;button pButton ... class="p-button-raised p-button-rounded p-button-danger"
+                    (click)="onLogout()"&gt;
+                    &lt;i class="pi pi-power-off"&gt;&lt;/i&gt;
+                &lt;/button&gt;
+            &lt;/ng-template&gt;
+        &lt;/p-toolbar&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS — nouveau fichier complet</div>
+        <div class="diff-code new-code"><span class="add">&lt;div class="layout-topbar"&gt;
+
+    &lt;!-- Bouton hamburger --&gt;
+    &lt;button #menubutton class="p-link layout-topbar-button" (click)="layoutService.onMenuToggle()"&gt;
+        &lt;i class="pi pi-bars"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+
+    &lt;!-- Logo --&gt;
+    &lt;a class="layout-topbar-logo" routerLink=""&gt;
+        &lt;img src="assets/layout/images/BNAF.png" alt="logo BNA"&gt;
+    &lt;/a&gt;
+
+    &lt;!-- Séparateur --&gt;
+    &lt;div class="topbar-separator"&gt;&lt;/div&gt;
+
+    &lt;!-- Contexte agence --&gt;
+    &lt;div class="topbar-context-pill"&gt;
+        &lt;i class="pi pi-building"&gt;&lt;/i&gt;
+        &lt;span&gt;
+            &lt;strong&gt;{{unifiedAuthService.getLibelleStructure()}}&lt;/strong&gt;
+            &amp;nbsp;· {{unifiedAuthService.getCodeStructure()}}
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Spacer --&gt;
+    &lt;div class="flex-1"&gt;&lt;/div&gt;
+
+    &lt;!-- Date --&gt;
+    &lt;div class="topbar-date-chip"&gt;
+        &lt;i class="pi pi-calendar"&gt;&lt;/i&gt;
+        {{unifiedAuthService.getDateJournee()}}
+    &lt;/div&gt;
+
+    &lt;!-- Infos utilisateur --&gt;
+    &lt;div class="topbar-user-info"&gt;
+        &lt;span class="topbar-user-name"&gt;{{unifiedAuthService.getUsername()}}&lt;/span&gt;
+        &lt;span class="topbar-user-post"&gt;{{unifiedAuthService.getPoste()}}&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Avatar initiales --&gt;
+    &lt;div class="topbar-avatar"&gt;
+        {{unifiedAuthService.getUsername() | slice:0:2 | uppercase}}
+    &lt;/div&gt;
+
+    &lt;!-- Déconnexion --&gt;
+    &lt;button class="topbar-logout-btn" (click)="onLogout()" pTooltip="Déconnexion" tooltipPosition="bottom"&gt;
+        &lt;i class="pi pi-power-off"&gt;&lt;/i&gt;
+        &lt;span&gt;Quitter&lt;/span&gt;
+    &lt;/button&gt;
+
+&lt;/div&gt;</span></div>
+      </div>
+
+      <div class="note note-amber"><span class="icon">⚠</span><span>Après ce changement HTML, ajouter les styles CSS correspondants dans <code>_topbar.scss</code> (voir bloc ci-dessous).</span></div>
+
+      <div class="diff">
+        <div class="diff-label new">✓ AJOUTER à la fin de _topbar.scss (nouveaux éléments)</div>
+        <div class="diff-code new-code"><span class="add">/* Éléments topbar additionnels */
+.topbar-separator {
+    width: 1px;
+    height: 28px;
+    background: var(--surface-border);
+    margin: 0 0.75rem;
+}
+
+.topbar-context-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--surface-b);
+    border: 1px solid var(--surface-border);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    color: var(--text-color-secondary);
+}
+.topbar-context-pill strong {
+    color: var(--surface-900);
+}
+.topbar-context-pill i {
+    font-size: 0.75rem;
+}
+
+.flex-1 { flex: 1; }
+
+.topbar-date-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: var(--text-color-secondary);
+    background: var(--surface-b);
+    border: 1px solid var(--surface-border);
+    padding: 4px 10px;
+    border-radius: 100px;
+    margin-right: 0.75rem;
+}
+.topbar-date-chip i { font-size: 0.75rem; }
+
+.topbar-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 0.5rem;
+}
+.topbar-user-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--surface-900);
+    line-height: 1.2;
+}
+.topbar-user-post {
+    font-size: 0.72rem;
+    color: var(--text-color-secondary);
+}
+
+.topbar-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-400), var(--green-700));
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.topbar-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--font-family);
+    transition: background 0.15s, color 0.15s;
+}
+.topbar-logout-btn:hover {
+    background: #dc2626;
+    color: #fff;
+}
+.topbar-logout-btn i { font-size: 0.85rem; }</span></div>
+      </div>
+
+      <div class="preview-box">
+        <div class="preview-label">Résultat visuel du topbar</div>
+        <div class="tb-after">
+          <div class="tb-brand"><div class="tb-brand-icon">B</div>BNA</div>
+          <div class="tb-sep"></div>
+          <div class="tb-pill"><span>🏢</span><strong>AG Tunis Centre</strong> · 001</div>
+          <div class="tb-spacer"></div>
+          <div class="tb-date">📅 08/06/2026</div>
+          <div style="font-size:11px;text-align:right;line-height:1.3;margin-right:6px"><strong style="display:block;color:#1f2937">Ahmed Ben Ali</strong><span style="color:#9ca3af">CCA</span></div>
+          <div class="tb-avatar">AB</div>
+          <button class="tb-logout">⏻ Quitter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MENUITEM HTML ========== -->
+  <h2 class="section-title" id="s9">9 — app.menuitem.component.html · Icônes avec wrapper</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/app/_components/layout/app.menuitem.component.html</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">13</div>
+      <div>
+        <div class="change-title">Entourer l'icône dans un div pour lui donner un fond carré</div>
+        <div class="change-file">app.menuitem.component.html · lignes 4–7 et 9–12 (les deux balises &lt;a&gt;)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT — ligne 5 et ligne 10 (icône directe)</div>
+        <div class="diff-code old-code"><span class="keep">    &lt;a *ngIf="(!item.routerLink || item.items) ..." ...&gt;
+</span><span class="del">        &lt;i [ngClass]="item.icon" class="layout-menuitem-icon"&gt;&lt;/i&gt;</span><span class="keep">
+        &lt;span class="layout-menuitem-text"&gt;{{item.label}}&lt;/span&gt;
+        &lt;i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"&gt;&lt;/i&gt;
+    &lt;/a&gt;
+    &lt;a *ngIf="(item.routerLink && !item.items) ..." ...&gt;
+</span><span class="del">        &lt;i [ngClass]="item.icon" class="layout-menuitem-icon"&gt;&lt;/i&gt;</span><span class="keep">
+        &lt;span class="layout-menuitem-text"&gt;{{item.label}}&lt;/span&gt;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS — icône dans un wrapper .menu-icon-wrap</div>
+        <div class="diff-code new-code"><span class="keep">    &lt;a *ngIf="(!item.routerLink || item.items) ..." ...&gt;
+</span><span class="add">        &lt;span class="menu-icon-wrap"&gt;
+            &lt;i [ngClass]="item.icon" class="layout-menuitem-icon"&gt;&lt;/i&gt;
+        &lt;/span&gt;</span><span class="keep">
+        &lt;span class="layout-menuitem-text"&gt;{{item.label}}&lt;/span&gt;
+        &lt;i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"&gt;&lt;/i&gt;
+    &lt;/a&gt;
+    &lt;a *ngIf="(item.routerLink && !item.items) ..." ...&gt;
+</span><span class="add">        &lt;span class="menu-icon-wrap"&gt;
+            &lt;i [ngClass]="item.icon" class="layout-menuitem-icon"&gt;&lt;/i&gt;
+        &lt;/span&gt;</span><span class="keep">
+        &lt;span class="layout-menuitem-text"&gt;{{item.label}}&lt;/span&gt;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ Style pour .menu-icon-wrap — ajouter dans _menu.scss</div>
+        <div class="diff-code new-code"><span class="add">.menu-icon-wrap {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.07);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+a.active-route .menu-icon-wrap {
+    background: rgba(255,255,255,0.2);
+}
+a:hover .menu-icon-wrap {
+    background: rgba(255,255,255,0.12);
+}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER HTML ========== -->
+  <h2 class="section-title" id="s10">10 — app.footer.component.html</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/app/_components/layout/app.footer.component.html</code></p>
+
+  <div class="change">
+    <div class="change-header">
+      <div class="change-num">14</div>
+      <div>
+        <div class="change-title">Footer : version + année + style plus sobre</div>
+        <div class="change-file">app.footer.component.html — fichier complet (5 lignes)</div>
+      </div>
+    </div>
+    <div class="change-body">
+      <div class="diff">
+        <div class="diff-label old">✗ AVANT</div>
+        <div class="diff-code old-code"><span class="del">&lt;div class="layout-footer"&gt;
+    &lt;img src="assets/demo/images/login/logo-BNA.png" alt="Logo" height="20" class="mr-2" /&gt;
+    by
+    &lt;span class="font-medium ml-2"&gt;BNA BANK&lt;/span&gt;
+&lt;/div&gt;</span></div>
+      </div>
+      <div class="diff">
+        <div class="diff-label new">✓ APRÈS</div>
+        <div class="diff-code new-code"><span class="add">&lt;div class="layout-footer"&gt;
+    &lt;img src="assets/demo/images/login/logo-BNA.png" alt="Logo" height="18" class="mr-2" /&gt;
+    &lt;span class="font-medium"&gt;BNA BANK&lt;/span&gt;
+    &lt;span style="margin:0 8px;color:var(--surface-d)"&gt;·&lt;/span&gt;
+    &lt;span style="font-size:0.75rem;color:var(--text-color-secondary)"&gt;PGCANVAS v1.0 — © 2026&lt;/span&gt;
+&lt;/div&gt;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== RÉSUMÉ ========== -->
+  <h2 class="section-title">Récapitulatif — Ordre d'application</h2>
+  <p class="section-sub">Appliquer dans cet ordre pour éviter les conflits visuels.</p>
+
+  <div style="background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#f9fafb;border-bottom:1px solid #f3f4f6">
+          <th style="padding:12px 18px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">#</th>
+          <th style="padding:12px 18px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Fichier</th>
+          <th style="padding:12px 18px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Action</th>
+          <th style="padding:12px 18px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Impact</th>
+          <th style="padding:12px 18px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Durée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">1</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">theme.css</td><td style="padding:12px 18px">5 variables modifiées</td><td style="padding:12px 18px"><span class="badge bg-green">Très élevé</span></td><td style="padding:12px 18px;color:#6b7280">5 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">2</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">_variables.scss</td><td style="padding:12px 18px">scale + borderRadius</td><td style="padding:12px 18px"><span class="badge bg-amber">Moyen</span></td><td style="padding:12px 18px;color:#6b7280">2 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">3</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">styles.css</td><td style="padding:12px 18px">Overrides PrimeNG globaux</td><td style="padding:12px 18px"><span class="badge bg-green">Très élevé</span></td><td style="padding:12px 18px;color:#6b7280">5 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">4</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">_menu.scss</td><td style="padding:12px 18px">Sidebar fond sombre + items</td><td style="padding:12px 18px"><span class="badge bg-green">Élevé</span></td><td style="padding:12px 18px;color:#6b7280">10 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">5</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">_topbar.scss</td><td style="padding:12px 18px">Ombre + nouveaux éléments CSS</td><td style="padding:12px 18px"><span class="badge bg-amber">Moyen</span></td><td style="padding:12px 18px;color:#6b7280">10 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">6</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">app.topbar.component.html</td><td style="padding:12px 18px">Refactorisation HTML topbar</td><td style="padding:12px 18px"><span class="badge bg-green">Élevé</span></td><td style="padding:12px 18px;color:#6b7280">20 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">7</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">app.menuitem.component.html</td><td style="padding:12px 18px">Wrapper icône .menu-icon-wrap</td><td style="padding:12px 18px"><span class="badge bg-blue">Visuel</span></td><td style="padding:12px 18px;color:#6b7280">10 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">8</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">_content.scss</td><td style="padding:12px 18px">Padding zone de contenu</td><td style="padding:12px 18px"><span class="badge bg-amber">Faible</span></td><td style="padding:12px 18px;color:#6b7280">2 min</td></tr>
+        <tr style="border-bottom:1px solid #f9fafb"><td style="padding:12px 18px;font-weight:700;color:#15803d">9</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">_utils.scss</td><td style="padding:12px 18px">Cards .card ombre + bordure</td><td style="padding:12px 18px"><span class="badge bg-blue">Visuel</span></td><td style="padding:12px 18px;color:#6b7280">2 min</td></tr>
+        <tr><td style="padding:12px 18px;font-weight:700;color:#15803d">10</td><td style="padding:12px 18px;font-family:monospace;font-size:12px">app.footer.component.html</td><td style="padding:12px 18px">Ajout version + année</td><td style="padding:12px 18px"><span class="badge bg-gray">Mineur</span></td><td style="padding:12px 18px;color:#6b7280">2 min</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note note-green" style="margin-top:20px">
+    <span class="icon">✅</span>
+    <span><strong>Total estimé : ~70 minutes</strong> pour toutes les modifications. Aucun changement de logique métier, aucun service Angular modifié, aucune route changée. Uniquement des fichiers CSS/SCSS et 2 fichiers HTML de layout.</span>
+  </div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGCANVAS – Guide d'Améliorations Design & Ergonomie</title>
+<style>
+  /* ============================================
+     RESET & BASE
+  ============================================ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50:  #f0fdf4; --green-100: #dcfce7; --green-200: #bbf7d0;
+    --green-400: #4ade80; --green-500: #22c55e; --green-600: #16a34a;
+    --green-700: #15803d; --green-800: #166534; --green-900: #14532d;
+    --gray-50:  #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+    --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+    --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937;
+    --gray-900: #111827;
+    --blue-100: #dbeafe; --blue-500: #3b82f6; --blue-600: #2563eb;
+    --amber-100: #fef3c7; --amber-500: #f59e0b; --amber-600: #d97706;
+    --red-100:  #fee2e2; --red-500: #ef4444;  --red-600: #dc2626;
+    --cyan-100: #cffafe; --cyan-500: #06b6d4;
+    --radius-sm: 6px; --radius: 10px; --radius-lg: 16px; --radius-xl: 22px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+    --shadow:    0 4px 12px rgba(0,0,0,.10);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,.12);
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  body { font-family: var(--font); background: #f1f5f9; color: var(--gray-800); line-height: 1.6; }
+
+  /* ============================================
+     DOC LAYOUT
+  ============================================ */
+  .doc-nav {
+    position: fixed; top: 0; left: 0; height: 100vh; width: 240px;
+    background: var(--gray-900); color: #fff; padding: 24px 0;
+    overflow-y: auto; z-index: 100;
+  }
+  .doc-nav .logo {
+    padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1);
+    font-size: 13px; font-weight: 700; letter-spacing: .5px; color: var(--green-400);
+    text-transform: uppercase;
+  }
+  .doc-nav .logo span { display: block; font-size: 11px; color: var(--gray-400); font-weight: 400; margin-top: 2px; }
+  .doc-nav ul { list-style: none; padding: 16px 0; }
+  .doc-nav ul li a {
+    display: block; padding: 8px 20px; color: var(--gray-300); text-decoration: none;
+    font-size: 13px; transition: all .15s;
+  }
+  .doc-nav ul li a:hover { color: #fff; background: rgba(255,255,255,.07); }
+  .doc-nav ul li.section { padding: 16px 20px 4px; font-size: 10px; color: var(--gray-500);
+    letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .doc-main { margin-left: 240px; padding: 40px 48px 80px; max-width: 1280px; }
+
+  /* ============================================
+     HEADINGS & TYPOGRAPHY
+  ============================================ */
+  .page-title { font-size: 32px; font-weight: 800; color: var(--gray-900); margin-bottom: 8px; }
+  .page-sub   { font-size: 16px; color: var(--gray-500); margin-bottom: 48px; }
+  .section-title {
+    font-size: 22px; font-weight: 700; color: var(--gray-900);
+    margin: 64px 0 6px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--green-500);
+  }
+  .section-desc { font-size: 14px; color: var(--gray-500); margin-bottom: 28px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--gray-600); text-transform: uppercase;
+    letter-spacing: .5px; margin-bottom: 12px; }
+
+  /* ============================================
+     COMPARISON CONTAINERS
+  ============================================ */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px;
+  }
+  .compare-box { background: #fff; border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow); }
+  .compare-label {
+    padding: 10px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+  .compare-label.before { background: var(--red-100); color: var(--red-600); }
+  .compare-label.after  { background: var(--green-100); color: var(--green-700); }
+  .compare-label.after::before { content: '✓ '; }
+  .compare-label.before::before{ content: '✗ '; }
+  .compare-body { padding: 20px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  }
+  .badge-green  { background: var(--green-100); color: var(--green-700); }
+  .badge-blue   { background: var(--blue-100);  color: var(--blue-600); }
+  .badge-amber  { background: var(--amber-100); color: var(--amber-600); }
+  .badge-red    { background: var(--red-100);   color: var(--red-600); }
+  .badge-gray   { background: var(--gray-100);  color: var(--gray-600); }
+  .badge-cyan   { background: var(--cyan-100);  color: var(--cyan-500); }
+
+  /* ============================================
+     COLOR PALETTE
+  ============================================ */
+  .palette-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .swatch {
+    width: 64px; height: 64px; border-radius: var(--radius); cursor: pointer;
+    position: relative; transition: transform .15s; box-shadow: var(--shadow-sm);
+  }
+  .swatch:hover { transform: scale(1.08); }
+  .swatch-label { font-size: 10px; text-align: center; margin-top: 4px; color: var(--gray-500); }
+
+  /* ============================================
+     TOPBAR — BEFORE
+  ============================================ */
+  .tb-old {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    padding: 8px 16px; display: flex; align-items: center; gap: 16px;
+    font-size: 12px; color: #fff;
+  }
+  .tb-old .logo-old { font-size: 20px; font-weight: 900; letter-spacing: -1px; }
+  .tb-old .info-old { display: flex; gap: 12px; flex: 1; justify-content: flex-end; }
+  .tb-old .info-item { display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; line-height: 1.3; }
+  .tb-old .btn-old {
+    padding: 4px 12px; background: #e53935; border: none; color: #fff;
+    border-radius: 4px; cursor: pointer; font-size: 11px;
+  }
+
+  /* TOPBAR — AFTER */
+  .tb-new {
+    background: #fff; border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .tb-new .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 17px; color: var(--green-700);
+  }
+  .tb-new .brand-icon {
+    width: 34px; height: 34px; background: linear-gradient(135deg, var(--green-500), var(--green-700));
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 14px;
+  }
+  .tb-new .sep { width: 1px; height: 28px; background: var(--gray-200); margin: 0 8px; }
+  .tb-new .ctx-pill {
+    display: flex; align-items: center; gap: 6px; padding: 5px 12px;
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 100px;
+    font-size: 12px; color: var(--gray-600);
+  }
+  .tb-new .ctx-pill strong { color: var(--gray-800); }
+  .tb-new .spacer { flex: 1; }
+  .tb-new .date-chip {
+    font-size: 12px; color: var(--gray-500); background: var(--gray-50);
+    padding: 4px 10px; border-radius: 100px; border: 1px solid var(--gray-200);
+  }
+  .tb-new .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-400), var(--green-700));
+    color: #fff; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .tb-new .user-info { font-size: 12px; text-align: right; line-height: 1.3; }
+  .tb-new .user-info strong { display: block; color: var(--gray-800); font-size: 13px; }
+  .tb-new .user-info span { color: var(--gray-400); font-size: 11px; }
+  .tb-new .btn-logout {
+    display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+    background: var(--red-100); color: var(--red-600); border: none;
+    border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; font-weight: 600;
+    transition: background .15s;
+  }
+  .tb-new .btn-logout:hover { background: var(--red-500); color: #fff; }
+
+  /* ============================================
+     SIDEBAR — BEFORE
+  ============================================ */
+  .sb-old {
+    width: 200px; background: #1a1a2e; padding: 12px 0; font-size: 12px;
+  }
+  .sb-old .menu-title { padding: 8px 14px; color: #aaa; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .5px; }
+  .sb-old .menu-item { padding: 9px 14px; color: #ccc; cursor: pointer; }
+  .sb-old .menu-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+  .sb-old .menu-item.active { background: var(--green-700); color: #fff; }
+  .sb-old .sub-item { padding: 7px 24px; color: #999; font-size: 11px; cursor: pointer; }
+  .sb-old .sub-item:hover { color: #fff; }
+
+  /* SIDEBAR — AFTER */
+  .sb-new {
+    width: 220px; background: var(--gray-900); padding: 12px 12px; font-size: 13px;
+  }
+  .sb-new .group-label {
+    padding: 14px 8px 4px; font-size: 10px; color: var(--gray-500);
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+  }
+  .sb-new .nav-item {
+    display: flex; align-items: center; gap: 9px; padding: 9px 10px;
+    color: var(--gray-300); border-radius: var(--radius-sm); cursor: pointer;
+    transition: all .15s; margin-bottom: 2px;
+  }
+  .sb-new .nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }
+  .sb-new .nav-item.active {
+    background: linear-gradient(135deg, var(--green-700), var(--green-600));
+    color: #fff; box-shadow: 0 2px 8px rgba(34,197,94,.3);
+  }
+  .sb-new .nav-item .icon {
+    width: 28px; height: 28px; border-radius: 7px; display: flex;
+    align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+  }
+  .sb-new .nav-item.active .icon { background: rgba(255,255,255,.18); }
+  .sb-new .nav-item:not(.active) .icon { background: rgba(255,255,255,.05); }
+  .sb-new .nav-item .label { font-size: 12.5px; }
+  .sb-new .nav-item .arrow { margin-left: auto; font-size: 10px; color: var(--gray-500); }
+  .sb-new .sub-nav { padding-left: 44px; }
+  .sb-new .sub-nav .sub-item {
+    padding: 7px 8px; color: var(--gray-400); border-radius: var(--radius-sm);
+    cursor: pointer; font-size: 12px; transition: all .15s; display: flex;
+    align-items: center; gap: 6px; margin-bottom: 1px;
+  }
+  .sb-new .sub-nav .sub-item::before { content: ''; width: 4px; height: 4px;
+    border-radius: 50%; background: var(--gray-600); flex-shrink: 0; }
+  .sb-new .sub-nav .sub-item:hover { color: var(--green-400); }
+  .sb-new .sub-nav .sub-item:hover::before { background: var(--green-400); }
+  .sb-new .sub-nav .sub-item.active-sub { color: var(--green-400); }
+  .sb-new .sub-nav .sub-item.active-sub::before { background: var(--green-400); }
+
+  /* ============================================
+     FORMS — BEFORE
+  ============================================ */
+  .form-old label { display: block; font-size: 12px; margin-bottom: 4px; color: #555; }
+  .form-old input, .form-old select {
+    width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;
+    font-size: 12px; margin-bottom: 10px;
+  }
+  .form-old .btn-submit-old {
+    background: #4CAF50; color: #fff; border: none; padding: 7px 18px;
+    border-radius: 3px; cursor: pointer; font-size: 12px;
+  }
+  .form-old .row-old { display: flex; gap: 10px; }
+  .form-old .col { flex: 1; }
+
+  /* FORMS — AFTER */
+  .form-new { display: flex; flex-direction: column; gap: 18px; }
+  .form-new .form-section {
+    background: var(--gray-50); border-radius: var(--radius); padding: 16px;
+    border: 1px solid var(--gray-100);
+  }
+  .form-new .section-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    font-size: 13px; font-weight: 700; color: var(--gray-700);
+  }
+  .form-new .section-header .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green-500);
+  }
+  .form-new .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-new .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-new label {
+    font-size: 12px; font-weight: 600; color: var(--gray-600); letter-spacing: .2px;
+  }
+  .form-new label .req { color: var(--red-500); margin-left: 2px; }
+  .form-new input, .form-new select, .form-new textarea {
+    padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--gray-800); background: #fff;
+    transition: border-color .15s, box-shadow .15s; outline: none; width: 100%;
+  }
+  .form-new input:focus, .form-new select:focus, .form-new textarea:focus {
+    border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(34,197,94,.12);
+  }
+  .form-new input.error { border-color: var(--red-500); }
+  .form-new .hint { font-size: 11px; color: var(--gray-400); }
+  .form-new .err-msg { font-size: 11px; color: var(--red-500); display: flex; align-items: center; gap: 4px; }
+  .form-new .form-actions {
+    display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px;
+    border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all .15s; text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--green-500), var(--green-600));
+    color: #fff; box-shadow: 0 2px 6px rgba(22,163,74,.3);
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--green-600), var(--green-700));
+    box-shadow: 0 4px 12px rgba(22,163,74,.35); transform: translateY(-1px); }
+  .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1.5px solid var(--gray-200); }
+  .btn-secondary:hover { background: var(--gray-200); }
+  .btn-danger { background: var(--red-100); color: var(--red-600); border: 1.5px solid var(--red-100); }
+  .btn-danger:hover { background: var(--red-500); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--green-600); border: 1.5px solid var(--green-200); }
+  .btn-ghost:hover { background: var(--green-50); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-xs { padding: 4px 9px; font-size: 11px; }
+  .btn-icon { width: 34px; height: 34px; padding: 0; justify-content: center; }
+
+  /* ============================================
+     STEPPER — BEFORE
+  ============================================ */
+  .stepper-old {
+    display: flex; gap: 0; margin-bottom: 20px; border: 1px solid #ddd;
+    border-radius: 4px; overflow: hidden;
+  }
+  .stepper-old .step-old {
+    flex: 1; padding: 10px 8px; text-align: center; font-size: 11px;
+    background: #f5f5f5; border-right: 1px solid #ddd; color: #666;
+  }
+  .stepper-old .step-old.done { background: #4CAF50; color: #fff; }
+  .stepper-old .step-old.current { background: #2196F3; color: #fff; }
+
+  /* STEPPER — AFTER */
+  .stepper-new {
+    display: flex; align-items: flex-start; gap: 0; margin-bottom: 28px;
+    position: relative; padding: 4px 0;
+  }
+  .stepper-new::before {
+    content: ''; position: absolute; top: 18px; left: 18px; right: 18px;
+    height: 2px; background: var(--gray-200); z-index: 0;
+  }
+  .stepper-new .step-wrap {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    position: relative; z-index: 1;
+  }
+  .stepper-new .step-circle {
+    width: 36px; height: 36px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+    border: 2px solid var(--gray-200); background: #fff; color: var(--gray-400);
+    transition: all .25s;
+  }
+  .stepper-new .step-wrap.done .step-circle {
+    background: var(--green-500); border-color: var(--green-500); color: #fff;
+  }
+  .stepper-new .step-wrap.current .step-circle {
+    background: #fff; border-color: var(--green-500); color: var(--green-600);
+    box-shadow: 0 0 0 4px rgba(34,197,94,.15);
+  }
+  .stepper-new .step-label { font-size: 11px; color: var(--gray-400); text-align: center;
+    max-width: 72px; line-height: 1.3; }
+  .stepper-new .step-wrap.current .step-label { color: var(--green-600); font-weight: 700; }
+  .stepper-new .step-wrap.done .step-label { color: var(--gray-600); }
+  .stepper-new .step-sub { font-size: 10px; color: var(--gray-400); }
+
+  /* ============================================
+     TABLE — BEFORE
+  ============================================ */
+  .table-old { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .table-old th { background: #4CAF50; color: #fff; padding: 8px 10px; text-align: left; font-size: 11px; }
+  .table-old td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+  .table-old tr:nth-child(even) { background: #f9f9f9; }
+  .table-old .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+
+  /* TABLE — AFTER */
+  .table-wrap { background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+  .table-toolbar {
+    display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .table-toolbar .title { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+  .table-toolbar .count { font-size: 12px; color: var(--gray-400); }
+  .table-toolbar .search-box {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    background: var(--gray-50); font-size: 13px; color: var(--gray-400);
+    margin-left: auto; min-width: 200px;
+  }
+  .table-new { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table-new thead th {
+    padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700;
+    color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px;
+    background: var(--gray-50); border-bottom: 1px solid var(--gray-100);
+  }
+  .table-new tbody td { padding: 13px 16px; border-bottom: 1px solid var(--gray-50); vertical-align: middle; }
+  .table-new tbody tr:hover { background: var(--green-50); }
+  .table-new tbody tr:last-child td { border-bottom: none; }
+  .table-new .cell-primary { font-weight: 600; color: var(--gray-800); }
+  .table-new .cell-secondary { font-size: 12px; color: var(--gray-400); }
+  .table-new .actions { display: flex; gap: 6px; }
+
+  /* ============================================
+     CARDS / STATS
+  ============================================ */
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .stat-card {
+    background: #fff; border-radius: var(--radius-lg); padding: 20px;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .stat-card .stat-label { font-size: 12px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  .stat-card .stat-value { font-size: 28px; font-weight: 800; color: var(--gray-900); line-height: 1; }
+  .stat-card .stat-trend { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .stat-card .stat-icon {
+    width: 44px; height: 44px; border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; align-self: flex-start; margin-bottom: 4px;
+  }
+  .stat-icon-green { background: var(--green-100); }
+  .stat-icon-blue  { background: var(--blue-100); }
+  .stat-icon-amber { background: var(--amber-100); }
+  .stat-icon-cyan  { background: var(--cyan-100); }
+
+  /* ============================================
+     SEARCH COMPONENT
+  ============================================ */
+  .search-card {
+    background: #fff; border-radius: var(--radius-lg); padding: 28px;
+    box-shadow: var(--shadow); border: 1px solid var(--gray-100);
+  }
+  .search-card .search-title { font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+  .search-card .search-sub { font-size: 13px; color: var(--gray-400); margin-bottom: 24px; }
+  .search-type-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .search-tab {
+    padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px;
+    font-weight: 600; cursor: pointer; border: 2px solid var(--gray-200);
+    color: var(--gray-500); background: #fff; transition: all .15s;
+  }
+  .search-tab.active {
+    border-color: var(--green-500); background: var(--green-50); color: var(--green-700);
+  }
+  .search-row { display: flex; gap: 12px; align-items: flex-end; }
+  .search-row .field { flex: 1; }
+  .search-row .field label { font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 5px; display: block; }
+  .search-row .field input, .search-row .field select {
+    width: 100%; padding: 10px 13px; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm); font-size: 13px; outline: none;
+    transition: border-color .15s;
+  }
+  .search-row .field input:focus, .search-row .field select:focus {
+    border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(34,197,94,.1);
+  }
+  .search-result-row {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+    margin-top: 16px; cursor: pointer; transition: all .15s;
+    background: #fff;
+  }
+  .search-result-row:hover { border-color: var(--green-400); background: var(--green-50);
+    box-shadow: 0 2px 8px rgba(34,197,94,.12); }
+  .search-result-row .res-avatar {
+    width: 42px; height: 42px; border-radius: 50%; background: var(--green-100);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: var(--green-700); flex-shrink: 0;
+  }
+  .search-result-row .res-info { flex: 1; }
+  .search-result-row .res-name { font-weight: 700; color: var(--gray-800); font-size: 14px; }
+  .search-result-row .res-id { font-size: 12px; color: var(--gray-400); }
+
+  /* ============================================
+     CANVAS FORM SECTIONS
+  ============================================ */
+  .canvas-progress {
+    background: #fff; border-radius: var(--radius-lg); padding: 20px 24px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .canvas-progress .prog-info { flex: 1; }
+  .canvas-progress .prog-title { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+  .canvas-progress .prog-sub { font-size: 12px; color: var(--gray-400); }
+  .prog-bar { height: 6px; background: var(--gray-100); border-radius: 100px; overflow: hidden; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--green-400), var(--green-600)); border-radius: 100px; transition: width .4s; }
+  .prog-pct { font-size: 13px; font-weight: 700; color: var(--green-600); }
+
+  .section-card {
+    background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow);
+    overflow: hidden; margin-bottom: 16px;
+  }
+  .section-card-header {
+    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100); cursor: pointer;
+  }
+  .section-card-header .sc-icon {
+    width: 38px; height: 38px; border-radius: var(--radius-sm);
+    background: var(--green-100); display: flex; align-items: center;
+    justify-content: center; font-size: 18px;
+  }
+  .section-card-header .sc-title { font-weight: 700; font-size: 14px; color: var(--gray-800); }
+  .section-card-header .sc-sub { font-size: 12px; color: var(--gray-400); }
+  .section-card-header .sc-status { margin-left: auto; }
+  .section-card-body { padding: 20px; }
+
+  /* ============================================
+     NOTIFICATIONS / ALERTS
+  ============================================ */
+  .alert {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 16px; border-radius: var(--radius); margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .alert-success { background: var(--green-50); border: 1px solid var(--green-200); color: var(--green-800); }
+  .alert-warning { background: var(--amber-100); border: 1px solid #fde68a; color: #92400e; }
+  .alert-info    { background: var(--blue-100); border: 1px solid #bfdbfe; color: #1e40af; }
+  .alert-error   { background: var(--red-100); border: 1px solid #fecaca; color: #991b1b; }
+  .alert .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert .alert-body strong { display: block; font-weight: 700; margin-bottom: 2px; }
+
+  /* ============================================
+     MODAL
+  ============================================ */
+  .modal-demo {
+    background: #fff; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+    padding: 28px; max-width: 440px; position: relative;
+  }
+  .modal-demo .modal-header {
+    display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;
+  }
+  .modal-demo .modal-title { font-size: 18px; font-weight: 800; color: var(--gray-900); }
+  .modal-demo .modal-close {
+    width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--gray-100);
+    color: var(--gray-400); font-size: 16px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .modal-demo .modal-close:hover { background: var(--gray-200); color: var(--gray-600); }
+  .modal-demo .modal-body { font-size: 14px; color: var(--gray-600); margin-bottom: 20px; line-height: 1.6; }
+  .modal-demo .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ============================================
+     TABS
+  ============================================ */
+  .tabs-new {
+    border-bottom: 2px solid var(--gray-100); display: flex; gap: 4px; margin-bottom: 20px;
+  }
+  .tab-new {
+    padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--gray-400);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all .15s; display: flex; align-items: center; gap: 6px;
+  }
+  .tab-new:hover { color: var(--gray-700); }
+  .tab-new.active { color: var(--green-600); border-bottom-color: var(--green-500); }
+  .tab-new .tab-count {
+    font-size: 11px; background: var(--gray-100); padding: 1px 7px; border-radius: 100px;
+    color: var(--gray-500);
+  }
+  .tab-new.active .tab-count { background: var(--green-100); color: var(--green-700); }
+
+  /* ============================================
+     AFFECTATION
+  ============================================ */
+  .affectation-card {
+    background: #fff; border-radius: var(--radius-lg); padding: 20px;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .affectation-card .agent-avatar {
+    width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--green-400), var(--blue-500));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 16px;
+  }
+  .affectation-card .agent-info { flex: 1; }
+  .affectation-card .agent-name { font-weight: 700; color: var(--gray-800); font-size: 14px; }
+  .affectation-card .agent-role { font-size: 12px; color: var(--gray-400); }
+  .affectation-card .agent-load { font-size: 12px; color: var(--gray-500); }
+  .load-bar { height: 4px; background: var(--gray-100); border-radius: 100px; overflow: hidden; width: 80px; margin-top: 4px; }
+  .load-fill-green { height: 100%; background: var(--green-500); border-radius: 100px; }
+  .load-fill-amber { height: 100%; background: var(--amber-500); border-radius: 100px; }
+
+  /* ============================================
+     FINANCIAL TABLE
+  ============================================ */
+  .fin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .fin-table th {
+    padding: 10px 14px; text-align: left; background: var(--gray-800);
+    color: #fff; font-size: 12px; font-weight: 600;
+  }
+  .fin-table th:not(:first-child) { text-align: right; }
+  .fin-table td { padding: 11px 14px; border-bottom: 1px solid var(--gray-100); }
+  .fin-table td:not(:first-child) { text-align: right; font-family: monospace; font-size: 13px; }
+  .fin-table .total-row td { background: var(--green-50); font-weight: 700; color: var(--green-800); }
+  .fin-table .sub-row td { padding-left: 28px; color: var(--gray-500); font-size: 12px; }
+  .fin-table .section-row td { background: var(--gray-50); font-weight: 700; color: var(--gray-700); font-size: 12px; text-transform: uppercase; letter-spacing: .3px; }
+  .pos { color: var(--green-600); }
+  .neg { color: var(--red-500); }
+
+  /* ============================================
+     PRINT SECTION
+  ============================================ */
+  .callout {
+    background: linear-gradient(135deg, var(--green-50), #fff);
+    border: 1px solid var(--green-200); border-left: 4px solid var(--green-500);
+    border-radius: var(--radius); padding: 16px 20px; margin: 16px 0;
+    font-size: 13px; color: var(--gray-700); line-height: 1.6;
+  }
+  .callout strong { color: var(--green-700); }
+  .tip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tip {
+    padding: 14px; background: #fff; border-radius: var(--radius);
+    border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm);
+    font-size: 13px; color: var(--gray-600);
+  }
+  .tip strong { color: var(--gray-800); display: block; margin-bottom: 4px; }
+
+  /* ============================================
+     MISC
+  ============================================ */
+  .flex { display: flex; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; }
+  .flex-1 { flex: 1; } .items-center { align-items: center; }
+  .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; }
+  .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; }
+  .text-sm { font-size: 12px; } .text-xs { font-size: 11px; }
+  .text-muted { color: var(--gray-400); } .text-green { color: var(--green-600); }
+  .fw-700 { font-weight: 700; }
+  .divider { height: 1px; background: var(--gray-100); margin: 24px 0; }
+
+  @media(max-width:900px){
+    .doc-nav{display:none;} .doc-main{margin-left:0;padding:20px;}
+    .compare-grid,.stats-grid,.tip-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="doc-nav">
+  <div class="logo">PGCANVAS <span>Guide Design & Ergonomie</span></div>
+  <ul>
+    <li class="section">Palette</li>
+    <li><a href="#palette">Couleurs & Typographie</a></li>
+    <li class="section">Layout</li>
+    <li><a href="#topbar">Barre de navigation</a></li>
+    <li><a href="#sidebar">Sidebar / Menu</a></li>
+    <li class="section">Composants</li>
+    <li><a href="#forms">Formulaires</a></li>
+    <li><a href="#stepper">Stepper multi-étapes</a></li>
+    <li><a href="#tables">Tableaux de données</a></li>
+    <li><a href="#search">Recherche client</a></li>
+    <li><a href="#stats">Dashboard / Stats</a></li>
+    <li><a href="#alerts">Alertes & Notifications</a></li>
+    <li><a href="#modal">Modal / Dialogue</a></li>
+    <li class="section">Pages</li>
+    <li><a href="#canvas-form">Canevas agricole</a></li>
+    <li><a href="#financial">Analyse financière</a></li>
+    <li><a href="#affectation">Affectation</a></li>
+    <li class="section">Guide</li>
+    <li><a href="#tips">Recommandations CSS</a></li>
+  </ul>
+</nav>
+
+<!-- ======================== MAIN ======================== -->
+<main class="doc-main">
+
+  <h1 class="page-title">Améliorations Design & Ergonomie</h1>
+  <p class="page-sub">Propositions concrètes pour moderniser l'interface PGCANVAS (Angular 17 + PrimeNG) sans changer la structure ni la logique métier.</p>
+
+  <!-- ======================== PALETTE ======================== -->
+  <section id="palette">
+    <h2 class="section-title">Couleurs & Typographie</h2>
+    <p class="section-desc">Conserver le thème <strong>Saga Green</strong> mais affiner la palette avec plus de contraste et de hiérarchie.</p>
+
+    <h4>Palette Principale</h4>
+    <div class="palette-grid">
+      <div><div class="swatch" style="background:#22c55e"></div><div class="swatch-label">green-500</div></div>
+      <div><div class="swatch" style="background:#16a34a"></div><div class="swatch-label">green-600</div></div>
+      <div><div class="swatch" style="background:#15803d"></div><div class="swatch-label">green-700</div></div>
+      <div><div class="swatch" style="background:#166534"></div><div class="swatch-label">green-800</div></div>
+      <div><div class="swatch" style="background:#f0fdf4"></div><div class="swatch-label">green-50</div></div>
+      <div><div class="swatch" style="background:#dcfce7"></div><div class="swatch-label">green-100</div></div>
+    </div>
+    <h4>Palette Neutre</h4>
+    <div class="palette-grid">
+      <div><div class="swatch" style="background:#111827"></div><div class="swatch-label">gray-900</div></div>
+      <div><div class="swatch" style="background:#374151"></div><div class="swatch-label">gray-700</div></div>
+      <div><div class="swatch" style="background:#6b7280"></div><div class="swatch-label">gray-500</div></div>
+      <div><div class="swatch" style="background:#d1d5db"></div><div class="swatch-label">gray-300</div></div>
+      <div><div class="swatch" style="background:#f3f4f6"></div><div class="swatch-label">gray-100</div></div>
+      <div><div class="swatch" style="background:#f9fafb;border:1px solid #e5e7eb"></div><div class="swatch-label">gray-50</div></div>
+    </div>
+    <h4>Sémantique</h4>
+    <div class="palette-grid">
+      <div><div class="swatch" style="background:#3b82f6"></div><div class="swatch-label">bleu / info</div></div>
+      <div><div class="swatch" style="background:#f59e0b"></div><div class="swatch-label">ambre / warn</div></div>
+      <div><div class="swatch" style="background:#ef4444"></div><div class="swatch-label">rouge / erreur</div></div>
+      <div><div class="swatch" style="background:#06b6d4"></div><div class="swatch-label">cyan / neutre</div></div>
+    </div>
+
+    <div class="callout">
+      <strong>Règle des 60-30-10 :</strong> 60% gris neutre (fonds, cartes), 30% vert (actions, états actifs), 10% couleurs sémantiques (alertes, statuts). Le vert actuel <code>#4CAF50</code> peut être conservé mais idéalement remplacé par <code>#22c55e</code> pour un rendu plus moderne.
+    </div>
+
+    <h4 class="mt-4">Badges de Statut</h4>
+    <div class="flex gap-2" style="flex-wrap:wrap;">
+      <span class="badge badge-green">✓ Validé</span>
+      <span class="badge badge-amber">⏳ En cours</span>
+      <span class="badge badge-blue">📋 En attente</span>
+      <span class="badge badge-red">✗ Refusé</span>
+      <span class="badge badge-gray">— Brouillon</span>
+      <span class="badge badge-cyan">↩ Réexamen</span>
+    </div>
+  </section>
+
+  <!-- ======================== TOPBAR ======================== -->
+  <section id="topbar">
+    <h2 class="section-title">Barre de Navigation (Topbar)</h2>
+    <p class="section-desc">Passer d'un fond vert saturé à un fond blanc avec ombres légères pour réduire la fatigue visuelle et libérer le vert pour les actions.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — fond vert dense, info compressée</div>
+        <div class="compare-body" style="padding:0">
+          <div class="tb-old">
+            <div class="logo-old">BNA</div>
+            <div class="info-old">
+              <div class="info-item"><span>Ahmed Ben Ali</span><span>Mat: 12345</span></div>
+              <div class="info-item"><span>AG Tunis Centre</span><span>Code: 001</span></div>
+              <div class="info-item"><span>Date Comptable: 08/06/2026</span></div>
+              <button class="btn-old">Déconnexion</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — fond blanc, hiérarchie claire, respiration</div>
+        <div class="compare-body" style="padding:0">
+          <div class="tb-new">
+            <div class="brand"><div class="brand-icon">B</div>PGCANVAS</div>
+            <div class="sep"></div>
+            <div class="ctx-pill">🏢 <strong>AG Tunis Centre</strong><span style="color:#d1d5db">|</span>001</div>
+            <div class="spacer"></div>
+            <div class="date-chip">📅 08/06/2026</div>
+            <div class="user-info"><strong>Ahmed Ben Ali</strong><span>Mat. 12345</span></div>
+            <div class="avatar">AB</div>
+            <button class="btn-logout">⏻ Déconnexion</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-grid">
+      <div class="tip"><strong>Respiration horizontale</strong> Espacer les éléments avec des séparateurs visuels plutôt que de tout coller. L'œil se repose entre les blocs d'information.</div>
+      <div class="tip"><strong>Avatar utilisateur</strong> Un cercle avec les initiales remplace le texte brut du nom. Permet d'ajouter un menu dropdown (profil, paramètres) en un clic futur.</div>
+      <div class="tip"><strong>Fond blanc topbar</strong> Contraste plus doux. Le fond vert peut rester pour la sidebar uniquement, créant une identité visuelle claire gauche/haut.</div>
+      <div class="tip"><strong>Pill contextuelle</strong> L'agence et le code regroupés dans un seul composant "pill" réduisent le bruit visuel et forment une unité logique.</div>
+    </div>
+  </section>
+
+  <!-- ======================== SIDEBAR ======================== -->
+  <section id="sidebar">
+    <h2 class="section-title">Sidebar / Menu Latéral</h2>
+    <p class="section-desc">Mieux organiser la hiérarchie de navigation avec des icônes, des sous-groupes et des indicateurs d'état actif.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — liste plate, sans icônes, peu de hiérarchie</div>
+        <div class="compare-body" style="padding:0">
+          <div class="sb-old">
+            <div class="menu-title">Navigation</div>
+            <div class="menu-item active">Gestion CANEVAS</div>
+            <div class="sub-item">PEC CANEVAS AGRICOLE</div>
+            <div class="sub-item">VALIDATION CANEVAS</div>
+            <div class="sub-item">PEC AVIS</div>
+            <div class="menu-item">AFFECTATION</div>
+            <div class="sub-item">Affectation CANEVAS</div>
+            <div class="menu-item">FICHE ÉTUDE</div>
+            <div class="menu-item">REFOULEMENT</div>
+            <div class="menu-item">REEXAMEN</div>
+          </div>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — icônes, groupes visuels, sous-nav contextuelle</div>
+        <div class="compare-body" style="padding:0">
+          <div class="sb-new">
+            <div class="group-label">Menu Principal</div>
+            <div class="nav-item">
+              <div class="icon">🏠</div><span class="label">Accueil</span>
+            </div>
+            <div class="nav-item active">
+              <div class="icon">📋</div><span class="label">Gestion Canevas</span>
+              <span class="arrow">▾</span>
+            </div>
+            <div class="sub-nav">
+              <div class="sub-item active-sub">PEC Canevas Agricole</div>
+              <div class="sub-item">Validation Canevas</div>
+              <div class="sub-item">PEC Avis</div>
+              <div class="sub-item">Validation Avis Décision</div>
+            </div>
+            <div class="nav-item">
+              <div class="icon">🔀</div><span class="label">Affectation</span>
+              <span class="arrow">▸</span>
+            </div>
+            <div class="nav-item">
+              <div class="icon">📂</div><span class="label">Fiche Étude</span>
+            </div>
+            <div class="group-label">Traitements</div>
+            <div class="nav-item">
+              <div class="icon">↩</div><span class="label">Refoulement</span>
+            </div>
+            <div class="nav-item">
+              <div class="icon">🔄</div><span class="label">Réexamen</span>
+            </div>
+            <div class="nav-item">
+              <div class="icon">✗</div><span class="label">Annulation Client</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Modification PrimeNG :</strong> Dans <code>app.menuitem.component.html</code>, entourer le label de chaque item avec un <code>&lt;span class="nav-item"&gt;</code> contenant une div icône. PrimeFlex fournit <code>flex align-items-center gap-2</code> nativement. Les icônes <code>pi pi-*</code> de PrimeNG peuvent remplacer les emojis.
+    </div>
+  </section>
+
+  <!-- ======================== FORMS ======================== -->
+  <section id="forms">
+    <h2 class="section-title">Formulaires</h2>
+    <p class="section-desc">Mieux structurer les champs avec des sections, de l'espacement, et des retours de validation clairs.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — champs serrés, sans groupement</div>
+        <div class="compare-body">
+          <div class="form-old">
+            <div class="row-old">
+              <div class="col"><label>Type d'identification</label><select><option>CIN</option></select></div>
+              <div class="col"><label>N° Identification *</label><input type="text" value=""></div>
+            </div>
+            <div class="row-old">
+              <div class="col"><label>Nom</label><input type="text"></div>
+              <div class="col"><label>Prénom</label><input type="text"></div>
+            </div>
+            <label>Adresse</label><input type="text">
+            <label>Téléphone</label><input type="text">
+            <button class="btn-submit-old">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — sections, focus ring, validation, hiérarchie</div>
+        <div class="compare-body">
+          <div class="form-new">
+            <div class="form-section">
+              <div class="section-header"><div class="dot"></div>Identification Client</div>
+              <div class="field-grid">
+                <div class="field-group">
+                  <label>Type d'identification</label>
+                  <select><option>CIN</option><option>Passeport</option><option>Carte de séjour</option></select>
+                </div>
+                <div class="field-group">
+                  <label>N° Identification <span class="req">*</span></label>
+                  <input type="text" placeholder="Ex: 12345678" class="error">
+                  <span class="err-msg">⚠ Ce champ est obligatoire</span>
+                </div>
+                <div class="field-group">
+                  <label>Nom <span class="req">*</span></label>
+                  <input type="text" value="Ben Ali">
+                </div>
+                <div class="field-group">
+                  <label>Prénom</label>
+                  <input type="text" value="Ahmed">
+                </div>
+              </div>
+            </div>
+            <div class="form-section">
+              <div class="section-header"><div class="dot"></div>Coordonnées</div>
+              <div class="field-grid">
+                <div class="field-group" style="grid-column:1/-1">
+                  <label>Adresse complète</label>
+                  <input type="text" placeholder="Rue, Ville, Code postal">
+                  <span class="hint">Adresse telle qu'elle figure sur le CIN</span>
+                </div>
+                <div class="field-group">
+                  <label>Téléphone</label>
+                  <input type="text" placeholder="+216 XX XXX XXX">
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-secondary">Annuler</button>
+              <button class="btn btn-primary">💾 Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h4 class="mt-4">Types de Boutons</h4>
+    <div class="flex gap-3" style="flex-wrap:wrap; margin-bottom:16px">
+      <button class="btn btn-primary">✓ Valider</button>
+      <button class="btn btn-secondary">← Retour</button>
+      <button class="btn btn-ghost">+ Ajouter</button>
+      <button class="btn btn-danger">✗ Supprimer</button>
+      <button class="btn btn-primary btn-sm">Exporter PDF</button>
+      <button class="btn btn-secondary btn-sm">Filtrer</button>
+      <button class="btn btn-icon btn-secondary">✏</button>
+      <button class="btn btn-icon btn-danger">🗑</button>
+    </div>
+  </section>
+
+  <!-- ======================== STEPPER ======================== -->
+  <section id="stepper">
+    <h2 class="section-title">Stepper Multi-Étapes (Canevas)</h2>
+    <p class="section-desc">Remplacer le stepper plat actuel par un stepper clair avec états done / current / pending et progression visible.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — stepper plat, peu lisible</div>
+        <div class="compare-body">
+          <div class="stepper-old">
+            <div class="step-old done">Ident.</div>
+            <div class="step-old done">Exploit.</div>
+            <div class="step-old current">Financier</div>
+            <div class="step-old">Crédit</div>
+            <div class="step-old">Garanties</div>
+            <div class="step-old">Avis</div>
+          </div>
+          <p style="font-size:12px;color:#999;">Étape 3 / 6 — Analyse Financière</p>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — stepper avec états visuels, progression</div>
+        <div class="compare-body">
+          <div class="stepper-new">
+            <div class="step-wrap done">
+              <div class="step-circle">✓</div>
+              <div class="step-label">Identification</div>
+            </div>
+            <div class="step-wrap done">
+              <div class="step-circle">✓</div>
+              <div class="step-label">Exploitation</div>
+            </div>
+            <div class="step-wrap current">
+              <div class="step-circle">3</div>
+              <div class="step-label">Financier</div>
+            </div>
+            <div class="step-wrap">
+              <div class="step-circle">4</div>
+              <div class="step-label">Crédit</div>
+            </div>
+            <div class="step-wrap">
+              <div class="step-circle">5</div>
+              <div class="step-label">Garanties</div>
+            </div>
+            <div class="step-wrap">
+              <div class="step-circle">6</div>
+              <div class="step-label">Avis</div>
+            </div>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:42%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-size:12px;color:#6b7280;">Étape 3 / 6 — Analyse Financière</span>
+            <span class="prog-pct">42%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Implémentation PrimeNG :</strong> Utiliser le composant <code>p-steps</code> avec <code>[model]="steps"</code> et styler via <code>::ng-deep .p-steps</code> dans le CSS du composant parent. La barre de progression peut être un <code>p-progressBar</code> lié à <code>(currentStep / totalSteps) * 100</code>.
+    </div>
+  </section>
+
+  <!-- ======================== TABLES ======================== -->
+  <section id="tables">
+    <h2 class="section-title">Tableaux de Données</h2>
+    <p class="section-desc">Ajouter un en-tête de tableau avec recherche inline, des badges de statut colorés et des actions contextuelles.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — en-tête vert uni, peu de hiérarchie</div>
+        <div class="compare-body" style="padding:12px">
+          <table class="table-old">
+            <thead><tr><th>N° Canevas</th><th>Client</th><th>Agence</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>CAN-2025-001</td><td>Ben Ali Ahmed</td><td>Tunis Centre</td><td><span class="status-dot" style="background:#4CAF50"></span> Validé</td><td>05/06/2026</td><td><button style="font-size:10px;padding:2px 6px">Voir</button></td></tr>
+              <tr><td>CAN-2025-002</td><td>Trabelsi Slim</td><td>Sfax</td><td><span class="status-dot" style="background:#FF9800"></span> En cours</td><td>04/06/2026</td><td><button style="font-size:10px;padding:2px 6px">Voir</button></td></tr>
+              <tr><td>CAN-2025-003</td><td>Khalil Mounir</td><td>Bizerte</td><td><span class="status-dot" style="background:#f44336"></span> Refusé</td><td>03/06/2026</td><td><button style="font-size:10px;padding:2px 6px">Voir</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — toolbar, badges colorés, hover, actions icônes</div>
+        <div class="compare-body" style="padding:0">
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <span class="title">Canevas Agricoles</span>
+              <span class="count badge badge-gray">124 dossiers</span>
+              <div class="search-box">🔍 Rechercher…</div>
+              <button class="btn btn-primary btn-sm">+ Nouveau</button>
+            </div>
+            <table class="table-new">
+              <thead><tr>
+                <th>N° Canevas</th><th>Client</th><th>Agence</th><th>Statut</th><th>Date</th><th></th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-primary">CAN-2025-001</span></td>
+                  <td><span class="cell-primary">Ben Ali Ahmed</span><br><span class="cell-secondary">CIN 12345678</span></td>
+                  <td>Tunis Centre</td>
+                  <td><span class="badge badge-green">✓ Validé</span></td>
+                  <td><span class="cell-secondary">05/06/2026</span></td>
+                  <td><div class="actions"><button class="btn btn-ghost btn-xs">Voir</button><button class="btn btn-secondary btn-xs">✏</button></div></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-primary">CAN-2025-002</span></td>
+                  <td><span class="cell-primary">Trabelsi Slim</span><br><span class="cell-secondary">CIN 98765432</span></td>
+                  <td>Sfax</td>
+                  <td><span class="badge badge-amber">⏳ En cours</span></td>
+                  <td><span class="cell-secondary">04/06/2026</span></td>
+                  <td><div class="actions"><button class="btn btn-ghost btn-xs">Voir</button><button class="btn btn-secondary btn-xs">✏</button></div></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-primary">CAN-2025-003</span></td>
+                  <td><span class="cell-primary">Khalil Mounir</span><br><span class="cell-secondary">CIN 11223344</span></td>
+                  <td>Bizerte</td>
+                  <td><span class="badge badge-red">✗ Refusé</span></td>
+                  <td><span class="cell-secondary">03/06/2026</span></td>
+                  <td><div class="actions"><button class="btn btn-ghost btn-xs">Voir</button><button class="btn btn-secondary btn-xs">✏</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>PrimeNG p-table :</strong> Activer <code>[globalFilterFields]</code> pour la recherche inline. Utiliser <code>&lt;ng-template pTemplate="header"&gt;</code> pour le toolbar. Les badges peuvent être des <code>&lt;p-tag&gt;</code> avec severity dynamique (<code>success</code>, <code>warning</code>, <code>danger</code>).
+    </div>
+  </section>
+
+  <!-- ======================== SEARCH ======================== -->
+  <section id="search">
+    <h2 class="section-title">Composant Recherche Client</h2>
+    <p class="section-desc">Rendre la recherche plus guidée avec des onglets de type d'identification et un résultat visuellement distinct.</p>
+
+    <div class="search-card">
+      <div class="search-title">Recherche Client</div>
+      <div class="search-sub">Saisissez les informations du client pour accéder à son dossier.</div>
+
+      <div class="search-type-tabs">
+        <button class="search-tab active">CIN</button>
+        <button class="search-tab">Passeport</button>
+        <button class="search-tab">Carte séjour</button>
+        <button class="search-tab">Matricule fiscal</button>
+      </div>
+
+      <div class="search-row">
+        <div class="field" style="flex:2">
+          <label>Numéro CIN</label>
+          <input type="text" placeholder="Ex: 12345678" value="08745231">
+        </div>
+        <div class="field">
+          <label>Agence</label>
+          <select><option>Tunis Centre</option><option>Sfax</option><option>Bizerte</option></select>
+        </div>
+        <button class="btn btn-primary">🔍 Rechercher</button>
+      </div>
+
+      <!-- Résultats -->
+      <div style="margin-top:20px">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:8px;">1 résultat trouvé</div>
+        <div class="search-result-row">
+          <div class="res-avatar">BA</div>
+          <div class="res-info">
+            <div class="res-name">Ben Ali Ahmed Mohamed</div>
+            <div class="res-id">CIN : 08745231 &nbsp;|&nbsp; Né le 15/03/1975 &nbsp;|&nbsp; Tunis</div>
+          </div>
+          <span class="badge badge-green">Client actif</span>
+          <button class="btn btn-primary btn-sm">Ouvrir →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== STATS ======================== -->
+  <section id="stats">
+    <h2 class="section-title">Dashboard / Statistiques</h2>
+    <p class="section-desc">Ajouter des cartes KPI en haut du tableau de bord pour une vision rapide de l'activité.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-green">📋</div>
+        <div class="stat-label">Canevas actifs</div>
+        <div class="stat-value">124</div>
+        <div class="stat-trend text-green">▲ +8 ce mois</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-amber">⏳</div>
+        <div class="stat-label">En attente validation</div>
+        <div class="stat-value">17</div>
+        <div class="stat-trend" style="color:#d97706">▲ +3 hier</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">✓</div>
+        <div class="stat-label">Validés ce mois</div>
+        <div class="stat-value">43</div>
+        <div class="stat-trend text-green">▲ +12% vs mois dernier</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-cyan">💰</div>
+        <div class="stat-label">Montant total (DT)</div>
+        <div class="stat-value" style="font-size:22px">2.4M</div>
+        <div class="stat-trend" style="color:#06b6d4">Crédit sollicité</div>
+      </div>
+    </div>
+
+    <div class="callout mt-4">
+      <strong>Mise en place :</strong> Ajouter ce bloc en haut du <code>dashboard.component.html</code>. Les données peuvent être chargées par un seul appel API <code>/api/canevas/stats</code> retournant un objet avec les 4 compteurs. Utiliser <code>p-skeleton</code> pendant le chargement pour un effet placeholder moderne.
+    </div>
+  </section>
+
+  <!-- ======================== ALERTS ======================== -->
+  <section id="alerts">
+    <h2 class="section-title">Alertes & Notifications</h2>
+    <p class="section-desc">Remplacer les <code>p-message</code> par défaut par des alertes plus expressives avec icônes et titres.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — messages PrimeNG par défaut</div>
+        <div class="compare-body">
+          <div style="border:1px solid #4CAF50;background:#E8F5E9;padding:8px 12px;border-radius:3px;font-size:12px;color:#2e7d32;margin-bottom:8px;">✓ Canevas enregistré avec succès.</div>
+          <div style="border:1px solid #FF9800;background:#FFF3E0;padding:8px 12px;border-radius:3px;font-size:12px;color:#e65100;margin-bottom:8px;">⚠ Certains champs sont manquants.</div>
+          <div style="border:1px solid #f44336;background:#FFEBEE;padding:8px 12px;border-radius:3px;font-size:12px;color:#b71c1c;">✗ Erreur lors de la sauvegarde.</div>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — alertes structurées avec titre et corps</div>
+        <div class="compare-body">
+          <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <div class="alert-body"><strong>Canevas enregistré</strong>Le dossier CAN-2026-124 a été sauvegardé. Il sera soumis à validation.</div>
+          </div>
+          <div class="alert alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-body"><strong>Champs manquants</strong>Les sections "Rendement végétal" et "Bilan fourrager" sont incomplètes.</div>
+          </div>
+          <div class="alert alert-error">
+            <span class="alert-icon">🚫</span>
+            <div class="alert-body"><strong>Erreur de sauvegarde</strong>Connexion au serveur perdue. Réessayez dans quelques instants.</div>
+          </div>
+          <div class="alert alert-info">
+            <span class="alert-icon">ℹ️</span>
+            <div class="alert-body"><strong>Session expire bientôt</strong>Votre session expirera dans 5 minutes. Pensez à sauvegarder.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== MODAL ======================== -->
+  <section id="modal">
+    <h2 class="section-title">Modal / Dialogue de Confirmation</h2>
+    <p class="section-desc">Moderniser les boîtes de dialogue PrimeNG (p-dialog, p-confirmDialog) avec des styles cohérents.</p>
+
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-label before">Avant — dialogue PrimeNG par défaut</div>
+        <div class="compare-body">
+          <div style="border:1px solid #ddd;border-radius:4px;overflow:hidden;">
+            <div style="background:#4CAF50;color:#fff;padding:12px 16px;font-size:14px;font-weight:600;">Confirmation</div>
+            <div style="padding:16px;font-size:13px;">Voulez-vous vraiment supprimer ce canevas ? Cette action est irréversible.</div>
+            <div style="padding:10px 16px;border-top:1px solid #eee;display:flex;gap:8px;justify-content:flex-end;">
+              <button style="padding:6px 14px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;font-size:12px;">Non</button>
+              <button style="padding:6px 14px;border:none;border-radius:3px;background:#f44336;color:#fff;cursor:pointer;font-size:12px;">Oui, supprimer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label after">Après — modal moderne avec hiérarchie et danger clair</div>
+        <div class="compare-body" style="background:#f1f5f9;padding:20px">
+          <div class="modal-demo">
+            <div class="modal-header">
+              <div>
+                <div style="width:44px;height:44px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;">🗑</div>
+                <div class="modal-title">Supprimer le canevas ?</div>
+              </div>
+              <button class="modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+              Cette action est <strong>irréversible</strong>. Le canevas <strong>CAN-2025-001</strong> et toutes ses données associées (exploitation, financier, garanties) seront définitivement supprimés.
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary">Annuler</button>
+              <button class="btn btn-danger">🗑 Supprimer définitivement</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== CANVAS FORM ======================== -->
+  <section id="canvas-form">
+    <h2 class="section-title">Page Canevas Agricole — Exemple Complet</h2>
+    <p class="section-desc">Comment afficher les sections du canevas (exploitation, crédit, garanties…) avec des cartes accordéon et une barre de progression.</p>
+
+    <div class="canvas-progress">
+      <div class="prog-info">
+        <div class="prog-title">CAN-2026-124 — Ben Ali Ahmed</div>
+        <div class="prog-sub">Crédit d'investissement agricole · Agence Tunis Centre</div>
+        <div class="prog-bar mt-2" style="width:320px"><div class="prog-fill" style="width:60%"></div></div>
+      </div>
+      <div class="flex flex-direction-column" style="flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="badge badge-amber">⏳ En cours de saisie</span>
+        <span class="prog-pct">60% complété</span>
+        <span style="font-size:11px;color:#6b7280">Dernière modif. il y a 2h</span>
+      </div>
+    </div>
+
+    <div class="tabs-new">
+      <div class="tab-new active">📋 Identification <span class="tab-count">✓</span></div>
+      <div class="tab-new">🌾 Exploitation <span class="tab-count">3/8</span></div>
+      <div class="tab-new">📊 Analyse Financière <span class="tab-count">1/4</span></div>
+      <div class="tab-new">💳 Crédit <span class="tab-count">0/3</span></div>
+      <div class="tab-new">🔒 Garanties <span class="tab-count">0</span></div>
+      <div class="tab-new">📝 Avis & Décision <span class="tab-count">—</span></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="sc-icon">🌾</div>
+        <div><div class="sc-title">Site Projet</div><div style="font-size:12px;color:#6b7280">Localisation et informations du site agricole</div></div>
+        <div class="sc-status"><span class="badge badge-green">✓ Complété</span></div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="sc-icon">🐄</div>
+        <div><div class="sc-title">Rendement Animal</div><div style="font-size:12px;color:#6b7280">Bovins, ovins, caprins, volailles…</div></div>
+        <div class="sc-status"><span class="badge badge-amber">⏳ En cours</span></div>
+      </div>
+      <div class="section-card-body">
+        <div class="form-new" style="gap:14px">
+          <div class="field-grid">
+            <div class="field-group">
+              <label>Type d'élevage <span class="req">*</span></label>
+              <select><option>Bovins</option><option>Ovins</option><option>Volailles</option></select>
+            </div>
+            <div class="field-group">
+              <label>Nombre de têtes</label>
+              <input type="number" value="45">
+            </div>
+            <div class="field-group">
+              <label>Production annuelle (kg)</label>
+              <input type="number" placeholder="0">
+            </div>
+            <div class="field-group">
+              <label>Prix unitaire (DT/kg)</label>
+              <input type="number" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary btn-sm">+ Ajouter une ligne</button>
+            <button class="btn btn-primary btn-sm">Sauvegarder</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="sc-icon">🌱</div>
+        <div><div class="sc-title">Rendement Végétal</div><div style="font-size:12px;color:#6b7280">Céréales, maraîchage, arboriculture…</div></div>
+        <div class="sc-status"><span class="badge badge-gray">— Non commencé</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== FINANCIAL ======================== -->
+  <section id="financial">
+    <h2 class="section-title">Analyse Financière — Tableau Bilan</h2>
+    <p class="section-desc">Mise en forme des tableaux financiers pour une meilleure lecture des chiffres (alignement droite, totaux en gras, sections distinctes).</p>
+
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <span class="title">Bilan Simplifié</span>
+        <span class="badge badge-gray">Exercice 2025</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto">📄 Exporter PDF</button>
+      </div>
+      <table class="fin-table">
+        <thead><tr>
+          <th style="width:40%">Rubrique</th><th>N-2 (2023)</th><th>N-1 (2024)</th><th>N (2025)</th>
+        </tr></thead>
+        <tbody>
+          <tr class="section-row"><td colspan="4">ACTIF</td></tr>
+          <tr class="sub-row"><td>Immobilisations nettes</td><td>245 000</td><td>280 000</td><td class="pos">310 000</td></tr>
+          <tr class="sub-row"><td>Stocks</td><td>38 500</td><td>41 200</td><td>39 800</td></tr>
+          <tr class="sub-row"><td>Créances clients</td><td>52 000</td><td>48 300</td><td class="neg">38 000</td></tr>
+          <tr class="sub-row"><td>Disponibilités</td><td>12 400</td><td>15 600</td><td>18 200</td></tr>
+          <tr class="total-row"><td>TOTAL ACTIF</td><td>347 900</td><td>385 100</td><td>406 000</td></tr>
+          <tr class="section-row"><td colspan="4">PASSIF</td></tr>
+          <tr class="sub-row"><td>Capitaux propres</td><td>180 000</td><td>195 000</td><td class="pos">215 000</td></tr>
+          <tr class="sub-row"><td>Dettes à long terme</td><td>95 000</td><td>110 000</td><td>105 000</td></tr>
+          <tr class="sub-row"><td>Dettes à court terme</td><td>72 900</td><td>80 100</td><td class="neg">86 000</td></tr>
+          <tr class="total-row"><td>TOTAL PASSIF</td><td>347 900</td><td>385 100</td><td>406 000</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ======================== AFFECTATION ======================== -->
+  <section id="affectation">
+    <h2 class="section-title">Page Affectation</h2>
+    <p class="section-desc">Afficher les agents disponibles avec leur charge de travail actuelle pour faciliter l'assignation.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      <div class="affectation-card">
+        <div class="agent-avatar">MK</div>
+        <div class="agent-info">
+          <div class="agent-name">Mansour Khelil</div>
+          <div class="agent-role">Chargé de crédit — Tunis Centre</div>
+          <div class="agent-load">
+            <span>Charge : 12 dossiers actifs</span>
+            <div class="load-bar mt-2"><div class="load-fill-green" style="width:60%"></div></div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm">Affecter</button>
+      </div>
+      <div class="affectation-card">
+        <div class="agent-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">SB</div>
+        <div class="agent-info">
+          <div class="agent-name">Sarra Belhaj</div>
+          <div class="agent-role">Chargée de crédit — Tunis Centre</div>
+          <div class="agent-load">
+            <span>Charge : 19 dossiers actifs</span>
+            <div class="load-bar mt-2"><div class="load-fill-amber" style="width:85%"></div></div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm">Affecter</button>
+      </div>
+      <div class="affectation-card">
+        <div class="agent-avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)">RB</div>
+        <div class="agent-info">
+          <div class="agent-name">Riadh Bouaziz</div>
+          <div class="agent-role">Chargé de crédit — Tunis Centre</div>
+          <div class="agent-load">
+            <span>Charge : 5 dossiers actifs</span>
+            <div class="load-bar mt-2"><div class="load-fill-green" style="width:25%"></div></div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm">Affecter</button>
+      </div>
+      <div class="affectation-card">
+        <div class="agent-avatar" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">NA</div>
+        <div class="agent-info">
+          <div class="agent-name">Nadia Ayari</div>
+          <div class="agent-role">Chargée de crédit — Tunis Centre</div>
+          <div class="agent-load">
+            <span>Charge : 9 dossiers actifs</span>
+            <div class="load-bar mt-2"><div class="load-fill-green" style="width:45%"></div></div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm">Affecter</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== TIPS ======================== -->
+  <section id="tips">
+    <h2 class="section-title">Recommandations d'Implémentation CSS/Angular</h2>
+    <p class="section-desc">Modifications ciblées à apporter dans les fichiers existants du projet.</p>
+
+    <div class="tip-grid">
+      <div class="tip">
+        <strong>layout.scss — Variables globales</strong>
+        Ajouter les custom properties CSS en haut de <code>src/assets/layout/styles/layout/layout.scss</code> : <code>--surface-card: #fff; --border-radius: 10px; --shadow-card: 0 4px 12px rgba(0,0,0,.1);</code>
+      </div>
+      <div class="tip">
+        <strong>app.topbar.component.css</strong>
+        Remplacer le fond dégradé vert par <code>background: #fff; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,.06);</code>
+      </div>
+      <div class="tip">
+        <strong>app.sidebar / app.menuitem</strong>
+        Ajouter <code>border-radius: 8px; margin: 2px 8px;</code> aux items du menu. Utiliser <code>transition: background .15s</code> pour les états hover.
+      </div>
+      <div class="tip">
+        <strong>theme.css — Ajustement primaire</strong>
+        Modifier <code>--primary-color</code> de <code>#4CAF50</code> à <code>#22c55e</code> et <code>--primary-color-text</code> en <code>#fff</code>. Tous les composants PrimeNG s'adapteront automatiquement.
+      </div>
+      <div class="tip">
+        <strong>styles.css — Body & Background</strong>
+        <code>body { background: #f1f5f9; }</code> à la place du gris actuel pour un fond légèrement bleuté plus moderne.
+      </div>
+      <div class="tip">
+        <strong>p-table global</strong>
+        Dans <code>styles.css</code> : <code>.p-datatable .p-datatable-header { border-radius: 10px 10px 0 0; }</code> et <code>.p-datatable tbody tr:hover { background: #f0fdf4 !important; }</code>
+      </div>
+      <div class="tip">
+        <strong>p-card — Uniformité</strong>
+        <code>::ng-deep .p-card { border-radius: 12px !important; box-shadow: 0 4px 12px rgba(0,0,0,.08) !important; }</code> dans <code>styles.css</code> pour toutes les cartes.
+      </div>
+      <div class="tip">
+        <strong>Polices</strong>
+        Ajouter dans <code>index.html</code> : <code>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;&lt;link href="...Inter:wght@400;500;600;700;800"&gt;</code> puis <code>--font-family: 'Inter', 'Segoe UI', sans-serif;</code> dans le thème.
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:24px">
+      <strong>Ordre de priorité suggéré :</strong><br>
+      1. Corriger la <strong>typographie</strong> (police Inter + tailles) — impact immédiat, 30 min<br>
+      2. Ajuster le <strong>topbar</strong> (fond blanc + spacing) — 1h<br>
+      3. Améliorer la <strong>sidebar</strong> (icônes + groupes) — 2h<br>
+      4. Uniformiser les <strong>cartes et tableaux</strong> via styles.css globaux — 1h<br>
+      5. Moderniser les <strong>formulaires</strong> (sections + focus ring) — 2-4h par composant<br>
+      6. Ajouter les <strong>badges de statut</strong> dans p-table — 1h<br>
+      Aucun de ces changements ne modifie la logique métier, les routes, ou les services Angular.
+    </div>
+  </section>
+
+  <div style="height:40px"></div>
+</main>
+
+</body>
+</html>
