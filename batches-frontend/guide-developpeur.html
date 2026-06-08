@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGCANVAS — Guide Développeur Débutant</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16a34a;--green-50:#f0fdf4;--green-100:#dcfce7;--green-200:#bbf7d0;
+  --blue:#2563eb;--blue-50:#eff6ff;--blue-100:#dbeafe;
+  --purple:#7c3aed;--purple-50:#f5f3ff;--purple-100:#ede9fe;
+  --amber:#d97706;--amber-50:#fffbeb;--amber-100:#fef3c7;
+  --red:#dc2626;--red-50:#fef2f2;--red-100:#fee2e2;
+  --cyan:#0891b2;--cyan-50:#ecfeff;--cyan-100:#cffafe;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
+  --gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:var(--gray-800);line-height:1.65;font-size:14px}
+
+/* NAVIGATION */
+.sidenav{position:fixed;top:0;left:0;width:250px;height:100vh;background:var(--gray-900);overflow-y:auto;z-index:100}
+.sidenav .brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidenav .brand .logo{font-size:16px;font-weight:800;color:#4ade80}
+.sidenav .brand .sub{font-size:11px;color:#6b7280;margin-top:2px}
+.sidenav .nav-group{padding:14px 14px 3px;font-size:9.5px;color:#4b5563;text-transform:uppercase;letter-spacing:1.2px;font-weight:700}
+.sidenav a{display:flex;align-items:center;gap:7px;padding:7px 14px;color:#9ca3af;text-decoration:none;font-size:12px;transition:all .13s;border-left:3px solid transparent}
+.sidenav a:hover{color:#fff;background:rgba(255,255,255,.05)}
+.sidenav a.active-link{color:#4ade80;border-left-color:#4ade80;background:rgba(74,222,128,.07)}
+.sidenav a .cat{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cat-green{background:#4ade80} .cat-blue{background:#60a5fa}
+.cat-purple{background:#a78bfa} .cat-amber{background:#fbbf24}
+.cat-red{background:#f87171} .cat-cyan{background:#22d3ee}
+.cat-gray{background:#9ca3af}
+
+/* MAIN */
+.main{margin-left:250px;padding:36px 48px 80px}
+
+/* TYPOGRAPHY */
+.page-h1{font-size:30px;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--gray-500);margin-bottom:52px;max-width:700px}
+.section-h{font-size:20px;font-weight:800;color:var(--gray-900);margin:60px 0 5px;padding-bottom:10px;border-bottom:3px solid var(--green)}
+.section-sub{font-size:13px;color:var(--gray-500);margin-bottom:24px}
+h4{font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.6px;margin:20px 0 8px}
+p{color:var(--gray-600);margin-bottom:10px}
+
+/* FILE CARD */
+.file-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:20px;overflow:hidden}
+.file-card-header{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border-bottom:1px solid var(--gray-100)}
+.file-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.icon-green{background:var(--green-100)} .icon-blue{background:var(--blue-100)}
+.icon-purple{background:var(--purple-100)} .icon-amber{background:var(--amber-100)}
+.icon-red{background:var(--red-100)} .icon-cyan{background:var(--cyan-100)}
+.icon-gray{background:var(--gray-100)}
+.file-title{font-size:14.5px;font-weight:700;color:var(--gray-900)}
+.file-path{font-size:11px;font-family:monospace;color:var(--gray-400);margin-top:2px;word-break:break-all}
+.file-badge{margin-left:auto;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700;flex-shrink:0}
+.badge-green{background:var(--green-100);color:var(--green)}
+.badge-blue{background:var(--blue-100);color:var(--blue)}
+.badge-purple{background:var(--purple-100);color:var(--purple)}
+.badge-amber{background:var(--amber-100);color:var(--amber)}
+.badge-gray{background:var(--gray-100);color:var(--gray-600)}
+.file-body{padding:18px 20px}
+
+/* ROLES LIST */
+.role-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.role-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--gray-700)}
+.role-list li::before{content:'→';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+
+/* CODE BLOCK */
+.code{background:var(--gray-900);color:#e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Consolas','Cascadia Code',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:10px 0}
+.code .kw{color:#93c5fd} .code .str{color:#86efac} .code .cmt{color:#6b7280}
+.code .fn{color:#fde68a} .code .cls{color:#c4b5fd} .code .num{color:#fb923c}
+
+/* NOTE BOX */
+.note{display:flex;gap:10px;padding:12px 15px;border-radius:8px;font-size:13px;margin:12px 0;line-height:1.55}
+.note-green{background:var(--green-50);border:1px solid var(--green-200);color:#15803d}
+.note-blue{background:var(--blue-50);border:1px solid #bfdbfe;color:#1e40af}
+.note-amber{background:var(--amber-50);border:1px solid #fde68a;color:#92400e}
+.note-purple{background:var(--purple-50);border:1px solid #ddd6fe;color:#5b21b6}
+.note .ni{font-size:16px;flex-shrink:0}
+.note strong{display:block;margin-bottom:2px}
+
+/* FLOW DIAGRAM */
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:16px 0}
+.flow-box{padding:9px 14px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;min-width:100px}
+.flow-arrow{font-size:18px;color:var(--gray-400);margin:0 4px;flex-shrink:0}
+.fb-green{background:var(--green-100);color:#15803d;border:1.5px solid var(--green-200)}
+.fb-blue{background:var(--blue-100);color:#1e40af;border:1.5px solid #bfdbfe}
+.fb-purple{background:var(--purple-100);color:#5b21b6;border:1.5px solid #ddd6fe}
+.fb-amber{background:var(--amber-100);color:#92400e;border:1.5px solid #fde68a}
+.fb-gray{background:var(--gray-100);color:var(--gray-600);border:1.5px solid var(--gray-200)}
+.fb-red{background:var(--red-100);color:#991b1b;border:1.5px solid #fecaca}
+.fb-cyan{background:var(--cyan-100);color:#164e63;border:1.5px solid #a5f3fc}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.data-table th{background:var(--gray-50);padding:9px 14px;text-align:left;font-size:11px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--gray-100)}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--gray-50);vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover{background:var(--green-50)}
+.td-file{font-family:monospace;font-size:12px;color:var(--blue);font-weight:600}
+.td-type{font-size:11px}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* MINI CARD */
+.mini-card{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid var(--gray-100);box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.mini-card .mc-title{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:5px}
+.mini-card .mc-body{font-size:12.5px;color:var(--gray-500)}
+.mc-icon{font-size:20px;margin-bottom:8px}
+
+/* HOWTO */
+.howto{border-left:3px solid var(--green);padding:12px 16px;background:var(--green-50);border-radius:0 8px 8px 0;margin:14px 0;font-size:13px;color:#15803d}
+.howto strong{display:block;font-size:13.5px;margin-bottom:4px}
+
+/* TAG */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;margin:1px}
+.tag-g{background:var(--green-100);color:var(--green)}
+.tag-b{background:var(--blue-100);color:var(--blue)}
+.tag-p{background:var(--purple-100);color:var(--purple)}
+.tag-a{background:var(--amber-100);color:var(--amber)}
+.tag-r{background:var(--red-100);color:var(--red)}
+.tag-gray{background:var(--gray-100);color:var(--gray-600)}
+
+/* STADE TABLE */
+.stade-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--gray-50);font-size:13px}
+.stade-circle{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+@media(max-width:900px){.sidenav{display:none}.main{margin-left:0;padding:20px}.grid-2,.grid-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="sidenav">
+  <div class="brand"><div class="logo">PGCANVAS</div><div class="sub">Guide Développeur Débutant</div></div>
+
+  <div class="nav-group">Vue d'ensemble</div>
+  <a href="#vue"><span class="cat cat-green"></span>Architecture globale</a>
+  <a href="#flux"><span class="cat cat-green"></span>Flux de données</a>
+  <a href="#stades"><span class="cat cat-green"></span>Stades du workflow</a>
+
+  <div class="nav-group">Démarrage</div>
+  <a href="#env"><span class="cat cat-blue"></span>environment.ts — Config</a>
+  <a href="#module"><span class="cat cat-blue"></span>app.module.ts</a>
+  <a href="#routing"><span class="cat cat-blue"></span>app-routing.module.ts</a>
+
+  <div class="nav-group">Sécurité</div>
+  <a href="#auth"><span class="cat cat-red"></span>auth.service — Connexion</a>
+  <a href="#token"><span class="cat cat-red"></span>token-storage — Session</a>
+  <a href="#guard"><span class="cat cat-red"></span>auth.guard — Protection</a>
+  <a href="#interceptor"><span class="cat cat-red"></span>auth.interceptor — Token</a>
+
+  <div class="nav-group">Layout</div>
+  <a href="#topbar"><span class="cat cat-purple"></span>app.topbar</a>
+  <a href="#menu"><span class="cat cat-purple"></span>app.menu — Navigation</a>
+  <a href="#menuitem"><span class="cat cat-purple"></span>app.menuitem</a>
+
+  <div class="nav-group">Modèles (données)</div>
+  <a href="#model-user"><span class="cat cat-amber"></span>User — Utilisateur</a>
+  <a href="#model-client"><span class="cat cat-amber"></span>Client + Personne</a>
+  <a href="#model-caneva"><span class="cat cat-amber"></span>Caneva — Dossier</a>
+  <a href="#model-avis"><span class="cat cat-amber"></span>Avis — Décision</a>
+
+  <div class="nav-group">Services (API)</div>
+  <a href="#svc-canevas"><span class="cat cat-cyan"></span>canevas.service</a>
+  <a href="#svc-user"><span class="cat cat-cyan"></span>user.service</a>
+  <a href="#svc-autres"><span class="cat cat-cyan"></span>Autres services</a>
+
+  <div class="nav-group">Pages principales</div>
+  <a href="#pg-search"><span class="cat cat-gray"></span>search-client</a>
+  <a href="#pg-list"><span class="cat cat-gray"></span>list</a>
+  <a href="#pg-add"><span class="cat cat-gray"></span>add-canevas</a>
+  <a href="#pg-fiche"><span class="cat cat-gray"></span>fiche-signalitique</a>
+  <a href="#pg-avis"><span class="cat cat-gray"></span>avis</a>
+
+  <div class="nav-group">Modifications</div>
+  <a href="#modif"><span class="cat cat-green"></span>Comment modifier</a>
+</nav>
+
+<main class="main">
+  <h1 class="page-h1">Guide Développeur — PGCANVAS</h1>
+  <p class="page-sub">Ce guide explique le rôle exact de chaque fichier du projet Angular. Conçu pour un développeur débutant qui veut comprendre la structure et faire ses premières modifications en confiance.</p>
+
+  <!-- ===================== VUE GLOBALE ===================== -->
+  <h2 class="section-h" id="vue">Architecture Globale</h2>
+  <p class="section-sub">PGCANVAS est une application Angular 17 avec un backend Spring Boot. Voici comment les grandes parties s'articulent.</p>
+
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="mini-card"><div class="mc-icon">🖥️</div><div class="mc-title">Frontend Angular 17</div><div class="mc-body">Dossier <code>frontend-app1/</code><br>Interface utilisateur, formulaires, navigation, affichage des données.</div></div>
+    <div class="mini-card"><div class="mc-icon">⚙️</div><div class="mc-title">Backend Spring Boot</div><div class="mc-body">Dossier <code>backend-saeb/</code><br>API REST, base de données Oracle, logique métier, authentification.</div></div>
+    <div class="mini-card"><div class="mc-icon">🔐</div><div class="mc-title">Auth Server</div><div class="mc-body">Serveur externe sur port 7070<br>Gère les connexions, les tokens JWT et les profils utilisateurs.</div></div>
+  </div>
+
+  <div class="note note-blue"><span class="ni">ℹ️</span><div><strong>Principe clé :</strong> Le frontend Angular ne parle JAMAIS directement à la base de données. Il passe toujours par les services Angular → API REST (port 8081) → Base Oracle.</div></div>
+
+  <h4>Structure des dossiers frontend</h4>
+  <div class="code"><span class="cmt">// frontend-app1/src/app/</span>
+├── <span class="str">_components/</span>         <span class="cmt">← Tous les composants visuels</span>
+│   ├── <span class="str">layout/</span>          <span class="cmt">← Topbar, Sidebar, Menu, Footer</span>
+│   └── <span class="str">pages/</span>
+│       └── <span class="str">canvas.agricole/</span> <span class="cmt">← Toutes les pages du projet</span>
+├── <span class="str">_models/</span>             <span class="cmt">← Interfaces TypeScript (formes des données)</span>
+├── <span class="str">_services/</span>           <span class="cmt">← Communication avec l'API backend</span>
+├── <span class="str">core/</span>
+│   ├── <span class="str">services/</span>        <span class="cmt">← auth.service, token-storage</span>
+│   ├── <span class="str">guards/</span>          <span class="cmt">← Protection des routes</span>
+│   └── <span class="str">interceptors/</span>    <span class="cmt">← Ajout automatique du token JWT</span>
+├── <span class="str">environments/</span>        <span class="cmt">← URLs et config selon l'environnement</span>
+├── <span class="str">app.module.ts</span>        <span class="cmt">← Point d'entrée, déclare tout</span>
+└── <span class="str">app-routing.module.ts</span> <span class="cmt">← Table des routes URL</span></div>
+
+  <!-- FLUX -->
+  <h2 class="section-h" id="flux">Flux de Données — Comment Circule l'Information</h2>
+  <p class="section-sub">Tracer le chemin complet : de l'action utilisateur jusqu'à la base de données et retour.</p>
+
+  <h4>Flux normal (ex: Rechercher un client)</h4>
+  <div class="flow">
+    <div class="flow-box fb-gray">Utilisateur<br><small>clique Rechercher</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box fb-purple">Composant HTML<br><small>search-client.html</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box fb-blue">TypeScript<br><small>search-client.component.ts</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box fb-green">Service<br><small>canevas.service.ts</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box fb-cyan">HTTP + Token<br><small>auth.interceptor.ts</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box fb-amber">API Backend<br><small>:8081/api/…</small></div>
+  </div>
+  <div class="flow" style="margin-top:4px">
+    <div class="flow-box fb-gray">Affichage<br><small>mise à jour HTML</small></div>
+    <span class="flow-arrow">←</span>
+    <div class="flow-box fb-blue">TypeScript<br><small>stocke dans variable</small></div>
+    <span class="flow-arrow">←</span>
+    <div class="flow-box fb-green">Service<br><small>retourne Observable</small></div>
+    <span class="flow-arrow">←</span>
+    <div class="flow-box fb-amber">Réponse JSON<br><small>données client</small></div>
+  </div>
+
+  <!-- STADES -->
+  <h2 class="section-h" id="stades">Stades du Workflow — Cycle de Vie d'un Canevas</h2>
+  <p class="section-sub">Chaque dossier (canevas) passe par des étapes précises. Le champ <code>stade</code> dans le modèle <code>Caneva</code> indique à quelle étape il se trouve.</p>
+
+  <div class="file-card">
+    <div class="file-body">
+      <div class="stade-row"><div class="stade-circle" style="background:#9ca3af"></div><div><strong>INIT_DONNEE</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Canevas créé, données initiales saisies</div></div>
+      <div class="stade-row"><div class="stade-circle" style="background:#3b82f6"></div><div><strong>PEC_DONNEE</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Prise en charge par le chargé de crédit (CHARGER)</div></div>
+      <div class="stade-row"><div class="stade-circle" style="background:#8b5cf6"></div><div><strong>VALID_DONNEE</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Validé par le chef d'agence (CHAGCE)</div></div>
+      <div class="stade-row"><div class="stade-circle" style="background:#f59e0b"></div><div><strong>CORRIGE_DONNEE</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Renvoyé pour correction</div></div>
+      <div class="stade-row"><div class="stade-circle" style="background:#06b6d4"></div><div><strong>PEC_AVIS_DEC</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Prise en charge avis/décision (PROFILE3)</div></div>
+      <div class="stade-row"><div class="stade-circle" style="background:#22c55e"></div><div><strong>VALID_AVIS_DEC</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Avis validé (PROFILE4)</div></div>
+      <div class="stade-row"><div class="stade-circle" style="background:#15803d"></div><div><strong>CLOTURE</strong></div><div style="margin-left:auto;font-size:12px;color:#6b7280">Dossier clôturé</div></div>
+    </div>
+  </div>
+
+  <div class="note note-amber"><span class="ni">⚠️</span><div><strong>Règle importante :</strong> Un utilisateur ne peut voir et modifier que les canevas dont le <code>stade</code> correspond à son profil. C'est géré dans <code>list.component.ts</code> via la méthode <code>isRowSelectable()</code> et la config <code>ALLOWED_STADES</code>.</div></div>
+
+  <!-- ===================== CONFIG ===================== -->
+  <h2 class="section-h" id="env">environment.development.ts — La Configuration</h2>
+  <p class="section-sub">Fichier : <code>frontend-app1/src/environments/environment.development.ts</code></p>
+
+  <div class="file-card">
+    <div class="file-card-header">
+      <div class="file-icon icon-blue">⚙️</div>
+      <div>
+        <div class="file-title">environment.development.ts</div>
+        <div class="file-path">src/environments/environment.development.ts</div>
+      </div>
+      <span class="file-badge badge-blue">CONFIG</span>
+    </div>
+    <div class="file-body">
+      <p><strong>Ce fichier contient toutes les URLs et paramètres de l'application.</strong> C'est le premier fichier à modifier quand on change d'environnement (dev → production).</p>
+      <div class="code"><span class="kw">export const</span> environment = {
+  production: <span class="num">false</span>,
+
+  <span class="cmt">// URL de l'API backend Spring Boot</span>
+  apiURL: <span class="str">'http://localhost:8081/'</span>,
+
+  <span class="cmt">// Mode d'authentification : 'custom' ou 'keycloak'</span>
+  AUTH_MODE: <span class="str">'custom'</span>,
+
+  <span class="cmt">// URL du serveur d'authentification externe</span>
+  authServerUrl: <span class="str">'http://localhost:7070'</span>,
+
+  <span class="cmt">// URL de redirection après connexion</span>
+  callbackUrl: <span class="str">'http://localhost:4333/auth/callback'</span>,
+
+  <span class="cmt">// URL de déconnexion → redirige vers le portail BNA</span>
+  portalLogin: <span class="str">'http://localhost:4300/login'</span>,
+};</div>
+      <div class="grid-2">
+        <div class="howto"><strong>📌 Quand modifier ce fichier ?</strong>Changer <code>apiURL</code> si le backend tourne sur un autre port. Changer <code>AUTH_MODE</code> pour passer de l'auth custom à Keycloak.</div>
+        <div class="note note-amber" style="margin:0"><span class="ni">⚠️</span><div>Ne jamais modifier <code>environment.ts</code> (production). Toujours travailler dans <code>environment.development.ts</code>.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODULE ===================== -->
+  <h2 class="section-h" id="module">app.module.ts — Le Registre Central</h2>
+
+  <div class="file-card">
+    <div class="file-card-header">
+      <div class="file-icon icon-blue">📋</div>
+      <div>
+        <div class="file-title">app.module.ts</div>
+        <div class="file-path">src/app/app.module.ts</div>
+      </div>
+      <span class="file-badge badge-blue">MODULE RACINE</span>
+    </div>
+    <div class="file-body">
+      <p><strong>C'est le fichier le plus important du projet.</strong> Angular l'utilise pour savoir quels composants, services et modules existent dans l'application. C'est ici qu'on déclare tout ce qu'on veut utiliser.</p>
+      <ul class="role-list">
+        <li>Déclare tous les composants Angular du niveau racine (Dashboard, Home, Profile…)</li>
+        <li>Importe les modules PrimeNG utilisés (ProgressSpinner, Toast, Messages…)</li>
+        <li>Importe Angular Material (Toolbar, Table, Card, Dialog…)</li>
+        <li>Configure l'intercepteur HTTP pour ajouter automatiquement le token JWT</li>
+        <li>Initialise Keycloak au démarrage (si AUTH_MODE = 'keycloak')</li>
+      </ul>
+      <div class="code"><span class="cmt">// Extrait simplifié</span>
+<span class="cls">@NgModule</span>({
+  declarations: [
+    <span class="cls">AppComponent</span>, <span class="cls">DashboardComponent</span>, <span class="cls">HomeComponent</span>...
+  ],
+  imports: [
+    <span class="cls">BrowserModule</span>, <span class="cls">FormsModule</span>, <span class="cls">ReactiveFormsModule</span>,
+    <span class="cls">TableModule</span>, <span class="cls">ButtonModule</span>, <span class="cls">ToastModule</span>... <span class="cmt">// PrimeNG</span>
+    <span class="cls">MatToolbarModule</span>, <span class="cls">MatCardModule</span>...  <span class="cmt">// Angular Material</span>
+  ],
+  providers: [
+    <span class="cls">MessageService</span>, <span class="cls">ConfirmationService</span>,
+    { provide: <span class="cls">HTTP_INTERCEPTORS</span>, useClass: <span class="cls">AuthInterceptor</span>, multi: <span class="kw">true</span> }
+  ]
+})</div>
+      <div class="howto"><strong>📌 Quand modifier ce fichier ?</strong>Si vous ajoutez un nouveau composant dans <code>src/app/</code> directement (pas dans un sous-module), il faut le déclarer ici. Si vous utilisez un nouveau module PrimeNG, l'importer ici.</div>
+    </div>
+  </div>
+
+  <!-- ===================== ROUTING ===================== -->
+  <h2 class="section-h" id="routing">app-routing.module.ts — La Table des Routes</h2>
+
+  <div class="file-card">
+    <div class="file-card-header">
+      <div class="file-icon icon-blue">🗺️</div>
+      <div>
+        <div class="file-title">app-routing.module.ts</div>
+        <div class="file-path">src/app/app-routing.module.ts</div>
+      </div>
+      <span class="file-badge badge-blue">ROUTAGE</span>
+    </div>
+    <div class="file-body">
+      <p><strong>Ce fichier définit quelle URL affiche quel composant.</strong> C'est la table des matières de l'application.</p>
+      <div class="code"><span class="kw">const</span> routes: <span class="cls">Routes</span> = [
+  <span class="cmt">// Callback OAuth (redirection après connexion externe)</span>
+  { path: <span class="str">'auth/callback'</span>, component: <span class="cls">AuthCallbackComponent</span> },
+
+  <span class="cmt">// Application principale — protégée par AuthGuard</span>
+  { path: <span class="str">''</span>, component: <span class="cls">AppLayoutComponent</span>,
+    canActivate: [<span class="cls">AuthGuard</span>],  <span class="cmt">← vérifie que l'user est connecté</span>
+    children: [
+      <span class="cmt">// Charge le module pages en "lazy loading"</span>
+      { path: <span class="str">'pages'</span>, loadChildren: () => import(<span class="str">'./pages.module'</span>) }
+    ]
+  },
+
+  <span class="cmt">// Page 404</span>
+  { path: <span class="str">'notfound'</span>, component: <span class="cls">NotfoundComponent</span> },
+  { path: <span class="str">'**'</span>, redirectTo: <span class="str">'/notfound'</span> }
+];</div>
+      <div class="note note-blue"><span class="ni">ℹ️</span><div><strong>Lazy loading :</strong> Le module <code>pages</code> n'est chargé que quand l'utilisateur navigue vers <code>/pages/…</code>. Cela accélère le chargement initial. Les routes du canevas agricole sont dans <code>canvas.agricole-routing.module.ts</code>.</div></div>
+
+      <h4>Routes du canevas agricole (canvas.agricole-routing.module.ts)</h4>
+      <table class="data-table">
+        <thead><tr><th>URL</th><th>Composant</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-file">/pages/agricole/searshClient</td><td>SearchClientComponent</td><td>Recherche d'un client par pièce d'identité</td></tr>
+          <tr><td class="td-file">/pages/agricole/listCanevas</td><td>ListComponent</td><td>Liste des canevas du client sélectionné</td></tr>
+          <tr><td class="td-file">/pages/agricole/add</td><td>AddCanevasComponent</td><td>Formulaire multi-étapes d'un canevas</td></tr>
+          <tr><td class="td-file">/pages/agricole/avis</td><td>AvisComponent</td><td>Formulaire d'avis et de décision</td></tr>
+          <tr><td class="td-file">/pages/agricole/garantie</td><td>GarantiesComponent</td><td>Gestion des garanties</td></tr>
+          <tr><td class="td-file">/pages/agricole/engagement</td><td>EngagementsComponent</td><td>Engagements BCT/BNA</td></tr>
+          <tr><td class="td-file">/pages/agricole/analyse</td><td>AnalyseFinancierComponent</td><td>Analyse financière (bilan, ratios…)</td></tr>
+          <tr><td class="td-file">/pages/agricole/affectation</td><td>AffectationComponent</td><td>Affecter un canevas à un agent</td></tr>
+          <tr><td class="td-file">/pages/agricole/snapshots</td><td>SnapshotHistoryComponent</td><td>Historique des modifications (audit trail)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== SECURITE ===================== -->
+  <h2 class="section-h" id="auth">Système de Sécurité — 4 Fichiers</h2>
+  <p class="section-sub">La sécurité est gérée par 4 fichiers qui travaillent ensemble. Il faut tous les comprendre.</p>
+
+  <div class="file-card" id="auth">
+    <div class="file-card-header">
+      <div class="file-icon icon-red">🔑</div>
+      <div>
+        <div class="file-title">auth.service.service.ts — Service de Connexion</div>
+        <div class="file-path">src/app/core/services/auth.service.service.ts</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#fee2e2;color:#dc2626">SÉCURITÉ</span>
+    </div>
+    <div class="file-body">
+      <p>Gère la <strong>connexion</strong> et la <strong>déconnexion</strong> de l'utilisateur. Stocke qui est connecté via des Signals Angular (état réactif).</p>
+      <ul class="role-list">
+        <li><code>login(username, password)</code> : envoie les identifiants au serveur d'auth (port 7070), reçoit le token JWT en retour</li>
+        <li><code>getAccessToken()</code> : retourne le token JWT stocké dans la session</li>
+        <li><code>isTokenExpired()</code> : vérifie si le token est encore valide</li>
+        <li><code>clearStorage()</code> : efface la session (déconnexion)</li>
+        <li><code>currentUserSignal</code> : signal réactif qui contient l'utilisateur connecté</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="file-card" id="token">
+    <div class="file-card-header">
+      <div class="file-icon icon-red">💾</div>
+      <div>
+        <div class="file-title">token-storage.service.ts — Stockage de Session</div>
+        <div class="file-path">src/app/core/services/token-storage.service.ts</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#fee2e2;color:#dc2626">SESSION</span>
+    </div>
+    <div class="file-body">
+      <p>Gère le <strong>stockage des données de session</strong> dans le navigateur (sessionStorage + localStorage). C'est ici que le token JWT, l'utilisateur et les menus sont sauvegardés.</p>
+      <div class="code"><span class="cmt">// Ce qui est stocké dans sessionStorage :</span>
+- <span class="str">'access_token'</span>  → le token JWT (clé d'accès API)
+- <span class="str">'user'</span>          → objet utilisateur (nom, matricule, profils…)
+- <span class="str">'menus'</span>         → menus autorisés pour cet utilisateur
+
+<span class="cmt">// Méthodes clés :</span>
+<span class="fn">saveToken</span>(token)     <span class="cmt">// stocker le token</span>
+<span class="fn">getToken</span>()           <span class="cmt">// lire le token</span>
+<span class="fn">getUser</span>()            <span class="cmt">// lire l'utilisateur</span>
+<span class="fn">getProfiles</span>()        <span class="cmt">// lire les profils [CCA, CHAGCE…]</span>
+<span class="fn">isLoggedIn</span>()         <span class="cmt">// vérifier si connecté</span>
+<span class="fn">signOut</span>()            <span class="cmt">// effacer la session</span></div>
+    </div>
+  </div>
+
+  <div class="file-card" id="guard">
+    <div class="file-card-header">
+      <div class="file-icon icon-red">🚧</div>
+      <div>
+        <div class="file-title">auth.guard.ts — Gardien des Routes</div>
+        <div class="file-path">src/app/core/guards/auth.guard.ts</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#fee2e2;color:#dc2626">GUARD</span>
+    </div>
+    <div class="file-body">
+      <p>Protège les pages de l'application. <strong>Avant d'afficher une page, Angular appelle ce fichier.</strong> S'il retourne <code>false</code>, l'utilisateur est redirigé vers la page de connexion.</p>
+      <div class="code"><span class="kw">canActivate</span>(): <span class="cls">boolean</span> {
+  <span class="cmt">// 1. Est-ce qu'il y a un token ?</span>
+  <span class="kw">if</span> (!tokenStorage.<span class="fn">getToken</span>()) {
+    window.location = environment.portalLogin; <span class="cmt">// → portail BNA</span>
+    <span class="kw">return false</span>;
+  }
+  <span class="cmt">// 2. Est-ce que l'utilisateur existe ?</span>
+  <span class="kw">if</span> (!tokenStorage.<span class="fn">getUser</span>()) { <span class="kw">return false</span>; }
+  <span class="cmt">// 3. Est-ce que le menu est autorisé ?</span>
+  <span class="cmt">// vérifie les menus stockés en session</span>
+  <span class="kw">return true</span>; <span class="cmt">// accès autorisé</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="interceptor">
+    <div class="file-card-header">
+      <div class="file-icon icon-red">🔄</div>
+      <div>
+        <div class="file-title">auth.interceptor.ts — Ajout Automatique du Token</div>
+        <div class="file-path">src/app/core/interceptors/auth.interceptor.ts</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#fee2e2;color:#dc2626">HTTP</span>
+    </div>
+    <div class="file-body">
+      <p><strong>Intercepte TOUTES les requêtes HTTP</strong> avant qu'elles partent vers le backend et ajoute automatiquement le token JWT dans l'en-tête. Sans ça, l'API refuserait les requêtes.</p>
+      <div class="code"><span class="cmt">// Ce que fait l'intercepteur pour chaque requête :</span>
+<span class="fn">intercept</span>(request, next) {
+  <span class="kw">const</span> token = tokenStorage.<span class="fn">getToken</span>();
+
+  <span class="cmt">// Ajoute le header Authorization: Bearer {token}</span>
+  <span class="kw">const</span> authReq = request.<span class="fn">clone</span>({
+    headers: request.headers.<span class="fn">set</span>(
+      <span class="str">'Authorization'</span>, <span class="str">`Bearer ${token}`</span>
+    )
+  });
+
+  <span class="cmt">// Si le serveur répond 401 (token expiré) → déconnexion</span>
+  <span class="kw">return</span> next.<span class="fn">handle</span>(authReq).<span class="fn">pipe</span>(
+    <span class="fn">catchError</span>(err => {
+      <span class="kw">if</span> (err.status === <span class="num">401</span>) { <span class="fn">handle401Error</span>(); }
+    })
+  );
+}</div>
+      <div class="note note-green"><span class="ni">💡</span><div>Grâce à cet intercepteur, les services Angular n'ont PAS besoin d'ajouter le token manuellement dans chaque appel HTTP. C'est fait une seule fois ici.</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== LAYOUT ===================== -->
+  <h2 class="section-h" id="topbar">Layout — Navigation et Structure Visuelle</h2>
+
+  <div class="file-card" id="topbar">
+    <div class="file-card-header">
+      <div class="file-icon icon-purple">📌</div>
+      <div>
+        <div class="file-title">app.topbar.component — Barre du Haut</div>
+        <div class="file-path">src/app/_components/layout/app.topbar.component.{html,ts,css}</div>
+      </div>
+      <span class="file-badge badge-purple">LAYOUT</span>
+    </div>
+    <div class="file-body">
+      <p>La barre de navigation fixe en haut de l'écran. Elle affiche les informations de l'utilisateur connecté et le bouton de déconnexion.</p>
+      <ul class="role-list">
+        <li><strong>app.topbar.component.html</strong> : structure HTML (logo, boutons, toolbar PrimeNG)</li>
+        <li><strong>app.topbar.component.ts</strong> : appelle <code>unifiedAuthService</code> pour obtenir le nom d'utilisateur, le code agence, les dates. Contient la méthode <code>onLogout()</code></li>
+      </ul>
+      <div class="code"><span class="cmt">// Données affichées dans le topbar :</span>
+unifiedAuthService.<span class="fn">getUsername</span>()       <span class="cmt">// Nom de l'agent</span>
+unifiedAuthService.<span class="fn">getPoste</span>()          <span class="cmt">// Code poste</span>
+unifiedAuthService.<span class="fn">getCodeStructure</span>()  <span class="cmt">// Code agence (ex: 001)</span>
+unifiedAuthService.<span class="fn">getLibelleStructure</span>()<span class="cmt">// Nom agence (ex: Tunis Centre)</span>
+unifiedAuthService.<span class="fn">getDateJournee</span>()    <span class="cmt">// Date du jour</span></div>
+      <div class="howto"><strong>📌 Modifier le topbar ?</strong> Éditer le fichier <code>.html</code> pour la structure et le fichier <code>_topbar.scss</code> pour le style.</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="menu">
+    <div class="file-card-header">
+      <div class="file-icon icon-purple">📂</div>
+      <div>
+        <div class="file-title">app.menu.component — Construction du Menu Latéral</div>
+        <div class="file-path">src/app/_components/layout/app.menu.component.ts</div>
+      </div>
+      <span class="file-badge badge-purple">MENU DYNAMIQUE</span>
+    </div>
+    <div class="file-body">
+      <p><strong>C'est ce fichier qui décide quels menus l'utilisateur voit.</strong> Le menu est construit dynamiquement selon les profils de l'utilisateur. Deux utilisateurs avec des profils différents voient des menus différents.</p>
+      <ul class="role-list">
+        <li><code>buildMenu()</code> : construit le tableau <code>model[]</code> en fonction des profils</li>
+        <li>Profil <strong>CCA / CHARGER</strong> → voit "PEC CANEVAS AGRICOLE"</li>
+        <li>Profil <strong>CHAGCE</strong> → voit "VALIDATION CANEVAS AGRICOLE"</li>
+        <li>Profil <strong>PROFILE3</strong> → voit "PEC AVIS CANEVAS AGRICOLE"</li>
+        <li>Profil <strong>PROFILE4</strong> → voit "VALIDATION AVIS DÉCISION"</li>
+        <li>Profil <strong>PROFILE5</strong> → voit "AFFECTATION CANEVAS"</li>
+      </ul>
+      <div class="code"><span class="cmt">// Exemple d'un item de menu dans buildMenu()</span>
+{
+  label: <span class="str">'PEC CANEVAS AGRICOLE'</span>,
+  icon: <span class="str">'pi pi-fw pi-file'</span>,
+  routerLink: [<span class="str">'/pages/agricole/searshClient'</span>],
+  visible: profiles.<span class="fn">includes</span>(<span class="str">'CCA'</span>) <span class="cmt">// visible si profil CCA</span>
+}</div>
+      <div class="howto"><strong>📌 Ajouter un item de menu ?</strong> Ouvrir <code>app.menu.component.ts</code>, trouver la méthode <code>buildMenu()</code>, et ajouter un objet <code>{ label, icon, routerLink, visible }</code> dans le bon tableau.</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="menuitem">
+    <div class="file-card-header">
+      <div class="file-icon icon-purple">🔹</div>
+      <div>
+        <div class="file-title">app.menuitem.component — Rendu d'un Item de Menu</div>
+        <div class="file-path">src/app/_components/layout/app.menuitem.component.{html,ts}</div>
+      </div>
+      <span class="file-badge badge-purple">COMPOSANT RÉCURSIF</span>
+    </div>
+    <div class="file-body">
+      <p>Composant récursif qui affiche <strong>un seul item du menu</strong> et ses sous-items. Utilisé dans une boucle par <code>app.menu.component.html</code>.</p>
+      <ul class="role-list">
+        <li>Affiche l'icône, le label, le chevron (si sous-menu)</li>
+        <li>Gère l'animation d'ouverture/fermeture des sous-menus</li>
+        <li>Applique la classe <code>active-route</code> sur l'item actif (route actuelle)</li>
+        <li><code>itemClick()</code> : gère le clic (navigation ou toggle sous-menu)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===================== MODÈLES ===================== -->
+  <h2 class="section-h" id="model-user">Les Modèles — Formes des Données</h2>
+  <p class="section-sub">Les modèles TypeScript dans <code>_models/</code> définissent la structure des données. Ce sont des <em>interfaces</em> : elles ne font rien, elles décrivent juste à quoi ressemble un objet.</p>
+
+  <div class="file-card" id="model-user">
+    <div class="file-card-header">
+      <div class="file-icon icon-amber">👤</div>
+      <div>
+        <div class="file-title">user.ts — L'Utilisateur Connecté</div>
+        <div class="file-path">src/app/_models/user.ts</div>
+      </div>
+      <span class="file-badge badge-amber">MODÈLE</span>
+    </div>
+    <div class="file-body">
+      <div class="code"><span class="kw">export interface</span> <span class="cls">User</span> {
+  id?:            <span class="kw">number</span>;
+  username?:      <span class="kw">string</span>;   <span class="cmt">// Nom de connexion</span>
+  matricule?:     <span class="kw">string</span>;   <span class="cmt">// Matricule BNA</span>
+  nom?:           <span class="kw">string</span>;
+  prenom?:        <span class="kw">string</span>;
+  profiles?:      <span class="kw">string</span>[];  <span class="cmt">// ['CCA', 'CHAGCE'] → détermine les droits</span>
+  token?:         <span class="kw">string</span>;   <span class="cmt">// Token JWT pour les appels API</span>
+  codeStructure?: <span class="kw">string</span>;   <span class="cmt">// Code de l'agence (ex: '001')</span>
+  libStructure?:  <span class="kw">string</span>;   <span class="cmt">// Nom de l'agence (ex: 'Tunis Centre')</span>
+  typeStructure?: <span class="kw">string</span>;   <span class="cmt">// '1'=Agence, '2'=Direction, '5'=Pôle</span>
+  codePoste?:     <span class="kw">string</span>;   <span class="cmt">// Code du poste (ex: 'CCA', 'CHAGCE')</span>
+  tmm?:           <span class="kw">number</span>;   <span class="cmt">// Taux Moyen du Marché (utilisé pour calculs)</span>
+}</div>
+      <div class="note note-amber"><span class="ni">⚠️</span><div><strong>Le champ <code>profiles</code> est crucial :</strong> c'est lui qui détermine quels menus et quelles actions l'utilisateur peut voir. Il est lu partout dans le projet.</div></div>
+    </div>
+  </div>
+
+  <div class="file-card" id="model-client">
+    <div class="file-card-header">
+      <div class="file-icon icon-amber">🧑‍🌾</div>
+      <div>
+        <div class="file-title">client.ts + Personne.ts — Le Client BNA</div>
+        <div class="file-path">src/app/_models/client.ts · Personne.ts</div>
+      </div>
+      <span class="file-badge badge-amber">MODÈLE</span>
+    </div>
+    <div class="file-body">
+      <p>Un <strong>Client</strong> est un client BNA. Il contient une <strong>Personne</strong> (ses infos personnelles) et ses comptes bancaires.</p>
+      <div class="code"><span class="kw">interface</span> <span class="cls">Client</span> {
+  np?:         <span class="kw">string</span>;         <span class="cmt">// Numéro de la personne (numSeqPers)</span>
+  personne?:   <span class="cls">Personne</span>;       <span class="cmt">// Informations personnelles</span>
+  comptes?:    <span class="cls">Compte</span>[];      <span class="cmt">// Comptes bancaires</span>
+  groupes?:    <span class="cls">Groupe</span>[];      <span class="cmt">// Groupes (famille, société...)</span>
+}
+
+<span class="kw">interface</span> <span class="cls">Personne</span> {
+  numSeqPers:   <span class="kw">string</span>;  <span class="cmt">// Identifiant unique de la personne</span>
+  nomPers:      <span class="kw">string</span>;  <span class="cmt">// Nom de famille</span>
+  prenomPers:   <span class="kw">string</span>;  <span class="cmt">// Prénom</span>
+  codTpcePers:  <span class="kw">string</span>;  <span class="cmt">// Type de pièce (CIN, PASSEPORT...)</span>
+  numPcePers:   <span class="kw">string</span>;  <span class="cmt">// Numéro de la pièce d'identité</span>
+  codActPers:   <span class="kw">string</span>;  <span class="cmt">// Code activité</span>
+  libActPrincipal: <span class="kw">string</span>; <span class="cmt">// Libellé activité principale</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="model-caneva">
+    <div class="file-card-header">
+      <div class="file-icon icon-amber">📁</div>
+      <div>
+        <div class="file-title">Caneva.ts — Le Dossier de Crédit Agricole</div>
+        <div class="file-path">src/app/_models/Caneva.ts</div>
+      </div>
+      <span class="file-badge badge-amber">MODÈLE CENTRAL</span>
+    </div>
+    <div class="file-body">
+      <p>C'est le <strong>modèle le plus important du projet</strong>. Il représente un dossier de demande de crédit agricole avec toutes ses données.</p>
+      <div class="code"><span class="kw">interface</span> <span class="cls">Caneva</span> {
+  id?:                   <span class="kw">number</span>;    <span class="cmt">// ID en base de données</span>
+  numSeqpers:            <span class="kw">number</span>;    <span class="cmt">// Référence du client</span>
+  stade?:                <span class="kw">string</span>;    <span class="cmt">// ← Étape du workflow (voir tableau stades)</span>
+  dateDemande?:          <span class="cls">Date</span>;
+  matrAffectCnv?:        <span class="kw">string</span>;    <span class="cmt">// Matricule de l'agent affecté</span>
+  codeStructure?:        <span class="kw">string</span>;    <span class="cmt">// Code de l'agence</span>
+
+  <span class="cmt">// Les types de crédit demandés</span>
+  creditCourtTermes?:    <span class="cls">CreditCourtTerme</span>[];
+  creditInvestissements?:<span class="cls">CreditInvestissement</span>[];
+  creditAchatTerrains?:  <span class="cls">CreditAchatTerrain</span>[];
+
+  <span class="cmt">// Sites du projet agricole</span>
+  selectedSites?:        <span class="cls">Site</span>[];
+
+  <span class="cmt">// Documents attachés</span>
+  documents?:            <span class="cls">DocumentCanevaFileDto</span>[];
+}</div>
+      <div class="note note-green"><span class="ni">💡</span><div>Ce modèle contient les types de crédit optionnels. Un canevas peut avoir un crédit court terme, un crédit investissement, ou un achat de terrain — ou plusieurs à la fois.</div></div>
+    </div>
+  </div>
+
+  <div class="file-card" id="model-avis">
+    <div class="file-card-header">
+      <div class="file-icon icon-amber">✅</div>
+      <div>
+        <div class="file-title">Avis.ts — La Décision sur le Dossier</div>
+        <div class="file-path">src/app/_models/Avis.ts</div>
+      </div>
+      <span class="file-badge badge-amber">MODÈLE</span>
+    </div>
+    <div class="file-body">
+      <div class="code"><span class="kw">interface</span> <span class="cls">AvisDTO</span> {
+  id?:                  <span class="kw">number</span>;
+  avisValue?:           <span class="kw">string</span>;    <span class="cmt">// 'Favorable' ou 'Defavorable'</span>
+  statusAvis?:          <span class="kw">string</span>;    <span class="cmt">// statut workflow</span>
+  commentaire?:         <span class="kw">string</span>;    <span class="cmt">// Commentaire du décideur</span>
+  codeStructureReceptrice?: <span class="kw">string</span>; <span class="cmt">// Agence destinataire</span>
+
+  <span class="cmt">// Avis détaillés par type de crédit</span>
+  avisCreditAchatTerrain?: <span class="cls">AvisCreditAchatTerrain</span>;
+  avisCreditInves?:     <span class="cls">AvisCreditInves</span>;
+  avisCreditCourtTerme?:<span class="cls">AvisCreditCourtTerme</span>;
+  avisGarantie?:        <span class="cls">AvisGarantie</span>;
+}</div>
+    </div>
+  </div>
+
+  <!-- ===================== SERVICES ===================== -->
+  <h2 class="section-h" id="svc-canevas">Les Services — Communication avec l'API</h2>
+  <p class="section-sub">Les services dans <code>_services/</code> contiennent les appels HTTP vers le backend. Les composants n'appellent jamais <code>HttpClient</code> directement, ils passent par les services.</p>
+
+  <div class="file-card" id="svc-canevas">
+    <div class="file-card-header">
+      <div class="file-icon icon-cyan">🌐</div>
+      <div>
+        <div class="file-title">canevas.service.ts — Service Principal des Canevas</div>
+        <div class="file-path">src/app/_services/canevas.service.ts</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#cffafe;color:#0891b2">SERVICE HTTP</span>
+    </div>
+    <div class="file-body">
+      <p>Le service le plus utilisé du projet. Fait tous les appels à l'API canevas.</p>
+      <table class="data-table">
+        <thead><tr><th>Méthode</th><th>URL API appelée</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>getCanevasByNumSeqPers(id)</code></td><td><code>GET /api/canevas/numseqpers/{id}</code></td><td>Canevas d'un client spécifique</td></tr>
+          <tr><td><code>getCanevasByCodeStructureAndStatus(code, stade)</code></td><td><code>GET /api/canevas/affectations/structure/{code}/status/{stade}</code></td><td>Canevas par agence et stade</td></tr>
+          <tr><td><code>getClientByNumSeqPers(id)</code></td><td><code>GET /api/client/{id}</code></td><td>Informations du client</td></tr>
+          <tr><td><code>create(caneva)</code></td><td><code>POST /api/canevas</code></td><td>Créer un nouveau canevas</td></tr>
+          <tr><td><code>update(caneva)</code></td><td><code>PUT /api/canevas</code></td><td>Mettre à jour un canevas</td></tr>
+          <tr><td><code>delete(id)</code></td><td><code>DELETE /api/canevas/{id}</code></td><td>Supprimer un canevas</td></tr>
+        </tbody>
+      </table>
+      <div class="code"><span class="cmt">// Exemple d'utilisation dans un composant :</span>
+<span class="kw">this</span>.canevasService.<span class="fn">getCanevasByNumSeqPers</span>(clientId)
+  .<span class="fn">subscribe</span>(data => {
+    <span class="kw">this</span>.listeCanevas = data; <span class="cmt">// met à jour l'affichage</span>
+  });</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="svc-user">
+    <div class="file-card-header">
+      <div class="file-icon icon-cyan">👤</div>
+      <div>
+        <div class="file-title">user.service.ts — Service Utilisateur</div>
+        <div class="file-path">src/app/_services/user.service.ts</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#cffafe;color:#0891b2">SERVICE</span>
+    </div>
+    <div class="file-body">
+      <p>Gère les données de l'utilisateur connecté et le contexte de la page courante (pour le menu dynamique).</p>
+      <ul class="role-list">
+        <li><code>getUserByMatricule(matricule)</code> : récupère les infos complètes de l'utilisateur depuis le backend</li>
+        <li><code>currentPageSignal</code> : signal réactif qui indique la page courante (utilisé par le menu pour le surlignage)</li>
+        <li><code>updateCurrentPage(pageName)</code> : met à jour la page active</li>
+        <li><code>user</code> : l'objet utilisateur complet avec ses profils et sa structure</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="file-card" id="svc-autres">
+    <div class="file-card-header">
+      <div class="file-icon icon-cyan">📦</div>
+      <div>
+        <div class="file-title">Autres Services — Tableau Récapitulatif</div>
+        <div class="file-path">src/app/_services/</div>
+      </div>
+      <span class="file-badge badge-green" style="background:#cffafe;color:#0891b2">SERVICES</span>
+    </div>
+    <div class="file-body">
+      <table class="data-table">
+        <thead><tr><th>Fichier service</th><th>Rôle</th><th>Endpoint API principal</th></tr></thead>
+        <tbody>
+          <tr><td class="td-file">avis.service.ts</td><td>CRUD des avis/décisions</td><td><code>/api/avis</code></td></tr>
+          <tr><td class="td-file">garantie.service.ts</td><td>Gestion des garanties</td><td><code>/api/garantie</code></td></tr>
+          <tr><td class="td-file">engagement.service.ts</td><td>Engagements BCT/BNA</td><td><code>/api/engagements</code></td></tr>
+          <tr><td class="td-file">analyseFinanciere.service.ts</td><td>Analyse financière</td><td><code>/api/analyseFinanciere</code></td></tr>
+          <tr><td class="td-file">bilan.service.ts</td><td>Bilan comptable</td><td><code>/api/bilan</code></td></tr>
+          <tr><td class="td-file">affectation.service.ts</td><td>Affecter un canevas</td><td><code>/api/affectation</code></td></tr>
+          <tr><td class="td-file">site.service.ts</td><td>Sites du projet agricole</td><td><code>/api/site</code></td></tr>
+          <tr><td class="td-file">credit-sollicite.service.ts</td><td>Crédit demandé</td><td><code>/api/creditSollicite</code></td></tr>
+          <tr><td class="td-file">document.client.canva.service.ts</td><td>Upload de fichiers</td><td><code>/api/documents</code></td></tr>
+          <tr><td class="td-file">pdf-export.service.ts</td><td>Génération de PDF</td><td>jsPDF (client-side)</td></tr>
+          <tr><td class="td-file">snapshot.service.ts</td><td>Historique des modifications</td><td><code>/api/snapshots</code></td></tr>
+          <tr><td class="td-file">loading.service.ts</td><td>Afficher/masquer le spinner</td><td>Pas d'API — état local</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== PAGES ===================== -->
+  <h2 class="section-h" id="pg-search">Pages Principales — Fonctionnement Détaillé</h2>
+
+  <div class="file-card" id="pg-search">
+    <div class="file-card-header">
+      <div class="file-icon icon-gray">🔍</div>
+      <div>
+        <div class="file-title">search-client — Recherche d'un Client</div>
+        <div class="file-path">src/app/_components/pages/canvas.agricole/search-client/</div>
+      </div>
+      <span class="file-badge badge-gray">PAGE</span>
+    </div>
+    <div class="file-body">
+      <p><strong>Point d'entrée principal.</strong> L'utilisateur arrive sur cette page et recherche un client par son numéro de pièce d'identité.</p>
+
+      <div class="flow">
+        <div class="flow-box fb-gray">Sélectionner<br>type pièce</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box fb-gray">Saisir numéro</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box fb-blue">Clic Rechercher</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box fb-green">canevasService<br>.getCanevas()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box fb-amber">Navigate vers<br>/listCanevas</div>
+      </div>
+
+      <ul class="role-list">
+        <li><strong>search-client.component.html</strong> : formulaire avec dropdown type pièce + input numéro</li>
+        <li><strong>search-client.component.ts</strong> : contient le FormGroup <code>identifiantForm</code> avec validators. Méthode <code>sendSearchClientEvent()</code> qui stocke les critères et navigue</li>
+        <li>Le titre de la page change selon le profil : "PEC CANEVAS" pour CCA, "VALIDATION" pour CHAGCE, etc.</li>
+      </ul>
+      <div class="code"><span class="cmt">// Les types de pièce proposés dans le dropdown :</span>
+typePieces: <span class="cls">TypePiece</span>[] = []; <span class="cmt">// chargé depuis l'API</span>
+
+<span class="cmt">// Formulaire réactif</span>
+identifiantForm = fb.<span class="fn">group</span>({
+  typePiece: [<span class="str">''</span>, <span class="cls">Validators</span>.required],
+  numPiece:  [<span class="str">''</span>, <span class="cls">Validators</span>.required]
+});</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="pg-list">
+    <div class="file-card-header">
+      <div class="file-icon icon-gray">📋</div>
+      <div>
+        <div class="file-title">list — Liste des Canevas</div>
+        <div class="file-path">src/app/_components/pages/canvas.agricole/list/</div>
+      </div>
+      <span class="file-badge badge-gray">PAGE</span>
+    </div>
+    <div class="file-body">
+      <p>Affiche la liste des dossiers de crédit (canevas) d'un client. Selon le profil de l'utilisateur, certaines lignes sont cliquables (sélectionnables) et d'autres non.</p>
+      <ul class="role-list">
+        <li><strong>isRowSelectable(event)</strong> : la méthode la plus importante — retourne <code>true</code> ou <code>false</code> selon si le stade du canevas correspond au profil de l'utilisateur</li>
+        <li><strong>onSelectionChange()</strong> : quand l'utilisateur clique sur une ligne, charge les détails du client et navigue vers <code>/add</code></li>
+        <li><strong>getSeverity(stade)</strong> : retourne la couleur du badge selon le stade ('success', 'warning', 'danger'…)</li>
+        <li>Utilise le composant PrimeNG <code>p-table</code> avec filtre global</li>
+      </ul>
+      <div class="code"><span class="cmt">// Config des stades accessibles par profil</span>
+<span class="kw">const</span> ALLOWED_STADES = {
+  CCA:      [<span class="str">'INIT_DONNEE'</span>, <span class="str">'PEC_DONNEE'</span>, <span class="str">'CORRIGE_DONNEE'</span>],
+  CHAGCE:   [<span class="str">'PEC_DONNEE'</span>, <span class="str">'VALID_DONNEE'</span>],
+  PROFILE3: [<span class="str">'VALID_DONNEE'</span>, <span class="str">'PEC_AVIS_DEC'</span>],
+  PROFILE4: [<span class="str">'PEC_AVIS_DEC'</span>, <span class="str">'VALID_AVIS_DEC'</span>],
+};</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="pg-add">
+    <div class="file-card-header">
+      <div class="file-icon icon-gray">📝</div>
+      <div>
+        <div class="file-title">add-canevas — Formulaire Multi-Étapes</div>
+        <div class="file-path">src/app/_components/pages/canvas.agricole/add-canevas/</div>
+      </div>
+      <span class="file-badge badge-gray">PAGE COMPLEXE</span>
+    </div>
+    <div class="file-body">
+      <p><strong>C'est la page la plus complexe du projet.</strong> Elle orchestre tous les sous-formulaires du canevas avec un système d'onglets (stepper).</p>
+      <ul class="role-list">
+        <li>Contient un <code>p-tabView</code> (onglets PrimeNG) avec les sections : Fiche Signalétique, Engagement, Analyse Financière, Conditions Banques, Garanties</li>
+        <li><strong>showDialog(type)</strong> : ouvre un dialogue pour éditer une section spécifique (ENGAGEMENT, GARANTIES, etc.)</li>
+        <li><strong>onStepChange(event)</strong> : quand l'utilisateur change d'onglet, initialise le service correspondant</li>
+        <li><strong>saveCanevas()</strong> : sauvegarde toutes les données en base via les services</li>
+        <li><strong>confirmEnregistree()</strong> : boîte de dialogue de confirmation avant enregistrement</li>
+      </ul>
+      <div class="code"><span class="cmt">// Structure des onglets :</span>
+menuItems = [
+  { label: <span class="str">'FICHE SIGNALITIQUE'</span> }, <span class="cmt">// Infos client</span>
+  { label: <span class="str">'ENGAGEMENT'</span> },       <span class="cmt">// Engagements BCT/BNA</span>
+  { label: <span class="str">'ANALYSE FINANCIERE'</span>}, <span class="cmt">// Bilan, ratios…</span>
+  { label: <span class="str">'CONDITIONS BANQUES'</span> },<span class="cmt">// Taux, durée…</span>
+  { label: <span class="str">'GARANTIES'</span> }         <span class="cmt">// Hypothèques, nantissements…</span>
+];</div>
+    </div>
+  </div>
+
+  <div class="file-card" id="pg-fiche">
+    <div class="file-card-header">
+      <div class="file-icon icon-gray">🪪</div>
+      <div>
+        <div class="file-title">fiche-signalitique — Fiche d'Identité Client</div>
+        <div class="file-path">src/app/_components/pages/canvas.agricole/fiche-signalitique/</div>
+      </div>
+      <span class="file-badge badge-gray">PAGE</span>
+    </div>
+    <div class="file-body">
+      <p>Affiche les informations d'identification du client. Ce composant fonctionne en 2 modes : <strong>ADD</strong> (saisie) et <strong>VIEW</strong> (lecture seule).</p>
+      <ul class="role-list">
+        <li>Reçoit l'objet <code>Client</code> en <code>@Input()</code> du composant parent</li>
+        <li>Reçoit le <code>mode</code> ('ADD' ou 'VIEW') en <code>@Input()</code></li>
+        <li>Calcule la date minimale d'ouverture de compte à partir des comptes du client</li>
+        <li>Affiche les données de la <code>Personne</code> liée au client (nom, CIN, adresse…)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="file-card" id="pg-avis">
+    <div class="file-card-header">
+      <div class="file-icon icon-gray">⚖️</div>
+      <div>
+        <div class="file-title">avis — Formulaire d'Avis et Décision</div>
+        <div class="file-path">src/app/_components/pages/canvas.agricole/avis/</div>
+      </div>
+      <span class="file-badge badge-gray">PAGE COMPLEXE</span>
+    </div>
+    <div class="file-body">
+      <p>La page de décision finale sur un dossier. Accessible selon le profil et le stade du canevas. Plusieurs "sous-avis" selon le type de crédit.</p>
+      <ul class="role-list">
+        <li><strong>loadExistingAvis()</strong> : charge l'avis existant depuis l'API selon la hiérarchie de statut</li>
+        <li><strong>saveAvis()</strong> : enregistre l'avis principal + les sous-avis (crédit court terme, investissement, achat terrain, garanties)</li>
+        <li><strong>submitAction()</strong> : soumet le dossier à l'étape suivante du workflow</li>
+        <li><strong>decisionFinaleCaneva()</strong> : marque le dossier comme décidé définitivement</li>
+        <li><strong>updateConditionalValidators()</strong> : selon le profil, certains champs deviennent obligatoires</li>
+        <li><strong>createAffectationRecords()</strong> : crée les enregistrements d'audit trail</li>
+      </ul>
+      <div class="note note-purple"><span class="ni">🔷</span><div><strong>C'est le composant le plus complexe.</strong> Il gère : les formulaires réactifs, les validators dynamiques, la navigation du workflow, les appels multi-services (AvisService, GarantieService, AffectationService), et les confirmations utilisateur.</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODIFICATIONS ===================== -->
+  <h2 class="section-h" id="modif">Comment Faire des Modifications — Exemples Pratiques</h2>
+  <p class="section-sub">Cas concrets avec les fichiers exacts à modifier.</p>
+
+  <div class="grid-2">
+    <div class="file-card">
+      <div class="file-card-header" style="padding:14px 16px">
+        <div class="file-icon icon-green" style="width:32px;height:32px;font-size:14px">➕</div>
+        <div class="file-title" style="font-size:13px">Ajouter un item au menu</div>
+      </div>
+      <div class="file-body">
+        <p>Fichier : <code>app.menu.component.ts</code></p>
+        <div class="code" style="font-size:11px"><span class="cmt">// Dans buildMenu(), ajouter :</span>
+{
+  label: <span class="str">'MON NOUVEAU MENU'</span>,
+  icon: <span class="str">'pi pi-fw pi-star'</span>,
+  routerLink: [<span class="str">'/pages/agricole/maPage'</span>],
+  visible: profiles.<span class="fn">includes</span>(<span class="str">'CCA'</span>)
+}</div>
+      </div>
+    </div>
+
+    <div class="file-card">
+      <div class="file-card-header" style="padding:14px 16px">
+        <div class="file-icon icon-green" style="width:32px;height:32px;font-size:14px">🔗</div>
+        <div class="file-title" style="font-size:13px">Ajouter une route URL</div>
+      </div>
+      <div class="file-body">
+        <p>Fichier : <code>canvas.agricole-routing.module.ts</code></p>
+        <div class="code" style="font-size:11px"><span class="cmt">// Dans le tableau routes, ajouter :</span>
+{
+  path: <span class="str">'maPage'</span>,
+  component: <span class="cls">MonNouveauComponent</span>,
+  canActivate: [guard]
+}</div>
+      </div>
+    </div>
+
+    <div class="file-card">
+      <div class="file-card-header" style="padding:14px 16px">
+        <div class="file-icon icon-blue" style="width:32px;height:32px;font-size:14px">📡</div>
+        <div class="file-title" style="font-size:13px">Appeler une nouvelle API</div>
+      </div>
+      <div class="file-body">
+        <p>Dans le service correspondant (ex: <code>canevas.service.ts</code>) :</p>
+        <div class="code" style="font-size:11px"><span class="fn">getMaDonnee</span>(id: <span class="kw">number</span>): <span class="cls">Observable</span>&lt;<span class="kw">any</span>&gt; {
+  <span class="kw">return this</span>.http.<span class="fn">get</span>(
+    <span class="str">`${this.apiUrl}api/maDonnee/${id}`</span>
+  );
+}</div>
+      </div>
+    </div>
+
+    <div class="file-card">
+      <div class="file-card-header" style="padding:14px 16px">
+        <div class="file-icon icon-amber" style="width:32px;height:32px;font-size:14px">📋</div>
+        <div class="file-title" style="font-size:13px">Ajouter un champ à un formulaire</div>
+      </div>
+      <div class="file-body">
+        <p>1. Dans le modèle (<code>_models/Caneva.ts</code>) : ajouter le champ. <br>2. Dans le composant <code>.ts</code> : ajouter dans le FormGroup. <br>3. Dans le <code>.html</code> : ajouter l'input avec <code>formControlName</code>.</p>
+        <div class="code" style="font-size:11px"><span class="cmt">// 1. Modèle</span>
+nouveauChamp?: <span class="kw">string</span>;
+
+<span class="cmt">// 2. FormGroup (composant .ts)</span>
+monForm = fb.<span class="fn">group</span>({
+  nouveauChamp: [<span class="str">''</span>]
+});
+
+<span class="cmt">// 3. HTML</span>
+&lt;input pInputText formControlName=<span class="str">"nouveauChamp"</span>&gt;</div>
+      </div>
+    </div>
+
+    <div class="file-card">
+      <div class="file-card-header" style="padding:14px 16px">
+        <div class="file-icon icon-purple" style="width:32px;height:32px;font-size:14px">🔐</div>
+        <div class="file-title" style="font-size:13px">Changer le mode d'authentification</div>
+      </div>
+      <div class="file-body">
+        <p>Fichier : <code>environment.development.ts</code></p>
+        <div class="code" style="font-size:11px"><span class="cmt">// Passer de custom à Keycloak :</span>
+AUTH_MODE: <span class="str">'keycloak'</span>
+<span class="cmt">// ou revenir en custom :</span>
+AUTH_MODE: <span class="str">'custom'</span></div>
+        <div class="note note-amber" style="font-size:11px;padding:8px 10px;margin:6px 0"><span class="ni">⚠️</span><span>Le garde, l'intercepteur et le module sont tous conditionnels sur cette valeur.</span></div>
+      </div>
+    </div>
+
+    <div class="file-card">
+      <div class="file-card-header" style="padding:14px 16px">
+        <div class="file-icon icon-red" style="width:32px;height:32px;font-size:14px">🚦</div>
+        <div class="file-title" style="font-size:13px">Autoriser un profil sur un stade</div>
+      </div>
+      <div class="file-body">
+        <p>Fichier : <code>list.component.ts</code></p>
+        <div class="code" style="font-size:11px"><span class="cmt">// Ajouter un stade accessible pour CCA :</span>
+CCA: [
+  <span class="str">'INIT_DONNEE'</span>,
+  <span class="str">'PEC_DONNEE'</span>,
+  <span class="str">'CORRIGE_DONNEE'</span>,
+  <span class="str">'MON_NOUVEAU_STADE'</span> <span class="cmt">← ajouter ici</span>
+]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECAP -->
+  <h2 class="section-h">Récapitulatif — Carte Mentale du Projet</h2>
+
+  <div class="file-card" style="margin-top:16px">
+    <div class="file-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+        <div>
+          <h4>📥 Entrée dans l'app</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="flow-box fb-red" style="min-width:0;width:100%;text-align:left;font-size:11px">auth.guard.ts · Protection routes</div>
+            <div class="flow-box fb-red" style="min-width:0;width:100%;text-align:left;font-size:11px">token-storage · Session</div>
+            <div class="flow-box fb-red" style="min-width:0;width:100%;text-align:left;font-size:11px">auth.interceptor · Token JWT</div>
+            <div class="flow-box fb-blue" style="min-width:0;width:100%;text-align:left;font-size:11px">app-routing · URL → Page</div>
+          </div>
+        </div>
+        <div>
+          <h4>🖥️ Navigation (layout)</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="flow-box fb-purple" style="min-width:0;width:100%;text-align:left;font-size:11px">app.topbar · Barre du haut</div>
+            <div class="flow-box fb-purple" style="min-width:0;width:100%;text-align:left;font-size:11px">app.menu · Menu dynamique / rôles</div>
+            <div class="flow-box fb-purple" style="min-width:0;width:100%;text-align:left;font-size:11px">app.menuitem · Item de menu</div>
+            <div class="flow-box fb-gray" style="min-width:0;width:100%;text-align:left;font-size:11px">app.footer · Pied de page</div>
+          </div>
+        </div>
+        <div>
+          <h4>📄 Pages métier</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="flow-box fb-gray" style="min-width:0;width:100%;text-align:left;font-size:11px">search-client · Chercher un client</div>
+            <div class="flow-box fb-gray" style="min-width:0;width:100%;text-align:left;font-size:11px">list · Liste des canevas</div>
+            <div class="flow-box fb-gray" style="min-width:0;width:100%;text-align:left;font-size:11px">add-canevas · Éditer un canevas</div>
+            <div class="flow-box fb-gray" style="min-width:0;width:100%;text-align:left;font-size:11px">avis · Décision finale</div>
+          </div>
+        </div>
+        <div>
+          <h4>📦 Données (modèles)</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="flow-box fb-amber" style="min-width:0;width:100%;text-align:left;font-size:11px">User · Utilisateur connecté</div>
+            <div class="flow-box fb-amber" style="min-width:0;width:100%;text-align:left;font-size:11px">Client + Personne · Client BNA</div>
+            <div class="flow-box fb-amber" style="min-width:0;width:100%;text-align:left;font-size:11px">Caneva · Dossier de crédit</div>
+            <div class="flow-box fb-amber" style="min-width:0;width:100%;text-align:left;font-size:11px">AvisDTO · Décision</div>
+          </div>
+        </div>
+        <div>
+          <h4>🌐 API (services)</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="flow-box fb-cyan" style="min-width:0;width:100%;text-align:left;font-size:11px">canevas.service · Principal</div>
+            <div class="flow-box fb-cyan" style="min-width:0;width:100%;text-align:left;font-size:11px">avis.service · Décisions</div>
+            <div class="flow-box fb-cyan" style="min-width:0;width:100%;text-align:left;font-size:11px">garantie/engagement.service</div>
+            <div class="flow-box fb-cyan" style="min-width:0;width:100%;text-align:left;font-size:11px">analyseFinanciere.service</div>
+          </div>
+        </div>
+        <div>
+          <h4>⚙️ Configuration</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="flow-box fb-blue" style="min-width:0;width:100%;text-align:left;font-size:11px">environment.ts · URLs + mode auth</div>
+            <div class="flow-box fb-blue" style="min-width:0;width:100%;text-align:left;font-size:11px">app.module.ts · Registre global</div>
+            <div class="flow-box fb-blue" style="min-width:0;width:100%;text-align:left;font-size:11px">theme.css · Couleurs</div>
+            <div class="flow-box fb-blue" style="min-width:0;width:100%;text-align:left;font-size:11px">_variables.scss · Police, radius</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-green" style="margin-top:24px">
+    <span class="ni">✅</span>
+    <div><strong>Conseil pour débuter :</strong> Commencez par lire <code>environment.development.ts</code> (config), puis <code>app-routing.module.ts</code> (routes), puis <code>app.menu.component.ts</code> (navigation). Ensuite explorez les pages dans l'ordre du workflow : search-client → list → add-canevas → avis.</div>
+  </div>
+
+</main>
+</body>
+</html>
