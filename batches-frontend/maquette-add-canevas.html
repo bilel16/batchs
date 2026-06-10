@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maquette &amp; estimation visuelle — add-canevas</title>
+<style>
+  :root{
+    --primary:#2dac4f;
+    --primary-dark:#1a2637;
+    --bg:#f5fbf8;
+    --card:#ffffff;
+    --border:#e2e8f0;
+    --warn:#E9A91F;
+    --danger:#F93A02;
+    --info:#3b82f6;
+    --topbar-h:64px;
+    --sidebar-w:220px;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:0; background:var(--bg); color:#1e293b; line-height:1.5;}
+  header{background:var(--primary-dark); color:#fff; padding:1.6rem 1.5rem; position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(0,0,0,.25);}
+  header h1{margin:0; font-size:1.5rem; color:#4ade80;}
+  header p{margin:.4rem 0 0; color:#cbd5e1; font-size:.92rem;}
+  nav.toc{display:flex; flex-wrap:wrap; gap:.4rem; max-width:1400px; margin:1rem auto; padding:0 1.5rem;}
+  nav.toc a{font-size:.78rem; background:#fff; border:1px solid var(--border); border-radius:99px; padding:.3rem .8rem; text-decoration:none; color:#1e293b;}
+  nav.toc a:hover{background:#e0f2e9;}
+  main{max-width:1400px; margin:0 auto; padding:0 1.5rem 4rem;}
+  section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem 1.8rem; margin-bottom:1.8rem; box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  h2{color:var(--primary-dark); border-bottom:3px solid var(--primary); display:inline-block; padding-bottom:.2rem; margin-top:0;}
+  h3{margin-top:0;}
+  .badge{display:inline-block; padding:.15rem .55rem; border-radius:99px; font-size:.72rem; font-weight:700; color:#fff; margin-left:.4rem; vertical-align:middle;}
+  .badge.ok{background:#22c55e;} .badge.warn{background:var(--warn);} .badge.bad{background:var(--danger);} .badge.info{background:var(--info);}
+
+  /* ===== Maquette globale (page complète) ===== */
+  .frame{
+    border:2px solid var(--primary-dark); border-radius:8px; overflow:hidden; font-size:.7rem;
+    box-shadow:0 4px 18px rgba(0,0,0,.12);
+  }
+  .frame-topbar{
+    height:34px; background:var(--primary-dark); color:#4ade80; display:flex; align-items:center;
+    padding:0 .8rem; gap:1rem; font-weight:700; letter-spacing:.04em;
+  }
+  .frame-topbar .right{margin-left:auto; color:#e2eaf2; font-weight:400; font-size:.65rem;}
+  .frame-body{display:flex; min-height:380px;}
+  .frame-sidebar{
+    width:90px; background:#0f172a; color:#cbd5e1; flex-shrink:0; padding:.6rem .4rem; font-size:.62rem;
+  }
+  .frame-sidebar .item{padding:.35rem .3rem; border-radius:4px; margin-bottom:.2rem;}
+  .frame-sidebar .item.active{background:rgba(74,222,128,.15); color:#4ade80; font-weight:700;}
+  .frame-main{flex:1; padding:.7rem; background:#f5fbf8; position:relative;}
+
+  .mock-menubar{
+    position:sticky; top:0; background:var(--primary); color:#fff; border-radius:6px; padding:.35rem .5rem;
+    display:flex; gap:.3rem; align-items:center; margin-bottom:.5rem; flex-wrap:wrap; z-index:5;
+  }
+  .mock-menubar .pill{background:rgba(255,255,255,.18); border-radius:4px; padding:.2rem .5rem; flex:1; text-align:center; white-space:nowrap;}
+  .mock-menubar .tagchip{background:rgba(0,0,0,.25); border-radius:4px; padding:.15rem .4rem; font-weight:700;}
+
+  .mock-banner{
+    background:#eaf7ee; border:1px dashed var(--primary); border-radius:6px; padding:.4rem .6rem; margin-bottom:.5rem;
+    display:flex; gap:.6rem; align-items:center;
+  }
+  .mock-banner .av{width:22px;height:22px;border-radius:50%;background:var(--primary); flex-shrink:0;}
+
+  .mock-stepper-nav{display:flex; gap:.3rem; margin-bottom:.5rem; position:sticky; top:34px; background:#fff; padding:.3rem; border-radius:6px; z-index:4;}
+  .mock-stepper-nav .step{flex:1; text-align:center; padding:.25rem; border-radius:4px; background:#e2e8f0; font-weight:700;}
+  .mock-stepper-nav .step.s0.active{background:#42A5F5; color:#fff;}
+  .mock-stepper-nav .step.s1.active{background:#b30fcc; color:#fff;}
+  .mock-stepper-nav .step.s2.active{background:#FFA726; color:#fff;}
+  .mock-stepper-nav .step.s3.active{background:#e20e0e; color:#fff;}
+
+  .mock-content{border:1px dashed #94a3b8; border-radius:6px; padding:.6rem; background:#fff; min-height:180px;}
+
+  /* ===== Wireframe générique pour chaque composant ===== */
+  .wire{border:1px solid var(--border); border-radius:8px; padding:.8rem; background:#fafcfe; font-size:.78rem;}
+  .wire-row{display:flex; gap:.5rem; margin-bottom:.4rem; flex-wrap:wrap;}
+  .wire-box{background:#e2e8f0; border-radius:4px; height:1.6rem; flex:1; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:.7rem; min-width:60px;}
+  .wire-box.tall{height:3.2rem;}
+  .wire-box.label{background:transparent; flex:0 0 auto; min-width:90px; justify-content:flex-start; color:#334155; font-weight:600;}
+  .wire-table{width:100%; border-collapse:collapse; font-size:.72rem; margin-top:.3rem;}
+  .wire-table th{background:#cbd5e1; padding:.3rem; text-align:left;}
+  .wire-table td{background:#f1f5f9; padding:.3rem; border-bottom:1px solid #e2e8f0;}
+  .wire-tabs{display:flex; gap:.25rem; margin-bottom:.4rem;}
+  .wire-tabs span{background:#e2e8f0; border-radius:4px 4px 0 0; padding:.25rem .6rem; font-size:.7rem;}
+  .wire-tabs span.active{background:var(--primary); color:#fff; font-weight:700;}
+  .wire-pill{display:inline-block; background:#e2e8f0; border-radius:99px; padding:.1rem .5rem; font-size:.68rem; margin:.1rem;}
+
+  /* ===== Layout 2 colonnes : maquette + ameliorations ===== */
+  .compcard{display:grid; grid-template-columns:1.1fr 1fr; gap:1.2rem; align-items:start;}
+  @media (max-width:980px){.compcard{grid-template-columns:1fr;}}
+  .improve{background:#eff6ff; border-left:4px solid var(--info); border-radius:0 8px 8px 0; padding:.7rem 1rem; font-size:.85rem;}
+  .improve h4{margin:0 0 .4rem; color:var(--primary-dark);}
+  .improve ul{margin:.3rem 0; padding-left:1.2rem;}
+  .meta{display:flex; gap:.4rem; flex-wrap:wrap; margin:.4rem 0 .8rem;}
+
+  table.summary{width:100%; border-collapse:collapse; font-size:.85rem; margin-top:.5rem;}
+  table.summary th, table.summary td{border:1px solid var(--border); padding:.5rem .6rem; text-align:left;}
+  table.summary th{background:#f1f5f9;}
+  table.summary tr:nth-child(even) td{background:#fafcfe;}
+
+  footer{text-align:center; color:#94a3b8; font-size:.8rem; padding:2rem 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🖼️ Maquette &amp; estimation visuelle — add-canevas.component</h1>
+  <p>Aperçu de l'affichage de chaque composant dans le template racine (topbar + sidebar) et estimation des améliorations à apporter</p>
+</header>
+
+<nav class="toc">
+  <a href="#global">Vue globale</a>
+  <a href="#agent-canevas">app-agent-canevas</a>
+  <a href="#fiche">app-fiche-signalitique-2</a>
+  <a href="#engagements">app-engagements</a>
+  <a href="#analyse">app-analyse-financier</a>
+  <a href="#condition">app-condition-banque</a>
+  <a href="#garanties">app-garanties</a>
+  <a href="#credit">app-credit-sollicite</a>
+  <a href="#garanties-prop">app-garanties-proposees</a>
+  <a href="#exploitation">app-exploitation</a>
+  <a href="#avis">app-avis</a>
+  <a href="#synthese">Synthèse</a>
+</nav>
+
+<main>
+
+<!-- ============ MAQUETTE GLOBALE ============ -->
+<section id="global">
+<h2>Vue globale — placement dans le layout</h2>
+<p>Cette maquette représente la fenêtre du navigateur avec la <strong>topbar</strong> (verte, 64px), la <strong>sidebar</strong> (menu gauche) et la zone <code>add-canevas</code> à droite. Le menubar et le stepper-nav sont en <code>sticky</code> (recommandation de la section 6 du rapport précédent).</p>
+
+<div class="frame">
+  <div class="frame-topbar">
+    <span>🟢 BNA — CANEVAS AGRICOLE</span>
+    <span class="right">Matricule · Structure · Déconnexion</span>
+  </div>
+  <div class="frame-body">
+    <div class="frame-sidebar">
+      <div class="item active">📁 Canevas</div>
+      <div class="item">👤 Clients</div>
+      <div class="item">📊 Rapports</div>
+      <div class="item">⚙️ Admin</div>
+    </div>
+    <div class="frame-main">
+      <!-- menubar sticky -->
+      <div class="mock-menubar">
+        <span class="tagchip">N° 12345</span>
+        <span class="tagchip">Relation: AGRI-001</span>
+        <span class="pill">FICHE SIGNALITIQUE</span>
+        <span class="pill">ENGAGEMENT</span>
+        <span class="pill">Analyse Financiers</span>
+        <span class="pill">Conditions Banques</span>
+        <span class="pill">GARANTIES</span>
+      </div>
+
+      <!-- agent-canevas banner -->
+      <div class="mock-banner">
+        <div class="av"></div>
+        <div><strong>app-agent-canevas</strong> — Agent en charge du dossier (toujours visible)</div>
+      </div>
+
+      <!-- stepper nav sticky -->
+      <div class="mock-stepper-nav">
+        <div class="step s0 active">① Crédit Sollicité</div>
+        <div class="step s1">② Garanties</div>
+        <div class="step s2">③ Exploitation</div>
+        <div class="step s3">④ Avis</div>
+      </div>
+
+      <!-- contenu de l'étape active -->
+      <div class="mock-content">
+        <em>Contenu de l'étape active (ex: app-credit-sollicite)</em><br>
+        ↳ Fond coloré selon <code>stepContentColors[index]</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="meta">
+  <span class="badge ok">✓ Banner toujours visible</span>
+  <span class="badge ok">✓ Menubar + stepper sticky (ne recouvrent plus la sidebar)</span>
+  <span class="badge info">ℹ️ p-dialog (5 sous-écrans) s'ouvre par-dessus en modal centré</span>
+</div>
+</section>
+
+<!-- ============ APP-AGENT-CANEVAS ============ -->
+<section id="agent-canevas">
+<h2>1. &lt;app-agent-canevas&gt; <span class="badge ok">Léger</span></h2>
+<div class="compcard">
+  <div class="wire">
+    <div class="wire-row">
+      <div class="wire-box label">👤 Agent:</div>
+      <div class="wire-box">Nom Prénom</div>
+      <div class="wire-box label">Matricule:</div>
+      <div class="wire-box">000123</div>
+      <div class="wire-box label">Agence:</div>
+      <div class="wire-box">AG · 045</div>
+    </div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li>Transformer le <code>p-panel</code> en <strong>bandeau compact (chip-bar)</strong> aligné horizontalement, comme la <code>topbar-chip</code> déjà existante — réutiliser les classes <code>.topbar-chip</code> pour cohérence visuelle.</li>
+      <li>Ajouter une icône avatar (initiales de l'agent) à gauche, comme <code>.topbar-avatar</code>.</li>
+      <li>Rendre le bandeau <strong>collant juste sous le menubar</strong> (actuellement il est dans le flux normal — OK, mais vérifier l'espacement avec <code>margin-bottom:.5rem</code>).</li>
+      <li>Effort: <strong>faible</strong> (composant déjà simple, juste un alignement de style).</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ============ DIALOG : 5 sous-composants ============ -->
+<section id="fiche">
+<h2>2. &lt;p-dialog&gt; → app-fiche-signalitique-2 <span class="badge warn">Moyen</span></h2>
+<div class="compcard">
+  <div class="wire">
+    <div class="wire-tabs">
+      <span class="active">Personne Physique</span>
+      <span>Personne Morale</span>
+    </div>
+    <div class="wire-row"><div class="wire-box label">CIN:</div><div class="wire-box"></div><div class="wire-box label">Nom:</div><div class="wire-box"></div></div>
+    <div class="wire-row"><div class="wire-box label">Adresse:</div><div class="wire-box tall" style="flex:3"></div></div>
+    <table class="wire-table">
+      <tr><th>Code</th><th>Libellé</th><th>Relation</th><th>Action</th></tr>
+      <tr><td>001</td><td>Responsable</td><td>Gérant</td><td>✏️</td></tr>
+      <tr><td>002</td><td>Associé</td><td>Membre</td><td>✏️</td></tr>
+    </table>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li>La <code>p-dialog</code> doit s'ouvrir avec <code>[style]="{width:'90vw', maxWidth:'1100px'}"</code> + <code>[breakpoints]</code> pour rester lisible avec la sidebar ouverte (285px en moins).</li>
+      <li>Remplacer les <code>[style]="{'color':'red'}"</code> inline par une classe <code>.field-required</code> avec <code>color: var(--red-500)</code>.</li>
+      <li>Le <code>p-dialog</code> en plein écran (<code>maximizable</code>) est déjà activé — bonne pratique pour formulaires longs.</li>
+      <li>Ajouter un <code>p-progressSpinner</code> pendant <code>loadClientData()</code> (appel HTTP direct) pour feedback utilisateur.</li>
+      <li>Effort: <strong>moyen</strong> (CSS + petit refactor du style inline).</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="engagements">
+<h2>3. &lt;p-dialog&gt; → app-engagements <span class="badge bad">Élevé</span></h2>
+<div class="compcard">
+  <div class="wire">
+    <div class="wire-tabs">
+      <span class="active">Crédits CT</span><span>Crédits MT</span><span>Cautions</span><span>Avals</span><span>Synthèse</span>
+    </div>
+    <div class="wire-row">
+      <span class="wire-pill" style="background:#0DD46433">● En cours</span>
+      <span class="wire-pill" style="background:#E9A91F33">● Échu</span>
+      <span class="wire-pill" style="background:#F9302233">● Contentieux</span>
+    </div>
+    <table class="wire-table">
+      <tr><th>Type</th><th>Montant</th><th>Échéance</th><th>Statut</th></tr>
+      <tr><td>Crédit campagne</td><td>50 000</td><td>12/2026</td><td>🟢</td></tr>
+      <tr><td>Avance/marchandise</td><td>20 000</td><td>03/2027</td><td>🟠</td></tr>
+    </table>
+    <div class="wire-row" style="margin-top:.4rem;"><div class="wire-box label">Total:</div><div class="wire-box" style="background:var(--primary); color:#fff;">70 000</div></div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li><strong>Priorité haute</strong> — c'est le composant avec le plus de <code>::ng-deep</code> (22-48). Créer une classe utilitaire <code>.engagement-status</code> avec des modificateurs <code>.status-encours / .status-echu / .status-contentieux</code> mappés sur <code>var(--green-500)</code>, <code>var(--orange-500)</code>, <code>var(--red-500)</code>.</li>
+      <li>Le <code>p-tabView orientation="left"</code> prend de la largeur — sur écran avec sidebar ouverte (1366px), passer en <code>orientation="top"</code> via <code>@media (max-width:1366px)</code>.</li>
+      <li>La ligne "Total" calculée par <code>computed totals()</code> mérite un style <strong>sticky en bas du tableau</strong> (footer de <code>p-table</code>) pour rester visible lors du scroll.</li>
+      <li>Effort: <strong>élevé</strong> (refonte CSS + tests visuels sur 8 types d'engagement).</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="analyse">
+<h2>4. &lt;p-dialog&gt; → app-analyse-financier <span class="badge warn">Moyen</span></h2>
+<div class="compcard">
+  <div class="wire">
+    <div class="wire-tabs">
+      <span class="active">Bilan</span><span>État Résultat</span><span>Flux Trésorerie</span><span>Ratios</span>
+    </div>
+    <table class="wire-table">
+      <tr><th>Rubrique</th><th>N-2</th><th>N-1</th><th>N</th></tr>
+      <tr><td>Actif circulant</td><td>120</td><td>140</td><td>160</td></tr>
+      <tr><td>Capitaux propres</td><td>80</td><td>90</td><td>100</td></tr>
+    </table>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li>Remplacer les verts codés en dur (<code>#2dac4f, #defced, #affac6...</code>) par une <strong>échelle de couleurs PrimeNG</strong> : <code>var(--green-50)</code> à <code>var(--green-700)</code> pour le dégradé d'années.</li>
+      <li>Migrer les <code>@Output</code> vers des <code>signal()</code>/<code>computed()</code> comme dans <code>app-engagements</code>, pour cohérence du code.</li>
+      <li>Le <code>textarea [style]="{'resize':'none'}"</code> → déplacer dans le CSS (<code>resize:none</code> en classe).</li>
+      <li>Effort: <strong>moyen</strong> (surtout CSS, le refactor signals est optionnel).</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="condition">
+<h2>5. &lt;p-dialog&gt; → app-condition-banque <span class="badge ok">Faible</span></h2>
+<div class="compcard">
+  <div class="wire">
+    <div class="wire-tabs">
+      <span class="active">Taux</span><span>Commission</span><span>Date Valeur</span>
+    </div>
+    <div class="wire-row"><div class="wire-box" style="flex:0 0 200px;">🔍 Recherche...</div></div>
+    <table class="wire-table">
+      <tr><th>Code</th><th>Libellé</th><th>Valeur</th></tr>
+      <tr><td>TECD01</td><td>Taux découvert</td><td>8.5%</td></tr>
+    </table>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li>Supprimer les <code>min-height:200px</code> inline → utiliser une classe <code>.table-container { min-height:200px }</code> commune aux 3 onglets.</li>
+      <li>Ajouter un <code>p-skeleton</code> pendant <code>isLoadingData</code> au lieu (ou en plus) du <code>p-progressSpinner</code>, plus moderne visuellement.</li>
+      <li>Composant déjà simple et cohérent — <strong>peu de changements nécessaires</strong>.</li>
+      <li>Effort: <strong>faible</strong>.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="garanties">
+<h2>6. &lt;p-dialog&gt; → app-garanties <span class="badge warn">Moyen</span></h2>
+<div class="compcard">
+  <div class="wire">
+    <table class="wire-table">
+      <tr><th>Bien garanti</th><th>Valeur</th><th>Type</th><th>Détail</th></tr>
+      <tr><td>Terrain agricole 2ha</td><td>80 000</td><td>Hypothèque</td><td>👁️</td></tr>
+      <tr><td>Matériel agricole</td><td>15 000</td><td>Nantissement</td><td>👁️</td></tr>
+    </table>
+    <div class="wire-row" style="margin-top:.4rem;">
+      <div class="wire-box" style="background:#007bff33; flex:0 0 140px;">[Dialog 80rem]</div>
+      <div class="wire-box" style="background:#007bff33; flex:0 0 140px;">[Dialog 80rem]</div>
+    </div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li>Les 2 dialogs imbriqués en <code>width:80rem</code> (≈1280px) sont <strong>plus larges que la zone disponible</strong> quand la sidebar (285px) est ouverte sur un écran 1366px (reste ~1080px). → passer à <code>width:'90vw', maxWidth:'1100px'</code>.</li>
+      <li>Couleur d'accent <code>#007bff</code> (bleu Bootstrap) ne correspond pas à la charte BNA (vert) → remplacer par <code>var(--primary-color)</code>.</li>
+      <li>Header <code>#f4f7fA</code> / lignes <code>#f4faf6</code> → utiliser <code>var(--surface-100)</code> / <code>var(--surface-50)</code> pour suivre le thème clair/sombre PrimeNG.</li>
+      <li>Effort: <strong>moyen</strong>.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ============ STEPPER : 4 étapes ============ -->
+<section id="credit">
+<h2>7. Étape ① — &lt;app-credit-sollicite [client] [mode]&gt; <span class="badge warn">Moyen</span> <span class="badge info">fond bleu clair</span></h2>
+<div class="compcard">
+  <div class="wire" style="background:rgba(66,165,245,.08);">
+    <div class="wire-row"><div class="wire-box label">Objet:</div><div class="wire-box" style="flex:3"></div></div>
+    <div class="wire-row">
+      <div class="wire-box label">Montant:</div><div class="wire-box"></div>
+      <div class="wire-box label">Date:</div><div class="wire-box" style="flex:0 0 380px; background:#fde68a;">p-calendar (380px !important)</div>
+    </div>
+    <div class="wire-row"><div class="wire-box label">Description:</div><div class="wire-box tall" style="flex:3"></div></div>
+    <div class="wire-row"><div class="wire-box" style="flex:0 0 160px;">📎 Joindre fichier</div><div class="wire-box" style="flex:0 0 160px; background:#bfdbfe;">[Preview 80vw]</div></div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li><code>.date-column .p-calendar { width: 380px !important }</code> est <strong>trop large</strong> sur un écran avec sidebar — passer à <code>width: 100%; max-width: 16rem</code> dans une grille <code>p-fluid</code>.</li>
+      <li>Adopter une grille <code>grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))</code> pour que les champs s'adaptent automatiquement à la largeur restante (avec/sans sidebar).</li>
+      <li>Le <code>p-dialog</code> de prévisualisation (<code>width:80vw</code>) → limiter à <code>maxWidth:900px</code> pour éviter un zoom excessif sur grand écran.</li>
+      <li><code>textarea cols="30"</code> → remplacer par <code>style="width:100%"</code> + classe CSS.</li>
+      <li>Effort: <strong>moyen</strong> (surtout grille de formulaire).</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="garanties-prop">
+<h2>8. Étape ② — &lt;app-garanties-proposees&gt; <span class="badge ok">Faible</span> <span class="badge info">fond violet clair</span></h2>
+<div class="compcard">
+  <div class="wire" style="background:rgba(179,15,204,.08);">
+    <div class="wire-row"><div class="wire-box" style="flex:0 0 180px;">☑️ Sélection multiple</div><div class="wire-box" style="flex:0 0 160px;">🔍 Filtre colonne</div></div>
+    <table class="wire-table">
+      <tr><th>☑</th><th>Type bien</th><th>Valeur estimée</th><th>Statut</th></tr>
+      <tr><td>☑</td><td>Terrain</td><td>50 000</td><td>Proposé</td></tr>
+      <tr><td>☐</td><td>Véhicule</td><td>30 000</td><td>Validé</td></tr>
+    </table>
+    <div class="wire-row"><div class="wire-box" style="flex:0 0 160px;">📤 Upload (icône seule)</div></div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li><code>max-height:70vh</code> sur la table → remplacer par <code>[scrollHeight]="'flex'"</code> de <code>p-table</code> avec un conteneur <code>flex:1</code>, plus robuste sur petits écrans.</li>
+      <li><code>[appendTo]="'body'"</code> sur le multiselect de filtre est correct (évite les problèmes d'<code>overflow:hidden</code> du dialog/stepper) — <strong>à conserver</strong>.</li>
+      <li><code>.p-fileupload-choose .p-button-label { display:none }</code> masque le texte du bouton upload → ajouter un <code>pTooltip="Importer un document"</code> pour l'accessibilité.</li>
+      <li>Effort: <strong>faible</strong>.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="exploitation">
+<h2>9. Étape ③ — &lt;app-exploitation [tabIndex]&gt; <span class="badge ok">Bon état</span> <span class="badge info">fond orange clair</span></h2>
+<div class="compcard">
+  <div class="wire" style="background:rgba(255,167,38,.08);">
+    <div class="wire-tabs"><span class="active">Avant Projet</span><span>Projet</span></div>
+    <div class="wire-row">
+      <span class="wire-pill" style="background:#fbbf2433;">Barème ●</span>
+      <span class="wire-pill" style="background:#86efac55;">CA Réalisé ●</span>
+      <span class="wire-pill" style="background:#bbf7d055;">CA Prévisionnel ●</span>
+      <span class="wire-pill" style="background:#dbeafe;">3 Mois ●</span>
+    </div>
+    <div class="wire-row">
+      <div class="wire-box">Site/Projet</div><div class="wire-box">Matériel</div><div class="wire-box">Stock</div>
+    </div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li>Déjà <strong>la meilleure pratique CSS du module</strong> : variables <code>--color-bareme</code>, <code>--color-ca-realise</code>, etc. → <strong>à dupliquer comme modèle</strong> pour <code>app-engagements</code> et <code>app-analyse-financier</code>.</li>
+      <li>Petits restes : <code>style="margin-right:5rem"</code> et <code>style="height:1rem"</code> inline → déplacer en classes <code>.spacer-lg</code> / <code>.divider-thin</code>.</li>
+      <li>Le <code>[tabIndex]</code> reçu en <code>@Input</code> piloté par le signal <code>activeTabCanva</code> du parent est un <strong>bon exemple de synchronisation stepper ↔ sous-tabs</strong> à documenter pour les autres composants.</li>
+      <li>Effort: <strong>très faible</strong> (2 styles inline à nettoyer).</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="avis">
+<h2>10. Étape ④ — &lt;app-avis [tabIndex]&gt; <span class="badge ok">Faible</span> <span class="badge info">fond rouge clair</span></h2>
+<div class="compcard">
+  <div class="wire" style="background:rgba(226,14,14,.08);">
+    <div class="wire-row">
+      <div class="wire-box" style="background:#22c55e33;">Avis Favorable</div>
+      <div class="wire-box" style="background:#fbbf2433;">Avis Réservé</div>
+      <div class="wire-box" style="background:#ef444433;">Avis Défavorable</div>
+    </div>
+    <div class="wire-row"><div class="wire-box label">Motif:</div><div class="wire-box tall" style="flex:3"></div></div>
+    <div class="wire-row"><div class="wire-box" style="flex:0 0 160px;">○ Crédit invest.</div><div class="wire-box" style="flex:0 0 160px;">○ Achat terrain</div></div>
+  </div>
+  <div class="improve">
+    <h4>Estimation d'amélioration</h4>
+    <ul>
+      <li><code>getSeverityForStade()</code> colore déjà les boutons dynamiquement (<code>success/warn/danger</code>) → <strong>bon pattern</strong>, conserver.</li>
+      <li><code>textarea cols="150" rows="5"</code> → remplacer <code>cols</code> par <code>style="width:100%"</code> pour que le motif s'adapte à la largeur de l'étape (qui change selon sidebar ouverte/fermée).</li>
+      <li>C'est la <strong>dernière étape</strong> (pas de bouton "Next") — vérifier que le bouton final "Enregistrer" (via <code>confirmEnregistree()</code> du parent) est bien visible et non caché sous le footer sticky.</li>
+      <li>Effort: <strong>très faible</strong>.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ============ SYNTHESE ============ -->
+<section id="synthese">
+<h2>Synthèse — effort estimé par composant</h2>
+<table class="summary">
+<tr><th>Composant</th><th>État visuel actuel</th><th>Effort estimé</th><th>Action principale</th></tr>
+<tr><td>app-agent-canevas</td><td><span class="badge ok">Bon</span></td><td>Faible (~0.5j)</td><td>Style "chip" aligné topbar</td></tr>
+<tr><td>app-fiche-signalitique-2</td><td><span class="badge warn">Moyen</span></td><td>Moyen (~1j)</td><td>Dialog responsive + couleurs inline</td></tr>
+<tr><td>app-engagements</td><td><span class="badge bad">À revoir</span></td><td>Élevé (~2-3j)</td><td>Refonte ::ng-deep + statuts colorés en variables</td></tr>
+<tr><td>app-analyse-financier</td><td><span class="badge warn">Moyen</span></td><td>Moyen (~1-1.5j)</td><td>Palette de verts → variables + signals</td></tr>
+<tr><td>app-condition-banque</td><td><span class="badge ok">Bon</span></td><td>Faible (~0.5j)</td><td>Skeleton loading + classes communes</td></tr>
+<tr><td>app-garanties</td><td><span class="badge warn">Moyen</span></td><td>Moyen (~1j)</td><td>Dialogs responsives + couleur d'accent</td></tr>
+<tr><td>app-credit-sollicite</td><td><span class="badge warn">Moyen</span></td><td>Moyen (~1-1.5j)</td><td>Grille de formulaire responsive</td></tr>
+<tr><td>app-garanties-proposees</td><td><span class="badge ok">Bon</span></td><td>Faible (~0.5j)</td><td>scrollHeight flex + tooltip upload</td></tr>
+<tr><td>app-exploitation</td><td><span class="badge ok">Très bon</span></td><td>Très faible (~0.25j)</td><td>Nettoyer 2 styles inline (modèle à copier)</td></tr>
+<tr><td>app-avis</td><td><span class="badge ok">Bon</span></td><td>Très faible (~0.25j)</td><td>Textarea responsive</td></tr>
+</table>
+<p style="margin-top:1rem;"><strong>Total estimé : ~9-11 jours/homme</strong> pour aligner l'ensemble du module sur la charte BNA et garantir la compatibilité topbar/sidebar à toutes les résolutions (≥1366px avec sidebar ouverte).</p>
+</section>
+
+</main>
+<footer>Maquette générée à titre indicatif — wireframes non liés au rendu PrimeNG réel, à valider en environnement de test.</footer>
+</body>
+</html>

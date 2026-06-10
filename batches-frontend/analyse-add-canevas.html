@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse — add-canevas &amp; module Canevas Agricole</title>
+<style>
+  :root{
+    --primary:#2dac4f;
+    --primary-dark:#1a2637;
+    --bg:#f5fbf8;
+    --card:#ffffff;
+    --border:#e2e8f0;
+    --warn:#E9A91F;
+    --danger:#F93A02;
+    --code-bg:#0f172a;
+    --code-fg:#e2e8f0;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    margin:0; background:var(--bg); color:#1e293b; line-height:1.6;
+  }
+  header{
+    background:var(--primary-dark); color:#fff; padding:2rem 1.5rem;
+    position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,.25);
+  }
+  header h1{margin:0; font-size:1.6rem; color:#4ade80;}
+  header p{margin:.4rem 0 0; color:#cbd5e1; font-size:.95rem;}
+  .layout{display:flex; max-width:1400px; margin:0 auto;}
+  nav{
+    width:280px; flex-shrink:0; padding:1.5rem 1rem; position:sticky; top:90px;
+    align-self:flex-start; max-height:calc(100vh - 110px); overflow:auto;
+  }
+  nav a{display:block; padding:.35rem .6rem; border-radius:6px; color:#1e293b; text-decoration:none; font-size:.9rem;}
+  nav a:hover{background:#e0f2e9;}
+  nav .sub{padding-left:1.4rem; font-size:.82rem; color:#475569;}
+  main{flex:1; padding:1.5rem 2rem 4rem;}
+  section{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:1.5rem 1.8rem; margin-bottom:1.8rem; box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  h2{color:var(--primary-dark); border-bottom:3px solid var(--primary); display:inline-block; padding-bottom:.2rem; margin-top:0;}
+  h3{color:var(--primary-dark); margin-top:1.6rem;}
+  h4{margin-bottom:.3rem;}
+  code{
+    background:#eef2f7; padding:.15rem .35rem; border-radius:4px; font-size:.88em;
+    font-family: Consolas, "Courier New", monospace;
+  }
+  pre{
+    background:var(--code-bg); color:var(--code-fg); padding:1rem 1.2rem; border-radius:8px;
+    overflow:auto; font-size:.85rem; line-height:1.5;
+  }
+  pre code{background:none; padding:0; color:inherit;}
+  table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:.9rem;}
+  th,td{border:1px solid var(--border); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+  th{background:#f1f5f9;}
+  tr:nth-child(even) td{background:#fafcfe;}
+  .tag{display:inline-block; padding:.15rem .55rem; border-radius:99px; font-size:.75rem; font-weight:600; color:#fff;}
+  .tag.ok{background:#22c55e;}
+  .tag.warn{background:var(--warn);}
+  .tag.bad{background:var(--danger);}
+  .tag.info{background:#3b82f6;}
+  .astuce{
+    border-left:4px solid var(--primary); background:#f0fdf4; padding:.8rem 1rem; margin:1rem 0; border-radius:0 8px 8px 0;
+  }
+  .probleme{
+    border-left:4px solid var(--danger); background:#fef2f2; padding:.8rem 1rem; margin:1rem 0; border-radius:0 8px 8px 0;
+  }
+  .solution{
+    border-left:4px solid #3b82f6; background:#eff6ff; padding:.8rem 1rem; margin:1rem 0; border-radius:0 8px 8px 0;
+  }
+  .tree{font-family:Consolas,monospace; font-size:.85rem; background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:1rem; white-space:pre;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:1rem;}
+  @media (max-width:1000px){
+    .layout{flex-direction:column;} nav{position:static; width:auto; max-height:none;} .grid2{grid-template-columns:1fr;}
+  }
+  footer{text-align:center; color:#94a3b8; font-size:.8rem; padding:2rem 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Analyse complète — Module "Canevas Agricole"</h1>
+  <p>Point d'entrée : <code>add-canevas.component</code> · Objectif : pédagogie débutant + compatibilité Topbar / Sidebar</p>
+</header>
+
+<div class="layout">
+<nav>
+  <a href="#vue-ensemble">1. Vue d'ensemble</a>
+  <a href="#layout-existant">2. Layout existant (topbar/sidebar)</a>
+  <a href="#add-canevas">3. add-canevas.component en détail</a>
+  <div class="sub">
+    <a href="#ts">3.1 TypeScript</a>
+    <a href="#html">3.2 Template HTML</a>
+    <a href="#css">3.3 CSS</a>
+  </div>
+  <a href="#astuces">4. Astuces pour débutant</a>
+  <a href="#composants-enfants">5. Composants enfants</a>
+  <a href="#compatibilite">6. Compatibilité Topbar/Sidebar</a>
+  <a href="#recommandations">7. Recommandations &amp; correctifs</a>
+  <a href="#checklist">8. Checklist d'action</a>
+</nav>
+
+<main>
+
+<section id="vue-ensemble">
+<h2>1. Vue d'ensemble de l'arborescence</h2>
+<p><code>AddCanevasComponent</code> est l'écran principal du dossier "Canevas Agricole". Il combine :</p>
+<ul>
+  <li>Une barre de navigation <code>p-menubar</code> qui ouvre des <strong>p-dialog</strong> (fiches annexes)</li>
+  <li>Un <code>p-stepper</code> (assistant en 4 étapes) qui charge le contenu principal du dossier</li>
+</ul>
+
+<div class="tree">add-canevas.component (racine)
+│
+├── &lt;app-agent-canevas&gt;            → bandeau "agent en charge" (toujours visible)
+│
+├── &lt;p-dialog&gt; (ouvert via p-menubar)
+│    ├── &lt;app-fiche-signalitique-2&gt;  ─ si selectedLabel === 'FICHE SIGNALITIQUE'
+│    ├── &lt;app-engagements&gt;           ─ si selectedLabel === 'ENGAGEMENT'
+│    ├── &lt;app-analyse-financier&gt;     ─ si selectedLabel === 'Analyse Financiers'
+│    ├── &lt;app-condition-banque&gt;      ─ si selectedLabel === 'Conditions Banques'
+│    └── &lt;app-garanties&gt;             ─ si selectedLabel === 'GARANTIES'
+│
+└── &lt;p-stepper&gt; (4 panels horizontaux)
+     ├── Étape 0 : &lt;app-credit-sollicite [client] [mode]&gt;
+     ├── Étape 1 : &lt;app-garanties-proposees&gt;
+     ├── Étape 2 : &lt;app-exploitation [tabIndex]&gt;
+     └── Étape 3 : &lt;app-avis [tabIndex]&gt;</div>
+
+<p>Tous les composants reposent sur des <strong>services partagés à base de signals</strong> (<code>CanevasAgrService</code>, <code>EngagementService</code>, <code>GarantieService</code>, <code>BilanService</code>, <code>AnalyseFinanciereService</code>, <code>CreditSolliciteService</code>, <code>UserService</code>) — c'est le mécanisme central de communication entre composants frères, à la place de @Input/@Output classiques.</p>
+</section>
+
+<section id="layout-existant">
+<h2>2. Le layout global existant (Topbar + Sidebar)</h2>
+<p>Avant de modifier <code>add-canevas</code>, il faut connaître les dimensions imposées par <code>app.layout.component</code> :</p>
+
+<table>
+<tr><th>Élément</th><th>Fichier</th><th>Règle clé</th><th>Valeur</th></tr>
+<tr><td><code>.layout-topbar</code></td><td><code>_topbar.scss</code></td><td><code>position: fixed; height; z-index</code></td><td><code>top:0</code>, <strong>4rem (64px)</strong>, <code>z-index:997</code></td></tr>
+<tr><td><code>.layout-sidebar</code></td><td><code>_menu.scss</code></td><td><code>width</code></td><td><strong>285px</strong></td></tr>
+<tr><td><code>.layout-main-container</code></td><td><code>_main.scss</code></td><td><code>padding-top</code> + <code>margin-left</code> (mode static)</td><td><strong>4.5rem</strong> (72px) en haut, <strong>300px</strong> à gauche</td></tr>
+<tr><td><code>.layout-main</code></td><td><code>_main.scss</code></td><td>contenu, <code>flex:1 1 auto</code></td><td>occupe le reste</td></tr>
+</table>
+
+<div class="astuce">
+<strong>À retenir :</strong> le contenu de <code>add-canevas</code> est injecté dans <code>&lt;router-outlet&gt;</code> qui est <strong>déjà</strong> décalé de la topbar (72px en haut) et de la sidebar (300px à gauche, en mode statique desktop). <br>
+👉 <strong>Tout positionnement <code>fixed</code> ou <code>sticky</code> à l'intérieur d'<code>add-canevas</code> doit donc tenir compte de ce décalage déjà appliqué</strong>, sinon on obtient des doublons d'espace ou des chevauchements.
+</div>
+</section>
+
+<section id="add-canevas">
+<h2>3. add-canevas.component — analyse détaillée</h2>
+
+<h3 id="ts">3.1 — TypeScript (<code>add-canevas.component.ts</code>)</h3>
+
+<table>
+<tr><th>Élément</th><th>Ligne</th><th>Rôle</th><th>Remarque</th></tr>
+<tr><td><code>menuTopPosition = 0</code></td><td>21</td><td>Censé suivre le scroll pour repositionner le menu flottant</td><td><span class="tag bad">Code mort</span> jamais mis à jour, <code>HostListener</code> importé mais non utilisé</td></tr>
+<tr><td><code>stepContentColors[]</code></td><td>22-27</td><td>Couleur de fond par étape du stepper</td><td><span class="tag ok">Bonne idée</span> mais couleurs codées en dur (pas de variables CSS)</td></tr>
+<tr><td><code>showDialog(label)</code></td><td>32-48</td><td>Ouvre la <code>p-dialog</code> et déclenche le chargement de données du sous-composant correspondant</td><td><span class="tag info">Pattern</span> "1 dialog réutilisée pour 5 contenus différents"</td></tr>
+<tr><td><code>effect(() =&gt; ...)</code></td><td>89-91</td><td>Synchronise <code>tabIndex</code> avec <code>canevasService.activeTabCanva()</code></td><td><span class="tag ok">Signals Angular 17+</span></td></tr>
+<tr><td><code>onStepChange(newIndex)</code></td><td>143-164</td><td>À chaque changement d'étape, prépare les données du composant suivant via les services</td><td><span class="tag info">Pattern</span> "préchargement à la navigation"</td></tr>
+<tr><td><code>confirmEnregistree()</code></td><td>165-182</td><td>Boîte de confirmation avant sauvegarde</td><td><span class="tag ok">ConfirmationService + MessageService (Toast)</span></td></tr>
+</table>
+
+<h3 id="html">3.2 — Template HTML (<code>add-canevas.component.html</code>)</h3>
+<table>
+<tr><th>Bloc</th><th>Lignes</th><th>Description</th></tr>
+<tr><td><code>.scrollbar-tracking-menu &gt; p-menubar</code></td><td>2-21</td><td>Barre de menu <strong>en position fixed</strong>, avec <code>ng-template pTemplate="start"</code> (logo/tags client) et <code>ng-template pTemplate="item"</code> (chaque item devient un <code>p-button</code> cliquable)</td></tr>
+<tr><td><code>&lt;app-agent-canevas&gt;</code></td><td>22-24</td><td>Bandeau d'information toujours affiché</td></tr>
+<tr><td><code>&lt;p-toast key="ct"&gt;</code></td><td>25</td><td>Notifications globales (succès/erreur)</td></tr>
+<tr><td><code>&lt;p-dialog&gt;</code> + 5x <code>*ngIf</code></td><td>28-43</td><td>Une seule fenêtre modale, contenu conditionnel selon <code>selectedLabel</code></td></tr>
+<tr><td><code>&lt;p-stepper&gt;</code></td><td>45-123</td><td>4 <code>p-stepperPanel</code>, chacun avec <code>fieldset [disabled]</code> + <code>div.step-content-wrapper</code> coloré + boutons Back/Next</td></tr>
+</table>
+
+<h3 id="css">3.3 — CSS (<code>add-canevas.component.css</code>)</h3>
+<div class="probleme">
+<strong>Problèmes principaux :</strong>
+<ul>
+<li><code>.scrollbar-tracking-menu { position: fixed; right:20px; }</code> + binding <code>[style.top.px]="menuTopPosition + 70"</code> → comme <code>menuTopPosition</code> ne change jamais, le menu reste figé à <strong>70px du haut du viewport</strong>, sans lien avec la topbar (64px) ni avec le défilement.</li>
+<li><code>:host ::ng-deep .p-stepper-nav { position: sticky; top: 130px; }</code> → valeur magique <strong>130px</strong> qui ne correspond à aucune variable du layout (topbar 64px + marge interne ?). Si la topbar change de hauteur (ex: passage en mode responsive où elle devient <code>auto</code>), ce <code>top</code> devient faux.</li>
+<li><code>#status-header { position: sticky; top: 120px; }</code> → règle définie mais <strong>l'id <code>status-header</code> n'existe nulle part dans le HTML</strong> (commentaire ligne 1 du HTML montre qu'il a été retiré) → CSS mort.</li>
+<li>Couleurs codées en dur : <code>#4caf50</code>, <code>#42A5F5</code>, <code>#b30fccff</code>, <code>#FFA726</code>, <code>#e20e0eff</code> au lieu de variables PrimeNG (<code>var(--primary-color)</code>, <code>var(--green-500)</code>, etc.)</li>
+<li>Usage massif de <code>::ng-deep</code> (12 occurrences) pour personnaliser <code>p-menubar</code> et <code>p-stepper</code> → casse l'encapsulation des styles, risque de collision avec d'autres pages utilisant les mêmes composants PrimeNG.</li>
+</ul>
+</div>
+</section>
+
+<section id="astuces">
+<h2>4. Astuces &amp; bonnes pratiques pour un développeur débutant</h2>
+<p>Cette section explique les <strong>patterns réutilisables</strong> déjà présents dans le code, pour qu'un débutant comprenne le "pourquoi" avant de les copier ailleurs.</p>
+
+<h3>4.1 — Une seule <code>p-dialog</code> pour plusieurs contenus (pattern "dialog factorisée")</h3>
+<div class="astuce">
+Plutôt que de créer 5 fenêtres modales différentes, on garde <strong>une seule <code>&lt;p-dialog&gt;</code></strong> et on affiche le bon composant à l'intérieur avec <code>*ngIf="selectedLabel === '...'"</code>. La variable <code>header</code> change le titre dynamiquement.
+</div>
+<pre><code>&lt;p-dialog [(visible)]="visible" header="{{header}}"&gt;
+  &lt;app-engagements *ngIf="selectedLabel === 'ENGAGEMENT'"&gt;&lt;/app-engagements&gt;
+  &lt;app-garanties *ngIf="selectedLabel === 'GARANTIES'"&gt;&lt;/app-garanties&gt;
+&lt;/p-dialog&gt;</code></pre>
+<p><strong>Avantage :</strong> un seul état <code>visible</code> à gérer. <strong>Limite :</strong> Angular détruit/recrée le composant à chaque changement de <code>selectedLabel</code> — donc tout état non sauvegardé dans un service est perdu. C'est pour ça que <code>showDialog()</code> appelle systématiquement un service (<code>setNumSeqPers</code>, etc.) pour que le composant recharge ses données à sa création.</p>
+
+<h3>4.2 — <code>ng-template pTemplate="item"</code> : personnaliser le rendu d'un menu PrimeNG</h3>
+<div class="astuce">
+PrimeNG fournit un rendu par défaut pour <code>p-menubar</code>, mais on peut le remplacer entièrement avec un template nommé. Ici chaque entrée du menu devient un vrai <code>p-button</code> cliquable.
+</div>
+<pre><code>&lt;ng-template pTemplate="item" let-item&gt;
+  &lt;p-button (onClick)="showDialog(item.label)" [icon]="item.icon"&gt;
+    {{item.label}}
+  &lt;/p-button&gt;
+&lt;/ng-template&gt;</code></pre>
+
+<h3>4.3 — <code>p-stepper</code> : callbacks <code>prevCallback</code> / <code>nextCallback</code> + <code>index</code></h3>
+<div class="astuce">
+Chaque <code>ng-template pTemplate="content"</code> d'un <code>p-stepperPanel</code> reçoit automatiquement 3 variables fournies par PrimeNG : <code>prevCallback</code>, <code>nextCallback</code> (fonctions à appeler pour naviguer) et <code>index</code> (numéro de l'étape, utile pour <code>stepContentColors[index]</code>).
+</div>
+<pre><code>&lt;ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index"&gt;
+  &lt;div [ngStyle]="{'background-color': stepContentColors[index]}"&gt;
+    &lt;app-credit-sollicite [client]="client" [mode]="mode"&gt;&lt;/app-credit-sollicite&gt;
+  &lt;/div&gt;
+  &lt;p-button label="Next" (onClick)="nextCallback.emit()" /&gt;
+&lt;/ng-template&gt;</code></pre>
+<p>L'événement <code>(activeStepChange)="onStepChange($event)"</code> sur <code>&lt;p-stepper&gt;</code> permet d'exécuter du code <strong>au moment du changement d'étape</strong> (ici : précharger les données de l'étape suivante via les services).</p>
+
+<h3>4.4 — Signals &amp; <code>effect()</code> : communication entre composants sans @Input/@Output</h3>
+<div class="astuce">
+Au lieu de faire remonter/redescendre des données via <code>@Input</code>/<code>@Output</code> sur plusieurs niveaux, un <strong>service injecté en <code>providedIn:'root'</code></strong> expose des <code>signal()</code>. N'importe quel composant peut lire ou écrire cette valeur, et <code>effect()</code> réagit automatiquement aux changements.
+</div>
+<pre><code>// Dans le service
+activeTabCanva = signal(0);
+updateActiveTab(tab: number, ...) { this.activeTabCanva.set(tab); }
+
+// Dans le composant
+constructor(public canevasService: CanevasAgrService) {
+  effect(() =&gt; {
+    this.tabIndex = this.canevasService.activeTabCanva(); // se relance à chaque .set()
+  });
+}</code></pre>
+<p><strong>Astuce débutant :</strong> <code>effect()</code> doit être appelé dans un <strong>contexte d'injection</strong> (constructeur, ou via <code>injector</code>), jamais dans une méthode comme <code>ngOnInit</code> sans précaution.</p>
+
+<h3>4.5 — <code>fieldset [disabled]="!permission()"</code> : verrouiller un formulaire selon le rôle utilisateur</h3>
+<div class="astuce">
+<code>userService.boolDisplayRubrique()</code> est un signal booléen basé sur les droits de l'utilisateur connecté. En l'attachant à l'attribut natif <code>disabled</code> d'un <code>&lt;fieldset&gt;</code>, <strong>tous les champs et boutons à l'intérieur</strong> deviennent automatiquement non-éditables — pas besoin de désactiver chaque champ un par un.
+</div>
+<pre><code>&lt;fieldset [disabled]="!userService.boolDisplayRubrique()"&gt;
+  &lt;app-credit-sollicite ... &gt;&lt;/app-credit-sollicite&gt;
+&lt;/fieldset&gt;</code></pre>
+
+<h3>4.6 — <code>ConfirmationService</code> + <code>MessageService</code> (Toast) : confirmation avant action destructive</h3>
+<pre><code>this.confirmationService.confirm({
+  message: 'Voulez vous sauvegarder les modifications effectuées',
+  header: 'Confirmation',
+  accept: () =&gt; { this.saveCanevas(); this.messagingService.add({severity:'info', summary:'Confirmed', detail:'Enregistrer avec succée'}); },
+  reject: () =&gt; { this.messagingService.add({severity:'error', summary:'Annuler', detail:'Sauvegarde Annulé'}); }
+});</code></pre>
+<p>Le <code>&lt;p-toast key="ct"&gt;</code> dans le template doit avoir la <strong>même <code>key</code></strong> que celle utilisée dans <code>messagingService.add({key:'ct', ...})</code> si on veut cibler un toast précis (ici la <code>key</code> n'est pas passée dans <code>add()</code>, donc le toast par défaut sera utilisé — à harmoniser).</p>
+
+<h3>4.7 — Pièges relevés (à corriger / éviter de reproduire)</h3>
+<table>
+<tr><th>Piège</th><th>Où</th><th>Pourquoi c'est un problème</th></tr>
+<tr><td>Import <code>HostListener</code> + variable jamais utilisée</td><td><code>add-canevas.component.ts:1,21</code></td><td>Code mort, donne une fausse impression de "scroll tracking" actif</td></tr>
+<tr><td>Sélecteur CSS <code>#status-header</code> sans élément correspondant</td><td><code>add-canevas.component.css:2-8</code></td><td>CSS mort, alourdit le bundle et induit en erreur lors de la maintenance</td></tr>
+<tr><td>Valeurs <code>top: 120px</code> / <code>top: 130px</code> codées en dur</td><td><code>add-canevas.component.css</code></td><td>Ne suit pas la hauteur réelle de la topbar (4rem) → décalages si le thème change</td></tr>
+<tr><td>Appels HTTP directs vers <code>localhost:8081</code> dans des composants</td><td><code>fiche-signalitique-2.component.ts</code></td><td>URL d'environnement codée en dur ; devrait passer par <code>environment.ts</code> + un service HTTP</td></tr>
+<tr><td>Couleurs hexadécimales dispersées (<code>#0DD464</code>, <code>#2dac4f</code>, <code>#007bff</code>...)</td><td><code>engagements.css</code>, <code>analyse-financier.css</code>, <code>garanties.css</code></td><td>Incohérence visuelle, difficile à thémer/maintenir</td></tr>
+</table>
+</section>
+
+<section id="composants-enfants">
+<h2>5. Composants enfants — synthèse</h2>
+<table>
+<tr><th>Composant</th><th>Type de contenu</th><th>Pattern Angular notable</th><th>Points d'attention CSS</th></tr>
+<tr><td><code>app-agent-canevas</code></td><td>Panel d'info (lecture seule)</td><td>Signal injecté directement <code>chargeCanevas = userService.user()</code></td><td><span class="tag ok">RAS</span> — CSS vide, aucun souci</td></tr>
+<tr><td><code>app-fiche-signalitique-2</code></td><td>2x <code>p-panel</code> (Pers. Physique/Morale) + tables imbriquées + dialog d'édition</td><td>Computed signals, <code>mapToPremierResponsable()</code></td><td>Couleurs inline <code>[style]="{'color':'red'}"</code>, dialog sans largeur responsive</td></tr>
+<tr><td><code>app-engagements</code></td><td><code>p-tabView</code> (5 onglets) + <code>p-fieldset</code> + tables conditionnelles</td><td><code>computed()</code> pour <code>totals()</code> et <code>filteredVendeurs()</code></td><td><span class="tag bad">::ng-deep</span> massif (22-48), couleurs <code>#0DD464/#E9A91F/#F93A02</code> en dur</td></tr>
+<tr><td><code>app-analyse-financier</code></td><td><code>p-panel</code> + <code>p-tabView</code> (Bilan/Résultat/Trésorerie/Ratio)</td><td>Encore en <code>@Output</code> (pas de signal)</td><td><span class="tag bad">::ng-deep</span> sur <code>p-datatable</code>, verts codés en dur</td></tr>
+<tr><td><code>app-condition-banque</code></td><td><code>p-tabView</code> (3 onglets) + <code>p-table</code> filtrables</td><td><code>@ViewChild('filter')</code> classique</td><td><code>min-height:200px</code> inline, <code>min-width:12rem</code> sur colonnes</td></tr>
+<tr><td><code>app-garanties</code></td><td><code>p-fieldset</code> + table + 2 dialogs (80rem)</td><td>WritableSignal + computed</td><td><span class="tag bad">::ng-deep</span> sur <code>p-datatable-thead/tbody</code>, dialog <code>width:80rem</code> fixe</td></tr>
+<tr><td><code>app-garanties-proposees</code></td><td><code>p-fieldset</code> + table sélectionnable + filtres colonne</td><td><code>onRowSelect</code>/<code>onRowUnselect</code></td><td><code>[appendTo]="'body'"</code> sur multiselect, <code>max-height:70vh</code> en dur</td></tr>
+<tr><td><code>app-credit-sollicite</code></td><td><code>FormGroup</code> réactif + <code>p-fileUpload</code> + dialog preview</td><td>Preview par type MIME (PDF/image/Excel)</td><td><code>.p-calendar { width: 380px !important }</code>, dialog <code>width:80vw</code></td></tr>
+<tr><td><code>app-exploitation</code></td><td><code>p-tabView</code> (Avant-projet/Projet) + sous-composants (site, matériel, stock...)</td><td><span class="tag ok">Bon usage</span> de variables CSS <code>--color-bareme</code>, <code>--bg-*</code></td><td><code>margin-right:5rem</code> inline, sinon propre</td></tr>
+<tr><td><code>app-avis</code></td><td><code>FormGroup</code> + sous-composants par type d'avis</td><td><code>getSeverityForStade()</code> pour colorer dynamiquement</td><td><code>cols="150"</code> sur textarea (devrait être en CSS)</td></tr>
+</table>
+</section>
+
+<section id="compatibilite">
+<h2>6. Compatibilité avec la Topbar et la Sidebar existantes</h2>
+
+<h3>6.1 — Le constat</h3>
+<div class="probleme">
+<ul>
+<li>Le menu flottant <code>.scrollbar-tracking-menu</code> est en <code>position: fixed; right: 20px</code> — il ignore donc complètement la sidebar (285px) et reste ancré à droite du <em>viewport</em>. Sur petit écran (sidebar repliée en mode mobile), il peut chevaucher le contenu.</li>
+<li>Les <code>top: 120px / 130px</code> ne correspondent à <strong>aucune variable</strong> du layout global (topbar = <code>4rem</code>, padding du container = <code>4.5rem</code>). Ce sont des valeurs "qui marchent par hasard" sur l'écran de test actuel.</li>
+<li><code>:host ::ng-deep .p-stepper-nav { position: sticky; top: 130px; }</code> entre potentiellement en conflit avec le menu fixed du dessus (lui-même à <code>top: 70px</code>) : zone de chevauchement possible entre 70px et 130px+hauteur du menubar.</li>
+<li>Le <code>p-panel</code> englobant (<code>CANEVAS AGRICOLE</code>) a <code>[style]="{'color':'red'}"</code> codé en dur — incohérent avec la charte (vert <code>#4ade80</code> de la topbar).</li>
+</ul>
+</div>
+
+<h3>6.2 — Le principe de correction</h3>
+<div class="solution">
+Le <code>.layout-main-container</code> applique déjà <code>padding-top: 4.5rem</code> (espace topbar) et <code>margin-left: 300px</code> (espace sidebar) sur desktop. <strong>Le contenu de <code>add-canevas</code> est donc déjà "dans" la zone libre.</strong>
+<br><br>
+→ Il ne faut <strong>plus utiliser <code>position: fixed</code></strong> pour le menu, mais <code>position: sticky</code> <strong>relatif à son propre conteneur</strong> (qui est déjà décalé correctement). Avec <code>sticky</code>, l'élément reste dans le flux normal (respecte la sidebar) mais se "colle" en haut de la zone visible lors du scroll.
+</div>
+
+<h3>6.3 — Variables CSS proposées (à ajouter dans <code>_variables.scss</code> ou un fichier global)</h3>
+<pre><code>:root {
+  --app-topbar-height: 4rem;     /* = 64px, doit matcher .layout-topbar */
+  --app-sidebar-width: 285px;    /* = .layout-sidebar */
+  --app-sticky-gap: 0.5rem;      /* petit espace de respiration */
+}</code></pre>
+
+<h3>6.4 — CSS corrigé pour <code>add-canevas.component.css</code></h3>
+<pre><code>/* AVANT (problématique) */
+.scrollbar-tracking-menu {
+  position: fixed;
+  right: 20px;
+  transition: all 0.3s ease;
+}
+:host ::ng-deep .p-stepper-nav {
+  position: sticky;
+  top: 130px; /* valeur magique */
+}
+
+/* APRÈS (compatible topbar/sidebar) */
+.scrollbar-tracking-menu {
+  position: sticky;
+  top: var(--app-topbar-height);   /* colle juste sous la topbar, dans le flux */
+  z-index: 999;
+  margin-left: auto;               /* aligne à droite dans son conteneur */
+  width: fit-content;
+}
+
+:host ::ng-deep .p-stepper-nav {
+  position: sticky;
+  /* sous le menubar : topbar + hauteur réelle du menubar (mesurée ~3.5rem) */
+  top: calc(var(--app-topbar-height) + 3.5rem);
+  z-index: 998;
+}
+
+/* Supprimer entièrement la règle #status-header (CSS mort, élément inexistant) */</code></pre>
+
+<h3>6.5 — Template : retirer le binding inutile</h3>
+<pre><code>&lt;!-- AVANT --&gt;
+&lt;div class="scrollbar-tracking-menu" [style.top.px]="menuTopPosition + 70"&gt;
+
+&lt;!-- APRÈS : le top est désormais géré entièrement en CSS via var(--app-topbar-height) --&gt;
+&lt;div class="scrollbar-tracking-menu"&gt;</code></pre>
+<p>Et dans <code>add-canevas.component.ts</code>, supprimer <code>menuTopPosition</code>, l'import <code>HostListener</code> non utilisé.</p>
+</section>
+
+<section id="recommandations">
+<h2>7. Recommandations de design détaillées</h2>
+
+<div class="grid2">
+<div>
+<h4>🎨 Harmonisation des couleurs</h4>
+<p>Remplacer les couleurs codées en dur par les variables PrimeNG / charte BNA déjà définies (vert <code>#4ade80</code> de la topbar, <code>--primary-color</code> du thème PrimeNG) :</p>
+<pre><code>/* AVANT */
+background-color: #4caf50;
+color: green;
+
+/* APRÈS */
+background-color: var(--primary-color);
+color: var(--green-600);</code></pre>
+</div>
+
+<div>
+<h4>🧩 Réduire les <code>::ng-deep</code></h4>
+<p>Centraliser les overrides PrimeNG répétés (couleurs de <code>p-stepper</code>, <code>p-fieldset</code>, <code>p-datatable</code>) dans <strong>un seul fichier de thème global</strong> (<code>src/assets/layout/styles/theme/_canevas-overrides.scss</code>) importé une fois, plutôt que de dupliquer <code>::ng-deep</code> dans chaque composant.</p>
+</div>
+
+<div>
+<h4>📐 Largeurs responsives des dialogs</h4>
+<p>Remplacer les largeurs fixes (<code>80rem</code>, <code>380px</code>) par des valeurs relatives bornées :</p>
+<pre><code>[style]="{ width: '90vw', maxWidth: '1200px' }"
+[breakpoints]="{ '1199px': '95vw', '575px': '98vw' }"</code></pre>
+<p>Important quand la sidebar (285px) réduit l'espace disponible sur écrans &lt; 1366px.</p>
+</div>
+
+<div>
+<h4>🧹 Nettoyage du code mort</h4>
+<ul>
+  <li>Supprimer <code>menuTopPosition</code> + import <code>HostListener</code></li>
+  <li>Supprimer la règle <code>#status-header</code></li>
+  <li>Décommenter ou supprimer définitivement le tableau <code>value</code> commenté (lignes 53-56 du .ts)</li>
+</ul>
+</div>
+
+<div>
+<h4>🔌 Centraliser les appels HTTP</h4>
+<p>Déplacer les appels <code>http.get('http://localhost:8081/...')</code> trouvés dans <code>fiche-signalitique-2.component.ts</code> vers un service dédié, en utilisant <code>environment.apiUrl</code>.</p>
+</div>
+
+<div>
+<h4>🔁 Uniformiser Signals vs @Input/@Output</h4>
+<p><code>app-analyse-financier</code> utilise encore <code>@Output</code> alors que la majorité des autres composants utilisent des <code>signal()</code>/<code>computed()</code> partagés via service. À terme, migrer vers le pattern signal pour cohérence (plus simple à débugger, pas de souscriptions à gérer).</p>
+</div>
+</div>
+</section>
+
+<section id="checklist">
+<h2>8. Checklist d'action priorisée</h2>
+<table>
+<tr><th>#</th><th>Action</th><th>Fichier(s)</th><th>Priorité</th></tr>
+<tr><td>1</td><td>Définir les variables CSS <code>--app-topbar-height</code>, <code>--app-sidebar-width</code></td><td><code>_variables.scss</code></td><td><span class="tag bad">Haute</span></td></tr>
+<tr><td>2</td><td>Remplacer <code>position: fixed</code> du menu par <code>sticky</code> + variables</td><td><code>add-canevas.component.css/.html</code></td><td><span class="tag bad">Haute</span></td></tr>
+<tr><td>3</td><td>Corriger <code>top: 130px</code> du <code>p-stepper-nav</code> avec <code>calc()</code></td><td><code>add-canevas.component.css</code></td><td><span class="tag bad">Haute</span></td></tr>
+<tr><td>4</td><td>Supprimer CSS mort (<code>#status-header</code>) et code mort (<code>menuTopPosition</code>, <code>HostListener</code>)</td><td><code>add-canevas.component.ts/.css</code></td><td><span class="tag warn">Moyenne</span></td></tr>
+<tr><td>5</td><td>Remplacer couleurs en dur par variables de thème</td><td>tous les <code>.css</code> listés en section 5</td><td><span class="tag warn">Moyenne</span></td></tr>
+<tr><td>6</td><td>Rendre les dialogs (<code>80rem</code>, <code>80vw</code>) responsives avec <code>breakpoints</code></td><td><code>garanties</code>, <code>credit-sollicite</code></td><td><span class="tag warn">Moyenne</span></td></tr>
+<tr><td>7</td><td>Centraliser les <code>::ng-deep</code> dans un fichier de thème partagé</td><td>nouveau <code>_canevas-overrides.scss</code></td><td><span class="tag info">Basse</span></td></tr>
+<tr><td>8</td><td>Déplacer les appels HTTP vers des services + <code>environment.ts</code></td><td><code>fiche-signalitique-2.component.ts</code></td><td><span class="tag info">Basse</span></td></tr>
+</table>
+</section>
+
+</main>
+</div>
+
+<footer>Document généré pour l'analyse du module Canevas Agricole — usage interne / pédagogique.</footer>
+</body>
+</html>
